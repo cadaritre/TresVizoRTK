@@ -1,6 +1,8 @@
 # TresVizoRTK
 
-TresVizoRTK es un proyecto personal para desarrollar un prototipo funcional de receptor GNSS RTK orientado a trabajos de topografía. El repositorio reunirá el firmware de un ESP32-S3, una aplicación móvil, la documentación electrónica, la lista de materiales y los archivos mecánicos de una carcasa imprimible en 3D.
+TresVizoRTK es un proyecto personal para desarrollar un prototipo funcional de receptor GNSS RTK de triple banda con IMU y lector microSD, orientado a trabajos de topografía. El repositorio reunirá el firmware de un ESP32-S3, una aplicación móvil, la documentación electrónica, la lista de materiales y los archivos mecánicos de una carcasa imprimible en 3D. La cobertura de bandas del conjunto receptor y antena deberá verificarse con el hardware real.
+
+El objetivo es disponer de un software de instrumento robusto en el ESP32-S3, tomando la experiencia de equipos Emlid como referencia de producto. El firmware concentrará la configuración y operación del equipo; una app independiente, todavía sin iniciar, resolverá levantamientos, replanteos y trazo. Esta referencia no implica equivalencia de funciones o rendimiento validada.
 
 El objetivo de desarrollo es alcanzar aproximadamente 2 cm de precisión en condiciones favorables. Esa cifra no representa una capacidad implementada, medida ni garantizada. La operación bajo árboles es un interés de investigación del proyecto y tampoco implica una garantía de precisión bajo vegetación.
 
@@ -19,14 +21,17 @@ El prototipo busca llegar a:
 - Acceso a correcciones NTRIP.
 - Registro de observaciones GNSS para postproceso externo.
 - Integración GNSS/IMU y compensación de inclinación del jalón, todavía por desarrollar y validar.
-- Configuración, operación y visualización de estado desde una aplicación móvil.
+- Configuración y operación del instrumento gestionadas por el firmware del ESP32-S3.
+- Aplicación móvil independiente para levantamientos, replanteos y trazo, con acceso a configuración y estado mediante el protocolo del instrumento.
 - Registro de diagnósticos para análisis y mejora del sistema.
 
 ## Arquitectura resumida
 
 - **Receptor GNSS:** calcula la solución GNSS/RTK y produce observaciones y mensajes compatibles con su modelo y firmware.
 - **ESP32-S3:** controla el receptor, enruta RTCM, adquiere la IMU, gestiona tiempos, almacenamiento, comunicaciones y apagado seguro. La fusión GNSS/IMU es trabajo futuro.
-- **Aplicación móvil:** gestiona mapas, proyectos, captura, replanteo, configuración, intercambio de archivos y visualización del estado del instrumento.
+- **IMU BMI088:** aporta aceleración y velocidad angular para la futura integración GNSS/IMU y compensación de inclinación.
+- **Lector y tarjeta microSD:** proporcionan almacenamiento local de observaciones, datos IMU y diagnósticos bajo control del ESP32-S3.
+- **Aplicación móvil independiente:** gestiona mapas, proyectos, levantamientos, replanteos, trazo e intercambio de archivos; consulta el estado y solicita cambios de configuración al firmware.
 
 La aplicación se comunicará mediante un protocolo propio del instrumento, separado de los comandos específicos de Unicore o u-blox. BLE se prevé como enlace principal de control y telemetría; el objetivo de 20 Hz está pendiente de pruebas. Wi-Fi, conectado al hotspot del teléfono, permitiría al ESP32 acceder a NTRIP. USB se reserva para desarrollo y diagnóstico, y Wi-Fi o USB para transferencias grandes.
 
@@ -40,7 +45,7 @@ La base considerada incluye:
 - u-blox ZED-F9P disponible para posibles pruebas.
 - ESP32-S3; se considera una Waveshare ESP32-S3-Tiny N8R8, con variante física por confirmar.
 - Bosch BMI088 en breakout.
-- Almacenamiento microSD.
+- Lector y tarjeta microSD, con módulo o socket e interfaz por confirmar.
 - Antena multibanda HA-901A, con unidad y especificaciones por confirmar.
 - Batería LiPo de una celda, nominal 3.7 V y aproximadamente 5000 mAh, aún pendiente.
 - Carcasa cilíndrica impresa en 3D y montaje sobre jalón.
@@ -70,4 +75,3 @@ No se han fijado GPIO, conectores, niveles eléctricos, dimensiones ni diseño d
 - [Concepto mecánico](mechanical/README.md)
 
 No se ha seleccionado una licencia. El contenido del repositorio no debe interpretarse como publicado bajo una licencia específica hasta que el propietario la defina expresamente.
-

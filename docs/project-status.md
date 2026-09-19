@@ -17,15 +17,17 @@ Fecha de referencia: septiembre de 2026.
 | Inventario de componentes | Por confirmar | Se reporta que llegó la mayoría, pero falta identificar y documentar cada unidad y revisión. |
 | Batería | Por confirmar | Aún no se ha recibido o seleccionado la unidad definitiva. |
 | GNSS principal UM980 | Previsto | Falta identificar la carrier, firmware, interfaces y señales expuestas. |
+| Receptor RTK de triple banda | Objetivo de desarrollo | Verificar cobertura del conjunto real de receptor, firmware y antena. |
 | PPS del UM980 | Por confirmar | Debe comprobarse su disponibilidad en el conector de la carrier concreta. |
 | ZED-F9P | Previsto para pruebas | Está disponible como opción de ensayo; no se ha definido integración. |
 | ESP32-S3 | Previsto | La variante física de Waveshare ESP32-S3-Tiny N8R8 debe confirmarse antes de fijar placa, memoria o pinout. |
 | BMI088 | Previsto | Falta identificar el breakout, orientación, interfaz y características eléctricas. |
-| microSD | Previsto | Interfaz, circuito y política de cierre seguro pendientes. |
+| Lector y tarjeta microSD | Previsto | Módulo o socket, interfaz, circuito y política de cierre seguro pendientes. |
 | Antena HA-901A | Por confirmar | Falta confirmar unidad, especificaciones, conector y referencia mecánica. |
 | Alimentación y carga | Por confirmar | No existe todavía un diseño verificado para protección, regulación, carga y encendido. |
-| Firmware | Previsto | No hay código, configuración de compilación ni primer flash documentado. |
-| Aplicación móvil | Previsto | No hay framework, proyecto ni protocolo implementado. |
+| Firmware del instrumento | Previsto | Centralizará configuración y operación del GNSS, IMU, almacenamiento y comunicaciones, con robustez tipo Emlid como referencia de producto. No hay código, configuración de compilación ni primer flash documentado. |
+| Interfaz de configuración del instrumento | Por definir | El firmware gestionará los ajustes; el mecanismo de interfaz de usuario no está seleccionado. |
+| Aplicación móvil independiente | Previsto | Destinada a levantamientos, replanteos y trazo. No hay framework, proyecto ni protocolo implementado. |
 | Carcasa | Previsto | Solo existe el concepto cilíndrico; no hay dimensiones ni CAD. |
 | Operación rover/base | Previsto | Sin implementación ni pruebas. |
 | NTRIP y transporte RTCM | Previsto | Sin implementación ni pruebas. |
@@ -40,4 +42,3 @@ Fecha de referencia: septiembre de 2026.
 Actualmente no hay subsistemas funcionales validados. El estado FIX de una solución futura no bastará para declarar exactitud: deberán realizarse ensayos independientes, repetibles y documentados contra referencias adecuadas.
 
 Este documento debe actualizarse cuando cambie la evidencia, no solo cuando cambien las intenciones. La secuencia prevista se describe en la [hoja de ruta](roadmap.md).
-

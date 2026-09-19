@@ -9,7 +9,7 @@ Esta lista documenta la configuración prevista, no un diseño electrónico cerr
 | Microcontrolador | Control, comunicaciones, registro e integración | ESP32-S3 | Previsto | Debe verificarse la placa física antes de fijar configuración. |
 | Placa del microcontrolador | Soporte del ESP32-S3 | Waveshare ESP32-S3-Tiny N8R8 | Considerada; variante física por confirmar | No fijar pinout, memoria ni perfil de compilación hasta identificar la unidad recibida. |
 | IMU | Aceleración y velocidad angular | Bosch BMI088 en breakout | Prevista; breakout por identificar | Verificar fabricante de la placa, orientación de ejes, interfaz, niveles y requisitos de montaje. |
-| Almacenamiento | Observaciones, estado y diagnóstico | microSD | Previsto; solución concreta por definir | Verificar interfaz, alimentación, detección y estrategia de cierre seguro. |
+| Lector y tarjeta microSD | Observaciones GNSS, datos IMU, estado y diagnóstico | Lector microSD mediante módulo o socket y tarjeta | Previsto; solución concreta por confirmar | Identificar lector y tarjeta; verificar interfaz, alimentación, detección y estrategia de cierre seguro. |
 | Antena GNSS | Recepción multibanda | HA-901A | Considerada; unidad y especificaciones por confirmar | Verificar ficha técnica, conector, alimentación si aplica, montaje y referencia del centro de fase. |
 | Batería | Alimentación portátil | LiPo 1S, 3.7 V nominal, aproximadamente 5000 mAh | Pendiente | Capacidad, dimensiones, conector, corriente admisible y protecciones deben confirmarse. |
 | Alimentación y carga | Carga, protección, regulación y encendido | Por definir | Pendiente de diseño y verificación | Diseñar a partir de los módulos reales y sus requisitos medidos o documentados. |
@@ -23,4 +23,3 @@ Esta lista documenta la configuración prevista, no un diseño electrónico cerr
 - Medir las dimensiones y masas relevantes para la carcasa.
 - Confirmar requisitos eléctricos y térmicos antes de elegir regulación, carga y batería.
 - Registrar sustituciones como decisiones explícitas, sin asumir equivalencia por nombre de chip.
-

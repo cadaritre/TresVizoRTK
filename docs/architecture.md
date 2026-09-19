@@ -2,6 +2,10 @@
 
 La arquitectura separa el procesamiento del receptor GNSS, la coordinación del instrumento en el ESP32-S3 y la experiencia de operación en la aplicación. Esta separación evita acoplar la app a comandos específicos de un fabricante y permite validar cada frontera de forma independiente.
 
+El producto previsto es un receptor GNSS RTK de triple banda con IMU y lector microSD. El software del ESP32-S3 debe concentrar la configuración y operación del instrumento, con robustez y experiencia de uso tipo Emlid como referencia de producto, sin asumir equivalencia funcional ni rendimiento demostrado. La app topográfica es un desarrollo independiente, todavía sin iniciar.
+
+La cobertura de triple banda deberá verificarse para el conjunto real de receptor, firmware y antena. Las interfaces eléctricas y los modelos de placa siguen pendientes de identificación.
+
 ## Responsabilidades
 
 ### Receptor GNSS
@@ -16,6 +20,7 @@ El UM980 es el receptor principal previsto. El ZED-F9P queda disponible para pru
 ### ESP32-S3
 
 - Configurar y controlar el receptor GNSS.
+- Centralizar la configuración del instrumento: modo base/rover, opciones GNSS admitidas, correcciones, comunicaciones, adquisición IMU y registro. Validar, aplicar y conservar los ajustes compatibles con el hardware y firmware verificados.
 - Leer posición, velocidad, tiempo y estado.
 - Gestionar y enrutar mensajes RTCM.
 - Actuar como cliente NTRIP cuando disponga de conectividad Wi-Fi adecuada.
@@ -25,17 +30,26 @@ El UM980 es el receptor principal previsto. El ZED-F9P queda disponible para pru
 - Exponer a la app un protocolo propio del instrumento.
 - Gestionar estado, energía y apagado seguro.
 
+El firmware será responsable del estado y la configuración efectiva del equipo. La interfaz de usuario para configurarlo queda por definir; la app podrá consultar y solicitar ajustes mediante el protocolo propio. Todavía no se ha elegido una interfaz web, pantalla u otro mecanismo de configuración.
+
+La robustez deberá demostrarse con pruebas de desconexión y reconexión, pérdida de correcciones, reinicios, configuración inválida, falta de espacio y cierre o recuperación de registros. Los diagnósticos deberán permitir conocer el estado real de cada subsistema.
+
+### IMU y lector microSD
+
+- **IMU BMI088:** componente central del instrumento para adquirir aceleración y velocidad angular. La fusión GNSS/IMU y la compensación de inclinación requieren desarrollo, sincronización, calibración y validación propios.
+- **Lector y tarjeta microSD:** almacenamiento local de observaciones GNSS, datos IMU y diagnósticos. El ESP32-S3 gestionará escritura, estado de la tarjeta, recuperación y cierre seguro; el módulo o socket y la interfaz están por confirmar.
+
 ### Aplicación móvil
 
 - Administrar mapas y proyectos.
-- Capturar puntos, códigos y notas.
-- Asistir en tareas de replanteo.
-- Configurar el instrumento mediante su protocolo público.
+- Realizar levantamientos mediante captura de puntos, códigos y notas.
+- Asistir en tareas de replanteo y trazo.
+- Consultar y solicitar cambios de configuración al firmware mediante el protocolo público del instrumento.
 - Importar y exportar archivos.
 - Mostrar calidad GNSS, estado de IMU, batería y diagnósticos relevantes.
 - Considerar a futuro puntos remotos mediante dirección de apuntado y una distancia introducida desde un distanciómetro externo.
 
-La app no debe depender directamente de comandos Unicore, UBX ni de detalles internos del hardware.
+La app no debe depender directamente de comandos Unicore, UBX ni de detalles internos del hardware. La lógica de levantamientos, replanteos y trazo pertenece a esta app; la gestión del receptor, la IMU, el almacenamiento y la configuración efectiva pertenece al firmware del instrumento.
 
 ## Flujos de datos previstos
 
@@ -76,4 +90,3 @@ La IMU y GNSS aportarán mediciones con tiempos y marcos de referencia distintos
 - **Interfaz GNSS:** pendiente de confirmar en la carrier real, incluidos niveles, tasas y señales temporales.
 
 Los detalles eléctricos se mantienen en [interfaces y conexiones](../hardware/wiring.md). Las decisiones deben reflejarse también en [el estado del proyecto](project-status.md).
-

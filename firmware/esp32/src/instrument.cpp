@@ -1,0 +1,287 @@
+#include "instrument.h"
+#include "config_rules.h"
+
+#include <Preferences.h>
+#include <WiFi.h>
+#include <esp_system.h>
+#include <esp_timer.h>
+
+namespace instrument {
+namespace {
+Preferences preferences;
+String deviceName = "TresVizo RTK";
+String stationSsid;
+String stationPassword;
+String key;
+String networkName;
+uint32_t refreshMs = 2000;
+uint32_t revision = 0;
+bool storageReady = false;
+bool configValid = true;
+bool apReady = false;
+bool pendingNetwork = false;
+uint32_t networkChangedAt = 0;
+uint32_t lastConnectionAttempt = 0;
+bool pendingRestart = false;
+uint32_t restartRequestedAt = 0;
+
+void error(JsonDocument& response, const char* code, const char* message) {
+    response["error"] = code;
+    response["message"] = message;
+}
+
+void config(JsonDocument& response) {
+    response["schema_version"] = 1;
+    response["revision"] = revision;
+    response["device_name"] = deviceName;
+    response["refresh_ms"] = refreshMs;
+    response["wifi_ssid"] = stationSsid;
+    response["wifi_password_saved"] = !stationPassword.isEmpty();
+    response["persistence_ready"] = storageReady;
+    response["stored_config_valid"] = configValid;
+}
+
+void connectStation() {
+    WiFi.disconnect(false, false);
+    lastConnectionAttempt = millis();
+    if (!stationSsid.isEmpty()) WiFi.begin(stationSsid.c_str(), stationPassword.c_str());
+}
+
+bool validString(JsonVariantConst field, bool (*rule)(const char*)) {
+    if (!field.is<const char*>()) return false;
+    const JsonString value = field.as<JsonString>();
+    return value.size() == strlen(value.c_str()) && rule(value.c_str());
+}
+
+int saveConfig(JsonVariantConst body, JsonDocument& response) {
+    if (!body.is<JsonObjectConst>()) {
+        error(response, "invalid_request", "Se esperaba un objeto de configuración.");
+        return 400;
+    }
+    for (JsonPairConst pair : body.as<JsonObjectConst>()) {
+        if (pair.value().isNull()) {
+            error(response, "invalid_setting", "Los ajustes no pueden tener valores nulos.");
+            return 400;
+        }
+        const String name = pair.key().c_str();
+        if (name != "revision" && name != "device_name" && name != "refresh_ms" &&
+            name != "wifi_ssid" && name != "wifi_password" && name != "forget_wifi") {
+            error(response, "unknown_setting", "La solicitud contiene un ajuste no admitido.");
+            return 400;
+        }
+    }
+    if (!body["revision"].is<uint32_t>() || body["revision"].as<uint32_t>() != revision) {
+        error(response, "revision_conflict", "Los ajustes cambiaron. Vuelve a cargarlos antes de guardar.");
+        return 409;
+    }
+    String nextName = deviceName;
+    String nextSsid = stationSsid;
+    String nextPassword = stationPassword;
+    uint32_t nextRefresh = refreshMs;
+    if (!body["device_name"].isNull()) {
+        if (!validString(body["device_name"], config_rules::deviceName)) {
+            error(response, "invalid_name", "Usa entre 1 y 32 letras sin acentos, números, espacios, guiones o guiones bajos.");
+            return 400;
+        }
+        nextName = body["device_name"].as<const char*>();
+    }
+    if (!body["refresh_ms"].isNull()) {
+        if (!body["refresh_ms"].is<uint32_t>() || !config_rules::refresh(body["refresh_ms"].as<uint32_t>())) {
+            error(response, "invalid_refresh", "El intervalo debe ser 1000, 2000 o 5000 ms.");
+            return 400;
+        }
+        nextRefresh = body["refresh_ms"].as<uint32_t>();
+    }
+    if (!body["forget_wifi"].isNull() && !body["forget_wifi"].is<bool>()) {
+        error(response, "invalid_wifi", "La opción de olvidar red debe ser booleana.");
+        return 400;
+    }
+    if (!body["wifi_ssid"].isNull()) {
+        if (!validString(body["wifi_ssid"], config_rules::ssid)) {
+            error(response, "invalid_ssid", "El nombre de red no puede superar 32 bytes ni contener controles.");
+            return 400;
+        }
+        nextSsid = body["wifi_ssid"].as<const char*>();
+        if (nextSsid != stationSsid) nextPassword = "";
+    }
+    if (!body["wifi_password"].isNull()) {
+        if (!body["wifi_password"].is<const char*>()) {
+            error(response, "invalid_password", "La contraseña debe ser texto.");
+            return 400;
+        }
+        JsonString value = body["wifi_password"].as<JsonString>();
+        if (value.size() != strlen(value.c_str()) ||
+            (value.size() && !config_rules::password(value.c_str()))) {
+            error(response, "invalid_password", "Usa entre 8 y 63 caracteres ASCII imprimibles.");
+            return 400;
+        }
+        if (value.size()) nextPassword = value.c_str();
+    }
+    if (body["forget_wifi"] == true) {
+        nextSsid = "";
+        nextPassword = "";
+    }
+    if (nextSsid.isEmpty()) nextPassword = "";
+    if (!nextSsid.isEmpty() && nextPassword.isEmpty()) {
+        error(response, "password_required", "Introduce la contraseña de la red seleccionada. Solo se admiten redes protegidas.");
+        return 400;
+    }
+    if (!storageReady) {
+        error(response, "storage_unavailable", "No se pudo abrir el almacenamiento interno de ajustes.");
+        return 503;
+    }
+    const bool changed = nextName != deviceName || nextRefresh != refreshMs ||
+        nextSsid != stationSsid || nextPassword != stationPassword || !configValid;
+    if (!changed) {
+        config(response);
+        response["saved"] = true;
+        response["changed"] = false;
+        return 200;
+    }
+    JsonDocument record;
+    record["schema_version"] = 1;
+    record["revision"] = revision + 1;
+    record["device_name"] = nextName;
+    record["refresh_ms"] = nextRefresh;
+    record["wifi_ssid"] = nextSsid;
+    record["wifi_password"] = nextPassword;
+    String encoded;
+    serializeJson(record, encoded);
+    // Una única entrada NVS: no publicar ajustes parcialmente persistidos.
+    if (preferences.putString("config", encoded) != encoded.length()) {
+        error(response, "save_failed", "No se pudieron guardar los ajustes. La configuración activa se conserva.");
+        return 503;
+    }
+    pendingNetwork = nextSsid != stationSsid || nextPassword != stationPassword;
+    if (pendingNetwork) networkChangedAt = millis();
+    deviceName = nextName;
+    stationSsid = nextSsid;
+    stationPassword = nextPassword;
+    refreshMs = nextRefresh;
+    ++revision;
+    configValid = true;
+    config(response);
+    response["saved"] = true;
+    response["changed"] = true;
+    return 200;
+}
+
+void status(JsonDocument& response) {
+    response["api_version"] = 1;
+    response["firmware_version"] = kVersion;
+    response["device_name"] = deviceName;
+    response["phase"] = "commissioning";
+    response["uptime_ms"] = static_cast<uint64_t>(esp_timer_get_time() / 1000);
+    response["free_heap_bytes"] = ESP.getFreeHeap();
+    response["min_free_heap_bytes"] = ESP.getMinFreeHeap();
+    response["chip"] = ESP.getChipModel();
+    response["chip_revision"] = ESP.getChipRevision();
+    response["cpu_mhz"] = ESP.getCpuFreqMHz();
+    response["flash_bytes"] = ESP.getFlashChipSize();
+    response["psram_enabled_bytes"] = ESP.getPsramSize();
+    response["reset_reason_code"] = static_cast<int>(esp_reset_reason());
+    response["config_ready"] = storageReady && configValid;
+    response["refresh_ms"] = refreshMs;
+    JsonObject wifi = response["wifi"].to<JsonObject>();
+    wifi["ap_ready"] = apReady;
+    wifi["ap_ssid"] = networkName;
+    wifi["ap_ip"] = WiFi.softAPIP().toString();
+    wifi["ap_clients"] = WiFi.softAPgetStationNum();
+    const bool connected = WiFi.status() == WL_CONNECTED;
+    wifi["station_state"] = stationSsid.isEmpty() ? "not_configured" : (connected ? "connected" : "connecting");
+    wifi["station_ssid"] = stationSsid;
+    if (connected) {
+        wifi["station_ip"] = WiFi.localIP().toString();
+        wifi["rssi_dbm"] = WiFi.RSSI();
+    } else {
+        wifi["station_ip"] = nullptr;
+        wifi["rssi_dbm"] = nullptr;
+    }
+    for (const char* subsystem : {"gnss", "imu", "microsd", "ntrip", "ble"}) {
+        response["subsystems"][subsystem]["state"] = "not_integrated";
+    }
+    response["solution"]["fix"] = nullptr;
+    response["solution"]["latitude_deg"] = nullptr;
+    response["solution"]["longitude_deg"] = nullptr;
+    response["solution"]["height_m"] = nullptr;
+    response["solution"]["height_reference"] = nullptr;
+    response["solution"]["measurement_time"] = nullptr;
+    response["solution"]["arrival_time_us"] = nullptr;
+}
+}
+
+void begin() {
+    storageReady = preferences.begin("tresvizo", false);
+    if (storageReady) {
+        key = preferences.getString("access_key", "");
+        const String saved = preferences.getString("config", "");
+        if (!saved.isEmpty()) {
+            JsonDocument record;
+            const auto parsed = deserializeJson(record, saved, DeserializationOption::NestingLimit(3));
+            configValid = !parsed && record["schema_version"] == 1 &&
+                validString(record["device_name"], config_rules::deviceName) &&
+                record["revision"].is<uint32_t>() && record["refresh_ms"].is<uint32_t>() &&
+                config_rules::refresh(record["refresh_ms"].as<uint32_t>()) &&
+                validString(record["wifi_ssid"], config_rules::ssid) &&
+                record["wifi_password"].is<const char*>();
+            if (configValid) {
+                const String ssid = record["wifi_ssid"].as<const char*>();
+                configValid = ssid.isEmpty() || validString(record["wifi_password"], config_rules::password);
+            }
+            if (configValid) {
+                deviceName = record["device_name"].as<const char*>();
+                revision = record["revision"].as<uint32_t>();
+                refreshMs = record["refresh_ms"].as<uint32_t>();
+                stationSsid = record["wifi_ssid"].as<const char*>();
+                stationPassword = record["wifi_password"].as<const char*>();
+            }
+        }
+    }
+    WiFi.persistent(false);
+    WiFi.mode(WIFI_AP_STA); // radio activa para la fuente de entropía del RNG
+    if (key.length() != 24) {
+        char randomKey[25];
+        snprintf(randomKey, sizeof(randomKey), "%08lx%08lx%08lx",
+            static_cast<unsigned long>(esp_random()), static_cast<unsigned long>(esp_random()),
+            static_cast<unsigned long>(esp_random()));
+        key = randomKey;
+        if (storageReady && preferences.putString("access_key", key) != key.length()) storageReady = false;
+    }
+    char suffix[5];
+    snprintf(suffix, sizeof(suffix), "%04X", static_cast<unsigned int>(ESP.getEfuseMac() >> 32) & 0xffff);
+    networkName = String("TresVizo-") + suffix;
+    WiFi.setAutoReconnect(true);
+    WiFi.setHostname("tresvizo-rtk");
+    WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
+    apReady = WiFi.softAP(networkName.c_str(), key.c_str(), 1, false, 4);
+    connectStation();
+}
+
+void tick() {
+    const uint32_t now = millis();
+    if (pendingRestart && config_rules::elapsed(now, restartRequestedAt, 1000)) ESP.restart();
+    if (pendingNetwork && config_rules::elapsed(now, networkChangedAt, 1000)) {
+        pendingNetwork = false;
+        connectStation();
+    }
+    if (!pendingNetwork && !stationSsid.isEmpty() && WiFi.status() != WL_CONNECTED &&
+        config_rules::elapsed(now, lastConnectionAttempt, 30000)) connectStation();
+}
+
+const String& accessKey() { return key; }
+const String& apName() { return networkName; }
+
+int request(const String& method, const String& path, JsonVariantConst body, JsonDocument& response) {
+    if (method == "GET" && path == "/api/status") { status(response); return 200; }
+    if (method == "GET" && path == "/api/config") { config(response); return 200; }
+    if (method == "PUT" && path == "/api/config") return saveConfig(body, response);
+    if (method == "POST" && path == "/api/restart") {
+        pendingRestart = true;
+        restartRequestedAt = millis();
+        response["restarting"] = true;
+        return 202;
+    }
+    error(response, "not_found", "Esta función no está disponible en el firmware actual.");
+    return 404;
+}
+}

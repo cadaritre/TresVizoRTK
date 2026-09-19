@@ -43,6 +43,7 @@ Las etapas son deliberadamente pequeñas. Cada una debe dejar evidencia reproduc
 ## 7. Comunicaciones
 
 - Definir y versionar el protocolo propio del instrumento.
+- Centralizar en el firmware la validación, aplicación y persistencia de la configuración del instrumento; definir su interfaz de usuario.
 - Implementar control y telemetría BLE y medir el objetivo de 20 Hz.
 - Implementar Wi-Fi y cliente NTRIP con manejo de desconexiones.
 - Evaluar el transporte alternativo de RTCM por BLE desde la app.
@@ -51,7 +52,7 @@ Las etapas son deliberadamente pequeñas. Cada una debe dejar evidencia reproduc
 ## 8. Aplicación e integración
 
 - Elegir el framework móvil con criterios explícitos.
-- Integrar estado, configuración, proyectos, captura y replanteo por etapas.
+- Desarrollar la app independiente para levantamientos, replanteos y trazo; integrar estado, acceso a configuración, proyectos y captura por etapas.
 - Incorporar exportación e importación sin mezclar el protocolo público con comandos del receptor.
 - Integrar GNSS, IMU, almacenamiento y gestión de energía con diagnósticos observables.
 
@@ -66,4 +67,3 @@ Las etapas son deliberadamente pequeñas. Cada una debe dejar evidencia reproduc
 ## Trabajo futuro adicional
 
 Una vez validada la arquitectura básica, podrá estudiarse un modo de puntos remotos que combine una dirección de apuntado con una distancia introducida desde un distanciómetro externo. No forma parte de la validación inicial.
-
