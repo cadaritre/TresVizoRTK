@@ -1,2 +1,38 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+* text=auto eol=lf
+
+# Formatos de texto habituales del proyecto
+*.md text eol=lf
+*.txt text eol=lf
+*.csv text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.c text eol=lf
+*.cc text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.hpp text eol=lf
+*.ino text eol=lf
+*.py text eol=lf
+*.sh text eol=lf
+
+# Imágenes, documentos y formatos CAD binarios
+*.png -text
+*.jpg -text
+*.jpeg -text
+*.gif -text
+*.webp -text
+*.pdf -text
+*.zip -text
+*.bin -text
+*.step -text
+*.stp -text
+*.iges -text
+*.igs -text
+*.stl -text
+*.3mf -text
+*.f3d -text
+*.FCStd -text
+*.blend -text
+*.sldprt -text
+*.sldasm -text

@@ -1,0 +1,74 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100/
+.Trashes/
+
+# Archivos temporales y cachés generales
+*~
+*.bak
+*.swp
+*.swo
+*.tmp
+*.temp
+.cache/
+
+# Firmware y PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+firmware/**/.pio/
+firmware/**/build/
+firmware/**/.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Aplicaciones móviles y ecosistema JavaScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+app/**/dist/
+app/**/build/
+app/**/coverage/
+app/**/.expo/
+app/**/.gradle/
+app/**/android/.cxx/
+app/**/android/local.properties
+app/**/ios/Pods/
+app/**/DerivedData/
+
+# Configuración personal de editores
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+*.code-workspace
+
+# Credenciales y configuración local
+.env
+.env.*
+!.env.example
+!.env.*.example
+secrets/
+credentials/
+*.pem
+*.p12
+
+# Datos locales voluminosos o sensibles
+captures/local/
+data/local/
+logs/local/
+
+# Los fixtures pequeños y anonimizados de tests/fixtures/ se versionan.
+
