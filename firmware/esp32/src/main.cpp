@@ -5,6 +5,8 @@
 #include "config_rules.h"
 #include "instrument.h"
 #include "gnss_receiver.h"
+#include "ble_transport.h"
+#include "firmware_update.h"
 #include "web_assets.h"
 
 namespace {
@@ -137,6 +139,7 @@ void handleSerialLine() {
         output["status"] = 200;
         output["body"]["ap_ssid"] = instrument::apName();
         output["body"]["access_key"] = instrument::accessKey();
+        output["body"]["ble_pairing_pin"] = ble_transport::passkey();
         output["body"]["ap_url"] = "http://192.168.4.1";
         serialReply(output);
         return;
@@ -200,6 +203,7 @@ void setup() {
     }
     instrument::begin();
     gnss_receiver::begin();
+    ble_transport::begin(dispatch, authenticated);
     httpd_config_t configuration = HTTPD_DEFAULT_CONFIG();
     configuration.uri_match_fn = httpd_uri_match_wildcard;
     configuration.stack_size = 8192;
@@ -216,14 +220,16 @@ void setup() {
             if (httpd_register_uri_handler(server, &route) != ESP_OK) Serial.println("Error al registrar ruta HTTP.");
         }
     } else Serial.println("Error al iniciar el servidor web. Consola USB disponible.");
-    Serial.println("TresVizo RTK 0.3.0. Consola JSON USB disponible.");
+    Serial.println("TresVizo RTK 0.4.0. Consola JSON USB disponible.");
 }
 
 void loop() {
     if (instrumentMutex) {
         pollSerial();
+        ble_transport::tick();
         if (xSemaphoreTake(instrumentMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
             instrument::tick();
+            firmware_update::tick(server != nullptr);
             xSemaphoreGive(instrumentMutex);
         }
     }

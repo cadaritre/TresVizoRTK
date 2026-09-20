@@ -1,6 +1,6 @@
 # Rediseño para imprimir y ensamblar — criterio A4
 
-Estado: revisión de arquitectura, **no un CAD A4 terminado ni una autorización de fabricación**. Responde al requisito de conservar la estética tipo RX y simplificar de raíz base, soporte interior y montaje. El CAD A3 se conserva como antecedente; no satisface este nuevo criterio.
+Estado original: revisión de arquitectura. **Ya existe un [CAD A4 de revisión](../cad/README-A4.md)** construido a partir de este criterio, con limitaciones explícitas; este documento conserva el razonamiento previo. Responde al requisito de conservar la estética tipo RX y simplificar de raíz base, soporte interior y montaje. El CAD A3 se conserva como antecedente; no satisface este nuevo criterio.
 
 ## Diagnóstico comprobado
 

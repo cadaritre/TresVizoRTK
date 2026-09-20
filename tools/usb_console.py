@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """Consola y puente local USB para TresVizo RTK; no simula el instrumento."""
 import argparse
+from collections import deque
 import json
 import getpass
+import fcntl
 import mimetypes
+import termios
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import urlsplit, parse_qs
+from gnss.receiver import Receiver
 
 import serial
 from serial.tools import list_ports
@@ -31,6 +36,7 @@ class Instrument:
         self.key = None
         self.sequence = 0
         self.lock = threading.Lock()
+        self.boot_diagnostics = deque(maxlen=12)
 
     def close(self):
         if self.connection:
@@ -46,6 +52,13 @@ class Instrument:
         connection.rts = False
         connection.port = self.port
         connection.open()
+        try:
+            # flock de pyserial es consultivo; impedir también nuevas aperturas
+            # del monitor serie que podrían cambiar DTR/RTS durante una OTA.
+            fcntl.ioctl(connection.fileno(), termios.TIOCEXCL)
+        except OSError:
+            connection.close()
+            raise
         self.connection = connection
 
     def _exchange(self, method, path, body=None, key=None):
@@ -60,10 +73,12 @@ class Instrument:
         if len(encoded) > MAX_REQUEST:
             return {"status": 413, "body": {"error": "request_too_large", "message": "La solicitud USB supera 1024 bytes."}}
         self.connection.write(encoded + b"\n")
-        deadline = time.monotonic() + 4
+        deadline = time.monotonic() + (15 if path.startswith("/api/update/") else 4)
         while time.monotonic() < deadline:
             line = self.connection.read_until(b"\n", 8192)
             if not line.startswith(b"{"):
+                if any(marker in line for marker in (b"Guru",b"panic",b"rst:",b"assert",b"watchdog",b"Backtrace",b"TresVizo RTK")):
+                    self.boot_diagnostics.append(line.decode(errors="replace").strip()[:256])
                 continue
             try:
                 response = json.loads(line)
@@ -89,10 +104,10 @@ class Instrument:
                 raise
 
 
-def serve(device, port):
+def serve(device, port, gps=None):
     allowed_hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
     allowed_origins = {f"http://{host}" for host in allowed_hosts}
-    assets = {"/": WEB / "index.html", "/app.css": WEB / "app.css", "/app.js": WEB / "app.js", "/assets/tresvizo-logo.png": WEB / "assets" / "tresvizo-logo.png"}
+    assets = {"/update.js": WEB / "update.js", "/bench.js": WEB / "bench.js", "/": WEB / "index.html", "/app.css": WEB / "app.css", "/app.js": WEB / "app.js", "/assets/tresvizo-logo.png": WEB / "assets" / "tresvizo-logo.png"}
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_args):
@@ -119,7 +134,68 @@ def serve(device, port):
                 path = assets[self.path]
                 mime = mimetypes.guess_type(path)[0] or "application/octet-stream"
                 return self.respond(200, path.read_bytes(), mime)
-            if self.path not in {"/api/status", "/api/config", "/api/restart", "/api/operations", "/api/base/plan"}:
+            path = urlsplit(self.path).path
+            if path.startswith("/api/bench/"):
+                if gps is None:
+                    return self.respond(404, {"error": "bench_not_enabled"})
+                if path.startswith("/api/bench/file/") and self.command == "GET":
+                    if self.headers.get("Sec-Fetch-Site") != "same-origin" and self.headers.get("X-TresVizo-Client") != "portal":
+                        return self.respond(403, {"error": "same_origin_required"})
+                    try:
+                        _, _, _, _, identity, artifact = path.split("/")
+                        file = gps.sessions.export(identity, artifact)
+                        size = file.stat().st_size
+                        start, end = 0, size - 1
+                        partial = self.headers.get("Range")
+                        if partial:
+                            import re
+                            match = re.fullmatch(r"bytes=(\d+)-(\d*)", partial)
+                            if not match: return self.respond(416, {"error": "invalid_range"})
+                            start = int(match[1]); end = min(int(match[2]), end) if match[2] else end
+                            if not 0 <= start <= end < size: return self.respond(416, {"error": "invalid_range"})
+                        self.send_response(206 if partial else 200)
+                        self.send_header("Content-Type", "application/octet-stream")
+                        self.send_header("Content-Disposition", f'attachment; filename="{identity}-{artifact}"')
+                        self.send_header("Content-Length", str(max(0, end-start+1)))
+                        self.send_header("Accept-Ranges", "bytes")
+                        self.send_header("Cache-Control", "no-store")
+                        if partial: self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
+                        self.end_headers()
+                        with file.open("rb") as source:
+                            source.seek(start)
+                            remaining = end-start+1
+                            while remaining > 0:
+                                chunk = source.read(min(65536, remaining))
+                                if not chunk: break
+                                self.wfile.write(chunk); remaining -= len(chunk)
+                        return
+                    except (ValueError, OSError):
+                        return self.respond(404, {"error": "file_unavailable"})
+                if self.headers.get("X-TresVizo-Client") != "portal":
+                    return self.respond(403, {"error": "client_header_required"})
+                try:
+                    if path == "/api/bench/gnss" and self.command == "GET":
+                        since = int(parse_qs(urlsplit(self.path).query).get("since", ["0"])[0])
+                        return self.respond(200, gps.snapshot(max(0, since)))
+                    if path == "/api/bench/sessions" and self.command == "GET":
+                        return self.respond(200, gps.sessions.catalog())
+                    if path in ("/api/bench/action", "/api/bench/base") and self.command == "POST":
+                        length = int(self.headers.get("Content-Length", "0"))
+                        if self.headers.get("Transfer-Encoding") or not 0 < length <= MAX_REQUEST:
+                            return self.respond(413, {"error": "invalid_length"})
+                        self.connection.settimeout(5)
+                        body = json.loads(self.rfile.read(length))
+                        if path == "/api/bench/base":
+                            preview = device.request("POST", "/api/base/plan", body)
+                            if preview["status"] != 200: return self.respond(preview["status"],preview["body"])
+                            return self.respond(200,gps.apply_base(preview["body"]["plan"]))
+                        return self.respond(200, gps.action(body))
+                except (ValueError, UnicodeError) as error:
+                    return self.respond(400, {"message": str(error)})
+                except (serial.SerialException, OSError, TimeoutError) as error:
+                    return self.respond(503, {"message": str(error)})
+                return self.respond(404, {"error": "not_found"})
+            if self.path not in {"/api/status", "/api/config", "/api/restart", "/api/operations", "/api/base/plan", "/api/update", "/api/update/begin", "/api/update/chunk", "/api/update/finish", "/api/update/abort", "/api/update/rollback", "/api/corrections/source"}:
                 return self.respond(404, {"error": "not_found"})
             if self.headers.get("X-TresVizo-Client") != "portal":
                 return self.respond(403, {"error": "client_header_required"})
@@ -156,6 +232,7 @@ def serve(device, port):
     finally:
         server.server_close()
         device.close()
+        if gps: gps.close()
 
 
 def main():
@@ -163,11 +240,13 @@ def main():
     parser.add_argument("--port", help="Puerto USB del ESP32; se detecta si hay uno solo.")
     parser.add_argument("command", choices=["access", "set-access", "status", "config", "serve"])
     parser.add_argument("--http-port", type=int, default=8765)
+    parser.add_argument("--gnss-port", help="Activa banco GNSS USB independiente; nunca se presenta como UART del ESP32.")
     args = parser.parse_args()
     device = Instrument(args.port or detect_port())
     try:
         if args.command == "serve":
-            serve(device, args.http_port)
+            gps = Receiver(args.gnss_port, ROOT / "captures" / "local" / "sessions") if args.gnss_port else None
+            serve(device, args.http_port, gps)
         elif args.command == "set-access":
             key = getpass.getpass("Nueva clave Wi-Fi/panel: ")
             if key != getpass.getpass("Repite la clave: "):

@@ -108,3 +108,12 @@ El panel incluye Base / rover, Registro / PPK y Correcciones (entrada, publicaci
 - `GET /api/operations`: capacidades actuales; catálogo de sesiones nulo mientras no pueda consultarse almacenamiento.
 - `POST /api/base/plan`: preparación autenticada con `method` (`known`/`average`) e `station_id`; devuelve `applied: false` y `persisted: false`. Los campos y límites se describen en [registro, base y NTRIP](../../docs/recording-base-ntrip.md).
 - `python tests/operations_smoke.py`: valida la API en el ESP32 sin cambiar modo, guardar coordenadas ni transmitir correcciones.
+
+## Versión 0.4.0
+
+- Servicio BLE de control autenticado y telemetría; [protocolo y límites](../../docs/ble-protocol.md).
+- OTA en doble partición, SHA-256, carga por bloques y recuperación; [paquetes y procedimiento](../../docs/firmware-updates.md).
+- Router de correcciones desacoplado; solo BLE instalado en el firmware, UART aún deshabilitado sin verificar cableado.
+- [Banco USB de Mac](../../docs/usb-bench.md) con GPS real, sesiones, conversión RINEX y NTRIP. No confundir sus controladores con capacidades autónomas del ESP32.
+
+Las pruebas del controlador OTA están en `tests/update_smoke.py`; `--install` escribe la imagen compilada en la partición inactiva, reinicia y verifica el cambio de slot. No correr junto al puente USB ni a otro monitor.

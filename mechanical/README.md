@@ -1,8 +1,8 @@
 # Diseño mecánico
 
-**Criterio de rediseño actual: [simplificación para impresión y montaje — A4](research/redesign-for-printing.md).** Se propone base de una pieza con inserto comercial atornillable y bandejas interiores que se impriman acostadas. Es una revisión de arquitectura; todavía no existe un CAD A4 terminado. El [CAD A3](cad/README-A3.md) queda como antecedente y no satisface este nuevo criterio de simplicidad.
+**CAD actual: [A4 — siete piezas impresas y base única](cad/README-A4.md).** Ya existen un conjunto, una vista interior y un despiece A4 con geometría nueva. Sustituye el bastidor de varillas y los adaptadores individuales por bandejas integradas. La [revisión de arquitectura](research/redesign-for-printing.md) documenta el criterio previo; A3 queda como antecedente. A4 es un CAD de revisión con los pendientes mecánicos y eléctricos identificados, no una liberación de fabricación.
 
-El concepto es una carcasa cilíndrica impresa en 3D, inspirada en el Reach RX, para un receptor montado sobre jalón. A3 retiene una tuerca comercial 5/8-11 y deja la HA-901A arriba con su envolvente original. Las [fuentes iniciales](research/component-dimensions.md) se complementan con las referencias de cada revisión. A0/A1/A2 se conservan como historial; sus montajes anteriores no son la propuesta actual. Todavía no es un modelo validado para fabricar y montar el receptor completo.
+El concepto es una carcasa cilíndrica impresa en 3D, inspirada en el Reach RX, para un receptor montado sobre jalón. A4 plantea un inserto con brida comercial 5/8-11 y deja la HA-901A arriba con su envolvente original. Las [fuentes iniciales](research/component-dimensions.md) se complementan con las referencias de cada revisión. A0/A1/A2 se conservan como historial; sus montajes anteriores no son la propuesta actual. Todavía no es un modelo validado para fabricar y montar el receptor completo.
 
 ## Criterios previstos
 
@@ -35,7 +35,7 @@ La calibración de offsets mecánicos y la inicialización dinámica de una solu
 
 ## Directorios
 
-- `cad/`: revisiones A0–A3, generadores y parámetros del estudio mecánico.
+- `cad/`: revisiones A0–A4, generadores y parámetros del estudio mecánico.
 - `exports/`: exportaciones deliberadamente versionadas para fabricación o revisión.
 
 No debe añadirse geometría ficticia para completar estos directorios.

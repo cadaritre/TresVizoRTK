@@ -1,5 +1,8 @@
 #include "instrument.h"
 #include "gnss_receiver.h"
+#include "ble_transport.h"
+#include "firmware_update.h"
+#include "correction_router.h"
 #include "config_rules.h"
 #include "base_plan.h"
 
@@ -204,6 +207,7 @@ void status(JsonDocument& response) {
     for (const char* subsystem : {"gnss", "imu", "microsd", "ntrip", "ble"}) {
         response["subsystems"][subsystem]["state"] = "not_integrated";
     }
+    ble_transport::status(response["subsystems"]["ble"].as<JsonObject>());
     response["solution"]["fix"] = nullptr;
     response["solution"]["latitude_deg"] = nullptr;
     response["solution"]["longitude_deg"] = nullptr;
@@ -382,6 +386,16 @@ int previewBase(JsonVariantConst body, JsonDocument& response) {
 }
 
 int request(const String& method, const String& path, JsonVariantConst body, JsonDocument& response) {
+    if (path == "/api/update" || path.startsWith("/api/update/")) return firmware_update::request(method,path,body,response);
+    if (firmware_update::busy() && method != "GET") { error(response,"updating","Actualización en curso. Espera antes de modificar el equipo."); return 409; }
+    if (path == "/api/corrections/source") {
+        if (method == "PUT") {
+            if (!body.is<JsonObjectConst>() || body.size() != 1 || !validString(body["source"], config_rules::deviceName) || !correction_router::select(body["source"])) {
+                error(response,"unsupported_source","Fuente no instalada. Disponibles: none, ble."); return 400;
+            }
+        } else if (method != "GET") { error(response,"invalid_method","Usa GET o PUT."); return 400; }
+        correction_router::status(response.to<JsonObject>()); return 200;
+    }
     if (method == "POST" && path == "/api/base/plan") return previewBase(body, response);
     if (method == "GET" && path == "/api/operations") {
         response["base"]["state"] = "not_integrated";

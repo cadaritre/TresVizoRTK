@@ -1,0 +1,13 @@
+"""Abre las tres vistas A4 y deja activo el interior en FreeCAD."""
+from pathlib import Path
+import FreeCAD as App
+import FreeCADGui as Gui
+
+cad=Path(__file__).resolve().parent
+Gui.activateWorkbench('PartWorkbench')
+for suffix in ('','-EXPLODED','-INTERIOR'):
+    path=cad/f'TresVizo-case-A4{suffix}.FCStd'
+    doc=next((d for d in App.listDocuments().values() if d.FileName==str(path)),None)
+    if doc is None: doc=App.openDocument(str(path))
+    App.setActiveDocument(doc.Name)
+    Gui.activeDocument().activeView().fitAll()

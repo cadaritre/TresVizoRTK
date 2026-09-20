@@ -1,0 +1,728 @@
+{
+  "repaired_at": "2026-09-19T21:31:11",
+  "change": "Part::Feature con BREP independiente y proveedores visuales nuevos",
+  "documents": [
+    {
+      "file": "TresVizo-case-A4.FCStd",
+      "objects": 46,
+      "shapes": [
+        {
+          "object": "MainShell",
+          "volume_difference_mm3": 1.673470251262188e-09,
+          "faces_before": 207,
+          "faces_after": 207,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ServiceCover",
+          "volume_difference_mm3": 5.911715561524034e-11,
+          "faces_before": 18,
+          "faces_after": 18,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "Base",
+          "volume_difference_mm3": 7.275957614183426e-12,
+          "faces_before": 121,
+          "faces_after": 121,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "FlangedInsert",
+          "volume_difference_mm3": 9.094947017729282e-13,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialNut1",
+          "volume_difference_mm3": 4.263256414560601e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialBolt1",
+          "volume_difference_mm3": 5.684341886080802e-14,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialNut2",
+          "volume_difference_mm3": 4.263256414560601e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialBolt2",
+          "volume_difference_mm3": 5.684341886080802e-14,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialNut3",
+          "volume_difference_mm3": 4.263256414560601e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialBolt3",
+          "volume_difference_mm3": 5.684341886080802e-14,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialNut4",
+          "volume_difference_mm3": 4.263256414560601e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialBolt4",
+          "volume_difference_mm3": 5.684341886080802e-14,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ElectronicsTray",
+          "volume_difference_mm3": 3.2741809263825417e-11,
+          "faces_before": 228,
+          "faces_after": 228,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "BatteryCradle",
+          "volume_difference_mm3": 1.6370904631912708e-10,
+          "faces_before": 118,
+          "faces_after": 118,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "IMUSeat",
+          "volume_difference_mm3": 9.094947017729282e-13,
+          "faces_before": 25,
+          "faces_after": 25,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "AntennaCap",
+          "volume_difference_mm3": 1.4551915228366852e-11,
+          "faces_before": 16,
+          "faces_after": 16,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "TrayBolt1",
+          "volume_difference_mm3": 2.2737367544323206e-13,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "TrayWasher1",
+          "volume_difference_mm3": 3.552713678800501e-15,
+          "faces_before": 4,
+          "faces_after": 4,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "TrayNut1",
+          "volume_difference_mm3": 2.842170943040401e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleBolt11",
+          "volume_difference_mm3": 1.4210854715202004e-13,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleNut11",
+          "volume_difference_mm3": 2.1316282072803006e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleBolt12",
+          "volume_difference_mm3": 1.1368683772161603e-13,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleNut12",
+          "volume_difference_mm3": 7.105427357601002e-15,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "IMUBolt1",
+          "volume_difference_mm3": 8.526512829121202e-14,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "IMUNut1",
+          "volume_difference_mm3": 1.4210854715202004e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "TrayBolt2",
+          "volume_difference_mm3": 2.2737367544323206e-13,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "TrayWasher2",
+          "volume_difference_mm3": 3.552713678800501e-15,
+          "faces_before": 4,
+          "faces_after": 4,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "TrayNut2",
+          "volume_difference_mm3": 2.842170943040401e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleBolt21",
+          "volume_difference_mm3": 1.4210854715202004e-13,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleNut21",
+          "volume_difference_mm3": 2.1316282072803006e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleBolt22",
+          "volume_difference_mm3": 1.1368683772161603e-13,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleNut22",
+          "volume_difference_mm3": 7.105427357601002e-15,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "IMUBolt2",
+          "volume_difference_mm3": 8.526512829121202e-14,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "IMUNut2",
+          "volume_difference_mm3": 1.4210854715202004e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "BatteryReserve",
+          "volume_difference_mm3": 0.0,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "GNSSReserve",
+          "volume_difference_mm3": 0.0,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "SDReference",
+          "volume_difference_mm3": 0.0,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "IMUReserve",
+          "volume_difference_mm3": 0.0,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "USBReference",
+          "volume_difference_mm3": 0.0,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ESPReference",
+          "volume_difference_mm3": 4.547473508864641e-13,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "LatchReserve",
+          "volume_difference_mm3": 0.0,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "HA901Reserve",
+          "volume_difference_mm3": 4.3655745685100555e-11,
+          "faces_before": 3,
+          "faces_after": 3,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "CoaxRouteReserve",
+          "volume_difference_mm3": 9.094947017729282e-13,
+          "faces_before": 12,
+          "faces_after": 12,
+          "valid": true,
+          "solids": 1
+        }
+      ]
+    },
+    {
+      "file": "TresVizo-case-A4-INTERIOR.FCStd",
+      "objects": 38,
+      "shapes": [
+        {
+          "object": "Base",
+          "volume_difference_mm3": 7.275957614183426e-12,
+          "faces_before": 121,
+          "faces_after": 121,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialNut1",
+          "volume_difference_mm3": 4.263256414560601e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialBolt1",
+          "volume_difference_mm3": 5.684341886080802e-14,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialNut2",
+          "volume_difference_mm3": 4.263256414560601e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialBolt2",
+          "volume_difference_mm3": 5.684341886080802e-14,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialNut3",
+          "volume_difference_mm3": 4.263256414560601e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialBolt3",
+          "volume_difference_mm3": 5.684341886080802e-14,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialNut4",
+          "volume_difference_mm3": 4.263256414560601e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "RadialBolt4",
+          "volume_difference_mm3": 5.684341886080802e-14,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ElectronicsTray",
+          "volume_difference_mm3": 3.2741809263825417e-11,
+          "faces_before": 228,
+          "faces_after": 228,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "BatteryCradle",
+          "volume_difference_mm3": 1.6370904631912708e-10,
+          "faces_before": 118,
+          "faces_after": 118,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "IMUSeat",
+          "volume_difference_mm3": 9.094947017729282e-13,
+          "faces_before": 25,
+          "faces_after": 25,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "TrayBolt1",
+          "volume_difference_mm3": 2.2737367544323206e-13,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "TrayWasher1",
+          "volume_difference_mm3": 3.552713678800501e-15,
+          "faces_before": 4,
+          "faces_after": 4,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "TrayNut1",
+          "volume_difference_mm3": 2.842170943040401e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleBolt11",
+          "volume_difference_mm3": 1.4210854715202004e-13,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleNut11",
+          "volume_difference_mm3": 2.1316282072803006e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleBolt12",
+          "volume_difference_mm3": 1.1368683772161603e-13,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleNut12",
+          "volume_difference_mm3": 7.105427357601002e-15,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "IMUBolt1",
+          "volume_difference_mm3": 8.526512829121202e-14,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "IMUNut1",
+          "volume_difference_mm3": 1.4210854715202004e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "TrayBolt2",
+          "volume_difference_mm3": 2.2737367544323206e-13,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "TrayWasher2",
+          "volume_difference_mm3": 3.552713678800501e-15,
+          "faces_before": 4,
+          "faces_after": 4,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "TrayNut2",
+          "volume_difference_mm3": 2.842170943040401e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleBolt21",
+          "volume_difference_mm3": 1.4210854715202004e-13,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleNut21",
+          "volume_difference_mm3": 2.1316282072803006e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleBolt22",
+          "volume_difference_mm3": 1.1368683772161603e-13,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ModuleNut22",
+          "volume_difference_mm3": 7.105427357601002e-15,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "IMUBolt2",
+          "volume_difference_mm3": 8.526512829121202e-14,
+          "faces_before": 5,
+          "faces_after": 5,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "IMUNut2",
+          "volume_difference_mm3": 1.4210854715202004e-14,
+          "faces_before": 9,
+          "faces_after": 9,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "BatteryReserve",
+          "volume_difference_mm3": 0.0,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "GNSSReserve",
+          "volume_difference_mm3": 0.0,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "SDReference",
+          "volume_difference_mm3": 0.0,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "IMUReserve",
+          "volume_difference_mm3": 0.0,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "USBReference",
+          "volume_difference_mm3": 0.0,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ESPReference",
+          "volume_difference_mm3": 4.547473508864641e-13,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "LatchReserve",
+          "volume_difference_mm3": 0.0,
+          "faces_before": 6,
+          "faces_after": 6,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "CoaxRouteReserve",
+          "volume_difference_mm3": 9.094947017729282e-13,
+          "faces_before": 12,
+          "faces_after": 12,
+          "valid": true,
+          "solids": 1
+        }
+      ]
+    },
+    {
+      "file": "TresVizo-case-A4-EXPLODED.FCStd",
+      "objects": 7,
+      "shapes": [
+        {
+          "object": "MainShell",
+          "volume_difference_mm3": 1.6880221664905548e-09,
+          "faces_before": 207,
+          "faces_after": 207,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ServiceCover",
+          "volume_difference_mm3": 5.95719029661268e-11,
+          "faces_before": 18,
+          "faces_after": 18,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "Base",
+          "volume_difference_mm3": 2.1827872842550278e-11,
+          "faces_before": 121,
+          "faces_after": 121,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "ElectronicsTray",
+          "volume_difference_mm3": 3.2741809263825417e-11,
+          "faces_before": 228,
+          "faces_after": 228,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "BatteryCradle",
+          "volume_difference_mm3": 1.6007106751203537e-10,
+          "faces_before": 118,
+          "faces_after": 118,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "IMUSeat",
+          "volume_difference_mm3": 0.0,
+          "faces_before": 25,
+          "faces_after": 25,
+          "valid": true,
+          "solids": 1
+        },
+        {
+          "object": "AntennaCap",
+          "volume_difference_mm3": 1.0913936421275139e-11,
+          "faces_before": 16,
+          "faces_after": 16,
+          "valid": true,
+          "solids": 1
+        }
+      ]
+    }
+  ]
+}

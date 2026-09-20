@@ -1,0 +1,78 @@
+{
+  "revision": "A4",
+  "documents": [
+    {
+      "file": "TresVizo-case-A4.FCStd",
+      "valid_solids": 43,
+      "mtime": 1789873292.10098
+    },
+    {
+      "file": "TresVizo-case-A4-INTERIOR.FCStd",
+      "valid_solids": 38,
+      "mtime": 1789873292.6576154
+    },
+    {
+      "file": "TresVizo-case-A4-EXPLODED.FCStd",
+      "valid_solids": 7,
+      "mtime": 1789873292.779121
+    }
+  ],
+  "stl": [
+    {
+      "name": "MainShell",
+      "closed": true,
+      "nonmanifold": false,
+      "volume_relative_error": 0.0005015935387245357
+    },
+    {
+      "name": "ServiceCover",
+      "closed": true,
+      "nonmanifold": false,
+      "volume_relative_error": 0.001665786349990544
+    },
+    {
+      "name": "Base",
+      "closed": true,
+      "nonmanifold": false,
+      "volume_relative_error": 0.0017838859661547918
+    },
+    {
+      "name": "ElectronicsTray",
+      "closed": true,
+      "nonmanifold": false,
+      "volume_relative_error": 5.64830421301798e-05
+    },
+    {
+      "name": "BatteryCradle",
+      "closed": true,
+      "nonmanifold": false,
+      "volume_relative_error": 0.0006293522701947901
+    },
+    {
+      "name": "IMUSeat",
+      "closed": true,
+      "nonmanifold": false,
+      "volume_relative_error": 7.764713224181662e-05
+    },
+    {
+      "name": "AntennaCap",
+      "closed": true,
+      "nonmanifold": false,
+      "volume_relative_error": 0.0024953525147200836
+    }
+  ],
+  "printed_parts": [
+    "MainShell",
+    "ServiceCover",
+    "Base",
+    "ElectronicsTray",
+    "BatteryCradle",
+    "IMUSeat",
+    "AntennaCap"
+  ],
+  "step": {
+    "valid": true,
+    "solids": 42
+  },
+  "cad_checks_pass": true
+}

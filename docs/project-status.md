@@ -58,3 +58,19 @@ Clave de acceso actualizada por USB y persistencia comprobada. Panel GNSS conect
 ## Firmware cargado: 0.3.0 — apartados de operación
 
 Agregados Base / rover, Registro / PPK y Correcciones con entrada NTRIP, publicación externa y caster local. Preparación y exportación de planes de base operativas; aplicación física, grabación, RINEX y transportes todavía no integrados. Pasaron 27 comprobaciones de la API en el ESP32 y pruebas del cálculo de alturas con sanitizadores. El plan de implementación y comandos investigados está en [registro, base y NTRIP](recording-base-ntrip.md).
+
+## Estado actual: 0.4.0 — actualización y banco USB
+
+Esta sección sustituye los estados históricos anteriores para estos componentes:
+
+| Componente | Implementado y límite actual |
+| --- | --- |
+| Actualización ESP32 | Panel y API autenticada, doble partición, SHA-256, comprobación de hardware e imagen, confirmación de arranque y restauración anterior. Cargas completas reales comprobadas conservando NVS. Firma de distribución pendiente. |
+| Extensiones de correcciones | Router RTCM3 con CRC, fuente única y colas limitadas; BLE integrado. Interfaces reservadas para NTRIP y radio en ESP32; necesitan su controlador y validación por modelo. |
+| BLE | Servicio, comandos autenticados, telemetría y recepción RTCM compilados y anunciados por la placa. Emparejamiento con la futura app y rendimiento extremo a extremo pendientes. |
+| GNSS por USB | Banco real en la Mac, demultiplexado Unicore/NMEA/RTCM, épocas GGA a 10 Hz y estado sin posición cuando corresponde. UART GPS–ESP32 permanece desactivada y sin cablear. |
+| Base / rover | Comandos y verificación implementados en banco; planes comprobados con pruebas. Aplicación de coordenadas de base reales pendiente. |
+| Registro / RINEX | Inicio, parada, originales, recuperación y exportación en la Mac; conversión real a RINEX 3.04. microSD física y PPK con una base solapada pendientes. |
+| NTRIP | Cliente, publicador y caster local de banco probados por sockets de loopback. NTRIP v1 inicial, sin GGA para VRS; sin ensayo con caster externo ni ejecución en ESP32. |
+
+Detalles: [actualizaciones y módulos](firmware-updates.md), [protocolo BLE](ble-protocol.md), [banco USB](usb-bench.md). La pérdida de posición del UM980 trasladado al interior no impide desarrollar ni confirmar un arranque saludable. IMU, compensación de inclinación y exactitud topográfica siguen sin validación física.

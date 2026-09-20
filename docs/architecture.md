@@ -100,3 +100,7 @@ Los detalles eléctricos se mantienen en [interfaces y conexiones](../hardware/w
 ## Registro, base y distribución de correcciones
 
 El alcance ampliado, los comandos investigados, referencias de altura, sesiones PPK y los roles de entrada/publicación/caster local se detallan en [registro, base y NTRIP](recording-base-ntrip.md).
+
+## Evolución 0.4.0
+
+Se incorporan [banco USB con datos reales](usb-bench.md), [protocolo BLE](ble-protocol.md) y [OTA / módulos de correcciones](firmware-updates.md). Los transportes de banco en la Mac no se anuncian como controladores del ESP32. El router del firmware normaliza RTCM3 y admite una fuente activa; los radios futuros se agregan mediante firmware actualizado y controladores verificados por modelo.

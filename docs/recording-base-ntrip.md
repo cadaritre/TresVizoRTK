@@ -111,3 +111,7 @@ La tasa de solución de al menos 10 Hz debe conservarse durante registro y corre
 - [BKG: arquitectura NTRIP](https://igs.bkg.bund.de/ntrip/).
 - [BKG: NtripCaster propio](https://igs.bkg.bund.de/ntrip/bkgcaster).
 - [BKG: documentación del protocolo y sourcetable](https://igs.bkg.bund.de/root_ftp/NTRIP/documentation/NtripDocumentation.pdf).
+
+## Avance posterior: banco USB y control BLE
+
+El estado inicial de este documento corresponde a 0.3.0. La implementación 0.4.0 agrega grabación/catálogo/descarga y conversión OBS/NAV en la **Mac**, comandos confirmados del UM980, adaptador de base y NTRIP/caster de banco; ver [alcance y pruebas](usb-bench.md). microSD, NTRIP autónomo en ESP32 y precisión PPK siguen pendientes. BLE y OTA tienen [contrato propio](ble-protocol.md) y [procedimiento de actualización](firmware-updates.md).

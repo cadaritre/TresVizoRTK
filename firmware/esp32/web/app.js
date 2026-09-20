@@ -108,8 +108,9 @@ function connected(ok) {
   $("export-diagnostics").disabled = !ok;
   if (!ok) {
     latestStatus = null;
-    renderGnss(null);
+    if (!window.benchActive) renderGnss(null);
     document.querySelectorAll("[data-live]").forEach((el) => {
+      if (window.benchActive && el.id.startsWith("gnss-")) return;
       el.textContent = "—";
     });
     text("ap-state", "Sin comunicación");
@@ -142,7 +143,7 @@ function renderGnss(data) {
   text("gnss-latitude", position ? `${solution.latitude_deg.toFixed(8)}°` : "—");
   text("gnss-longitude", position ? `${solution.longitude_deg.toFixed(8)}°` : "—");
   text("gnss-height", position && Number.isFinite(solution.height_m) ?
-    `${solution.height_m.toFixed(3)} m · ${solution.height_reference === "receiver_msl" ? "MSL del receptor" : "Referencia no confirmada"}` : "—");
+    `${solution.height_m.toFixed(3)} m · ${solution.height_reference === "receiver_msl" ? "MSL del receptor" : solution.height_reference === "ellipsoidal_user_configured" ? "Elipsoidal configurada" : "Referencia no confirmada"}` : "—");
   text("gnss-quality", current ? qualities[solution.fix] || "Sin datos" : "Sin datos vigentes");
 }
 
@@ -154,12 +155,14 @@ function renderStatus(data) {
   )
     throw new Error("Versión de protocolo no compatible.");
   latestStatus = data;
-  renderGnss(data);
+  if (!window.benchActive) renderGnss(data);
   refreshMs = [1000, 2000, 5000].includes(data.refresh_ms)
     ? data.refresh_ms
     : 2000;
   connected(true);
   text("device-name", data.device_name);
+  const ble = data.subsystems?.ble;
+  text("ble-state", ble?.state === "advertising" ? "Disponible para emparejar" : ble?.state === "authorized" ? "App autenticada" : ble?.state === "connected" ? "Cliente conectado" : "No disponible en este firmware");
   text("uptime", duration(data.uptime_ms));
   text("heap", kib(data.free_heap_bytes));
   text("firmware", `v${data.firmware_version}`);
@@ -343,6 +346,7 @@ $("export-diagnostics").addEventListener("click", () => {
   const data = JSON.parse(JSON.stringify(latestStatus));
   delete data.wifi;
   delete data.device_name;
+  delete data.solution;
   const url = URL.createObjectURL(
     new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }),
   );
@@ -392,7 +396,7 @@ $("base-plan-form").addEventListener("submit", async (event) => {
   try {
     const result = await api("/api/base/plan", "POST", plan);
     if (marker !== basePlanRequest) return;
-    preparedBase = result;
+    preparedBase = {...result, request: plan};
     $("base-export").disabled = false;
     text("base-result", result.message + (result.plan.arp_ellipsoid_height_m !== undefined ?
       ` Altura elipsoidal ARP: ${result.plan.arp_ellipsoid_height_m.toFixed(4)} m.` :
@@ -413,4 +417,12 @@ $("base-export").addEventListener("click", () => {
   const link = document.createElement("a");
   link.href = url; link.download = "tresvizo-base-plan.json"; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+$("correction-source-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  try {
+    const result = await api("/api/corrections/source","PUT",{source:$("correction-source").value});
+    text("correction-source-message", `Fuente seleccionada: ${result.active_source}. ${result.receiver_ready ? "UART disponible." : "GPS–ESP32 sin conectar; aún no se entregan correcciones."}`);
+  } catch (error) { text("correction-source-message",error.message); }
 });

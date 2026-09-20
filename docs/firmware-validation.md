@@ -62,3 +62,13 @@ Los comandos y precauciones específicas del puerto están en el [README del fir
 - `base_plan_test.cpp`: límites y cálculo con AddressSanitizer/UndefinedBehaviorSanitizer. Pasó también `tests/gnss_panel_test.js`.
 - Navegador: revisados los tres apartados, controles pendientes deshabilitados y un plan sintético con altura del punto 100 m + antena 2 m que devolvió ARP 102 m. Plan de prueba retirado recargando, sin persistencia ni aplicación al GPS.
 - Ajustada y revisada visualmente la navegación de siete apartados en pantalla estrecha. Grabación real, RINEX, aplicación de base y conexiones NTRIP no probadas porque sus controladores siguen pendientes.
+
+## Actualización 0.4.0 — OTA, BLE y banco USB
+
+- Compilación del firmware estándar y de la variante UART con GPIO 18/17 completadas. Solo se cargó la variante estándar, sin habilitar GPIO externos. Nueva imagen instalada por OTA en `app0`, arranque confirmado y ajustes NVS idénticos antes/después.
+- `tests/hardware_smoke.py`: 29 comprobaciones en placa; `tests/operations_smoke.py`: 27. `tests/update_smoke.py --install`: 27 comprobaciones de rechazo/abortado y actualización completa. Incluyen hardware/tamaño/hash inválidos, autenticación, duplicados, offsets, imagen incompleta y rechazo de restauración de un candidato inválido.
+- Cargas posteriores mostraron reinicios `USB_UART_CHIP_RESET`, perdiendo la sesión antes de activar el candidato. Se añadió exclusividad del dispositivo (`TIOCEXCL`, además del flock de pyserial) y diagnóstico de arranque al cliente USB. La siguiente carga completa pasó. Esto no demuestra todavía la causa externa exacta ni resistencia prolongada a desconexiones. No abrir monitores simultáneos; una transferencia interrumpida se inicia de nuevo.
+- CRC/fragmentación RTCM3 C++ con AddressSanitizer/UndefinedBehaviorSanitizer; 14 pruebas Python de banco GNSS y 3 de NTRIP por sockets reales de loopback; pruebas de render GNSS y sintaxis JS superadas.
+- Registro real del UM980: 393285 bytes, cero pérdidas de cola, 105 observaciones binarias con CRC válido. Conversión RTKLIB produjo RINEX 3.04 con 105 épocas OBS y 35 registros NAV. No constituye procesamiento PPK ni validación de precisión.
+- BLE iniciado en el ESP32 y capacidades consultadas; pendientes emparejamiento de un cliente real, latencia/rendimiento y transferencia de correcciones hasta el GPS. NTRIP se ejecuta en banco Mac, no en firmware ESP32.
+- Pendientes: Wi-Fi OTA con cliente independiente, restauración manual de ida/vuelta, fallo inducido antes de confirmar arranque, firmas de distribución, base real, caster externo, UART cableado, microSD e IMU. No se exige posición GNSS para confirmar un arranque: el receptor fue trasladado al interior.
