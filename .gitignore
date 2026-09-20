@@ -72,3 +72,8 @@ logs/local/
 
 # Los fixtures pequeños y anonimizados de tests/fixtures/ se versionan.
 
+
+# Revisiones mecanicas anteriores y copias automaticas de FreeCAD
+/mechanical/legacy/
+/mechanical/**/*.FCStd1
+/mechanical/**/*.FCBak

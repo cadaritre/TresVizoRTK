@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "name": "POWER & INTERFACE PCB",
+  "status": "TBD — arquitectura pendiente de aprobación",
+  "units": "mm",
+  "coordinates": {
+    "xy_origin": "board_geometric_center",
+    "z_origin": "board_bottom",
+    "axes": "right_handed"
+  },
+  "board": {
+    "width_mm": null,
+    "length_mm": null,
+    "thickness_mm": null,
+    "outline_xy_mm": null
+  },
+  "mounting_holes": [],
+  "connectors": [
+    {
+      "name": "USB_C",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null,
+      "insertion_direction": null,
+      "mating_center_mm": null
+    },
+    {
+      "name": "BATTERY",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null
+    },
+    {
+      "name": "ESP_EXTERNAL",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null
+    },
+    {
+      "name": "GNSS_POWER",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null
+    }
+  ],
+  "external_features": [
+    {
+      "name": "BUTTON",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null,
+      "press_direction": null,
+      "actuation_center_mm": null
+    },
+    {
+      "name": "RGB_LED",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null,
+      "emission_direction": null,
+      "optical_center_mm": null
+    },
+    {
+      "name": "CHARGE_LED_OPTIONAL",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null,
+      "emission_direction": null,
+      "optical_center_mm": null
+    }
+  ],
+  "component_envelopes": [],
+  "keepouts": [
+    {
+      "name": "USB_PLUG_AND_INSERTION",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null
+    },
+    {
+      "name": "BUTTON_ACCESS",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null
+    },
+    {
+      "name": "LED_OPTICAL_PATH",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null
+    },
+    {
+      "name": "BATTERY_PLUG_AND_CABLE",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null
+    },
+    {
+      "name": "ESP_PLUG_AND_CABLE",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null
+    },
+    {
+      "name": "GNSS_PLUG_AND_CABLE",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null
+    }
+  ],
+  "step": {
+    "path": "hardware/power-board/manufacturing/power-board.step",
+    "local_frame_confirmed": false
+  },
+  "completeness": {
+    "mounting_holes_reviewed": false,
+    "component_envelopes_reviewed": false,
+    "access_and_cables_reviewed": false
+  },
+  "notes": [
+    "Sólo datos de la nueva PCB. Placement global corresponde al responsable del case.",
+    "Listas vacías y null no certifican espacio libre."
+  ]
+}
