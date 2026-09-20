@@ -1,6 +1,6 @@
 # Alimentación e interfaz con módulos comerciales
 
-Revisión del 20 de septiembre de 2026. Sustituye la propuesta de PCB personalizada por módulos comprables y un arnés. Se conservan la Tiny, su Tiny-Adapter y cable original, el UM980, BMI088, microSD y batería. Se entrega una [propuesta CAD independiente para el panel y sus soportes](../../mechanical/panel-modules/README.md), con ajustes a copias de carcasa y bandeja. El maestro A5 y el firmware se conservan.
+Revisión del 20 de septiembre de 2026. Sustituye la propuesta de PCB personalizada por módulos comprables y un arnés. Se conservan la Tiny, su Tiny-Adapter y cable original, el UM980, BMI088, microSD y batería. El [receptor V1](../../mechanical/v1/README.md) integra el panel y los soportes internos; el A5 de partida permanece como fuente y el firmware se conserva.
 
 **Resultado: tres módulos principales, pulsador y dos ventanas de luz en el panel.** El USB-C exterior se usa para alimentación/carga y para el USB nativo del ESP32. El botón exterior acciona el encendido electrónico; el cierre de archivos antes de apagar requiere integración en firmware. No hay PCB que mandar fabricar.
 
@@ -69,7 +69,7 @@ El USB nativo proporciona flashing, consola Serial/JTAG y depuración del **ESP3
 ## Límites que condicionan el montaje
 
 1. **Corriente del USB.** PowerBoost está configurado para fuente de pared y carga de hasta 1 A; no negocia por sí mismo el presupuesto de un puerto de computadora. Para carga y operación simultáneas usar una fuente/puerto documentado de 5 V y al menos 2 A, compatible con su margen de entrada. Las resistencias CC de la placa USB no autorizan a tomar 2 A de cualquier puerto. Para un puerto de datos de capacidad desconocida, abrir el ramal interno `CHARGE_LINK` y operar desde batería: el mismo USB-C sigue dando datos. Para automatizar carga limitada en todos los puertos haría falta gestión adicional de corriente; no se presenta como resuelta.
-2. **Batería.** La referencia 955565 anunciada es 1S, 3.7 V/5000 mAh. Antes de conectarla se comprueban polaridad, protección PCM y admisión de carga a 4.2 V/1 A. PowerBoost no sustituye una protección de pack ni incorpora un termistor pegado a esta batería. La carga de una celda cuya protección y límites se desconocen no queda validada. Se conserva la [evidencia original](../power-board/BATTERY_REFERENCE.md).
+2. **Batería.** La referencia 955565 anunciada es 1S, 3.7 V/5000 mAh. Antes de conectarla se comprueban polaridad, protección PCM y admisión de carga a 4.2 V/1 A. PowerBoost no sustituye una protección de pack ni incorpora un termistor pegado a esta batería. La carga de una celda cuya protección y límites se desconocen no queda validada. Se conserva la [evidencia original](../references/BATTERY_REFERENCE.md).
 3. **USB self-powered.** El TS3USB30 permite desconectar los datos cuando está sin alimentación y seleccionar un canal vacío cuando Tiny está apagada. Eso **no demuestra** los umbrales de detección VBUS ni el tiempo de desconexión. Espressif indica detección válida por encima de 4.75 V, inválida por debajo de 4.35 V y señal baja en 3 ms al desconectar. Los condensadores de los módulos pueden retener VBUS. El prototipo requiere medirlo y completar detector/descarga si procede; no es una solución certificada. `self_powered` y `vbus_monitor_io` pertenecen a TinyUSB/OTG, no configuran Serial/JTAG ni ROM. [Espressif](https://docs.espressif.com/projects/esp-idf/en/v5.4/esp32s3/api-reference/peripherals/usb_device.html#self-powered-device), [TI TS3USB30](https://cdn-shop.adafruit.com/product-files/5871/ts3usb30.pdf).
 4. **Protección y corriente del sistema.** El módulo USB no trae una matriz TVS dedicada; la especificación HBM del chip no acredita ESD del equipo. Para uso de campo debe completarse esa protección y ensayarse. El elevador se selecciona para un presupuesto inicial de hasta 1 A; comprobar arranque, radio, microSD, ruido GNSS y margen térmico con todos los módulos. Verificar las entradas de alimentación reales antes de distribuir 5.2 V. No aplicar 5.2 V al chip BMI088 ni a señales de 3.3 V.
 
@@ -79,12 +79,10 @@ Estos puntos separan el prototipo económico de la anterior propuesta de product
 
 - [Cableado y control](WIRING.md).
 - [Montaje al panel y dimensiones para mecánica](PANEL.md).
-- [CAD, STEP, STL y render del panel](../../mechanical/panel-modules/README.md).
+- [CAD, STEP, STL y montaje de V1](../../mechanical/v1/README.md).
 - [Proveedores para México](SOURCING_MX.md).
 - [Diagrama inicial del reparto](panel-and-modules.svg), anterior a seleccionar pulsador y RGB Steren; no usar sus precios como presupuesto vigente.
 
 El [Adafruit bq25185 + boost 6106](https://www.adafruit.com/product/6106), de $8.95, ahorra $11, pero su guía advierte arranque con cargas por encima de 200 mA y un temporizador de carga fijo de seis horas. No se elige sin resolver esas condiciones para el GNSS y la batería de 5 Ah. [Limitaciones oficiales](https://learn.adafruit.com/adafruit-bq25185-usb-dc-solar-charger-with-5v-boost-board/pinouts).
 
 El [DFRobot MP2636 DFR0446](https://www.dfrobot.com/product-1613.html), de $8, es otra alternativa documentada con power-path, pero requiere cerrar corriente de carga/entrada, control OFF y transiciones de fuente de la placa concreta antes de sustituir el PowerBoost. El biestable verde que ya tiene el proyecto puede reutilizarse sólo después de identificar sus señales y comprobar apagado controlado/forzado; no se atribuyen esas funciones por su anuncio. CP2102N queda fuera.
-
-Se retiraron únicamente archivos de diseño/fabricación de PCB dentro de `hardware/power-board/`. Los documentos y datasheets anteriores se conservaron como antecedentes. No se borró firmware, CAD, archivos mecánicos ni módulos del receptor.

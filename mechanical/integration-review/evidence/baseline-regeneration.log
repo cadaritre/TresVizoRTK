@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "/var/folders/61/hbzm8hxn4kn_wg4j3s0gm1gh0000gn/T/tresvizo-panel-baseline-b7bthxzr/panel-modules/build_panel.py", line 241, in <module>
-    Part.export([objects['ModulePanel'],objects['A5_MainShell'],objects['A5_ElectronicsTray']],str(ROOT/'case-integration.step'))
-                                                                ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
-KeyError: 'A5_ElectronicsTray'

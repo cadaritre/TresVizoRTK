@@ -2,7 +2,7 @@
 
 Abrir **[TresVizo-V1.FCStd](generated/TresVizo-V1.FCStd) con FreeCAD 1.0.2**. El archivo contiene geometría propia y tres carpetas: **Para imprimir**, **Tornillería para comprar** y **Componentes**. La plantilla del BMI088 es una herramienta oculta, no parte del conjunto instalado. Seleccionar una carpeta/pieza y pulsar espacio alterna su visibilidad.
 
-Fuente de V1: `build_v1.py` + `parameters.json`, derivados del generador del panel y del A5 conservado. Este paquete sustituye las exportaciones anteriores para el primer prototipo completo. [Resultado breve y verificaciones](../../docs/INTEGRATION_REVIEW.md) · [Lista de compra](../MECHANICAL_BOM.md).
+Fuente de V1: `build_v1.py` + `parameters.json`, derivados del generador del panel y del A5 conservado en [sources](../sources/README.md). Este paquete sustituye las exportaciones anteriores para el primer prototipo completo. [Resultado breve y verificaciones](../../docs/INTEGRATION_REVIEW.md) · [Lista de compra](../MECHANICAL_BOM.md).
 
 ## Archivos para fabricar
 
@@ -29,7 +29,7 @@ Los dos difusores requieren material translúcido; los otros ocho elementos son 
 FRONT sigue siendo **+Y**; Z es el eje del jalón. Las direcciones siguientes son globales. Los movimientos se ensayaron en ambos sentidos por reversibilidad, a pasos de 1 mm; botón a 0.05 mm. Las bridas se cortan para servicio y se sustituyen.
 
 1. **Base e inserto, antes de electrónica.** Colocar tres tuercas M3 en bolsillos inferiores, sujetándolas durante el primer roscado. Introducir McMaster 90611A121 desde atrás (−Y), elevado 16 mm; centrar y bajar. Barril hacia abajo, brida arriba. Atornillar tres M3×8 desde arriba; hay paso de llave Ø3×35 mm. El barril termina a ras de Z0. Las tuercas quedan encerradas al apretar, no son clips a presión.
-2. **IMU con cuna fuera.** Introducir prensa con dos tuercas M2.5 desde +Y hacia −Y; colocar BMI088, alinear con plantilla y apretar los dos M2.5×12 alternadamente. Retirar plantilla hacia +Z. Conservar el [procedimiento de datum A5](../A5/IMU-ALIGNMENT.md). No usar espuma ni bridas en el IMU.
+2. **IMU con cuna fuera.** Introducir prensa con dos tuercas M2.5 desde +Y hacia −Y; colocar BMI088, alinear con plantilla y apretar los dos M2.5×12 alternadamente. Retirar plantilla hacia +Z. Conservar el [procedimiento de datum A5](../sources/a5/IMU-ALIGNMENT.md). No usar espuma ni bridas en el IMU.
 3. **Batería y placas de la cuna.** Introducir batería desde +Y sin comprimirla; sacar su cable por el canal superior lateral. Montar microSD y ambos módulos power desde atrás. PowerBoost sin USB-A, dos bridas por bandeja; microSD, dos bridas. Mantener cabezas de brida junto a las placas de soporte y dentro del cilindro de paso Ø61 mm; cortar sobrantes.
 4. **Placas del chasis.** UM980 entra desde +Y, sobre dos apoyos de borde y con dos bridas. Tiny entra desde arriba por sus guías, con una brida por ranuras; conserva posición original. Tiny-Adapter entra desde +Y, con una brida, FPC original y conexión accesible. No apretar bridas sobre conectores o componentes altos; usar lámina aislante fina en apoyos de placas expuestas.
 5. **Cuna cargada.** Presentarla desde −Y y deslizar hacia +Y hasta las guías; cerrar con dos M3×20. Montar las tuercas cautivas de cierres. Comprobar que el pack queda libre de puntas de tornillo.
@@ -58,6 +58,6 @@ Desde la raíz del repositorio:
 zsh mechanical/v1/regenerate.sh
 ```
 
-Usa el Python instalado de FreeCAD **1.0.2**, regenera primero A5+panel en `generated/baseline`, construye V1, exporta y valida. Finaliza con error si la geometría o exportaciones fallan. No escribe el A5 original. Para guardar colores y subcarpetas nativos, ejecutar `present_v1.py` en la consola Python de esa misma versión, usando `exec(compile(...), {'__file__': ruta})`; no inyectar un `GuiDocument.xml` de otra versión.
+Usa el Python instalado de FreeCAD **1.0.2**, regenera primero A5+panel en `.cache/mechanical-v1/baseline/` (raíz del repositorio), construye V1, exporta y valida. Finaliza con error si la geometría o exportaciones fallan. No escribe el A5 original. Para guardar colores y subcarpetas nativos, ejecutar `present_v1.py` en la consola Python de esa misma versión, usando `exec(compile(...), {'__file__': ruta})`; no inyectar un `GuiDocument.xml` de otra versión.
 
 Las envolventes comerciales son referencias simplificadas y la rosca se representa sin hélice. La simulación es nominal y discreta, no una prueba física de resistencia. Las comprobaciones físicas están limitadas a siete en el informe breve.

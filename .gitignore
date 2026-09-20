@@ -75,6 +75,7 @@ logs/local/
 
 
 # Revisiones mecanicas anteriores y copias automaticas de FreeCAD
+/archive/
 /mechanical/legacy/
 /mechanical/**/*.FCStd1
 /mechanical/**/*.FCBak

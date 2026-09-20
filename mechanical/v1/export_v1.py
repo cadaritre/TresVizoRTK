@@ -19,7 +19,7 @@ for n,filename,axis,angle in settings:
  if not item['closed'] or abs(item['z_min_mm'])>.001:raise ValueError(item)
  print(filename,'closed',item['facets'],flush=True)
 # Plantilla ya orientada, heredada del mismo datum A5.
-jig=ROOT.parent/'A5/print/07-plantilla-centrado.stl';dest=O/'stl/11-plantilla-centrado-imu.stl';shutil.copy2(jig,dest)
+jig=ROOT.parent/'sources/a5/print/07-plantilla-centrado.stl';dest=O/'stl/11-plantilla-centrado-imu.stl';shutil.copy2(jig,dest)
 m=Mesh.Mesh(str(dest));R.append({'object':'IMUAlignmentJig','file':str(dest.relative_to(ROOT)),'closed':m.isSolid(),'facets':m.CountFacets,'source_sha256':hashlib.sha256(jig.read_bytes()).hexdigest()})
 step=Part.Shape();step.read(str(O/'TresVizo-V1-assembly.step'))
 result={'meshes':R,'assembly_step_valid':step.isValid(),'assembly_step_solids':len(step.Solids),'expected_assembly_solids':len(S)-len(exclude),'all_pass':all(x['closed'] for x in R) and step.isValid() and len(step.Solids)==len(S)-len(exclude)}

@@ -41,5 +41,3 @@ Muestreo de traslación a 1 mm y botón a 0.05 mm, no barrido continuo certifica
 5. USB/botón: enchufe completo, placa sin palanca y retorno del botón sin quedar presionado.
 6. Módulos/arnés: bridas firmes fuera de componentes, cabezas dentro del paso, coaxial sin tirones y lazos de servicio libres.
 7. Encendido/carga: primera alimentación limitada, separación de VBUS y alimentación interna según WIRING, apagado y temperatura inicial de módulos.
-
-La revisión anterior se conserva como [evidencia histórica](../mechanical/v1/evidence/integration-review-before-v1.md); sus bloqueos no describen esta V1.

@@ -63,8 +63,8 @@ El enlace GNSS usa RX del ESP32 en GPIO18 y TX en GPIO17, con GND común; ambos 
 | --- | --- |
 | `firmware/esp32/` | Firmware del controlador ESP32-S3. |
 | `app/` | Aplicación móvil del instrumento. |
-| `hardware/` | BOM, conexiones y futuros esquemas electrónicos. |
-| `mechanical/` | Requisitos, fuentes CAD y exportaciones mecánicas. |
+| `hardware/` | BOM, módulos comerciales, conexiones y referencias del hardware vigente. |
+| `mechanical/` | V1 para imprimir y fuentes necesarias para regenerarla. |
 | `docs/` | Arquitectura, estado, hoja de ruta y entorno de desarrollo. |
 | `tools/` | Puente USB, diagnóstico GNSS/BLE, empaquetado y actualización de firmware. |
 | `tests/fixtures/` | Datos de prueba pequeños y anonimizados. |

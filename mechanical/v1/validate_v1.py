@@ -92,14 +92,14 @@ for n,key in [('PowerBoost','powerboost'),('SoftPower','soft_switch')]:
   sh=Part.makeBox(*b[3:],V(*b[:3]));obs={k:s for k,s in S.items() if k not in [n,'A5_IMUTarget']+I['routes']+I.get('tools',[])}
   R['universal_tray_options'].append({'module':n,'box':b,'hits':hits(sh,obs)})
 # Datums y superficies criticas conservadas respecto de A5 / panel.
-B=A.openDocument(str(OUT/'baseline/TresVizo-panel-modules.FCStd'));old={o.Name:o.Shape for o in B.Objects if hasattr(o,'Shape') and not hasattr(o,'Group')}
+B=A.openDocument(str(ROOT.parents[1]/'.cache/mechanical-v1/baseline/TresVizo-panel-modules.FCStd'));old={o.Name:o.Shape for o in B.Objects if hasattr(o,'Shape') and not hasattr(o,'Group')}
 critical=['A5_IMUReserve','A5_IMUTarget','A5_IMUNutBar','A5_AntennaCap','A5_HA901Reserve','A5_BatteryReserve','A5_ESPReference','USBModule','USBReceptacle','ButtonCap']
 R['preserved']=[{'name':n,'symmetric_difference_mm3':S[n].cut(old[n]).Volume+old[n].cut(S[n]).Volume} for n in critical]
 region=Part.makeBox(35,22,13,V(-17.5,-11,113))
 R['imu_datum_removed_mm3']=old['A5_BatteryIMUCarrier'].common(region).cut(S['A5_BatteryIMUCarrier']).Volume
 logo=Part.makeBox(50,20,40,V(-25,20,40))
 R['front_logo_removed_mm3']=old['A5_MainShell'].common(logo).cut(S['A5_MainShell']).Volume
-original_doc=A.openDocument(str(ROOT.parent/'A5/TresVizo-A5.FCStd'))
+original_doc=A.openDocument(str(ROOT.parent/'sources/a5/TresVizo-A5.FCStd'))
 S['IMUAlignmentGauge']=original_doc.IMUAlignmentGauge.Shape
 R['motions'].append(motion('imu_alignment_gauge',['IMUAlignmentGauge'],['A5_BatteryIMUCarrier','A5_IMUReserve','A5_IMUNutBar','A5_IMUPcbBolt1','A5_IMUPcbBolt2'],(0,0,1),40))
 R['shell_bbox_before']=bbox(old['A5_MainShell']);R['shell_bbox_after']=bbox(S['A5_MainShell'])
@@ -111,7 +111,7 @@ for angle in [-5,5]:
  R['insert_retention'].append({'rotation_deg':angle,'hits':hits(s,poleobs)})
 for z in [-.5,.5]:R['insert_retention'].append({'translation_z_mm':z,'hits':hits(moved(S['A5_FlangedInsert'],[0,0,z]),poleobs)})
 R['pole_clear_bore']={'diameter_mm':15.875,'free_height_mm':30,'hits':hits(Part.makeCylinder(7.9375,30,V()),{'chassis':S['A5_Chassis']})}
-source=ROOT.parent/'A5/TresVizo-A5.FCStd';initial=json.loads((ROOT/'evidence/inputs.json').read_text())['sha256']['mechanical/A5/TresVizo-A5.FCStd']
+source=ROOT.parent/'sources/a5/TresVizo-A5.FCStd';initial=json.loads((ROOT/'evidence/inputs.json').read_text())['sha256']['mechanical/A5/TresVizo-A5.FCStd']
 R['original_a5_unchanged']=hashlib.sha256(source.read_bytes()).hexdigest()==initial
 R['counts']={'printed':len(I['printed']),'screws':len(R['tools']),'nuts':len([n for n in I['hardware'] if 'Nut' in n]),'fastener_diameter_length_combinations':5}
 fail=[]

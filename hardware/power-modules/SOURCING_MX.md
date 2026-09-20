@@ -40,4 +40,4 @@ El biestable que ya posee el proyecto sigue siendo candidato para reutilizar. Ha
 | Fusibles y cable de potencia | Según WIRING, tras medir picos y verificar batería. No sustituir un fusible por una protección de celda. |
 | Difusores / guía de carga | Dos piezas translúcidas según STL; guía desde los LEDs del cargador. Trayectoria/longitud y brillo aún por probar. |
 
-Los consumibles de esta última tabla no tienen una oferta ni precio verificados en esta consulta; son requisitos de montaje, no una cotización cerrada. El [CAD del panel](../../mechanical/panel-modules/README.md) contiene los soportes y las holguras para prototipar.
+Los consumibles de esta última tabla no tienen una oferta ni precio verificados en esta consulta; son requisitos de montaje, no una cotización cerrada. El [CAD vigente V1](../../mechanical/v1/README.md) contiene los soportes y las holguras para prototipar.

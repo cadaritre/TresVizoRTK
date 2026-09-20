@@ -2,16 +2,19 @@
 from pathlib import Path
 import FreeCAD as App
 import Part, MeshPart, Mesh
-import json, math, hashlib
+import json, math, hashlib, argparse
 ROOT=Path(__file__).resolve().parent
-OUT=ROOT/'generated'; OUT.mkdir(exist_ok=True)
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--output-dir',type=Path,default=ROOT/'generated')
+OUT=parser.parse_args().output_dir.resolve(); OUT.mkdir(parents=True,exist_ok=True)
+BASELINE=ROOT.parents[1]/'.cache/mechanical-v1/baseline'
 P=json.loads((ROOT/'parameters.json').read_text(encoding='utf-8'))
 V=App.Vector
-base=App.openDocument(str(OUT/'baseline/TresVizo-panel-modules.FCStd'))
+base=App.openDocument(str(BASELINE/'TresVizo-panel-modules.FCStd'))
 doc=App.newDocument('TresVizoV1')
 S={o.Name:o.Shape.copy() for o in base.Objects if hasattr(o,'Shape')}
 labels={o.Name:o.Label for o in base.Objects if hasattr(o,'Shape')}
-colors={o['name']:o['color'] for o in json.loads((OUT/'baseline/render-meshes.json').read_text())}
+colors={o['name']:o['color'] for o in json.loads((BASELINE/'render-meshes.json').read_text())}
 original={n:s.copy() for n,s in S.items()}
 printed=['A5_MainShell','A5_Chassis','A5_BatteryIMUCarrier','A5_AntennaCap','A5_IMUNutBar','ModulePanel','ButtonCap','ButtonCartridge','StatusLens','ChargeLens']
 removed=[]; functional_contacts=[]
@@ -207,7 +210,7 @@ for n,s in S.items():
  if o.ViewObject:
   o.ViewObject.ShapeColor=tuple(c/255 for c in colors.get(n,[100,140,150]));o.ViewObject.Visibility=n not in route_names+['A5_IMUTarget','TinyUSBPlugReserve']
 tools_group=doc.addObject('App::DocumentObjectGroup','PrintTools');tools_group.Label='Plantilla reutilizable - fuera del montaje';gp.addObject(tools_group)
-source_doc=App.openDocument(str(ROOT.parent/'A5/TresVizo-A5.FCStd'))
+source_doc=App.openDocument(str(ROOT.parent/'sources/a5/TresVizo-A5.FCStd'))
 gauge=doc.addObject('Part::Feature','IMUAlignmentGauge');gauge.Label='11 Plantilla de centrado BMI088';gauge.Shape=source_doc.IMUAlignmentGauge.Shape.copy();tools_group.addObject(gauge)
 if gauge.ViewObject:gauge.ViewObject.Visibility=False
 doc.recompute();doc.saveAs(str(OUT/'TresVizo-V1.FCStd'))

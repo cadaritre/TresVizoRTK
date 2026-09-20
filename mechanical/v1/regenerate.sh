@@ -3,7 +3,7 @@ set -eu
 v1_dir="${0:A:h}"
 freecad_python='/Users/cadaritre/Applications/FreeCAD-1.0.2.app/Contents/Resources/bin/python'
 export PYTHONPATH='/Users/cadaritre/Applications/FreeCAD-1.0.2.app/Contents/Resources/lib'
-"$freecad_python" "$v1_dir/../panel-modules/build_panel.py" --output-dir "$v1_dir/generated/baseline"
+"$freecad_python" "$v1_dir/../sources/panel/build_panel.py" --output-dir "$v1_dir/../../.cache/mechanical-v1/baseline"
 "$freecad_python" "$v1_dir/build_v1.py"
 "$freecad_python" "$v1_dir/export_v1.py"
 "$freecad_python" "$v1_dir/validate_v1.py"

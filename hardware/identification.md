@@ -2,7 +2,7 @@
 
 ## Corrección para Power Board P1
 
-El propietario identifica ahora la placa utilizada como **Waveshare ESP32-S3-Tiny-N8R8** y reporta serigrafía trasera `ESP32-S3-TINY`. Esta marca no distingue variante ni revisión del FPC. Los resultados USB 4 MB/2 MB de abajo se conservan como evidencia histórica, cuya correspondencia con la unidad actual está pendiente. Para P1 rige N8R8 declarada; no convertir esa declaración en verificación física ni cambiar firmware automáticamente. Ver [revisión USB nativo](power-board/USB_NATIVE_REVIEW.md). La restricción histórica «No usar el perfil N8R8» de la tabla no es una decisión sobre la unidad actualmente declarada.
+El propietario identifica ahora la placa utilizada como **Waveshare ESP32-S3-Tiny-N8R8** y reporta serigrafía trasera `ESP32-S3-TINY`. Esta marca no distingue variante ni revisión del FPC. Los resultados USB 4 MB/2 MB de abajo se conservan como evidencia histórica, cuya correspondencia con la unidad actual está pendiente. Para P1 rige N8R8 declarada; no convertir esa declaración en verificación física ni cambiar firmware automáticamente. Ver [cableado USB vigente](power-modules/WIRING.md). La restricción histórica «No usar el perfil N8R8» de la tabla no es una decisión sobre la unidad actualmente declarada.
 
 Fecha: 19 de septiembre de 2026. Fuentes: capturas de las publicaciones proporcionadas por el propietario, identificación USB y consulta de documentación del fabricante. Las fotografías de una publicación no verifican por sí solas las conexiones de la unidad recibida.
 
@@ -18,7 +18,7 @@ El propietario confirmó que solo el ESP32 está conectado a la Mac por USB. GNS
 
 ## Batería indicada posteriormente
 
-El propietario identifica la [publicación 955565](https://es.aliexpress.com/item/1005008867815394.html), anunciada 3.7 V, 5000 mAh y 18.5 Wh, mediante captura. Cableado mostrado de dos hilos; PCM, NTC, conector, corrientes y medidas reales sin verificar. Véase [referencia de batería](power-board/BATTERY_REFERENCE.md).
+El propietario identifica la [publicación 955565](https://es.aliexpress.com/item/1005008867815394.html), anunciada 3.7 V, 5000 mAh y 18.5 Wh, mediante captura. Cableado mostrado de dos hilos; PCM, NTC, conector, corrientes y medidas reales sin verificar. Véase [referencia de batería](references/BATTERY_REFERENCE.md).
 
 ## Fuentes técnicas
 
