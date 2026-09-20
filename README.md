@@ -8,7 +8,7 @@ El objetivo de desarrollo es alcanzar aproximadamente 2 cm de precisión en cond
 
 ## Estado actual
 
-Ya existe una primera versión de firmware, compilada y cargada al ESP32-S3 conectado por USB. Incluye un panel web con la identidad de TresVizo, diagnóstico real y ajustes persistentes. GNSS, IMU, microSD, NTRIP y BLE siguen sin integrar. No hay aplicación móvil, diseño electrónico ni modelo mecánico implementados. La batería continúa pendiente.
+Ya existe una primera versión de firmware, compilada y cargada al ESP32-S3 conectado por USB. Incluye un panel web con la identidad de TresVizo, diagnóstico real y ajustes persistentes. GNSS, IMU, microSD, NTRIP y BLE siguen sin integrar. No hay aplicación móvil ni diseño electrónico fabricable. La carcasa cuenta con una [base CAD A5 independiente](mechanical/README.md), pendiente de integrar la PCB de alimentación e interfaz. La batería continúa pendiente.
 
 Consulta las [instrucciones del firmware](firmware/esp32/README.md) y la [evidencia de validación](docs/firmware-validation.md).
 
