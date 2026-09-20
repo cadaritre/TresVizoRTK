@@ -1,4 +1,6 @@
-# Revisión conjunta de integración
+# Revisión conjunta de integración — antecedente
+
+> Paquete histórico. Para fabricar el prototipo completo usar [V1](../v1/README.md) con FreeCAD **1.0.2**; las limitaciones y órdenes de ejecución siguientes describen la auditoría anterior.
 
 Resultado y decisiones: [INTEGRATION_REVIEW.md](../../docs/INTEGRATION_REVIEW.md). Tornillería: [MECHANICAL_BOM.md](../MECHANICAL_BOM.md).
 

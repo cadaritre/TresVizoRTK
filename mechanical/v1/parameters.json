@@ -25,6 +25,7 @@
     "overtravel_top": 30.0
   },
   "powerboost": {
+    "alternative_box": [-13, -26, 96.8, 26, 8, 47],
     "box": [
       -11.5,
       -28.0,
@@ -40,6 +41,7 @@
     ]
   },
   "soft_switch": {
+    "alternative_box": [-13.5, -24, 24.5, 27, 8, 27],
     "box": [
       -12.7,
       -26.0,

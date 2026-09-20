@@ -8,13 +8,13 @@ El objetivo de desarrollo es alcanzar aproximadamente 2 cm de precisión en cond
 
 ## Estado actual
 
-Ya existe una primera versión de firmware, compilada y cargada al ESP32-S3 conectado por USB. Incluye un panel web con la identidad de TresVizo, diagnóstico real y ajustes persistentes. GNSS, IMU, microSD, NTRIP y BLE siguen sin integrar. No hay aplicación móvil ni diseño electrónico fabricable. La carcasa cuenta con una [base CAD A5 independiente](mechanical/README.md), pendiente de integrar la PCB de alimentación e interfaz. La batería continúa pendiente.
+Ya existe una primera versión de firmware, compilada y cargada al ESP32-S3 conectado por USB. Incluye un panel web con la identidad de TresVizo, diagnóstico real y ajustes persistentes. En 0.5.0 se probaron el enlace UART con UM980, control BLE cifrado y 2 MB de PSRAM. La salida GGA por UART se comprobó a 10 Hz; la precisión y la telemetría de posición en exterior siguen pendientes. La entrada NTRIP está implementada, pendiente de prueba con caster real. IMU sigue sin integrar y microSD está preparada en código, deshabilitada hasta conectar y validar el hardware. No hay aplicación móvil ni diseño electrónico fabricable. La carcasa cuenta con una [V1 mecánica para el primer prototipo completo](mechanical/v1/README.md), con módulos comerciales y una reserva de batería; todavía no se ha impreso ni ensayado físicamente.
 
 Consulta las [instrucciones del firmware](firmware/esp32/README.md) y la [evidencia de validación](docs/firmware-validation.md).
 
 Consulta [el estado detallado](docs/project-status.md) antes de interpretar cualquier elemento como funcional.
 
-**Revisión de integración, 20/09/2026:** la propuesta vigente de alimentación usa [módulos comerciales](hardware/power-modules/README.md). La [revisión conjunta A5 + panel](docs/INTEGRATION_REVIEW.md) corrige interferencias del panel y documenta pendientes de montaje del cuerpo, power, cableado e inserto 5/8-11. El receptor completo todavía no está listo para impresión de armado. Las menciones anteriores a integrar una PCB personalizada describen el estado previo.
+**V1 mecánica, 20/09/2026:** [modelo, STEP/STL y montaje](mechanical/v1/README.md) con paso del cuerpo corregido, bandejas power, retención McMaster 90611A121 y tres carpetas en FreeCAD 1.0.2. La [validación y estado de impresión](docs/INTEGRATION_REVIEW.md) corresponden al prototipo completo; alimentación por [módulos comerciales](hardware/power-modules/README.md). Las referencias anteriores a una PCB personalizada son antecedentes.
 
 ## Alcance previsto
 
@@ -55,7 +55,7 @@ La base considerada incluye:
 - Módulo de interruptor biestable para estudiar el encendido, aún sin verificar ni integrar.
 - Carcasa cilíndrica impresa en 3D y montaje sobre jalón.
 
-No se han fijado GPIO, conectores, niveles eléctricos, dimensiones ni diseño de alimentación. La disponibilidad de PPS en la carrier UM980 concreta está pendiente de verificación. Consulta la [lista de materiales](hardware/bom.md) y las [conexiones pendientes](hardware/wiring.md).
+El enlace GNSS usa RX del ESP32 en GPIO18 y TX en GPIO17, con GND común; ambos equipos reciben alimentación USB por separado. El resto de interfaces requiere seguir la documentación de cableado y sus validaciones. La disponibilidad de PPS en la carrier UM980 concreta está pendiente de verificación. Consulta la [lista de materiales](hardware/bom.md) y las [conexiones pendientes](hardware/wiring.md).
 
 ## Mapa del repositorio
 
@@ -66,13 +66,14 @@ No se han fijado GPIO, conectores, niveles eléctricos, dimensiones ni diseño d
 | `hardware/` | BOM, conexiones y futuros esquemas electrónicos. |
 | `mechanical/` | Requisitos, fuentes CAD y exportaciones mecánicas. |
 | `docs/` | Arquitectura, estado, hoja de ruta y entorno de desarrollo. |
-| `tools/` | Futuras herramientas auxiliares del proyecto. |
+| `tools/` | Puente USB, diagnóstico GNSS/BLE, empaquetado y actualización de firmware. |
 | `tests/fixtures/` | Datos de prueba pequeños y anonimizados. |
 
 ## Documentación
 
 - [Arquitectura del sistema](docs/architecture.md)
 - [Estado del proyecto](docs/project-status.md)
+- [Servicios actuales del ESP32 (0.5.0)](docs/esp32-services.md)
 - [Hoja de ruta](docs/roadmap.md)
 - [Entorno y prácticas de desarrollo](docs/development.md)
 - [Lista de materiales](hardware/bom.md)

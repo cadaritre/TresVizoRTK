@@ -78,6 +78,19 @@
     ]
   },
   {
+    "a": "A5_CoaxRouteReserve",
+    "b": "A5_BatteryIMUCarrier",
+    "volume": 5.09033,
+    "box": [
+      14.5,
+      -17.64,
+      29.51,
+      17.0,
+      -12.51,
+      35.53
+    ]
+  },
+  {
     "a": "TinyUSBPlugReserve",
     "b": "UsbHarness",
     "volume": 0.00377,

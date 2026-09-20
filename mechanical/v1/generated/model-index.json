@@ -75,7 +75,7 @@
       "name": "ModulePanel",
       "solids": 1,
       "valid": true,
-      "volume": 3932.1101296540382,
+      "volume": 3934.551157367335,
       "bbox": [
         -14.191182208349598,
         12.100636363636365,
@@ -649,7 +649,7 @@
       "name": "A5_Chassis",
       "solids": 1,
       "valid": true,
-      "volume": 74751.09798199407,
+      "volume": 74734.40818665622,
       "bbox": [
         -32.18,
         -32.18,
@@ -663,7 +663,7 @@
       "name": "A5_BatteryIMUCarrier",
       "solids": 1,
       "valid": true,
-      "volume": 56913.87317695046,
+      "volume": 55719.309678204634,
       "bbox": [
         -30.3,
         -28.400000000000006,
@@ -1424,5 +1424,8 @@
       152,
       56
     ]
-  }
+  },
+  "tools": [
+    "IMUAlignmentGauge"
+  ]
 }

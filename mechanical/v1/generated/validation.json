@@ -1,0 +1,1607 @@
+{
+  "freecad_version": [
+    "1",
+    "0",
+    "2",
+    "39319 (Git)",
+    "https://github.com/FreeCAD/FreeCAD",
+    "2025/08/05 20:19:07",
+    "(HEAD detached at 1.0.2)",
+    "256fc7eff3379911ab5daf88e10182c509aa8052"
+  ],
+  "limits": "Geometria nominal; movimientos discretos cada 1 mm (boton 0.05 mm). Cables flexibles desconectados/retirados para servicio. No ensayo fisico ni barrido continuo certificado.",
+  "solids": [
+    {
+      "name": "ModulePanel",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "ButtonCap",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "ButtonCartridge",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "TactileBody",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "TactileStem",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "StatusLens",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "ChargeLens",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "RGBLed",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "USBModule",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "USBReceptacle",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "USBPortInterior",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "USBContactTongue",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "USBChip",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "USBScrew1",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "USBScrew4",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_MainShell",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_AntennaCap",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_FlangedInsert",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_RadialNut1",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_RadialBolt1",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_RadialNut3",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_RadialBolt3",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_ModuleBolt12",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_ModuleNut12",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_ModuleBolt22",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_ModuleNut22",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_BatteryReserve",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_GNSSReserve",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_SDReference",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_IMUReserve",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_ESPReference",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_HA901Reserve",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_CoaxRouteReserve",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_AntennaBolt1",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_AntennaBolt2",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_AntennaBolt3",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_IMUTarget",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_IMUPcbBolt1",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_IMUPcbNut1",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_IMUPcbBolt2",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_IMUPcbNut2",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_Chassis",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_BatteryIMUCarrier",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_IMUNutBar",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_CapClosureBolt1",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_CapClosureNut1",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_CapClosureBolt2",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_CapClosureNut2",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_PanelBolt1",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_PanelNut1",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_PanelBolt2",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "A5_PanelNut2",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "TinyAdapterPosition",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "TinyUSBPlugReserve",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "ButtonM3",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "InsertBolt1",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "InsertNut1",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "InsertBolt2",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "InsertNut2",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "InsertBolt3",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "InsertNut3",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "PowerBoost",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "SoftPower",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "BatteryToPower",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "RearPowerBus",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "PowerToGNSS",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "UartAndImu",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "UsbHarness",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "ChargeLight",
+      "valid": true,
+      "solids": 1
+    },
+    {
+      "name": "IMUAlignmentGauge",
+      "valid": true,
+      "solids": 1
+    }
+  ],
+  "pair_intersections": [
+    {
+      "part": "ModulePanel",
+      "classification": "Vastago liso dentro de piloto para roscar plastico",
+      "against": "USBScrew1",
+      "volume_mm3": 2.96409,
+      "box": [
+        -8.62,
+        13.80064,
+        125.35,
+        -6.62,
+        15.80064,
+        128.75
+      ]
+    },
+    {
+      "part": "ModulePanel",
+      "classification": "Vastago liso dentro de piloto para roscar plastico",
+      "against": "USBScrew4",
+      "volume_mm3": 2.96409,
+      "box": [
+        6.62,
+        31.58064,
+        125.35,
+        8.62,
+        33.58064,
+        128.75
+      ]
+    },
+    {
+      "part": "ModulePanel",
+      "classification": "Vastago liso dentro de piloto para roscar plastico",
+      "against": "ButtonM3",
+      "volume_mm3": 11.87915,
+      "box": [
+        7.5,
+        28.8,
+        108.5,
+        10.5,
+        34.3,
+        111.5
+      ]
+    },
+    {
+      "part": "A5_HA901Reserve",
+      "classification": "Rosca comercial de antena representada sin vaciado",
+      "against": "A5_AntennaBolt1",
+      "volume_mm3": 19.63495,
+      "box": [
+        10.26814,
+        5.4,
+        168.0,
+        12.76814,
+        7.9,
+        172.0
+      ]
+    },
+    {
+      "part": "A5_HA901Reserve",
+      "classification": "Rosca comercial de antena representada sin vaciado",
+      "against": "A5_AntennaBolt2",
+      "volume_mm3": 19.63495,
+      "box": [
+        -12.76814,
+        5.4,
+        168.0,
+        -10.26814,
+        7.9,
+        172.0
+      ]
+    },
+    {
+      "part": "A5_HA901Reserve",
+      "classification": "Rosca comercial de antena representada sin vaciado",
+      "against": "A5_AntennaBolt3",
+      "volume_mm3": 19.63495,
+      "box": [
+        -1.25,
+        -14.55,
+        168.0,
+        1.25,
+        -12.05,
+        172.0
+      ]
+    },
+    {
+      "part": "TinyUSBPlugReserve",
+      "classification": "Continuidad plug/arnes",
+      "against": "UsbHarness",
+      "volume_mm3": 0.00377,
+      "box": [
+        -4.50444,
+        22.95523,
+        135.14209,
+        0.42669,
+        23.0538,
+        137.544
+      ]
+    },
+    {
+      "part": "BatteryToPower",
+      "classification": "Corredores de un mismo arnes compartido; no solidos de cables individuales",
+      "against": "RearPowerBus",
+      "volume_mm3": 19.42217,
+      "box": [
+        -17.8,
+        -23.8,
+        105.7741,
+        -14.39003,
+        -20.16288,
+        111.80029
+      ]
+    },
+    {
+      "part": "BatteryToPower",
+      "classification": "Corredores de un mismo arnes compartido; no solidos de cables individuales",
+      "against": "PowerToGNSS",
+      "volume_mm3": 21.50316,
+      "box": [
+        -17.8,
+        -23.8,
+        105.62025,
+        -14.38996,
+        -20.07344,
+        111.80041
+      ]
+    },
+    {
+      "part": "RearPowerBus",
+      "classification": "Corredores de un mismo arnes compartido; no solidos de cables individuales",
+      "against": "PowerToGNSS",
+      "volume_mm3": 159.68532,
+      "box": [
+        -19.19726,
+        -23.6,
+        100.0,
+        -15.4,
+        -19.80135,
+        120.20381
+      ]
+    }
+  ],
+  "motions": [
+    {
+      "name": "panel",
+      "moving": [
+        "ModulePanel",
+        "ButtonCap",
+        "ButtonCartridge",
+        "TactileBody",
+        "TactileStem",
+        "StatusLens",
+        "ChargeLens",
+        "RGBLed",
+        "USBModule",
+        "USBReceptacle",
+        "USBPortInterior",
+        "USBContactTongue",
+        "USBChip",
+        "USBScrew1",
+        "USBScrew4",
+        "ButtonM3"
+      ],
+      "obstacles": [
+        "A5_MainShell",
+        "A5_AntennaCap",
+        "A5_FlangedInsert",
+        "A5_RadialNut1",
+        "A5_RadialBolt1",
+        "A5_RadialNut3",
+        "A5_RadialBolt3",
+        "A5_ModuleBolt12",
+        "A5_ModuleNut12",
+        "A5_ModuleBolt22",
+        "A5_ModuleNut22",
+        "A5_BatteryReserve",
+        "A5_GNSSReserve",
+        "A5_SDReference",
+        "A5_IMUReserve",
+        "A5_ESPReference",
+        "A5_HA901Reserve",
+        "A5_AntennaBolt1",
+        "A5_AntennaBolt2",
+        "A5_AntennaBolt3",
+        "A5_IMUPcbBolt1",
+        "A5_IMUPcbNut1",
+        "A5_IMUPcbBolt2",
+        "A5_IMUPcbNut2",
+        "A5_Chassis",
+        "A5_BatteryIMUCarrier",
+        "A5_IMUNutBar",
+        "A5_CapClosureBolt1",
+        "A5_CapClosureNut1",
+        "A5_CapClosureBolt2",
+        "A5_CapClosureNut2",
+        "A5_PanelNut1",
+        "A5_PanelNut2",
+        "TinyAdapterPosition",
+        "InsertBolt1",
+        "InsertNut1",
+        "InsertBolt2",
+        "InsertNut2",
+        "InsertBolt3",
+        "InsertNut3",
+        "PowerBoost",
+        "SoftPower"
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 60,
+      "step_mm": 1,
+      "samples": 61,
+      "hits": []
+    },
+    {
+      "name": "cap",
+      "moving": [
+        "A5_AntennaCap",
+        "A5_HA901Reserve",
+        "A5_AntennaBolt1",
+        "A5_AntennaBolt2",
+        "A5_AntennaBolt3"
+      ],
+      "obstacles": [
+        "ModulePanel",
+        "ButtonCap",
+        "ButtonCartridge",
+        "TactileBody",
+        "TactileStem",
+        "StatusLens",
+        "ChargeLens",
+        "RGBLed",
+        "USBModule",
+        "USBReceptacle",
+        "USBPortInterior",
+        "USBContactTongue",
+        "USBChip",
+        "USBScrew1",
+        "USBScrew4",
+        "A5_MainShell",
+        "A5_FlangedInsert",
+        "A5_RadialNut1",
+        "A5_RadialBolt1",
+        "A5_RadialNut3",
+        "A5_RadialBolt3",
+        "A5_ModuleBolt12",
+        "A5_ModuleNut12",
+        "A5_ModuleBolt22",
+        "A5_ModuleNut22",
+        "A5_BatteryReserve",
+        "A5_GNSSReserve",
+        "A5_SDReference",
+        "A5_IMUReserve",
+        "A5_ESPReference",
+        "A5_IMUPcbBolt1",
+        "A5_IMUPcbNut1",
+        "A5_IMUPcbBolt2",
+        "A5_IMUPcbNut2",
+        "A5_Chassis",
+        "A5_BatteryIMUCarrier",
+        "A5_IMUNutBar",
+        "A5_CapClosureNut1",
+        "A5_CapClosureNut2",
+        "A5_PanelBolt1",
+        "A5_PanelNut1",
+        "A5_PanelBolt2",
+        "A5_PanelNut2",
+        "TinyAdapterPosition",
+        "ButtonM3",
+        "InsertBolt1",
+        "InsertNut1",
+        "InsertBolt2",
+        "InsertNut2",
+        "InsertBolt3",
+        "InsertNut3",
+        "PowerBoost",
+        "SoftPower"
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 170,
+      "step_mm": 1,
+      "samples": 171,
+      "hits": []
+    },
+    {
+      "name": "shell",
+      "moving": [
+        "A5_MainShell"
+      ],
+      "obstacles": [
+        "A5_FlangedInsert",
+        "A5_RadialNut1",
+        "A5_RadialNut3",
+        "A5_ModuleBolt12",
+        "A5_ModuleNut12",
+        "A5_ModuleBolt22",
+        "A5_ModuleNut22",
+        "A5_BatteryReserve",
+        "A5_GNSSReserve",
+        "A5_SDReference",
+        "A5_IMUReserve",
+        "A5_ESPReference",
+        "A5_IMUPcbBolt1",
+        "A5_IMUPcbNut1",
+        "A5_IMUPcbBolt2",
+        "A5_IMUPcbNut2",
+        "A5_Chassis",
+        "A5_BatteryIMUCarrier",
+        "A5_IMUNutBar",
+        "TinyAdapterPosition",
+        "InsertBolt1",
+        "InsertNut1",
+        "InsertBolt2",
+        "InsertNut2",
+        "InsertBolt3",
+        "InsertNut3",
+        "PowerBoost",
+        "SoftPower"
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 180,
+      "step_mm": 1,
+      "samples": 181,
+      "hits": []
+    },
+    {
+      "name": "loaded_carrier",
+      "moving": [
+        "A5_BatteryIMUCarrier",
+        "A5_BatteryReserve",
+        "A5_IMUReserve",
+        "A5_IMUNutBar",
+        "A5_IMUPcbBolt1",
+        "A5_IMUPcbBolt2",
+        "A5_IMUPcbNut1",
+        "A5_IMUPcbNut2",
+        "A5_SDReference",
+        "A5_ModuleNut12",
+        "A5_ModuleNut22",
+        "PowerBoost",
+        "SoftPower"
+      ],
+      "obstacles": [
+        "A5_FlangedInsert",
+        "A5_RadialNut1",
+        "A5_RadialNut3",
+        "A5_GNSSReserve",
+        "A5_ESPReference",
+        "A5_Chassis",
+        "A5_PanelNut1",
+        "A5_PanelNut2",
+        "TinyAdapterPosition",
+        "InsertBolt1",
+        "InsertNut1",
+        "InsertBolt2",
+        "InsertNut2",
+        "InsertBolt3",
+        "InsertNut3"
+      ],
+      "axis": [
+        0,
+        -1,
+        0
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 80,
+      "step_mm": 1,
+      "samples": 81,
+      "hits": []
+    },
+    {
+      "name": "battery",
+      "moving": [
+        "A5_BatteryReserve"
+      ],
+      "obstacles": [
+        "A5_BatteryIMUCarrier",
+        "A5_IMUReserve",
+        "A5_IMUNutBar",
+        "PowerBoost",
+        "SoftPower",
+        "A5_SDReference"
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 60,
+      "step_mm": 1,
+      "samples": 61,
+      "hits": []
+    },
+    {
+      "name": "powerboost",
+      "moving": [
+        "PowerBoost"
+      ],
+      "obstacles": [
+        "A5_BatteryIMUCarrier",
+        "A5_BatteryReserve",
+        "A5_IMUReserve",
+        "A5_SDReference",
+        "SoftPower"
+      ],
+      "axis": [
+        0,
+        -1,
+        0
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 60,
+      "step_mm": 1,
+      "samples": 61,
+      "hits": []
+    },
+    {
+      "name": "soft_power",
+      "moving": [
+        "SoftPower"
+      ],
+      "obstacles": [
+        "A5_BatteryIMUCarrier",
+        "A5_BatteryReserve",
+        "A5_SDReference",
+        "PowerBoost"
+      ],
+      "axis": [
+        0,
+        -1,
+        0
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 60,
+      "step_mm": 1,
+      "samples": 61,
+      "hits": []
+    },
+    {
+      "name": "insert_lift",
+      "moving": [
+        "A5_FlangedInsert"
+      ],
+      "obstacles": [
+        "A5_Chassis"
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 16,
+      "step_mm": 1,
+      "samples": 17,
+      "hits": []
+    },
+    {
+      "name": "insert_rear",
+      "moving": [
+        "A5_FlangedInsert"
+      ],
+      "obstacles": [
+        "A5_Chassis"
+      ],
+      "axis": [
+        0,
+        -1,
+        0
+      ],
+      "origin": [
+        0,
+        0,
+        16
+      ],
+      "distance_mm": 60,
+      "step_mm": 1,
+      "samples": 61,
+      "hits": []
+    },
+    {
+      "name": "imu_nutbar",
+      "moving": [
+        "A5_IMUNutBar",
+        "A5_IMUPcbNut1",
+        "A5_IMUPcbNut2"
+      ],
+      "obstacles": [
+        "A5_BatteryIMUCarrier"
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 50,
+      "step_mm": 1,
+      "samples": 51,
+      "hits": []
+    },
+    {
+      "name": "imu_board",
+      "moving": [
+        "A5_IMUReserve"
+      ],
+      "obstacles": [
+        "A5_BatteryIMUCarrier",
+        "A5_IMUNutBar"
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 40,
+      "step_mm": 1,
+      "samples": 41,
+      "hits": []
+    },
+    {
+      "name": "gnss",
+      "moving": [
+        "A5_GNSSReserve"
+      ],
+      "obstacles": [
+        "A5_Chassis",
+        "A5_BatteryIMUCarrier"
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 60,
+      "step_mm": 1,
+      "samples": 61,
+      "hits": []
+    },
+    {
+      "name": "sd",
+      "moving": [
+        "A5_SDReference"
+      ],
+      "obstacles": [
+        "A5_BatteryIMUCarrier",
+        "PowerBoost",
+        "SoftPower"
+      ],
+      "axis": [
+        0,
+        -1,
+        0
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 60,
+      "step_mm": 1,
+      "samples": 61,
+      "hits": []
+    },
+    {
+      "name": "tiny",
+      "moving": [
+        "A5_ESPReference"
+      ],
+      "obstacles": [
+        "A5_Chassis",
+        "TinyAdapterPosition"
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 40,
+      "step_mm": 1,
+      "samples": 41,
+      "hits": []
+    },
+    {
+      "name": "adapter",
+      "moving": [
+        "TinyAdapterPosition"
+      ],
+      "obstacles": [
+        "A5_Chassis",
+        "A5_ESPReference"
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 60,
+      "step_mm": 1,
+      "samples": 61,
+      "hits": []
+    },
+    {
+      "name": "button_cartridge",
+      "moving": [
+        "ButtonCartridge",
+        "TactileBody",
+        "TactileStem"
+      ],
+      "obstacles": [
+        "ModulePanel",
+        "ButtonCap"
+      ],
+      "axis": [
+        0,
+        -1,
+        0
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 40,
+      "step_mm": 1,
+      "samples": 41,
+      "hits": []
+    },
+    {
+      "name": "button_stroke",
+      "moving": [
+        "ButtonCap"
+      ],
+      "obstacles": [
+        "ModulePanel",
+        "ButtonCartridge",
+        "A5_Chassis",
+        "A5_MainShell"
+      ],
+      "axis": [
+        0,
+        -1,
+        0
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 0.4,
+      "step_mm": 0.05,
+      "samples": 9,
+      "hits": []
+    },
+    {
+      "name": "imu_alignment_gauge",
+      "moving": [
+        "IMUAlignmentGauge"
+      ],
+      "obstacles": [
+        "A5_BatteryIMUCarrier",
+        "A5_IMUReserve",
+        "A5_IMUNutBar",
+        "A5_IMUPcbBolt1",
+        "A5_IMUPcbBolt2"
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "distance_mm": 40,
+      "step_mm": 1,
+      "samples": 41,
+      "hits": []
+    }
+  ],
+  "tools": [
+    {
+      "screw": "USBScrew1",
+      "stage": "panel fuera",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "USBScrew4",
+      "stage": "panel fuera",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "A5_RadialBolt1",
+      "stage": "conjunto cerrado",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "A5_RadialBolt3",
+      "stage": "conjunto cerrado",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "A5_ModuleBolt12",
+      "stage": "cuerpo fuera",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "A5_ModuleBolt22",
+      "stage": "cuerpo fuera",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "A5_AntennaBolt1",
+      "stage": "tapa fuera",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "A5_AntennaBolt2",
+      "stage": "tapa fuera",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "A5_AntennaBolt3",
+      "stage": "tapa fuera",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "A5_IMUPcbBolt1",
+      "stage": "cuna fuera",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "A5_IMUPcbBolt2",
+      "stage": "cuna fuera",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "A5_CapClosureBolt1",
+      "stage": "conjunto cerrado",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "A5_CapClosureBolt2",
+      "stage": "conjunto cerrado",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "A5_PanelBolt1",
+      "stage": "conjunto cerrado",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "A5_PanelBolt2",
+      "stage": "conjunto cerrado",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "ButtonM3",
+      "stage": "panel fuera",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "InsertBolt1",
+      "stage": "base desnuda",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "InsertBolt2",
+      "stage": "base desnuda",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    },
+    {
+      "screw": "InsertBolt3",
+      "stage": "base desnuda",
+      "tool_diameter_mm": 3,
+      "length_mm": 35,
+      "hits": []
+    }
+  ],
+  "head_intersections": [
+    {
+      "screw": "USBScrew1",
+      "hits": []
+    },
+    {
+      "screw": "USBScrew4",
+      "hits": []
+    },
+    {
+      "screw": "A5_RadialBolt1",
+      "hits": []
+    },
+    {
+      "screw": "A5_RadialBolt3",
+      "hits": []
+    },
+    {
+      "screw": "A5_ModuleBolt12",
+      "hits": []
+    },
+    {
+      "screw": "A5_ModuleBolt22",
+      "hits": []
+    },
+    {
+      "screw": "A5_AntennaBolt1",
+      "hits": []
+    },
+    {
+      "screw": "A5_AntennaBolt2",
+      "hits": []
+    },
+    {
+      "screw": "A5_AntennaBolt3",
+      "hits": []
+    },
+    {
+      "screw": "A5_IMUPcbBolt1",
+      "hits": []
+    },
+    {
+      "screw": "A5_IMUPcbBolt2",
+      "hits": []
+    },
+    {
+      "screw": "A5_CapClosureBolt1",
+      "hits": []
+    },
+    {
+      "screw": "A5_CapClosureBolt2",
+      "hits": []
+    },
+    {
+      "screw": "A5_PanelBolt1",
+      "hits": []
+    },
+    {
+      "screw": "A5_PanelBolt2",
+      "hits": []
+    },
+    {
+      "screw": "ButtonM3",
+      "hits": []
+    },
+    {
+      "screw": "InsertBolt1",
+      "hits": []
+    },
+    {
+      "screw": "InsertBolt2",
+      "hits": []
+    },
+    {
+      "screw": "InsertBolt3",
+      "hits": []
+    }
+  ],
+  "usb": {
+    "envelope_mm": [
+      13,
+      5.5,
+      25
+    ],
+    "setback_mm": 1.2,
+    "hits": [],
+    "minimum_gap_mm": 0.0
+  },
+  "universal_tray_options": [
+    {
+      "module": "PowerBoost",
+      "box": [
+        -11.5,
+        -28.0,
+        97.0,
+        23.0,
+        10.0,
+        45.0
+      ],
+      "hits": []
+    },
+    {
+      "module": "PowerBoost",
+      "box": [
+        -13,
+        -26,
+        96.8,
+        26,
+        8,
+        47
+      ],
+      "hits": []
+    },
+    {
+      "module": "SoftPower",
+      "box": [
+        -12.7,
+        -26.0,
+        24.5,
+        25.4,
+        10.0,
+        25.4
+      ],
+      "hits": []
+    },
+    {
+      "module": "SoftPower",
+      "box": [
+        -13.5,
+        -24,
+        24.5,
+        27,
+        8,
+        27
+      ],
+      "hits": []
+    }
+  ],
+  "preserved": [
+    {
+      "name": "A5_IMUReserve",
+      "symmetric_difference_mm3": 0.0
+    },
+    {
+      "name": "A5_IMUTarget",
+      "symmetric_difference_mm3": 0.0
+    },
+    {
+      "name": "A5_IMUNutBar",
+      "symmetric_difference_mm3": 0.0
+    },
+    {
+      "name": "A5_AntennaCap",
+      "symmetric_difference_mm3": 0.0
+    },
+    {
+      "name": "A5_HA901Reserve",
+      "symmetric_difference_mm3": 0.0
+    },
+    {
+      "name": "A5_BatteryReserve",
+      "symmetric_difference_mm3": 0.0
+    },
+    {
+      "name": "A5_ESPReference",
+      "symmetric_difference_mm3": 0.0
+    },
+    {
+      "name": "USBModule",
+      "symmetric_difference_mm3": 0.0
+    },
+    {
+      "name": "USBReceptacle",
+      "symmetric_difference_mm3": 0.0
+    },
+    {
+      "name": "ButtonCap",
+      "symmetric_difference_mm3": 0.0
+    }
+  ],
+  "imu_datum_removed_mm3": 0.0,
+  "front_logo_removed_mm3": 0.0,
+  "shell_bbox_before": [
+    -37.0,
+    -37.0,
+    12.0,
+    37.0,
+    37.0,
+    150.2
+  ],
+  "shell_bbox_after": [
+    -37.0,
+    -37.0,
+    12.0,
+    37.0,
+    37.0,
+    150.2
+  ],
+  "insert_retention": [
+    {
+      "rotation_deg": -5,
+      "hits": [
+        {
+          "against": "InsertBolt1",
+          "volume_mm3": 4.15386,
+          "box": [
+            12.01243,
+            0.06235,
+            9.525,
+            14.9987,
+            1.5,
+            11.90625
+          ]
+        },
+        {
+          "against": "InsertBolt2",
+          "volume_mm3": 4.15386,
+          "box": [
+            -8.25,
+            10.19134,
+            9.525,
+            -6.17313,
+            12.95808,
+            11.90625
+          ]
+        },
+        {
+          "against": "InsertBolt3",
+          "volume_mm3": 4.15386,
+          "box": [
+            -7.44535,
+            -13.19134,
+            9.525,
+            -5.25,
+            -10.49944,
+            11.90625
+          ]
+        }
+      ]
+    },
+    {
+      "rotation_deg": 5,
+      "hits": [
+        {
+          "against": "InsertBolt1",
+          "volume_mm3": 4.15386,
+          "box": [
+            12.01243,
+            -1.5,
+            9.525,
+            14.9987,
+            -0.06235,
+            11.90625
+          ]
+        },
+        {
+          "against": "InsertBolt2",
+          "volume_mm3": 4.15386,
+          "box": [
+            -7.44535,
+            10.49944,
+            9.525,
+            -5.25,
+            13.19134,
+            11.90625
+          ]
+        },
+        {
+          "against": "InsertBolt3",
+          "volume_mm3": 4.15386,
+          "box": [
+            -8.25,
+            -12.95808,
+            9.525,
+            -6.17313,
+            -10.19134,
+            11.90625
+          ]
+        }
+      ]
+    },
+    {
+      "translation_z_mm": -0.5,
+      "hits": [
+        {
+          "against": "A5_Chassis",
+          "volume_mm3": 351.64969,
+          "box": [
+            -18.25625,
+            -18.25625,
+            9.025,
+            18.25625,
+            18.25625,
+            9.525
+          ]
+        }
+      ]
+    },
+    {
+      "translation_z_mm": 0.5,
+      "hits": [
+        {
+          "against": "InsertBolt1",
+          "volume_mm3": 6.5734,
+          "box": [
+            10.65,
+            -2.85,
+            11.90625,
+            16.35,
+            2.85,
+            12.40625
+          ]
+        },
+        {
+          "against": "InsertBolt2",
+          "volume_mm3": 6.5734,
+          "box": [
+            -9.6,
+            8.84134,
+            11.90625,
+            -3.9,
+            14.54134,
+            12.40625
+          ]
+        },
+        {
+          "against": "InsertBolt3",
+          "volume_mm3": 6.5734,
+          "box": [
+            -9.6,
+            -14.54134,
+            11.90625,
+            -3.9,
+            -8.84134,
+            12.40625
+          ]
+        }
+      ]
+    }
+  ],
+  "pole_clear_bore": {
+    "diameter_mm": 15.875,
+    "free_height_mm": 30,
+    "hits": []
+  },
+  "original_a5_unchanged": true,
+  "counts": {
+    "printed": 10,
+    "screws": 19,
+    "nuts": 13,
+    "fastener_diameter_length_combinations": 5
+  },
+  "failures": [],
+  "scope_ready_for_first_full_prototype_print": true
+}

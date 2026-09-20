@@ -71,7 +71,7 @@ panel=panel.cut(cyl(6.7,1.7,(0,33.2,110),(0,1,0)))
 cart=cart.cut(cyl(P['M3_CLEARANCE']/2,4,(9,back-3,110),(0,1,0)))
 # Lengueta izquierda entra en un bolsillo abierto en Y, cierre posterior por el M3.
 tab=box(-12.1,27.8,105,2.8,4.5,2.0)
-panel=panel.fuse(box(-12.4,28.8,104.5,3.6,5.5,3.0)).cut(box(-12.25,27.5,104.85,3.1,5.3,2.3))
+panel=panel.fuse(box(-12.4,28.8,104.5,3.6,5.5,3.2)).cut(box(-12.25,27.5,104.85,3.1,5.3,2.3))
 cart=cart.fuse(tab)
 S['ModulePanel']=clean(panel);S['ButtonCartridge']=clean(cart)
 screw('ButtonM3',(9,back-2.5,110),(0,1,0))
@@ -111,6 +111,8 @@ for key,name,label in [('powerboost','PowerBoost','Adafruit PowerBoost 1000C - s
  env=box(x,y,z,w,depth,height)
  cavity=box(x-clearance,y-clearance,z-clearance,w+2*clearance,depth+2*clearance,height+2*clearance)
  carrier=carrier.cut(cavity)
+ ax,ay,az,aw,ad,ah=e['alternative_box']
+ carrier=carrier.cut(box(ax-clearance,ay-clearance,az-clearance,aw+2*clearance,ad+2*clearance,ah+2*clearance))
  plate=box(x-2.6,py,z-2.4,w+5.2,2.4,height+4.8)
  bottom=box(x-1.1,y-.4,z-2.4,w+2.2,py+2.4-y+.4,2.0)
  tray=plate.fuse(bottom).common(cyl(P['CORE_PASS_RADIUS'],180,(0,0,0)))
@@ -135,6 +137,10 @@ adapter_support=adapter_support.fuse(box(-10.4,16.3,142,5.4,7.1,1)).fuse(box(5.0
 for x in [-10.4,9.4]: adapter_support=adapter_support.fuse(box(x,8.8,147,1,8.8,3))
 for x in [-8,5]:adapter_support=adapter_support.cut(box(x,16.1,153,3,1.7,1.4))
 ch=ch.fuse(adapter_support)
+# Tiny sale hacia arriba: retirar solo el labio superior, conservar guias y
+# tope inferior; una brida de 2.5 mm por dos ranuras reemplaza ese labio.
+ch=ch.cut(box(-9.3,12.2,162.8,18.6,3.9,1.0))
+for x in [-8,5]:ch=ch.cut(box(x,8.0,155,3,4.6,1.4))
 S['A5_Chassis']=clean(ch)
 S['A5_SDReference']=move(S['A5_SDReference'],(0,0,3))
 # microSD: bridas a traves de su soporte existente, puntas alejadas de bateria.
@@ -143,6 +149,12 @@ for z in [53,85]:
  car=car.fuse(box(-12.9,-17.6,z,25.8,2.8,2.4))
  for x in [-9,6]:car=car.cut(box(x,-17.8,z+.4,3,3.2,1.4))
 S['A5_BatteryIMUCarrier']=clean(car)
+# Recuperar los dos alojamientos de plantilla que la fusion A5 habia rellenado;
+# no cambia la cara de asiento, los dos tornillos ni el datum del sensor.
+for x in [-15.5,15.5]:
+ S['A5_BatteryIMUCarrier']=S['A5_BatteryIMUCarrier'].cut(cyl(1.45,3.5,(x,-13.5,120.5)))
+# Paso del puente de plantilla; adelgazar localmente respaldo power a 1.9 mm.
+S['A5_BatteryIMUCarrier']=clean(S['A5_BatteryIMUCarrier'].cut(box(-17.5,-15.7,123,35,.6,22)))
 
 # Rutas continuas de cableado con salida lateral por encima del pack.
 routes={
@@ -156,6 +168,7 @@ routes={
 # Conservar el corredor curvado R10 de A5; se alimenta con el cuerpo colocado,
 # antes de cerrar panel/tapa, y se retira antes de deslizar el cuerpo.
 S['A5_CoaxRouteReserve']=original['A5_CoaxRouteReserve'].copy()
+S['A5_BatteryIMUCarrier']=clean(S['A5_BatteryIMUCarrier'].cut(S['A5_CoaxRouteReserve'].makeOffsetShape(.3,.01)))
 labels['A5_CoaxRouteReserve']='Coaxial flexible - instalar despues del cuerpo / R10'
 route_names=[]
 for n,e in routes.items():
@@ -165,7 +178,7 @@ S['A5_BatteryIMUCarrier']=clean(S['A5_BatteryIMUCarrier'].cut(tube(routes['Batte
 
 # Pasos locales de arnes en espina y en el borde de la bandeja, lejos del IMU.
 for n in ['RearPowerBus','PowerToGNSS','UartAndImu','UsbHarness','ChargeLight']:
-    e=routes[n]; tool=tube(e['points'],e['r']+.3)
+    e=routes[n]; tool=tube(e['points'],e['r']+(.35 if n=='PowerToGNSS' else .3))
     S['A5_Chassis']=clean(S['A5_Chassis'].cut(tool))
     if n in ['ChargeLight','PowerToGNSS']:
         S['A5_BatteryIMUCarrier']=clean(S['A5_BatteryIMUCarrier'].cut(tool))
@@ -193,8 +206,13 @@ for n,s in S.items():
  o.addProperty('App::PropertyString','Fabricacion','V1');o.Fabricacion='Imprimir' if n in printed else 'Comercial / referencia'
  if o.ViewObject:
   o.ViewObject.ShapeColor=tuple(c/255 for c in colors.get(n,[100,140,150]));o.ViewObject.Visibility=n not in route_names+['A5_IMUTarget','TinyUSBPlugReserve']
+tools_group=doc.addObject('App::DocumentObjectGroup','PrintTools');tools_group.Label='Plantilla reutilizable - fuera del montaje';gp.addObject(tools_group)
+source_doc=App.openDocument(str(ROOT.parent/'A5/TresVizo-A5.FCStd'))
+gauge=doc.addObject('Part::Feature','IMUAlignmentGauge');gauge.Label='11 Plantilla de centrado BMI088';gauge.Shape=source_doc.IMUAlignmentGauge.Shape.copy();tools_group.addObject(gauge)
+if gauge.ViewObject:gauge.ViewObject.Visibility=False
 doc.recompute();doc.saveAs(str(OUT/'TresVizo-V1.FCStd'))
 meta={'printed':printed,'hardware':hardware,'routes':route_names,'removed':removed,'functional_contacts':functional_contacts,'objects':[{'name':n,'solids':len(s.Solids),'valid':s.isValid(),'volume':s.Volume,'bbox':[getattr(s.BoundBox,k) for k in ['XMin','YMin','ZMin','XMax','YMax','ZMax']]} for n,s in S.items()], 'colors':colors}
+meta['tools']=['IMUAlignmentGauge']
 (OUT/'model-index.json').write_text(json.dumps(meta,indent=2,ensure_ascii=False),encoding='utf-8')
 print('BUILT',len(S),'printed',len(printed),flush=True)
 App.closeDocument(doc.Name);App.closeDocument(base.Name)
