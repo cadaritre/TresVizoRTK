@@ -14,11 +14,11 @@ El árbol contiene siete piezas impresas, tornillería comercial y volúmenes de
 - `A5/PCB-INTERFACE.md`: coordenadas y restricciones para integrar la PCB.
 - `legacy/`: todos los archivos mecánicos anteriores, incluida una copia de la sesión abierta en FreeCAD. Está excluida de Git. `legacy/archive-sha256.json` registra los 228 archivos trasladados; se verificó que sus contenidos no cambiaron.
 
-Los archivos antiguos ya versionados aparecerán como eliminaciones en la próxima revisión de Git: los originales siguen guardados localmente en `legacy`. No se hizo commit, push ni se borró el historial.
+Los archivos antiguos ya versionados aparecerán como eliminaciones en la próxima revisión de Git: los originales siguen guardados localmente en `legacy`. Esta reorganización no ejecutó comandos de commit ni push, ni borró el historial.
 
 ## Validación y límites
 
-Se comprobó que los 43 objetos sólidos del archivo tienen geometría válida, que las siete piezas estructurales conservan exactamente el volumen de su origen y que el archivo vuelve a abrir sin vínculos externos. El resultado de comprobación queda dentro del documento, en `VerificacionGeometrica`. La comprobación geométrica no sustituye una prueba de impresión o ensamble.
+Se comprobó que los 43 objetos sólidos del archivo tienen geometría válida, que las siete piezas estructurales conservan exactamente el volumen de su origen y que el archivo vuelve a abrir sin vínculos externos. Además, se abrió una copia aislada en FreeCAD 1.0.2 / Qt 5.15.15: 43 sólidos válidos y un solo documento abierto. El resultado queda dentro del maestro, en `VerificacionGeometrica` y `VerificacionApertura`. La comprobación geométrica no sustituye una prueba de impresión o ensamble.
 
 Continúan pendientes de cerrar la batería concreta, el patrón real del breakout BMI088, la fijación de la antena y el inserto comercial del jalón. Las reservas se identifican como tales en el árbol. La carcasa **no está liberada para fabricación ni tiene un grado IP validado**.
 

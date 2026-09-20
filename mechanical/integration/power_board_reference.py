@@ -79,6 +79,9 @@ def build_geometry(data=None, root=None):
                 if field in entry and (not _numbers(entry[field], 3) or
                                        not math.isclose(sum(v*v for v in entry[field]), 1.0, abs_tol=1e-6)):
                     missing.append(name + '.' + field)
+            for field in ('mating_center_mm', 'actuation_center_mm', 'optical_center_mm'):
+                if field in entry and not _numbers(entry[field], 3):
+                    missing.append(name + '.' + field)
             if use_step and section != 'keepouts':
                 continue
             box = Part.makeBox(*size)

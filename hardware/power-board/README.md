@@ -19,11 +19,16 @@ Esta es una selección de partida, no autorización implícita de compra o fabri
 ## Documentos para revisar
 
 - [Requisitos y criterios de aceptación](REQUIREMENTS.md).
+- [Comprobaciones realizadas y pendientes](VALIDATION.md).
 - [Arquitectura, alternativas y estados](ARCHITECTURE.md).
 - [Presupuesto eléctrico inicial](POWER_BUDGET.md).
 - [BOM de investigación y aprovisionamiento](bom.md).
 - [Fuentes oficiales y límites de verificación](datasheets/README.md).
 - [Interfaz mecánica y restricciones A4](../../mechanical/integration/POWER_BOARD_INTEGRATION.md).
+
+## Cambio externo en la mecánica
+
+Después de inspeccionar A4, gran parte de `mechanical/` fue eliminada por una operación externa. No se restauró. Las medidas registradas son evidencia histórica de la copia leída; confirmar modelo vigente antes del esquema mecánico/placement. Ver informe de integración.
 
 ## Pendientes que bloquean el cierre
 
