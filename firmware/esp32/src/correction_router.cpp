@@ -13,7 +13,8 @@ bool select(const char* name) {
     Source next;
     if (!strcmp(name,"none")) next = Source::None;
     else if (!strcmp(name,"ble")) next = Source::Ble;
-    else return false; // NTRIP/radio solo se habilitan al registrar y probar su controlador.
+    else if (!strcmp(name,"ntrip")) next = Source::Ntrip;
+    else return false;
     if (selected.exchange(next) != next) ++revision;
     return true;
 }
@@ -28,10 +29,10 @@ bool submit(Source source, const uint8_t* frame, size_t length) {
 }
 uint32_t generation() { return revision; }
 void status(JsonObject out) {
-    out["active_source"] = selected == Source::Ble ? "ble" : "none";
+    out["active_source"] = selected == Source::Ble ? "ble" : selected == Source::Ntrip ? "ntrip" : "none";
     out["format"] = "rtcm3"; out["generation"] = revision.load();
     out["accepted_frames"] = accepted.load(); out["rejected_frames"] = rejected.load();
-    out["drivers"]["ble"] = true; out["drivers"]["ntrip"] = false; out["drivers"]["radio"] = false;
+    out["drivers"]["ble"] = true; out["drivers"]["ntrip"] = true; out["drivers"]["radio"] = false;
     out["receiver_ready"] = gnss_receiver::snapshot().enabled;
     out["hot_load_modules"] = false;
 }

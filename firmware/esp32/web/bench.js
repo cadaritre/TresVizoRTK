@@ -15,7 +15,7 @@
   }
   function show(data) {
     const s = data.solution;
-    renderGnss({subsystems: {gnss: {state: data.state}}, solution: s});
+    if (!window.instrumentGnssEnabled) renderGnss({subsystems: {gnss: {state: data.state}}, solution: s});
     text("bench-state", data.state === "receiving" ? "USB recibiendo" : data.error || "Sin datos vigentes");
     text("bench-hz", `${format(data.measurement_hz)} Hz / ${format(data.arrival_hz)} Hz`);
     text("bench-sats", `${s.satellites_used ?? "—"} / ${format(s.hdop)}`);
@@ -24,7 +24,7 @@
     text("bench-mode", data.mode || "Sin consultar");
     if (data.ntrip) text("bench-ntrip-state", `${data.ntrip.state} · ${data.ntrip.frames} tramas · ${data.ntrip.bytes} bytes`);
     if (data.caster) text("bench-caster-state", `${data.caster.state} · ${data.caster.clients ?? 0} rovers · ${data.caster.frames ?? 0} tramas`);
-    if (data.state === "receiving") text("gnss-description", "Fuente: GPS por USB a la Mac. UART del ESP32 pendiente. Calidad reportada por el receptor.");
+    if (!window.instrumentGnssEnabled && data.state === "receiving") text("gnss-description", "Fuente: GPS por USB a la Mac. Calidad reportada por el receptor.");
     // Rehacer solo la lista de señales a 1 Hz; solución y épocas se consultan aparte.
     if (Date.now() - catalogAt > 1000) {
       const rows = data.signals.map(signal => {
@@ -127,7 +127,8 @@
     try {
       const data = await request(`/api/bench/gnss?since=${since}`);
       if (!data) { if (!enabled) return; throw new Error("Banco no disponible"); }
-      enabled = window.benchActive = true;
+      enabled = true;
+      window.benchActive = !window.instrumentGnssEnabled;
       $("bench-panel").hidden = $("bench-recording").hidden = $("bench-corrections").hidden = $("bench-base").hidden = false;
       since = data.sequence;
       show(data);
@@ -137,7 +138,7 @@
       }
     } catch {
       if (enabled) {
-        renderGnss(null);
+        if (!window.instrumentGnssEnabled) renderGnss(null);
         text("bench-state", "Puente USB sin conexión");
         text("bench-hz", "—"); text("bench-sats", "—"); text("bench-age", "—"); text("bench-sigma", "—");
         $("bench-signals").replaceChildren();

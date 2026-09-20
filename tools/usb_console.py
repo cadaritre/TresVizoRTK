@@ -107,7 +107,7 @@ class Instrument:
 def serve(device, port, gps=None):
     allowed_hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
     allowed_origins = {f"http://{host}" for host in allowed_hosts}
-    assets = {"/update.js": WEB / "update.js", "/bench.js": WEB / "bench.js", "/": WEB / "index.html", "/app.css": WEB / "app.css", "/app.js": WEB / "app.js", "/assets/tresvizo-logo.png": WEB / "assets" / "tresvizo-logo.png"}
+    assets = {"/device.js": WEB / "device.js", "/update.js": WEB / "update.js", "/bench.js": WEB / "bench.js", "/": WEB / "index.html", "/app.css": WEB / "app.css", "/app.js": WEB / "app.js", "/assets/tresvizo-logo.png": WEB / "assets" / "tresvizo-logo.png"}
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_args):
@@ -195,7 +195,7 @@ def serve(device, port, gps=None):
                 except (serial.SerialException, OSError, TimeoutError) as error:
                     return self.respond(503, {"message": str(error)})
                 return self.respond(404, {"error": "not_found"})
-            if self.path not in {"/api/status", "/api/config", "/api/restart", "/api/operations", "/api/base/plan", "/api/update", "/api/update/begin", "/api/update/chunk", "/api/update/finish", "/api/update/abort", "/api/update/rollback", "/api/corrections/source"}:
+            if self.path not in {"/api/recording", "/api/recording/start", "/api/recording/stop", "/api/recording/read", "/api/recording/sessions", "/api/gnss/control", "/api/base/apply", "/api/ntrip/input", "/api/status", "/api/config", "/api/restart", "/api/operations", "/api/base/plan", "/api/update", "/api/update/begin", "/api/update/chunk", "/api/update/finish", "/api/update/abort", "/api/update/rollback", "/api/corrections/source"}:
                 return self.respond(404, {"error": "not_found"})
             if self.headers.get("X-TresVizo-Client") != "portal":
                 return self.respond(403, {"error": "client_header_required"})

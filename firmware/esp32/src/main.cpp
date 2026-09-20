@@ -1,3 +1,7 @@
+#include "sd_recorder.h"
+#include "ntrip_input.h"
+#include "gnss_control.h"
+#include "memory_health.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <esp_http_server.h>
@@ -201,8 +205,12 @@ void setup() {
         Serial.println("Error: no se pudo crear el bloqueo del instrumento.");
         return;
     }
+    memory_health::begin();
+    gnss_control::begin();
     instrument::begin();
+    sd_recorder::begin();
     gnss_receiver::begin();
+    ntrip_input::begin();
     ble_transport::begin(dispatch, authenticated);
     httpd_config_t configuration = HTTPD_DEFAULT_CONFIG();
     configuration.uri_match_fn = httpd_uri_match_wildcard;
@@ -220,7 +228,7 @@ void setup() {
             if (httpd_register_uri_handler(server, &route) != ESP_OK) Serial.println("Error al registrar ruta HTTP.");
         }
     } else Serial.println("Error al iniciar el servidor web. Consola USB disponible.");
-    Serial.println("TresVizo RTK 0.4.0. Consola JSON USB disponible.");
+    Serial.println("TresVizo RTK 0.5.0. Consola JSON USB disponible.");
 }
 
 void loop() {

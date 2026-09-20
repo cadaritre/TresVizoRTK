@@ -33,3 +33,6 @@ Cada cambio futuro debe indicar qué comprobaciones se realizaron y qué quedó 
 
 
 La preparación de GNSS por USB, parser compartido, compilación de pruebas y captura pasiva se describe en [primera adquisición GNSS](gnss-bringup.md).
+
+
+Desde 0.5.0 se habilita PSRAM Quad y se comprueba memoria en la placa. UART GPIO18/17 habilitada desde 0.4.1. Las menciones iniciales a interfaces desactivadas corresponden al primer arranque; ver [servicios actuales](esp32-services.md).

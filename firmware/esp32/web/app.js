@@ -155,6 +155,8 @@ function renderStatus(data) {
   )
     throw new Error("Versión de protocolo no compatible.");
   latestStatus = data;
+  window.instrumentGnssEnabled = !!data.subsystems?.gnss && data.subsystems.gnss.state !== "not_integrated";
+  if (window.instrumentGnssEnabled) window.benchActive = false;
   if (!window.benchActive) renderGnss(data);
   refreshMs = [1000, 2000, 5000].includes(data.refresh_ms)
     ? data.refresh_ms
@@ -164,7 +166,7 @@ function renderStatus(data) {
   const ble = data.subsystems?.ble;
   text("ble-state", ble?.state === "advertising" ? "Disponible para emparejar" : ble?.state === "authorized" ? "App autenticada" : ble?.state === "connected" ? "Cliente conectado" : "No disponible en este firmware");
   text("uptime", duration(data.uptime_ms));
-  text("heap", kib(data.free_heap_bytes));
+  text("heap", kib(data.memory?.internal_free_bytes ?? data.free_heap_bytes));
   text("firmware", `v${data.firmware_version}`);
   text("ap-name", data.wifi.ap_ssid);
   text(
@@ -198,7 +200,7 @@ function renderStatus(data) {
       ? kib(data.psram_enabled_bytes)
       : "Desactivada en esta versión",
   );
-  text("diag-min-heap", kib(data.min_free_heap_bytes));
+  text("diag-min-heap", kib(data.memory?.internal_min_free_bytes ?? data.min_free_heap_bytes));
   const reasons = {
     1: "Encendido",
     3: "Reinicio por software",

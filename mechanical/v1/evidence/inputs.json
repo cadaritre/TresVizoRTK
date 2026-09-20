@@ -1,0 +1,10 @@
+{
+  "head": "c08fa5141047aca5807da19fe57a643dbc7638c2",
+  "sha256": {
+    "mechanical/A5/TresVizo-A5.FCStd": "73fd95f536f6537bbcbc9e3633d12d050ab901e844b4a03dcd79d3889115f4fb",
+    "mechanical/panel-modules/build_panel.py": "e8d09532432a415f7207ad17ebcdb7358d3614c0ea5b82c48062ca629021e4b3",
+    "mechanical/panel-modules/parameters.json": "c871faffb9a8cdf272d8fc73b7c5c5ea6a120b7c8507ca5e34d18d3d2af6e210",
+    "mechanical/integration-review/generated/TresVizo-panel-modules-FreeCAD-1.0.2.FCStd": "e13016090fb3e408440bc66bec4d5e61ef42b0f2b3921de629df2122a18c142e"
+  },
+  "status": " M docs/firmware-validation.md\n M docs/gnss-bringup.md\n M docs/project-status.md\n M firmware/esp32/README.md\n M firmware/esp32/include/instrument.h\n M firmware/esp32/platformio.ini\n M firmware/esp32/scripts/embed_web.py\n M firmware/esp32/src/correction_router.cpp\n M firmware/esp32/src/gnss_receiver.cpp\n M firmware/esp32/src/instrument.cpp\n M firmware/esp32/src/main.cpp\n M firmware/esp32/web/app.js\n M firmware/esp32/web/bench.js\n M firmware/esp32/web/index.html\n M tools/usb_console.py\n?? firmware/esp32/include/gnss_control.h\n?? firmware/esp32/include/memory_health.h\n?? firmware/esp32/include/ntrip_input.h\n?? firmware/esp32/src/gnss_control.cpp\n?? firmware/esp32/src/memory_health.cpp\n?? firmware/esp32/src/ntrip_input.cpp\n?? firmware/esp32/web/device.js\n?? mechanical/integration-review/generated/TresVizo-panel-modules-FreeCAD-1.0.2.FCStd\n?? mechanical/v1/\n?? tests/device_services_smoke.py\n"
+}

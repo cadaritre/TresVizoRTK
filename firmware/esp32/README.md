@@ -1,6 +1,6 @@
 # Firmware inicial del instrumento
 
-Versión 0.3.0 para el ESP32-S3 conectado por USB. El perfil usa 4 MB de flash comprobados por esptool. La placa de referencia de PlatformIO aporta la configuración de CPU/USB; no identifica la carrier como DevKitC ni autoriza sus pines externos. PSRAM desactivada en esta etapa.
+Versión 0.5.0 para el ESP32-S3 conectado por USB. El perfil usa 4 MB de flash comprobados por esptool. La placa de referencia de PlatformIO aporta la configuración de CPU/USB; no identifica la carrier como DevKitC ni autoriza sus pines externos. PSRAM Quad de 2 MB habilitada, con prueba de integridad y métricas separadas de RAM interna.
 
 ## Funciones implementadas
 
@@ -98,7 +98,7 @@ La prueba de hardware guarda ajustes temporales, reinicia el equipo y restaura l
 
 Con el puente detenido, ejecutar `python tools/usb_console.py set-access` e introducir dos veces la nueva clave en el prompt oculto. La operación solo existe por USB, requiere la clave actual (la consola la recupera por acceso físico), valida 8–63 caracteres ASCII imprimibles y reinicia después de guardar en NVS. Una solicitud inválida no cambia la clave. La clave anterior permanece activa hasta el reinicio; la nueva no se incluye en la respuesta ni en estado/configuración. No pasar credenciales como argumentos del shell ni guardarlas en el repositorio.
 
-El panel representa estado GNSS, calidad y coordenadas recibidas por el ESP32, diferenciando datos antiguos y falta de posición. La tarea UART y el parser compartido se describen en [adquisición GNSS](../../docs/gnss-bringup.md). La UART sigue desactivada por defecto hasta verificar y conectar las placas; tener ambas conectadas por USB a la Mac no las comunica entre sí.
+El panel representa estado GNSS, calidad y coordenadas recibidas por el ESP32, diferenciando datos antiguos y falta de posición. La tarea UART y el parser compartido se describen en [adquisición GNSS](../../docs/gnss-bringup.md). En 0.4.1 se habilita UART2 a 115200: RX GPIO18, TX GPIO17, tras confirmar el cableado TTL cruzado y GND común. Ambos equipos mantienen alimentación USB separada, sin unir alimentación. Tener ambos USB en la Mac por sí solo no los comunica.
 
 
 ## Apartados de operación (0.3.0)
@@ -117,3 +117,8 @@ El panel incluye Base / rover, Registro / PPK y Correcciones (entrada, publicaci
 - [Banco USB de Mac](../../docs/usb-bench.md) con GPS real, sesiones, conversión RINEX y NTRIP. No confundir sus controladores con capacidades autónomas del ESP32.
 
 Las pruebas del controlador OTA están en `tests/update_smoke.py`; `--install` escribe la imagen compilada en la partición inactiva, reinicia y verifica el cambio de slot. No correr junto al puente USB ni a otro monitor.
+
+
+## Versión 0.5.0
+
+Control bidireccional UM980, PSRAM verificada y cliente NTRIP directo; microSD preparada sin activar pines hasta cableado. Ver [servicios autónomos](../../docs/esp32-services.md) para API, límites y pruebas. BLE comprobado con la Mac: cifrado, autenticación, fragmentación y consulta del UM980 a través del ESP32.

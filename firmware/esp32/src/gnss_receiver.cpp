@@ -2,6 +2,9 @@
 #include <esp_timer.h>
 #include "gnss_receiver.h"
 #include "correction_router.h"
+#include "gnss_control.h"
+#include "sd_recorder.h"
+#include "wire_filter.h"
 
 #if defined(TRESVIZO_GNSS_RX) || defined(TRESVIZO_GNSS_TX) || defined(TRESVIZO_GNSS_BAUD)
 #if !defined(TRESVIZO_GNSS_RX) || !defined(TRESVIZO_GNSS_TX) || !defined(TRESVIZO_GNSS_BAUD)
@@ -20,15 +23,22 @@ struct Correction { uint32_t arrival, generation; uint16_t length; uint8_t bytes
 QueueHandle_t corrections = nullptr;
 void acquire(void*) {
     gnss::GgaParser parser;
+    gnss::WireFilter filter;
     gnss::Gga solution;
     Correction outbound = {};
     size_t sent = 0;
     for (;;) {
         // Un bloque acotado permite atender otras tareas con entrada continua.
         for (size_t budget = 0; budget < 4096 && uart.available(); ++budget) {
-            parser.feed(static_cast<char>(uart.read()), esp_timer_get_time(), solution);
+            const char byte=static_cast<char>(uart.read());
+            sd_recorder::feed(uint8_t(byte));
+            filter.feed(uint8_t(byte),millis(),[&](char text){
+                parser.feed(text, esp_timer_get_time(), solution);
+                gnss_control::feed(text);
+            });
         }
-        if (!outbound.length && xQueueReceive(corrections, &outbound, 0) == pdTRUE) sent = 0;
+        if (!outbound.length) gnss_control::tick(uart);
+        if (!gnss_control::busy() && !outbound.length && xQueueReceive(corrections, &outbound, 0) == pdTRUE) sent = 0;
         if (outbound.length) {
             if (millis() - outbound.arrival > 2000 || outbound.generation != correction_router::generation()) {
                 portENTER_CRITICAL(&lock); ++state.correction_frames_dropped; portEXIT_CRITICAL(&lock);

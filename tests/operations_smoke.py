@@ -19,9 +19,9 @@ def run():
         caps = device.request("GET", "/api/operations")
         check(caps["status"] == 200)
         body = caps["body"]
-        check(body["base"]["can_preview"] and not body["base"]["can_apply"])
+        check(body["base"]["can_preview"] and body["base"]["can_apply"])
         check(body["recording"]["sessions"] is None and not body["recording"]["can_start"])
-        check(all(not value["can_start"] for value in body["corrections"].values()))
+        check(body["corrections"]["input"]["can_start"] and all(not body["corrections"][role]["can_start"] for role in ("publisher","local_caster")))
         plan = dict(method="known",station_id=1,datum="Test frame",coordinate_epoch=None,
                     latitude_deg=0,longitude_deg=0,ellipsoid_height_m=100,antenna_vertical_m=2,height_point="marker")
         r = preview(plan)
@@ -40,7 +40,7 @@ def run():
         check(preview({**average,"average_seconds":3601})["status"]==400)
         check(preview({**average,"reuse_distance_m":11})["status"]==400)
         check(device._exchange("POST","/api/base/plan",plan,key="wrong")["status"]==401)
-        check(device.request("POST","/api/recording/start",{})["status"]==404)
+        check(device.request("POST","/api/recording/start",{})["status"]==503)
         check(device.request("GET","/api/config")["body"]==before["body"])
         print(f"Operaciones: {count} comprobaciones; sin cambios persistentes ni comandos GNSS.")
     finally:

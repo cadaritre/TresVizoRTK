@@ -76,3 +76,23 @@ Esta sección sustituye los estados históricos anteriores para estos componente
 | NTRIP | Cliente, publicador y caster local de banco probados por sockets de loopback. NTRIP v1 inicial, sin GGA para VRS; sin ensayo con caster externo ni ejecución en ESP32. |
 
 Detalles: [actualizaciones y módulos](firmware-updates.md), [protocolo BLE](ble-protocol.md), [banco USB](usb-bench.md). La pérdida de posición del UM980 trasladado al interior no impide desarrollar ni confirmar un arranque saludable. IMU, compensación de inclinación y exactitud topográfica siguen sin validación física.
+
+
+## Validación UART física — 0.4.1, 2026-09-20
+
+Cableado confirmado por el propietario: GPS TTL_TXD2 → ESP32 GPIO18, TTL_RXD2 → GPIO17, GND común; alimentación USB separada sin unir los pines de alimentación. Perfil predeterminado actualizado. Compilación, OTA a app1 y conservación de ajustes comprobadas.
+
+En 58.969 s entre muestras: 589 GGA nuevos (9.988 mensajes/s), cero rechazos, desbordes y errores UART; 332 consultas USB, todas en estado receiving. RAM libre final: 138024 bytes. Sin UTC ni posición válida en interior, por lo que esto demuestra transporte de mensajes cercano a 10 Hz, no diez soluciones de posición por segundo. Métricas locales sin coordenadas: captures/local/uart-20260920-validation.json.
+
+El panel prioriza UART del ESP32 sobre el banco USB de la Mac. Pasaron las pruebas existentes de render GNSS y comprobaciones de sintaxis JS. Pendientes transmisión ESP32→GPS, correcciones reales, pérdidas bajo carga completa y persistencia del perfil COM2 tras apagar (no se envió SAVECONFIG).
+
+
+## 0.5.0 — 2026-09-20: servicios autónomos y PSRAM
+
+- PSRAM Quad habilitada: 2094703 bytes de heap utilizable; prueba de 1 MiB con tres patrones superada. RAM interna libre observada ~154 kB, PSRAM libre ~2066 kB. No implica que cada servicio futuro esté validado bajo carga simultánea.
+- Control UART real: VERSIONA identificó UM980 R4.10Build13504; MODE confirmó rover; cambios de GGA a 5 Hz y 10 Hz verificados en recepción. Se deja 10 Hz. Base aplica planes validados pero coordenadas/convergencia siguen pendientes de prueba exterior. No se aplicaron coordenadas sintéticas.
+- BLE físico con Mac: cifrado SC+MITM (auth mode 13), clave inválida rechazada, respuestas fragmentadas recompuestas, recuperación de credenciales bloqueada y consulta VERSIONA/MODE realizada por BLE→ESP32→UART. Repetido después de reinicios con PIN persistente. Telemetría con UTC y RTCM real por BLE pendientes.
+- Cliente NTRIP Wi-Fi implementado y panel disponible. Validación de parámetros y espera sin red comprobadas; flujo real con caster pendiente de que el propietario configure su cuenta. Inicialmente v1/TCP, sin TLS/GGA para VRS; no confundir con servicio plenamente validado.
+- Controlador SD de flujo original, cola, cierre, catálogo y lectura por bloques preparado. Perfil con SD compilado, pero nunca cargado; pines de esa compilación son solo para verificar código. El propietario confirma lector desconectado. Perfil instalado mantiene SD not_configured, sin conducir pines supuestos.
+- Pruebas: 24 comprobaciones API de servicios; 27 de operaciones; 29 de hardware; 14 Python GNSS y 3 NTRIP de banco. Parser de binario con sanitizadores y render GNSS JS superados. Primera prueba corta de frecuencia capturó transición; se añadió estabilización y cálculo por tiempo real del ESP32: 4.96 y 10.12 Hz en ventanas de unos 5 s. Pruebas históricas se actualizaron para UART activo y respuesta 503 de SD ausente.
+- Firmware instalado por OTA, arranque confirmado y ajustes conservados. Detalles y límites: [servicios del ESP32](esp32-services.md).

@@ -9,6 +9,7 @@
     <script src="/app.js" defer></script>
     <script src="/bench.js" defer></script>
     <script src="/update.js" defer></script>
+    <script src="/device.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Ir al contenido</a>
@@ -46,7 +47,7 @@
       <div class="sidebar-bottom">
         <span class="eyebrow">TRESVIZO INGENIERÍA</span>
         <p>Tecnología que<br />conecta con el terreno.</p>
-        <span class="version">PROTOTIPO <b>0.4.0</b></span>
+        <span class="version">PROTOTIPO <b>0.5.0</b></span>
       </div>
     </aside>
     <div class="workspace">
@@ -111,7 +112,7 @@
               </div>
               <div class="instrument-bottom">
                 <span
-                  ><i class="dot"></i> Integración de sensores pendiente</span
+                  ><i class="dot"></i> GNSS por UART · IMU y microSD pendientes</span
                 ><span>01 / PROTOTIPO</span>
               </div>
             </article>
@@ -151,7 +152,7 @@
           </div>
           <article class="panel bench-panel" id="bench-panel" hidden>
             <div class="card-top"><h2>GPS conectado a la Mac</h2><span class="badge" id="bench-state">Consultando</span></div>
-            <p>Datos reales por USB. El enlace GPS–ESP32 todavía no está conectado.</p>
+            <p>Banco opcional por USB directo a la Mac. La solución principal se recibe por UART en el ESP32.</p>
             <dl class="detail-list">
               <div><dt>Épocas / llegada</dt><dd id="bench-hz">—</dd></div>
               <div><dt>Satélites usados / HDOP</dt><dd id="bench-sats">—</dd></div>
@@ -189,7 +190,7 @@
             <article class="metric">
               <span class="metric-label">FIRMWARE <i>◈</i></span
               ><strong id="firmware" data-live>—</strong
-              ><small>Primera versión del instrumento</small>
+              ><small>Control autónomo en desarrollo</small>
             </article>
           </div>
           <div class="section-heading">
@@ -201,9 +202,9 @@
               <span class="component-icon" aria-hidden="true">⌖</span>
               <div>
                 <h3>Receptor GNSS</h3>
-                <p>Unicore UM980 · previsto</p>
+                <p>Unicore UM980 · UART 115200</p>
               </div>
-              <span class="status-label">Pendiente</span>
+              <span class="status-label">UART habilitada</span>
             </article>
             <article class="component">
               <span class="component-icon" aria-hidden="true">⊕</span>
@@ -304,11 +305,7 @@
           <div class="two-columns lower">
             <article class="panel">
               <h2>Correcciones NTRIP</h2>
-              <span class="badge muted">Pendiente de desarrollo</span>
-              <p>
-                La conexión al caster y el envío de RTCM estarán disponibles al
-                integrar el receptor.
-              </p>
+              <span class="badge muted">Cliente directo disponible</span><p>Configura la entrada Wi-Fi en Correcciones. Publicación y caster en el ESP32 siguen pendientes.</p>
             </article>
             <article class="panel">
               <h2>Bluetooth LE</h2>
@@ -320,9 +317,9 @@
         </section>
         <section class="page" id="page-base" aria-labelledby="base-title" hidden>
           <div class="page-heading"><div><p class="eyebrow">FUNCIÓN DEL RECEPTOR</p><h1 id="base-title">Base / rover</h1><p class="intro">Prepara la estación y comprueba sus referencias antes de aplicarla.</p></div></div>
-          <div class="notice">El cambio de modo aún requiere integrar el enlace al GPS. Preparar un plan no cambia el modo del receptor.</div>
+          <div class="notice">Control UART disponible. Preparar un plan no cambia el GPS; usa Aplicar después de revisar las referencias.</div>
           <div class="two-columns lower">
-            <article class="panel"><h2>Modo del equipo</h2><p>Modo efectivo: <strong>No consultado</strong></p><button class="button secondary" disabled>Activar rover topográfico</button><p>El rover recibirá correcciones desde la app por BLE o desde un caster por Wi-Fi.</p><button class="button secondary" data-page="corrections">Ver correcciones ↗</button></article>
+            <article class="panel"><h2>Modo del equipo</h2><p>Consulta el modo efectivo y activa rover en el panel GPS conectado al ESP32 de esta página.</p><p>El rover recibirá correcciones desde la app por BLE o desde un caster por Wi-Fi.</p><button class="button secondary" data-page="corrections">Ver correcciones ↗</button></article>
             <article class="panel"><h2>Base con referencia conocida</h2><p>Conserva el datum, la época y el origen de tus coordenadas. La altura del punto y la altura de antena son valores distintos.</p><p>El promedio autónomo sirve para establecer una referencia local; no garantiza coordenadas centimétricas absolutas.</p></article>
           </div>
           <form id="base-plan-form" class="panel lower">
@@ -338,16 +335,13 @@
               <label for="base-antenna">Altura vertical del punto al ARP (m)</label><input id="base-antenna" type="number" min="0" max="100" step="any" required /><small class="field-help">Medición vertical, no inclinada. Si la coordenada ya es del ARP, no se vuelve a sumar. Alturas ortométricas requieren conversión previa.</small>
             </fieldset>
             <fieldset id="base-average" hidden disabled><legend>Promedio autónomo</legend><label for="base-seconds">Tiempo máximo (s)</label><input id="base-seconds" type="number" min="1" max="3600" step="1" value="300" required /><label for="base-reuse">Distancia de reutilización de coordenada guardada (m)</label><input id="base-reuse" type="number" min="0" max="10" step="any" value="0" required /><small class="field-help">Cero solicita una nueva solución promedio. Este parámetro no es una tolerancia de precisión garantizada.</small></fieldset>
-            <div class="save-bar"><button class="button primary" type="submit">Validar y preparar plan</button><button id="base-export" class="button secondary" type="button" disabled>Exportar plan JSON</button><button class="button secondary" type="button" disabled>Aplicar base al GPS</button></div>
-            <p id="base-result" role="status">El plan se prepara en memoria y se puede descargar; todavía no se guarda ni aplica en el equipo.</p>
+            <div class="save-bar"><button class="button primary" type="submit">Validar y preparar plan</button><button id="base-export" class="button secondary" type="button" disabled>Exportar plan JSON</button></div>
+            <p id="base-result" role="status">Prepara y revisa el plan; después puedes aplicarlo desde el control UART de esta página.</p>
           </form>
-        <article class="panel bench-panel" id="bench-base" hidden><h2>Aplicar al GPS por USB de la Mac</h2><p>La base conocida requiere WGS84 y altura elipsoidal. El promedio puede guardar coordenadas en la memoria del GPS y no garantiza precisión absoluta.</p><button class="button primary" type="button" id="bench-base-apply">Aplicar el plan validado al GPS USB</button><p id="bench-base-message" role="status"></p></article></section>
+        <article class="panel lower"><h2>GPS conectado al ESP32</h2><p>Comandos por UART. La adquisición continúa durante las consultas. Cambios temporales: no se envía SAVECONFIG.</p><div class="button-row"><button class="button secondary" id="device-query">Consultar versión y modo</button><button class="button secondary" id="device-rover">Configurar rover</button></div><label for="device-hz">Frecuencia GGA</label><select id="device-hz"><option value="1">1 Hz</option><option value="5">5 Hz</option><option value="10" selected>10 Hz</option></select><button class="button secondary" id="device-rate">Aplicar frecuencia</button><p id="device-control-state"></p><p id="device-version"></p><p id="device-control-error" role="status"></p><p id="device-control-message" role="status"></p><button class="button primary" id="device-base-apply">Aplicar plan de base al ESP32</button><p id="device-base-message" role="status"></p><p>La lectura de modo base no verifica las coordenadas. No publicar correcciones hasta comprobar coordenadas, referencia de altura y convergencia.</p></article><article class="panel bench-panel" id="bench-base" hidden><h2>Aplicar al GPS por USB de la Mac</h2><p>La base conocida requiere WGS84 y altura elipsoidal. El promedio puede guardar coordenadas en la memoria del GPS y no garantiza precisión absoluta.</p><button class="button primary" type="button" id="bench-base-apply">Aplicar el plan validado al GPS USB</button><p id="bench-base-message" role="status"></p></article></section>
         <section class="page" id="page-recording" aria-labelledby="recording-title" hidden>
           <div class="page-heading"><div><p class="eyebrow">OBSERVACIONES Y SESIONES</p><h1 id="recording-title">Registro / PPK</h1><p class="intro">Graba observaciones para procesarlas después y conserva el contexto de cada sesión.</p></div></div>
-          <div class="notice" id="recording-availability">Registro sin habilitar: falta integrar la microSD y las observaciones crudas del GNSS.</div>
-          <div class="two-columns lower"><article class="panel"><h2>Nueva sesión</h2><fieldset disabled><legend>Opciones de grabación pendientes</legend><label for="record-name">Nombre de sesión</label><input id="record-name" placeholder="Nombre del levantamiento" /><label for="record-role">Tipo de sesión</label><select id="record-role"><option>Rover cinemático</option><option>Base estática</option></select><label for="record-rate">Frecuencia de observaciones</label><select id="record-rate"><option>1 Hz</option><option>5 Hz</option><option>10 Hz · pendiente de validar</option></select><label for="record-antenna">Modelo de antena</label><input id="record-antenna" placeholder="Identificación de la antena" /><label for="record-height">Altura vertical al ARP (m)</label><input id="record-height" type="number" min="0" step="any" /></fieldset><div class="save-bar"><button class="button primary" disabled>Iniciar grabación</button><button class="button secondary" disabled>Detener y cerrar</button></div><small class="field-help">Detener deberá vaciar las colas y cerrar el archivo antes de confirmar que puede apagarse.</small></article>
-          <article class="panel"><h2>Estado de grabación</h2><dl class="solution-values"><div><dt>Sesión activa</dt><dd>No disponible</dd></div><div><dt>Tiempo / bytes</dt><dd>—</dd></div><div><dt>Espacio en microSD</dt><dd>Sin lectura</dd></div><div><dt>Épocas perdidas</dt><dd>Sin medición</dd></div></dl><p>La grabación deberá continuar aunque se cierre el panel o se desconecte la app.</p><p>Los datos crudos permiten postproceso; un CSV de posiciones no los sustituye.</p></article></div>
-          <article class="panel lower"><h2>Sesiones y exportación</h2><p>No se puede consultar el catálogo hasta integrar el almacenamiento.</p><div class="save-bar"><button class="button secondary" disabled>Descargar datos nativos + metadatos</button><button class="button secondary" disabled>Exportar RINEX OBS / NAV</button><button class="button secondary" disabled>Exportar soluciones CSV</button></div><p>Las descargas serán por Wi-Fi. La conversión RINEX y el cálculo PPK requieren validación y se realizarán inicialmente fuera del ESP32.</p></article>
+<article class="panel"><h2>Grabación autónoma · microSD</h2><p>El lector está pendiente de cableado. Los controles se habilitan cuando el firmware detecta la tarjeta con pines verificados.</p><p>Registro del flujo original Unicore. Observaciones a 1 Hz; GGA a 10 Hz es independiente. No es un cálculo PPK ni una validación de precisión.</p><div class="button-row"><button class="button secondary" id="sd-profile" disabled>Preparar observaciones</button><button class="button primary" id="sd-start" disabled>Iniciar microSD</button><button class="button secondary" id="sd-stop" disabled>Detener y cerrar</button></div><p id="sd-state" role="status"></p><p id="sd-message" role="status"></p><p>Espera al cierre confirmado antes de apagar. Límite inicial de 64 MiB por sesión. Ante un cierre interrumpido se conserva el archivo parcial; FAT y alimentación deben validarse físicamente.</p><div id="sd-sessions"></div></article>
         <article class="panel bench-panel" id="bench-recording" hidden>
             <div class="card-top"><h2>Grabación de banco · Mac</h2><span class="badge">Disco local</span></div>
             <p>Conserva el flujo recibido por USB. Una captura solo NMEA no sirve para PPK. RINEX requiere observaciones, efemérides y conversión validada.</p>
@@ -363,15 +357,15 @@
           </section>
         <section class="page" id="page-corrections" aria-labelledby="corrections-title" hidden>
           <div class="page-heading"><div><p class="eyebrow">RTCM Y CONECTIVIDAD</p><h1 id="corrections-title">Correcciones</h1><p class="intro">Recibe correcciones como rover o distribuye las de tu base.</p></div></div>
-          <div class="notice" id="corrections-availability">Los transportes NTRIP están pendientes de integración. Ninguna conexión se inicia desde estos controles todavía.</div>
+          <p id="device-memory"></p><div class="notice" id="corrections-availability">Entrada NTRIP directa al ESP32 disponible. Publicador y caster integrados siguen pendientes.</div>
           <div class="two-columns lower">
-            <article class="panel"><h2>Entrada NTRIP · rover</h2><p>App con internet → BLE → ESP32 → GPS, o conexión directa del ESP32 al caster por Wi-Fi.</p><fieldset disabled><legend>Fuente de correcciones</legend><label for="ntrip-input-path">Transporte</label><select id="ntrip-input-path"><option>Desde app por BLE</option><option>Directo por Wi-Fi</option></select><label for="ntrip-input-host">Caster (hostname o IP)</label><input id="ntrip-input-host" /><label for="ntrip-input-port">Puerto</label><input id="ntrip-input-port" type="number" value="2101" /><label for="ntrip-input-mount">Mountpoint</label><input id="ntrip-input-mount" /><label for="ntrip-input-user">Usuario</label><input id="ntrip-input-user" autocomplete="off" /><label for="ntrip-input-pass">Contraseña</label><input id="ntrip-input-pass" type="password" autocomplete="new-password" /><label class="checkbox-label"><input type="checkbox" /> TLS</label><label class="checkbox-label"><input type="checkbox" /> Enviar GGA al caster cuando lo requiera</label></fieldset><button class="button primary" disabled>Conectar entrada</button><p>Estado: sin integrar · RTCM recibido: — · Edad de correcciones: —</p></article>
+            <article class="panel"><h2>Entrada NTRIP · ESP32 por Wi-Fi</h2><p>Conecta el equipo a tu hotspot en Configuración y consulta el modo rover en Base / rover.</p><p>Versión inicial: NTRIP v1 por TCP, sin TLS y sin envío GGA para VRS. Usa un caster compatible. Las credenciales quedan solo en memoria hasta reiniciar.</p><form id="device-ntrip-form"><label for="device-host">Caster</label><input id="device-host" maxlength="128" required /><label for="device-port">Puerto</label><input id="device-port" type="number" min="1" max="65535" value="2101" required /><label for="device-mount">Mountpoint</label><input id="device-mount" maxlength="96" required /><label for="device-user">Usuario</label><input id="device-user" maxlength="64" autocomplete="off" /><label for="device-password">Contraseña</label><input id="device-password" type="password" maxlength="128" autocomplete="off" /><div class="button-row"><button class="button primary" type="submit">Conectar NTRIP</button><button class="button secondary" type="button" id="device-ntrip-stop">Detener</button></div></form><p id="device-ntrip-state" role="status"></p></article>
             <article class="panel"><h2>Publicación NTRIP · base</h2><p>GPS → ESP32 → caster externo → rovers. Las credenciales de publicación pueden ser diferentes de las de recepción.</p><fieldset disabled><legend>Destino de publicación</legend><label for="ntrip-output-host">Caster destino (hostname o IP LAN)</label><input id="ntrip-output-host" /><label for="ntrip-output-port">Puerto</label><input id="ntrip-output-port" type="number" value="2101" /><label for="ntrip-output-mount">Mountpoint de la base</label><input id="ntrip-output-mount" /><label for="ntrip-output-user">Usuario de fuente</label><input id="ntrip-output-user" autocomplete="off" /><label for="ntrip-output-pass">Contraseña de fuente</label><input id="ntrip-output-pass" type="password" autocomplete="new-password" /><label for="ntrip-output-version">Protocolo</label><select id="ntrip-output-version"><option>NTRIP v2</option><option>NTRIP v1</option></select><label class="checkbox-label"><input type="checkbox" /> TLS</label></fieldset><button class="button primary" disabled>Iniciar publicación</button><p>Estado: sin integrar · RTCM enviado: — · Reconexiones: —</p></article>
           </div>
           <article class="panel lower"><h2>Caster propio · red local</h2><p>Previsto dentro del ESP32, o en una Mac/PC/Raspberry Pi de la misma red. La opción externa usa la publicación NTRIP de arriba hacia la IP LAN del servidor.</p><fieldset disabled><legend>Caster integrado en el ESP32 · pendiente</legend><label for="caster-network">Red de acceso</label><select id="caster-network"><option>Wi-Fi del equipo (AP)</option><option>Red local del sitio (LAN)</option></select><label for="caster-port">Puerto local</label><input id="caster-port" type="number" value="2101" /><label for="caster-mount">Mountpoint local</label><input id="caster-mount" value="TRESVIZO" /><label for="caster-user">Usuario rover</label><input id="caster-user" autocomplete="off" /><label for="caster-pass">Contraseña rover</label><input id="caster-pass" type="password" autocomplete="new-password" /><label for="caster-clients">Límite propuesto de rovers</label><input id="caster-clients" type="number" value="2" /></fieldset><button class="button primary" disabled>Iniciar caster local</button><p>Dirección disponible: — · Clientes conectados: — · Capacidad pendiente de pruebas.</p><p>La distribución local no necesita internet. Los rovers deben alcanzar la IP y puerto del caster; el panel web y el caster son servicios distintos.</p></article>
         <article class="panel bench-panel" id="bench-corrections" hidden>
             <h2>Correcciones de banco · Mac</h2>
-            <p>Este transporte se ejecuta en la Mac. El ESP32 todavía no ofrece NTRIP. Perfil inicial NTRIP v1; no envía tu posición GGA al caster.</p>
+            <p>Este transporte se ejecuta en la Mac y es independiente de la entrada directa del ESP32. Perfil inicial NTRIP v1; no envía tu posición GGA al caster.</p>
             <form id="bench-ntrip-form">
               <label for="bench-ntrip-role">Función</label><select id="bench-ntrip-role"><option value="input">Recibir RTCM y enviar al GPS USB</option><option value="publisher">Publicar RTCM del GPS base</option></select>
               <label for="bench-ntrip-host">Servidor</label><input id="bench-ntrip-host" required maxlength="253" placeholder="IP o nombre del caster" />

@@ -1,3 +1,7 @@
+#include "sd_recorder.h"
+#include "ntrip_input.h"
+#include "gnss_control.h"
+#include "memory_health.h"
 #include "instrument.h"
 #include "gnss_receiver.h"
 #include "ble_transport.h"
@@ -179,6 +183,7 @@ void status(JsonDocument& response) {
     response["device_name"] = deviceName;
     response["phase"] = "commissioning";
     response["uptime_ms"] = static_cast<uint64_t>(esp_timer_get_time() / 1000);
+    memory_health::status(response["memory"].to<JsonObject>());
     response["free_heap_bytes"] = ESP.getFreeHeap();
     response["min_free_heap_bytes"] = ESP.getMinFreeHeap();
     response["chip"] = ESP.getChipModel();
@@ -208,6 +213,8 @@ void status(JsonDocument& response) {
         response["subsystems"][subsystem]["state"] = "not_integrated";
     }
     ble_transport::status(response["subsystems"]["ble"].as<JsonObject>());
+    ntrip_input::status(response["subsystems"]["ntrip"].as<JsonObject>());
+    sd_recorder::status(response["subsystems"]["microsd"].as<JsonObject>());
     response["solution"]["fix"] = nullptr;
     response["solution"]["latitude_deg"] = nullptr;
     response["solution"]["longitude_deg"] = nullptr;
@@ -243,7 +250,7 @@ void status(JsonDocument& response) {
                 out["longitude_deg"] = gnss.solution.longitude_deg;
                 if (std::isfinite(gnss.solution.altitude_msl_m)) {
                     out["height_m"] = gnss.solution.altitude_msl_m;
-                    out["height_reference"] = "receiver_msl";
+                    out["height_reference"] = gnss_control::heightReference();
                 }
                 if (std::isfinite(gnss.solution.geoid_separation_m))
                     out["geoid_separation_m"] = gnss.solution.geoid_separation_m;
@@ -312,6 +319,7 @@ void tick() {
 }
 
 int changeAccessKey(JsonVariantConst body, JsonDocument& response) {
+    if(sd_recorder::active() || gnss_control::busy() || firmware_update::busy()) {error(response,"busy","Espera al cierre de la operación antes de cambiar la clave y reiniciar.");return 409;}
     if (pendingRestart) { error(response, "restarting", "Reinicio en curso."); return 409; }
     if (!body.is<JsonObjectConst>() || body.size() != 1 ||
         !validString(body["access_key"], config_rules::password)) {
@@ -386,36 +394,56 @@ int previewBase(JsonVariantConst body, JsonDocument& response) {
 }
 
 int request(const String& method, const String& path, JsonVariantConst body, JsonDocument& response) {
-    if (path == "/api/update" || path.startsWith("/api/update/")) return firmware_update::request(method,path,body,response);
+    if (path == "/api/update" || path.startsWith("/api/update/")) {
+        if(method!="GET" && (gnss_control::busy() || ntrip_input::active() || sd_recorder::active())) {error(response,"busy","Detén NTRIP y espera al GPS antes de actualizar.");return 409;}
+        return firmware_update::request(method,path,body,response);
+    }
     if (firmware_update::busy() && method != "GET") { error(response,"updating","Actualización en curso. Espera antes de modificar el equipo."); return 409; }
+    if(path=="/api/recording" || path.startsWith("/api/recording/"))return sd_recorder::request(method,path,body,response);
+    if(path=="/api/ntrip/input") return ntrip_input::request(method,body,response);
+    if(path=="/api/gnss/control") {
+        if(method=="GET"){gnss_control::status(response.to<JsonObject>());return 200;}
+        if(method=="POST")return gnss_control::start(body,response);
+        return 400;
+    }
+    if(path=="/api/base/apply" && method=="POST") {
+        JsonDocument preview;int code=previewBase(body,preview);
+        if(code!=200){response=preview;return code;}
+        return gnss_control::applyBase(preview["plan"],response);
+    }
     if (path == "/api/corrections/source") {
+        if(method=="PUT" && (ntrip_input::active() || gnss_control::busy())) {error(response,"busy","Detén NTRIP y espera al GPS antes de cambiar fuente.");return 409;}
         if (method == "PUT") {
             if (!body.is<JsonObjectConst>() || body.size() != 1 || !validString(body["source"], config_rules::deviceName) || !correction_router::select(body["source"])) {
-                error(response,"unsupported_source","Fuente no instalada. Disponibles: none, ble."); return 400;
+                error(response,"unsupported_source","Fuente no instalada. Disponibles: none, ble, ntrip."); return 400;
             }
         } else if (method != "GET") { error(response,"invalid_method","Usa GET o PUT."); return 400; }
         correction_router::status(response.to<JsonObject>()); return 200;
     }
     if (method == "POST" && path == "/api/base/plan") return previewBase(body, response);
     if (method == "GET" && path == "/api/operations") {
-        response["base"]["state"] = "not_integrated";
+        response["base"]["state"] = "uart_control_available";
         response["base"]["can_preview"] = true;
-        response["base"]["can_apply"] = false;
-        response["recording"]["state"] = "storage_not_integrated";
-        response["recording"]["can_start"] = false;
-        response["recording"]["can_stop"] = false;
-        response["recording"]["can_export"] = false;
+        response["base"]["can_apply"] = gnss_receiver::snapshot().enabled;
+        JsonDocument storage;sd_recorder::status(storage.to<JsonObject>());
+        response["recording"]["state"] = storage["state"];
+        response["recording"]["can_start"] = storage["available"].as<bool>() && !sd_recorder::active();
+        response["recording"]["can_stop"] = sd_recorder::active();
+        response["recording"]["can_export"] = storage["available"].as<bool>() && !sd_recorder::active();
         response["recording"]["sessions"] = nullptr;
         for (const char* role : {"input", "publisher", "local_caster"}) {
             response["corrections"][role]["state"] = "not_integrated";
             response["corrections"][role]["can_start"] = false;
         }
+        response["corrections"]["input"]["can_start"] = true;
+        response["corrections"]["input"]["state"] = "available_ntrip_v1_tcp";
         return 200;
     }
     if (method == "GET" && path == "/api/status") { status(response); return 200; }
     if (method == "GET" && path == "/api/config") { config(response); return 200; }
     if (method == "PUT" && path == "/api/config") return saveConfig(body, response);
     if (method == "POST" && path == "/api/restart") {
+        if(sd_recorder::active()||gnss_control::busy()){error(response,"busy","Cierra grabación y espera al GPS antes de reiniciar.");return 409;}
         pendingRestart = true;
         restartRequestedAt = millis();
         response["restarting"] = true;

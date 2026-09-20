@@ -2,6 +2,10 @@
 
 ## Estado
 
+**Actualización 2026-09-20:** el propietario confirmó TTL_TXD2 → GPIO18, TTL_RXD2 → GPIO17 y GND común, sin unir alimentación; cada placa se alimenta por su USB. Firmware 0.4.1 habilita UART2 a 115200 y se instaló por OTA con arranque confirmado y ajustes conservados. El UM980 confirmó `CONFIG COM2 115200` y `GPGGA COM2 0.1` enviados por COM3 USB. No se envió SAVECONFIG; la persistencia del perfil GNSS tras apagar sigue pendiente. La identificación eléctrica de la carrier a 3.3 V no se ha medido con instrumental.
+
+El panel principal prioriza la adquisición UART del ESP32; la lectura USB directa a la Mac permanece separada como banco. La recepción de GGA confirma GPS→ESP32. No demuestra todavía el enlace de transmisión ESP32→GPS, ni RTCM real, ni precisión. Las secciones siguientes conservan el historial anterior, cuando UART estaba desactivada.
+
 El receptor conectado a la Mac responde a `VERSIONA` como UM980, firmware `R4.10Build13504`, por `/dev/cu.usbserial-1110` (USB 1A86:7523). El puerto físico puede cambiar al reconectar. Respondió `devicename,COM3` a 115200 baudios. El ESP32 continúa conectado por separado; los datos USB del GPS no llegan al ESP32 por el hecho de compartir la Mac.
 
 El receptor aceptó `GPGGA 0.1` en su puerto actual. No se envió `SAVECONFIG`. La captura inicial posterior contiene mensajes GGA sin hora ni posición: esto demuestra comunicación, pero no demuestra diez posiciones distintas por segundo ni RTK. Las capturas y la respuesta completa de versión se guardan en `captures/local/`, excluido de Git.

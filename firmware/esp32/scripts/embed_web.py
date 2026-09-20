@@ -5,6 +5,7 @@ from pathlib import Path
 Import("env")
 root = Path(env.subst("$PROJECT_DIR"))
 assets = [
+    ("/device.js", "device.js", "application/javascript; charset=utf-8"),
     ("/", "index.html", "text/html; charset=utf-8"),
     ("/app.css", "app.css", "text/css; charset=utf-8"),
     ("/update.js", "update.js", "application/javascript; charset=utf-8"),

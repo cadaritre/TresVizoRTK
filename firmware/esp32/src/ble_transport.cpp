@@ -9,6 +9,7 @@
 #include <BLESecurity.h>
 #include <esp_timer.h>
 #include <atomic>
+#include <Preferences.h>
 
 namespace ble_transport {
 namespace {
@@ -25,6 +26,7 @@ BLECharacteristic *responses = nullptr, *solutions = nullptr;
 BLEServer* server = nullptr;
 std::atomic<bool> connected{false}, secure{false}, authorized{false}, advertise{false};
 std::atomic<uint32_t> generation{0}, dropped{0}, correctionAccepted{0}, correctionRejected{0}, correctionDropped{0};
+std::atomic<uint8_t> lastAuthReason{0},lastAuthMode{0};
 bool ready = false;
 uint32_t pairingPin = 0;
 String pending;
@@ -34,8 +36,9 @@ uint32_t lastSend = 0, lastEpoch = UINT32_MAX, lastSample = 0;
 uint32_t responseGeneration = 0;
 
 class ConnectionCallbacks : public BLEServerCallbacks {
-    void onConnect(BLEServer*) override {
+    void onConnect(BLEServer*, esp_ble_gatts_cb_param_t* parameters) override {
         ++generation; connected = true; secure = false; authorized = false;
+        esp_ble_set_encryption(parameters->connect.remote_bda,ESP_BLE_SEC_ENCRYPT_MITM);
     }
     void onDisconnect(BLEServer*) override {
         ++generation; connected = false; secure = false; authorized = false; advertise = true;
@@ -47,6 +50,7 @@ class SecurityCallbacks : public BLESecurityCallbacks {
     bool onSecurityRequest() override { return true; }
     bool onConfirmPIN(uint32_t) override { return false; }
     void onAuthenticationComplete(esp_ble_auth_cmpl_t event) override {
+        lastAuthReason=event.fail_reason;lastAuthMode=event.auth_mode;
         secure = event.success && (event.auth_mode & ESP_LE_AUTH_REQ_MITM);
         if (!secure && server) server->disconnect(server->getConnId());
     }
@@ -104,7 +108,14 @@ void begin(Dispatch dispatch, Authenticate authenticate) {
     dispatchRequest = dispatch; authenticateRequest = authenticate;
     requests = xQueueCreate(2, sizeof(Request));
     if (!requests) return;
-    pairingPin = 100000 + esp_random() % 900000;
+    Preferences pairing;
+    if(!pairing.begin("ble_pairing",false))return;
+    pairingPin=pairing.getUInt("pin",0);
+    if(pairingPin<100000 || pairingPin>999999){
+        pairingPin=100000+esp_random()%900000;
+        if(pairing.putUInt("pin",pairingPin)!=sizeof(uint32_t)){pairing.end();return;}
+    }
+    pairing.end();
     BLEDevice::init(instrument::apName().c_str());
     BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT_MITM);
     BLEDevice::setSecurityCallbacks(new SecurityCallbacks());
@@ -158,7 +169,7 @@ void tick() {
                     const String method = input["method"] | "";
                     const String path = input["path"] | "";
                     // La recuperación/cambio de credenciales permanece exclusivamente por USB.
-                    if (path == "/api/access" || (path.startsWith("/api/update/") && method != "GET") || (method != "GET" && method != "POST" && method != "PUT")) {
+                    if (path == "/api/recording/read" || path == "/api/access" || (path.startsWith("/api/update/") && method != "GET") || (method != "GET" && method != "POST" && method != "PUT")) {
                         code = 400; body["error"] = "unsupported_operation";
                     } else code = dispatchRequest(method, path, input["body"].as<JsonVariantConst>(), body);
                 }
@@ -200,6 +211,7 @@ void tick() {
 void status(JsonObject out) {
     out["state"] = !ready ? "start_failed" : (connected ? (authorized ? "authorized" : "connected") : "advertising");
     out["encrypted_authenticated"] = secure.load();
+    out["last_auth_reason"] = lastAuthReason.load();out["last_auth_mode"] = lastAuthMode.load();
     out["protocol_version"] = 1;
     out["dropped_requests"] = dropped.load();
     out["control_available"] = ready;

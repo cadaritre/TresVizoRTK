@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 
 namespace instrument {
-constexpr const char* kVersion = "0.4.0";
+constexpr const char* kVersion = "0.5.0";
 void begin();
 void tick();
 int changeAccessKey(JsonVariantConst body, JsonDocument& response);
