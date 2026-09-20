@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "name": "POWER & INTERFACE PCB",
-  "status": "TBD — arquitectura pendiente de aprobación",
+  "status": "D0 — contorno provisional, sin componentes ni ruteo; no entregar como geometría final",
   "units": "mm",
   "coordinates": {
     "xy_origin": "board_geometric_center",
@@ -9,10 +9,27 @@
     "axes": "right_handed"
   },
   "board": {
-    "width_mm": null,
-    "length_mm": null,
-    "thickness_mm": null,
-    "outline_xy_mm": null
+    "width_mm": 35,
+    "length_mm": 30,
+    "thickness_mm": 1.6,
+    "outline_xy_mm": [
+      [
+        -17.5,
+        -15
+      ],
+      [
+        17.5,
+        -15
+      ],
+      [
+        17.5,
+        15
+      ],
+      [
+        -17.5,
+        15
+      ]
+    ]
   },
   "mounting_holes": [],
   "connectors": [
@@ -31,13 +48,26 @@
       "rotation_xyzw": null
     },
     {
-      "name": "ESP_EXTERNAL",
+      "name": "ESP_NATIVE_FPC",
+      "position_mm": null,
+      "size_mm": null,
+      "rotation_xyzw": null,
+      "manufacturer": null,
+      "mpn": null,
+      "contact_count": null,
+      "pitch_mm": null,
+      "footprint": null,
+      "pinout": null,
+      "cable_contact_orientation": null
+    },
+    {
+      "name": "GNSS_POWER",
       "position_mm": null,
       "size_mm": null,
       "rotation_xyzw": null
     },
     {
-      "name": "GNSS_POWER",
+      "name": "ESP_AUX_SIGNALS",
       "position_mm": null,
       "size_mm": null,
       "rotation_xyzw": null
@@ -119,6 +149,8 @@
   },
   "notes": [
     "Sólo datos de la nueva PCB. Placement global corresponde al responsable del case.",
-    "Listas vacías y null no certifican espacio libre."
+    "Listas vacías y null no certifican espacio libre.",
+    "P1 reemplaza función Tiny-Adapter; FPC sin verificación física. No transformar datos 8/10 del símbolo en contactos de cable.",
+    "20-09-2026: propietario pide diseño compacto y adaptación mecánica posterior. 35×30 mm es objetivo provisional; no demuestra cabida de componentes. STEP poblado pendiente."
   ]
 }

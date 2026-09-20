@@ -1,6 +1,6 @@
 # Fuentes y trazabilidad
 
-Consultadas el 19 de septiembre de 2026. Se conservan enlaces oficiales; no se descargaron copias PDF aquí. Lectura de ficha/datasheet para selección conceptual no equivale a revisión de cada pin, tolerancia, layout o certificación. Antes de esquema, guardar revisión exacta y hash de los documentos de los MPN aprobados.
+Consultadas el 19 de septiembre de 2026. Se conservan enlaces oficiales; P1 añade copias de los dos PDF Waveshare en `waveshare/`, con hash abajo. Lectura de ficha/datasheet para selección conceptual no equivale a revisión de cada pin, tolerancia, layout o certificación. Antes de esquema, guardar revisión exacta y hash de los documentos de los MPN aprobados.
 
 | Fuente primaria | Uso / estado |
 | --- | --- |
@@ -21,8 +21,15 @@ Consultadas el 19 de septiembre de 2026. Se conservan enlaces oficiales; no se d
 | [TI BQ2970](https://www.ti.com/product/BQ2970) | Protección independiente de celda; escoger variante por umbrales |
 | [USB-IF Type-C Release 2.5](https://www.usb.org/document-library/usb-type-cr-cable-and-connector-specification-release-25) | Revisión vigente localizada; texto normativo completo no recuperado |
 | [USB-IF Type-C R2.0](https://www.usb.org/sites/default/files/USB%20Type-C%20Spec%20R2.0%20-%20August%202019.pdf) | Referencia anterior localizada; recuperación completa falló. No basta para certificar V1 |
-| [Waveshare Tiny](https://docs.waveshare.com/ESP32-S3-Tiny) | Familia; no se obtuvo esquema legible para verificar el punto de alimentación de la revisión física |
+| [Waveshare Tiny](https://docs.waveshare.com/ESP32-S3-Tiny) | P1: esquemas genéricos Tiny/Adapter recuperados y revisados visualmente; no certifican revisión física N8R8 |
 | [BDLX UM980](https://www.bdlxgnss.com/?list_22/101.html=) | Enlace conservado del repositorio; no resolvió pinout/tensiones de header |
 | [atopile](https://docs.atopile.io/) | Flujo textual propuesto, versión local no instalada en PATH |
 
 Las fuentes de stock/precio se enlazan por fila en `../bom.md`. Revalidar todas antes de compra. Consultas no recuperables se indican como pendientes, sin rellenarlas desde resúmenes de terceros.
+
+## Fuentes P1
+
+Ver [USB_NATIVE_REVIEW.md](../USB_NATIVE_REVIEW.md) para fuentes Espressif, alcance por controlador y discrepancia FPC. Documentos Waveshare descargados desde los enlaces oficiales del informe; no se encontró revisión N8R8 diferenciada en el índice consultado.
+
+- `ESP32-S3-Tiny-Sch.pdf` SHA256: `7a1069dc3c1f966f6bcea56c25272cb8ad3a7f992c46a194e6a1fdfe5b503b14`.
+- `Tiny-Adapter.pdf` SHA256: `05bab7dddf85759c838841c4a9cee4942cbe7509d431ba85e4119d06a05aa96c`.

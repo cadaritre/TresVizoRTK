@@ -65,7 +65,7 @@ BOOT y RUN/RESET serán señales de recuperación accesibles mediante pads/jumpe
 
 ## Verificación física pendiente: bloqueo para FPC
 
-No se encontró en el repositorio foto legible de ambas caras de la unidad/cable ni hay acceso físico para contar contactos o medir continuidad. N8R8 queda confirmado **por declaración del propietario**, no por una inspección que no se realizó.
+El propietario reporta únicamente `ESP32-S3-TINY` en la cara posterior. No distingue revisión/N8R8 y no aporta todavía conteo del FPC. No se encontró en el repositorio foto legible de ambas caras de la unidad/cable ni hay acceso físico para contar contactos o medir continuidad. N8R8 queda confirmado **por declaración del propietario**, no por una inspección que no se realizó.
 
 Antes de seleccionar símbolo, huella y cable:
 

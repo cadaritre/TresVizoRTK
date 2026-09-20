@@ -1,21 +1,26 @@
 # Arquitectura propuesta y alternativas
 
-P0 pendiente de aprobación. Los enlaces de fabricante están reunidos en [fuentes](datasheets/README.md).
+Antecedente P1. El propietario autoriza comenzar D0 y priorizar compacidad; ver [diseño vigente](DESIGN_D0.md). La revisión USB vigente es [USB_NATIVE_REVIEW.md](USB_NATIVE_REVIEW.md). Los enlaces de fabricante están reunidos en [fuentes](datasheets/README.md).
 
 ```mermaid
 flowchart TD
   USB[USB-C único 5 V sink] --> PROT[Protección VBUS y límite total]
   USB --> DATA[ESD D+/D-]
-  DATA --> UART[CP2102N dominio USB]
+  DATA --> USBSW[Desconexión USB hardware]
+  USBSW --> FPC[FPC verificado]
+  FPC --> ESP
+  USB --> SENSE[USB_VBUS sensing]
+  SENSE --> USBSW
+  PG[Tiny power-good] --> USBSW
   USB --> CC[CC1/CC2: Rd y detección de corriente]
   CC --> LIMIT[Política de corriente / suspensión]
   LIMIT --> PROT
   PROT --> CHG[BQ24074 cargador + power-path]
-  BAT[Pack LiPo 1S protegido + NTC] <--> CHG
+  BAT[Pack 955565 1S: PCM por verificar] <--> CHG
   CHG --> SYS[SYSTEM_POWER siempre disponible]
   SYS --> BOOST[TPS61023 habilitado por controlador]
   BOOST --> V5[SYSTEM_5V conmutado]
-  V5 --> ESP[ESP32-S3 externo]
+  V5 --> ESP[Tiny-N8R8 externa]
   V5 --> GNSS[Carrier UM980 externa]
   V5 --> OPT[Otras salidas sólo tras verificar rails]
   SYS --> CTRL[LTC2954-1 + UVLO + lógica de arranque]
@@ -23,8 +28,6 @@ flowchart TD
   CTRL --> BOOST
   CTRL -->|POWER_REQUEST_N| ESP
   ESP -->|POWER_HOLD| CTRL
-  UART --> ISO[Aislamiento de señales en OFF]
-  ISO --> ESP
   BAT --> GAUGE[MAX17048]
   GAUGE -->|I2C / ALERT con protección OFF| ESP
 ```
@@ -43,13 +46,13 @@ Las flechas de 5 V a placas son conceptuales, condicionadas al presupuesto. La c
 
 TPS61023: boost con desconexión al deshabilitar; dimensionar con corriente de inductor y condiciones peores, no con «3.7 A» como salida. Su UVLO permite tensiones demasiado bajas para ser protección funcional de LiPo: añadir corte adecuado. Si sus picos/térmica no alcanzan, reabrir selección antes del esquemático. [TI TPS61023](https://www.ti.com/product/TPS61023).
 
-La carga queda aguas arriba del apagado de los módulos. OFF con USB permite cargar, sin encender automáticamente el receptor. Proponer pack protegido con NTC; si carece de PCM, evaluar BQ297xx + FETs antiparalelo con variante y umbrales de la celda. El gauge no protege. Añadir UVLO con histéresis y aviso previo; evitar ciclos de arranque al recuperar tensión en reposo. [TI BQ2970](https://www.ti.com/product/BQ2970).
+La carga queda aguas arriba del apagado de los módulos. OFF con USB permite cargar, sin encender automáticamente el receptor. Pack indicado: 955565, 3.7 V/5000 mAh anunciados; imagen de dos cables, sin NTC separado visible. Evaluar NTC externo en contacto con la celda y confirmar PCM; si carece de PCM, evaluar BQ297xx + FETs antiparalelo con variante y umbrales de la celda. El gauge no protege. Añadir UVLO con histéresis y aviso previo; evitar ciclos de arranque al recuperar tensión en reposo. [TI BQ2970](https://www.ti.com/product/BQ2970).
 
 ## Estados de potencia (comportamiento objetivo, no prueba realizada)
 
 | Estado | Ruta | Carga / condición |
 | --- | --- | --- |
-| A: batería sola | Pack → power-path → SYS → boost habilitado | Cargador sin entrada; bridge USB apagado. UVLO puede impedir ON. |
+| A: batería sola | Pack → power-path → SYS → boost habilitado | Cargador sin entrada; datos USB desconectados sin VBUS. UVLO puede impedir ON. |
 | B: USB + batería | USB → power-path → SYS; batería suplementa si corresponde | Prioridad sistema; corriente sobrante carga batería. No prometer carga positiva bajo sobreconsumo. |
 | C: USB + batería descargada | USB sostiene SYS sin esperar carga completa | Precarga según charger; ON sólo si fuente puede sostener arranque. Batería descargada puede no suplir picos. |
 | D: USB sin batería | USB → SYS → boost | Permitido por power-path candidato con desacoplación adecuada; limitar carga, indicar batería ausente. Puerto débil puede no sostener receptor. |
@@ -70,25 +73,27 @@ Secuencia normal: request → dejar de aceptar nuevas escrituras → terminar/ab
 
 ## USB-C, corriente y señales
 
+P1 sustituye la función de Tiny-Adapter. USB Serial/JTAG nativo es preferido; **USB_VBUS y SYSTEM_5V permanecen separados**. El FPC recibe datos y alimentación interna por contactos todavía TBD; sensing observa VBUS real del host, nunca la entrada FPC alimentada por batería. Detector y switch USB propuestos garantizan desconexión sin depender del firmware. Ver la investigación enlazada para límites y pruebas pendientes.
+
 Puerto UFP/sink, CC1 y CC2 separados con Rd nominal 5.1 kΩ cada uno a GND si se implementa pasivamente; nunca unir CC1 con CC2. Si se usa TUSB320LAI en modo sink con Rd integrado, no duplicar resistencias. Evaluar detección CC autónoma, sin depender del ESP apagado. D+ A6/B6 unidos cerca del receptáculo; D− A7/B7 igualmente. Protección ESD de baja capacitancia junto al conector, retorno corto, par USB sobre referencia continua y objetivo de impedancia según stackup. SBU y pares SuperSpeed no utilizados.
 
-Rd permite conexión, **no autoriza por sí solo 1.5/3 A**. Propuesta V1: boot USB conservador y lógica de límite total según CC/enumeración/suspend, contando bridge y cargador juntos. BQ24074 en modo «100 mA» más un bridge paralelo puede superar 100 mA: presupuestar ambos o limitar la entrada común. No fijar 500 mA por defecto antes de enumerar ni usar la configuración USB del bridge como prueba de que el resto de la placa cumple. Suspensión necesita reducir/desconectar carga USB si no hay autorización independiente. MPN del limitador y tabla lógica: TBD antes de ERC.
+Rd permite conexión, **no autoriza por sí solo 1.5/3 A**. La limitación cuenta sistema, cargador, detector y lógica. Con Tiny apagada no hay enumeración ni bridge independiente. Resolver consumo de arranque pre-enumeración, suspender/reducir carga y secuenciar cargas si hace falta; no forzar 500 mA por defecto. MPN del limitador y tabla de control TBD.
 
-Sólo un detector BC1.2 debe controlar D+/D−. Si se cambia a BQ25606, coordinar su DPDM con bridge; no habilitar dos detectores sobre el mismo par. No mezclar USB nativo del ESP con bridge en D+/D− sin hub/mux: el conector principal es USB-UART. USB-UART ofrece consola/flashing posible, no USB-JTAG nativo. Aislar alimentación proveniente del adaptador USB original o de otros cables antes de conectar otra fuente.
+La ruta nativa no requiere DTR/RTS ni USB-UART. Mantener pads de servicio BOOT y RUN/RESET, con funciones verificadas en la revisión real; no añadir botones exteriores ni reasignar el pulsador de encendido. Si se considera BQ25606, coordinar DPDM con conexión USB para no perturbar el par; no habilitar detectores simultáneos. No conectar Tiny-Adapter original como segunda fuente en paralelo. CP2102N sólo se reabre por una limitación demostrada y no proporciona JTAG nativo.
 
 Se revisaron documentos oficiales USB-IF y TI; [USB-IF publica Release 2.5](https://www.usb.org/document-library/usb-type-cr-cable-and-connector-specification-release-25). El texto completo de esa revisión no fue recuperado: cumplimiento completo, límites/inrush/suspend y revisión normativa final quedan pendientes; no se declara certificación.
 
-## Bridge, gauge e indicadores
+## USB nativo, contingencias, gauge e indicadores
 
 | Opción | Evaluación |
 | --- | --- |
-| CP2102N | Preferido por documentación, DTR/RTS y soporte VCP oficial macOS; hasta 3 Mbaud. Probar instalación/reconexión/flashing en la Mac real. |
+| CP2102N | Fuera de P1; contingencia sólo tras documentar limitación real del USB nativo. |
 | CH343P | Alternativa compacta QFN16; WCH publica driver macOS. Datos eléctricos/velocidad final pendientes de lectura completa del datasheet. |
 | CH340C | Alternativa SOP16 y menor coste potencial, mayor área. No asumir igual velocidad ni compatibilidad de pines. |
-| USB nativo externo | Evita bridge pero cambia el requisito y usa otra ruta; sólo alternativa para decisión del usuario, no adoptada. |
+| USB nativo externo | Preferido: reemplaza Tiny-Adapter y permite Serial/JTAG/flashing. FPC y sensing pendientes de cierre. |
 | MAX17048 | Preferido: I2C/SOC/tensión/ALERT, sin shunt, 3 µA hibernate típico. Requiere compensación/validación con batería real. |
 | BQ27441-G1A | Alternativa con shunt y estimación de capacidad/SOC; más configuración y área. Seleccionar química 4.2 V; G1B no es sustituto automático. |
-| Divisor + ADC | Menor BOM, útil para tensión; bajo carga no equivale a SOC. No se omite gauge en P0. |
+| Divisor + ADC | Menor BOM, útil para tensión; bajo carga no equivale a SOC. No se omite gauge en P1. |
 
 RGB discreto controlado por tres señales externas y drivers si hacen falta; evitar LED direccionable con consumo permanente. CHG opcional alimentado desde USB. Posición, encapsulado, difusión y resistencias TBD por mecánica/corriente; lógica de color en firmware.
 
@@ -97,7 +102,8 @@ RGB discreto controlado por tres señales externas y drivers si hacen falta; evi
 | Destino | Señales potenciales |
 | --- | --- |
 | Batería | PACK+, PACK−, NTC si disponible; polarización mecánica y eléctrica por confirmar |
-| ESP externo | POWER_OUT, GND, bridge TX → ESP RX, bridge RX ← ESP TX, DTR/RTS reservados, POWER_HOLD, POWER_REQUEST_N, BATTERY_ALERT_N, SDA/SCL, RGB_R/G/B |
+| Tiny externa por FPC | D+/D−, GND, alimentación interna verificada, BOOT, RUN/RESET; contacto/numeración/capacidad TBD |
+| Tiny por conector auxiliar | USB_VBUS_VALID, POWER_HOLD, POWER_REQUEST_N, BATTERY_ALERT_N, SDA/SCL, RGB_R/G/B; no asumir contactos FPC libres ni GPIO |
 | UM980 carrier | POWER_OUT verificado, GND; sin UART/PPS por esta placa |
 | Otras cargas | Rail verificado + GND solamente según inventario |
 | Servicio | TP y jumper PROGRAM_MODE; acceso por confirmar |

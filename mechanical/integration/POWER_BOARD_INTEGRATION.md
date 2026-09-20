@@ -1,3 +1,5 @@
+> D0, 20-09-2026: por instrucción del propietario se diseña primero una placa compacta y otro agente adaptará la mecánica después. Contorno provisional 35 × 30 × 1.6 mm, sin placement ni STEP poblado; no tratarlo como entrega final. Las medidas A4 siguientes son antecedentes.
+
 # Power Board en el assembly existente
 
 **La Power Board es un nuevo componente del assembly existente.** KiCad será fuente de su geometría; JSON es interfaz local y Python adaptador. La carcasa gobierna espacio disponible. No se reconstruyen otros módulos.
@@ -64,3 +66,7 @@ Cuando exista `hardware/power-board/manufacturing/power-board.step`, lo prioriza
 `NO_COLLISIONS_IN_SUPPLIED_GEOMETRY` sólo significa ausencia de colisiones en formas suministradas. No certifica completitud de obstáculos, accesibilidad, tolerancias ni montaje físico. `access_validation` permanece PENDING para revisión por responsable mecánico. Los contactos de apoyo intencionales requieren tratamiento explícito; no ignorar bandeja entera.
 
 **Fit check real PENDING**, por falta de geometría/placement y cambio externo de la fuente mecánica. Las pruebas sintéticas del adaptador no dimensionan esta PCB.
+
+## Actualización P1: función Tiny-Adapter
+
+El propietario pide evaluar como preferido que Power Board sustituya Tiny-Adapter. Queda aceptado en el alcance funcional de P1, sin quitar su reserva ni alterar el CAD. Se incorpora conector ESP_NATIVE_FPC con todos los datos físicos/pinout TBD y conector auxiliar para sensing/HOLD/señales que no necesariamente caben en FPC. Confirmar orientación, radio de flexión, extracción, longitud y contactos físicos antes de marcar volumen disponible. Serigrafía trasera informada: ESP32-S3-TINY; N8R8 declarada, revisión aún pendiente. Ver USB_NATIVE_REVIEW.md. Las referencias A4 anteriores son históricas; no se modificó el modelo A5 que aparece actualmente en el repositorio.

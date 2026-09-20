@@ -2,7 +2,7 @@
 
 **Estado: referencia para coordinación; no es un volumen asignado ni un fit check aprobado.** El botón está en espera por indicación del propietario. No fijar su perforación ni comprar el módulo comercial estudiado antes de recibir el STEP de la PCB.
 
-Maestro: `TresVizo-A5.FCStd`, en esta carpeta. A5 conserva las geometrías físicas de A4; cambia el empaquetado del archivo y su documentación. Toda geometría está embebida. No importar archivos de `legacy` como dependencias.
+Maestro: `TresVizo-A5.FCStd`, en esta carpeta. A5 parte de A4 y modifica la tapa y dos rebajes superiores de la bandeja para fijar la antena HA-901A. Toda geometría está embebida. No importar archivos de `legacy` como dependencias.
 
 ## Coordenadas
 
@@ -20,6 +20,10 @@ Unidades mm. Z coincide con el eje vertical del receptor/jalón. Z=0 en la cara 
 | Reserva BMI088 | −14…14 | −15…9 | 123…131 | El patrón del breakout sigue sin confirmar. |
 
 No sumar las reservas USB y biestable como una caja única: existen plataformas, nervios y asiento IMU entre ellas. El STEP de la PCB debe incluir espesor, componentes, salientes, fijaciones, conector USB, botón/actuador, LEDs, plugs y salida de cables. Luego se ajustarán la bandeja y el panel en este mismo maestro, manteniendo la silueta, el grabado y la base de una pieza.
+
+### Fijación de antena integrada en A5
+
+Tres ejes verticales en `(X,Y)=(+11.518138,6.650), (-11.518138,6.650), (0,-13.300)` mm. Las cabezas M2.5 ocupan Z162–164.5 y Ø4.5 mm; las arandelas, Z164.5–165 y Ø6 mm. Los vástagos pasan por la tapa hasta Z172.5. Reservar al menos 0.5 mm adicional alrededor de esta tornillería al integrar la PCB. Los dos rebajes R3.5 de la bandeja empiezan en Z161.2 y no son nuevas zonas de apoyo. Los barrenos de la tapa son Ø3 mm y el paso coaxial central continúa siendo Ø16 mm. El apriete se hace con la tapa retirada, antes de cerrar el cuerpo. No mover estos ejes ni el eje de antena para acomodar la PCB.
 
 ## Entrega necesaria del diseño electrónico
 

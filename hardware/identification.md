@@ -1,5 +1,9 @@
 # Identificación inicial de componentes
 
+## Corrección para Power Board P1
+
+El propietario identifica ahora la placa utilizada como **Waveshare ESP32-S3-Tiny-N8R8** y reporta serigrafía trasera `ESP32-S3-TINY`. Esta marca no distingue variante ni revisión del FPC. Los resultados USB 4 MB/2 MB de abajo se conservan como evidencia histórica, cuya correspondencia con la unidad actual está pendiente. Para P1 rige N8R8 declarada; no convertir esa declaración en verificación física ni cambiar firmware automáticamente. Ver [revisión USB nativo](power-board/USB_NATIVE_REVIEW.md). La restricción histórica «No usar el perfil N8R8» de la tabla no es una decisión sobre la unidad actualmente declarada.
+
 Fecha: 19 de septiembre de 2026. Fuentes: capturas de las publicaciones proporcionadas por el propietario, identificación USB y consulta de documentación del fabricante. Las fotografías de una publicación no verifican por sí solas las conexiones de la unidad recibida.
 
 El propietario confirmó que solo el ESP32 está conectado a la Mac por USB. GNSS, IMU, microSD y alimentación externa no están cableados entre sí. También confirmó la compra de una antena Helix.
@@ -11,6 +15,10 @@ El propietario confirmó que solo el ESP32 está conectado a la Mac por USB. GNS
 | [Publicación UM980](https://es.aliexpress.com/item/1005009578780196.html) | Se muestra una carrier BDLX con UM980, USB y SMA. La opción seleccionada en la captura es `Helix Antenna`; el propietario confirma la compra de la Helix. | La fotografía física coincide con RTK_UM98_V1.0.1 de BDLX; por USB responde UM980, R4.10Build13504 (COM3, 115200 baud). Identificar la antena y sus bandas; no asumir que sea HA-901A. Comprobar qué conectores son TTL y cuáles RS232 antes de cablear. |
 | [Lector microSD](https://es.aliexpress.com/item/1005011827601230.html) | Módulo azul SPI, opción `1pcs`; la publicación anuncia regulador y conversión de niveles. | Identificar los circuitos reales y verificar alimentación y niveles. La etiqueta comercial 5 V/3.3 V no demuestra que cualquier pin acepte ambas tensiones. Tarjeta concreta pendiente. |
 | [Interruptor biestable](https://es.aliexpress.com/item/33054170454.html) | Módulo verde con pines; la publicación anuncia 2.5–6 V y 6 A. | Verificar modelo, esquema, corriente y función de las señales. Las cifras anunciadas no están validadas. No se ha identificado como cargador, regulador ni protector de LiPo. |
+
+## Batería indicada posteriormente
+
+El propietario identifica la [publicación 955565](https://es.aliexpress.com/item/1005008867815394.html), anunciada 3.7 V, 5000 mAh y 18.5 Wh, mediante captura. Cableado mostrado de dos hilos; PCM, NTC, conector, corrientes y medidas reales sin verificar. Véase [referencia de batería](power-board/BATTERY_REFERENCE.md).
 
 ## Fuentes técnicas
 

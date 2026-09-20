@@ -1,6 +1,6 @@
 # Lista de materiales inicial
 
-Esta lista documenta la configuración prevista, no un diseño electrónico cerrado. No confirma compatibilidades eléctricas o mecánicas entre componentes. La mayoría de los componentes se reporta como recibida, pero falta realizar y documentar un inventario físico detallado; la batería está pendiente.
+Esta lista documenta la configuración prevista, no un diseño electrónico cerrado. No confirma compatibilidades eléctricas o mecánicas entre componentes. La mayoría de los componentes se reporta como recibida, pero falta realizar y documentar un inventario físico detallado; la referencia de batería ya fue indicada y su caracterización sigue pendiente.
 
 | Componente | Función | Modelo previsto | Estado de confirmación | Observaciones |
 | --- | --- | --- | --- | --- |
@@ -11,7 +11,7 @@ Esta lista documenta la configuración prevista, no un diseño electrónico cerr
 | IMU | Aceleración y velocidad angular | Bosch BMI088 en breakout | Prevista; breakout por identificar | Verificar fabricante de la placa, orientación de ejes, interfaz, niveles y requisitos de montaje. |
 | Lector y tarjeta microSD | Observaciones GNSS, datos IMU, estado y diagnóstico | Lector microSD mediante módulo o socket y tarjeta | Previsto; solución concreta por confirmar | Identificar lector y tarjeta; verificar interfaz, alimentación, detección y estrategia de cierre seguro. |
 | Antena GNSS | Recepción GNSS | Helix; modelo exacto por confirmar | Compra confirmada por el propietario | Verificar bandas, conector, alimentación, montaje y referencia del centro de fase. La HA-901A mencionada inicialmente no está confirmada. |
-| Batería | Alimentación portátil | LiPo 1S, 3.7 V nominal, aproximadamente 5000 mAh | Pendiente | Capacidad, dimensiones, conector, corriente admisible y protecciones deben confirmarse. |
+| Batería | Alimentación portátil | 955565, LiPo 1S, 3.7 V / 5000 mAh / 18.5 Wh anunciados | Publicación indicada por el propietario; sin caracterización física | Dos cables en imagen; capacidad real, dimensiones, conector, PCM, corriente admisible y NTC por confirmar. Ver power-board/BATTERY_REFERENCE.md. |
 | Alimentación y carga | Carga, protección, regulación y encendido | Por definir | Pendiente de diseño y verificación | Diseñar a partir de los módulos reales y sus requisitos medidos o documentados. |
 | Carcasa | Protección y referencia mecánica | Cilíndrica, impresa en 3D | Concepto previsto | Dimensiones y material pendientes; debe mantener alineación entre antena, IMU y jalón. |
 | Interruptor biestable | Posible control de encendido | Módulo verde con pines de la publicación compartida | Identificado en captura; sin verificación eléctrica | No asumir que carga o protege una LiPo; comprobar posibilidad de apagado coordinado antes de integrarlo. |
