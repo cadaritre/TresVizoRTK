@@ -1,0 +1,1 @@
+(sym_lib_table (lib (name "Power") (type "KiCad") (uri "${KIPRJMOD}/Power.kicad_sym") (options "") (descr "Power Board Rev A")))

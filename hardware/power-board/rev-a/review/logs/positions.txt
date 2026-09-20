@@ -1,0 +1,1 @@
+Se escribieron los datos de posición en '/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK/hardware/power-board/manufacturing/rev-a/assembly/positions-kicad.csv'.

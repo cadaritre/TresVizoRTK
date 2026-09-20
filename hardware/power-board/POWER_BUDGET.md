@@ -1,35 +1,22 @@
-# Presupuesto de alimentación inicial
+# Presupuesto de potencia — Rev A
 
-**No hay medida de consumo del conjunto ni total verificable.** TBD no significa cero. La ficha BDLX respalda un rail de 5 V para su carrier; todavía debe cerrarse el punto físico de inyección.
+Datos publicados, cálculos y medidas se distinguen expresamente. El prototipo todavía no está medido.
 
-| Carga | Tensión de entrada de placa | I típico | I máximo/pico | Fuente / estado | Margen |
-| --- | --- | --- | --- | --- | --- |
-| Carrier BDLX RTK_UM98_V1.0.1 UM980 | 4.0–5.5 V, nominal 5 V según BDLX; header pendiente | 160 mA a 5 V, ficha (condiciones no detalladas) | TBD | [Tabla oficial](https://www.bdlxgnss.com/static/upload/image/20250804/1754279536807539.png); falta pico medido | TBD |
-| ESP32-S3-Tiny-N8R8 (declarada) | TBD para punto de inyección elegido | TBD | TBD | Serigrafía informada ESP32-S3-TINY; revisión FPC pendiente. Evidencia histórica 4/2 por reconciliar; ver USB_NATIVE_REVIEW.md | TBD |
-| BMI088 breakout | TBD | TBD | TBD | Breakout no identificado eléctricamente | TBD |
-| microSD + lector | TBD | TBD | TBD | Lector/tarjeta sin caracterización; incluir escritura/flush | TBD |
-| Antena activa, si recibe bias de carrier | TBD | TBD | TBD | Evitar doble conteo con UM980; modelo/consumo de alimentación pendiente | TBD |
-| USB nativo de Tiny | Incluido en la alimentación de Tiny | TBD | TBD | Evitar doble conteo; medir enumeración y Serial/JTAG activos | TBD |
-| Detector VBUS + switch USB + protección | USB_VBUS / lógica según circuito definitivo | TBD | TBD | Nuevos auxiliares P1; comprobar OFF/Ioff y consumo pre-enumeración | TBD |
-| RGB y CHG | Según rail/driver elegido | TBD | TBD | Duty y corriente LED por definir; CHG desde USB | TBD |
-| Soft-power/gauge/protección | SYSTEM_POWER / PACK | TBD total | TBD | Registrar corrientes de reposo, pull-ups y fugas | TBD |
-| Otros módulos/cables | TBD | TBD | TBD | Inventario pendiente | TBD |
+| Carga / rail | Tensión | Consumo típico | Máximo | Fuente / margen |
+| --- | --- | --- | --- | --- |
+| Carrier UM980 BDLX externa | 4.0–5.5 V; alimentar a 5 V | 160 mA publicado | TBD, antena/configuración incluidas | [Tabla de carrier](https://www.bdlxgnss.com/static/upload/image/20250804/1754279536807539.png); no confundir con módulo desnudo |
+| Tiny N8R8 externa | 5 V por entrada documentada | TBD con firmware real | TBD, picos radio/SD | [Waveshare](https://docs.waveshare.com/ESP32-S3-Tiny); comprobar revisión/diodo/LDO |
+| IMU, SD y periféricos existentes | Según cableado externo | TBD | TBD | Fuera de esta placa; deben entrar en medición total |
+| LEDs de estado | SYSTEM_5V; 1 kΩ/canal | ~2–3 mA/canal ON | <15 mA total | Cálculo de resistencias, brillo por medir |
+| OFF a batería | SYSTEM_POWER → AON_3V0 | Orden 0.4–0.5 mA | TBD con temperatura | Estimación de ICs y pull-ups |
+| Gauge MAX17048 | PACK_P | Según hibernación/lectura | Ver hoja técnica/medir | SOC requiere caracterización de celda |
+| Salida total de ensayo | 4.992 V nominal | Punto de diseño 0.6 A, 3 W | No medido | TPS61023, L=1 µH, CIN=10 µF, COUT=44 µF nominal |
+| Carga de celda | CC/CV 4.2 V | 500 mA nominal | ~548 mA por tolerancia ISET antes de regulación | Límite real de la batería pendiente |
 
-## Batería de referencia
+A 3 W, eficiencia supuesta 85% y batería 3.1 V: `Ibat ≈ 3/(0.85×3.1) = 1.14 A`, más consumos auxiliares. Los 18.5 Wh anunciados darían `18.5×0.85/3 ≈ 5.2 h` ideales. UVLO, temperatura, envejecimiento y capacidad real reducen energía útil: no es autonomía garantizada.
 
-El propietario identifica la publicación **955565, 3.7 V, 5000 mAh, 18.5 Wh**. Son datos anunciados, no mediciones. Imagen con dos cables: NTC accesible no confirmado; prever evaluación de termistor externo. PCM, corrientes admisibles, conector y dimensiones reales TBD. Ver [evidencia y efecto en el diseño](BATTERY_REFERENCE.md).
+Fuente C-C con anuncio ≥1.5 A habilita ~1 A en la rama power-path. Un receptor de 3 W puede consumir ~0.65–0.8 A de entrada; no queda margen para cargar siempre a 500 mA. DPPM reduce carga y la batería puede suplementar. Puerto legacy limita esa rama a ~50 mA nominales: debug con batería y carga lenta, sin garantía de funcionamiento completo desde USB solo.
 
-## Cálculo reproducible cuando existan medidas
+CC ideal de 5000 mAh/500 mA dura 10 h, más CV/precharge. El sistema encendido prolonga ese tiempo. TMR desactivado explícitamente; consultar DESIGN.md. No se afirma tiempo máximo de carga.
 
-- `P_load = sum(V_rail * I_rail)`, sin duplicar cargas alimentadas por otra placa.
-- `I_pack_peak >= sum(P_rail_peak / eta_rail_min) / V_pack_min + I_always_on`.
-- Objetivo propuesto de margen continuo: 30% sobre máximo medido; además verificar picos de arranque, saturación de inductores, caída de conectores y temperatura. No convertirlo en corriente nominal hasta medir.
-- `P_USB_available = VBUS_min * I_USB_authorized`; descontar lógica/pérdidas antes de asignar carga. Si no alcanza, reducir carga; si batería no puede suplementar, inhibir arranque o apagar de forma controlada.
-- Para cargador lineal, primera estimación: `P_loss ≈ (VBUS - VBAT)*I_charge + (VBUS - VSYS)*I_system_from_USB`. No incluye todas las pérdidas. Ejemplo hipotético: sólo cargar a 0.5 A con batería a 3.2 V desde 5 V disipa ~0.9 W, antes del sistema. No demuestra que A4 lo tolere.
-- 3.7 V × 5 Ah = 18.5 Wh **nominales**; autonomía = energía útil × eficiencia / potencia media. Energía útil, potencia y autonomía: TBD. Tiempo de carga requiere corriente efectiva y fase CV.
-
-## Campaña de medida pendiente
-
-Medir cada placa por su entrada documentada: reposo, arranque, GNSS activo con antena, Wi-Fi TX, escritura/flush SD y combinación simultánea. Registrar fuente, revisión, tensión mínima/máxima, duración y pico con osciloscopio; repetir en batería baja y USB limitado. Medir corte y corriente OFF con USB/FPC/sensing/I2C conectados. Después congelar rails, límites y calibre/conectores.
-
-SYSTEM_3V3 externo se añadirá sólo si una placa lo requiere; no alimentar salidas de LDO existentes ni unir dos fuentes de 3.3 V. Una eventual lógica auxiliar de 3.3 V no implica distribuir esa tensión a todos los módulos.
+Charger con celda a 3 V y carga 0.5 A: `(5−3)×0.5 ≈ 1 W`, más pérdidas de alimentar el sistema. Debe ensayarse con carcasa y NTC real; puede regular térmicamente. Planos de GND y lazo switching corto no certifican ruido GNSS aceptable.

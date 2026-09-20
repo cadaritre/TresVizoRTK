@@ -1,0 +1,3 @@
+Trazado a '/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK/hardware/power-board/rev-a/output/pdf/power-board.pdf'.
+Listo.
+Fontconfig error: Cannot load default config file: File not found

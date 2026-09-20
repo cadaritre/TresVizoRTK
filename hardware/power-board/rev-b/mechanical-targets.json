@@ -1,0 +1,47 @@
+{
+  "reference": "mechanical/A5/TresVizo-A5.FCStd",
+  "controls": {
+    "width": 18,
+    "length": 26,
+    "thickness": 1.6,
+    "front_plane_y": 31.4,
+    "z_bottom": 102,
+    "button": [
+      0,
+      110
+    ],
+    "status": [
+      [
+        -2.2,
+        121
+      ],
+      [
+        0,
+        121
+      ],
+      [
+        2.2,
+        121
+      ]
+    ],
+    "charge": [
+      0,
+      125
+    ]
+  },
+  "usb": {
+    "width": 22,
+    "length": 24,
+    "thickness": 1.6,
+    "mating_plane_y": 37.1,
+    "axis_z": 132,
+    "neck_width": 11,
+    "neck_length": 8
+  },
+  "power_core": {
+    "width": 45,
+    "length": 40,
+    "thickness": 1.6,
+    "placement": "interior; comprobar detr\u00e1s de bater\u00eda"
+  }
+}

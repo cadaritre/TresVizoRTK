@@ -1,3 +1,5 @@
+> HISTÓRICO D0. El proyecto vigente está en [../rev-a/](../rev-a/power-board.kicad_pro); este directorio no es el paquete de fabricación.
+
 # KiCad D0
 
 Abrir `power-board.kicad_pro` para alimentación y `usb-native.kicad_pro` para USB. Símbolos propios incluidos en `PowerDraft.kicad_sym` y `sym-lib-table`. Las dos hojas se consolidarán antes de obtener la netlist completa para PCB.

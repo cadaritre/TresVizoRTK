@@ -1,3 +1,5 @@
+> ANTECEDENTE DE INVESTIGACIÓN. La revisión vigente con esquema y PCB ruteado está en [README.md](README.md) y [rev-a/DESIGN.md](rev-a/DESIGN.md). Las indicaciones de fase/pendiente de aprobación siguientes describen su fecha original.
+
 # Diseño D0 — inicio del esquemático
 
 20 de septiembre de 2026. El propietario autoriza empezar y prioriza una PCB compacta; la adaptación de carcasa se hará después. Esto sustituye el bloqueo previo por dimensiones y aprobación P1. Los módulos siguen externos.

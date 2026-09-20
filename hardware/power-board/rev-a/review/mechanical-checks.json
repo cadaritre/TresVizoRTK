@@ -1,0 +1,24 @@
+{
+  "status": "VALID_LOCAL_STEP",
+  "solids": 142,
+  "bounding_box_mm": [
+    -22.5,
+    -20.0,
+    -1.5900000000000003,
+    22.5,
+    20.15,
+    5.44
+  ],
+  "nominal_board_mm": [
+    45,
+    40,
+    1.6
+  ],
+  "kicad_body_thickness_mm": 1.51,
+  "component_z_translation_mm": 0.04500000000000004,
+  "keepouts": 9,
+  "missing": [
+    "completeness.access_and_cables_reviewed"
+  ],
+  "case_fit": "NOT_TESTED"
+}

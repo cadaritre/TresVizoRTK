@@ -1,42 +1,35 @@
-# BOM de investigación, no de ensamblaje
+# Compra y montaje — Power Board Rev A
 
-**P1: CP2102N y alternativas UART son sólo investigación histórica/contingencia; no se incluyen en la BOM prevista.** Se añaden FPC, detector VBUS y switch USB como TBD; sin pinout/huella inventados.
+La [BOM completa](manufacturing/rev-a/assembly/bom.csv) contiene 61 filas agrupadas por MPN, con fabricante, encapsulado/huella, cantidad, DNP, código LCSC, clase JLC, observaciones de stock, precio/tramo, fuente y alternativa. El montaje incluye **135 componentes**. Los datos comerciales son observaciones de catálogo del 19–20 de septiembre de 2026; no son una cotización ni una reserva.
 
-Consulta: 19 de septiembre de 2026. Precios USD de catálogo LCSC, sin envío/impuestos/ensamblaje; no son cotización ni reserva de stock. Stock LCSC **no demuestra** stock utilizable en PCBA JLC. TBD indica dato no confirmado. Alternativas funcionales no son sustituciones pin a pin.
+[Fuente comercial editable](rev-a/procurement.json) · [BOM JLCPCB](manufacturing/rev-a/assembly/bom-jlcpcb.csv) · [CPL JLCPCB](manufacturing/rev-a/assembly/cpl-jlcpcb.csv) · [revisión de abastecimiento](manufacturing/rev-a/assembly/purchasing-review.csv).
 
-| Función / fabricante | MPN | LCSC y fuente comercial | Encapsulado | Basic/Extended JLC | Disponibilidad observada | USD/unidad (tramo) | Alternativa |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Charger / TI | BQ24074RGTR | [C54313](https://www.lcsc.com/product-detail/C54313.html) | VQFN16 3×3 EP | TBD; página JLC no recuperada | Precio activo; cantidad no verificada | 2.1424 (1+) | BQ25606RGER, rediseño |
-| Charger alternativo / TI | BQ25606RGER | [C374063](https://www.lcsc.com/product-detail/C374063.html) | VQFN24 4×4 EP | TBD | 599 LCSC; listado JLC localizado | 1.6374 (1+) | BQ24074, sujeto a térmica |
-| Boost / TI | TPS61023DRLR | [C919459](https://www.lcsc.com/product-detail/C919459.html) | SOT563, 6 pines | [Extended](https://jlcpcb.com/partdetail/TPS61023DRLR/C919459) | 10,180 LCSC | 0.2680 (5+) | TPS63070, nueva BOM/layout |
-| Soft-power / ADI | LTC2954CTS8-1#TRPBF | [C683782](https://www.lcsc.com/product-detail/C683782.html) | TSOT23-8 | TBD; acceso JLC falló | 2,356 LCSC | 6.6897 (1+) | LTC2954ITS8-1#TRPBF, suministro TBD |
-| Gauge / ADI-Maxim | MAX17048G+T10 | [C2682616](https://www.lcsc.com/product-detail/C2682616.html) | TDFN8 2×2 EP | [Extended](https://jlcpcb.com/partdetail/C2682616) | 25,630 LCSC | 2.1980 (1+) | BQ27441-G1A, shunt/configuración |
-| Bridge contingente, no poblado / Silicon Labs | CP2102N-A02-GQFN24R | [C969151](https://www.lcsc.com/product-detail/C969151.html) | QFN24 4×4 EP | TBD; acceso JLC falló | Presentación reel listada disponible; cantidad no reconfirmada | 1.9399 (1+) | CH343P/G con revisión eléctrica/macOS |
-| Bridge alternativo / WCH | CH343G | [C2844153](https://www.lcsc.com/product-detail/C2844153.html) | SOP16 | TBD | Precio activo; cantidad TBD | 1.2423 (1+) | CH343P QFN16, código TBD |
-| Bridge económico / WCH | CH340C | [C84681](https://www.lcsc.com/product-detail/C84681.html) | SOP16 | TBD | 44,205 LCSC | 0.5900 (1+) | CP2102N, distinta huella |
+`TBD` significa que no se confirmó el código, precio o clasificación exactos. Una pieza listada por LCSC puede requerir precompra/consignación para PCBA. Para MPN sin código confirmado, adquirir el MPN exacto en distribuidor y acordar consignación; no cargar un código de valor o sufijo parecido. No se ha calculado un precio total ficticio con campos faltantes. `purchasing-review.csv` reúne las filas sin código y las observaciones de falta de stock.
 
-La variante **C** de LTC2954 está especificada 0–70 °C, no equivale a la **I** −40–85 °C. Para un equipo de campo se propone buscar I; el stock/precio C sólo demuestra una opción comercial de laboratorio. Esto y su coste son puntos de decisión, no detalles a ocultar. La presentación CP2102N sin R, C1550551, apareció agotada; preferir investigación de reel R sin confundir los códigos.
+## Selección que debe preservarse
 
-## Componentes auxiliares pendientes de dimensionamiento
+- **Carga/power-path:** TI BQ24074RGTR, 500 mA nominales; la celda de 5 Ah requiere más de diez horas más fase CV en condiciones favorables. NTC externo obligatorio; timer total desactivado deliberadamente, con explicación en DESIGN.md.
+- **5 V:** TPS61023DRLR y Coilcraft XAL4020-102MEC; no sustituir inductor por otro de igual inductancia sin revisar saturación, RMS, pérdidas y huella. Capacitores 22 µF/1206 X7R seleccionados considerando polarización DC.
+- **Botón:** LTC2954ITS8-1#TRMPBF, grado industrial I. La variante C de investigación P1 no es la pieza montada.
+- **USB:** TUSB320LAIRWBR, TPS22950YBHR con bloqueo inverso y TS3USB31ERSER. CP2102N/CH34x no están en el circuito ni la BOM de montaje.
+- **Protección de celda:** BQ29700DSER, CSD13202Q2 y shunt WSL1206R0100FEA. No cambiar sufijo del protector: cambia umbrales. Mantener CELL_N separado de GND.
+- **Gauge:** MAX17048G+T10 y TMUX1511PWR para aislar las señales cuando los dominios se apagan.
+- **Divisores críticos:** R28/R29 0.1 % y 10 ppm/°C; R31/R32 0.1 % y 25 ppm/°C. Las alternativas de 1 % incumplen el análisis de márgenes.
+- **Fusibles:** 046601.5NRHF / 0466002.NRHF, serie Littelfuse 466 en 1206. La serie 467 no comparte esta huella.
+- **FPC J5:** FH12-8S-0.5SH(55), sólo candidato DNP. No comprar/montar cable ni conector como compatibles con la Tiny sin verificar orientación/continuidad.
 
-| Función | Candidato/familia investigada | Datos comerciales pendientes / condición |
-| --- | --- | --- |
-| CC sink/current detect | TI TUSB320LAI, sufijo de compra TBD | LCSC, precio, stock/clase/huella TBD; revisar Rd integrado y dead-battery |
-| Limitación común USB, OVP y reverse blocking | MPN TBD | Debe contar consumo sistema + charger + lógica y cumplir arranque/suspend; no basta fusible para limitar consumo autorizado |
-| Protección pack | TI BQ297xx + FETs, variante TBD | Umbrales, Rds(on), corrientes y recuperación según celda; omisión sólo si PCM del pack verificado |
-| UVLO / asistencia de arranque / señales Ioff | MPN TBD | Histéresis, corriente OFF, dominios y prioridades por cerrar |
-| Load switch opcional | TI TPS22919 | Evaluado conceptualmente; no es timer ni garantía de bloqueo inverso. Sufijo/stock/precio TBD |
-| USB-C, ESD/TVS, botón, RGB, CHG | MPN TBD | Mecánica/acceso, capacitancia USB, clamp y corrientes antes de seleccionar |
-| Inductor(es), capacitores, resistencias | MPN TBD | Isat/Irms, DCR, tensión, bias DC y térmica; selección posterior a power budget |
-| Conectores batería/ESP/GNSS | MPN TBD | Polaridad, corriente/contacto, altura, plug y salida de cables según fit |
+Las alternativas indicadas por función requieren revisión eléctrica y de layout, salvo reemplazo con el mismo MPN. Una etiqueta «direct replacement» del catálogo no autoriza sustituir un IC crítico.
 
-No se ha completado la BOM de pasivos ni las alternativas comerciales de todos los auxiliares porque no hay esquemático ni corrientes fijadas. Cada fila futura debe tener fabricante, MPN completo, huella validada con datasheet, LCSC, clase, stock, precio con cantidad/fecha y alternativa. Las características eléctricas se toman del fabricante, no de etiquetas automáticas del distribuidor: la página JLC del MAX17048 mezcla funciones de cargador/protector que no deben atribuírsele.
+## Material externo al montaje SMD
 
-## Auxiliares USB nativo P1
+| Elemento | Especificación / uso |
+| --- | --- |
+| Pack del usuario | LiPo anunciada 955565, 3.7 V/5000 mAh, dos hilos. Verificar polaridad y ficha antes de conectar J2; el conector fotografiado no está identificado |
+| NTC | Semitec 103AT-2, 10 kΩ a 25 °C, conectado a J3 y térmicamente unido a la celda con aislamiento adecuado. No puentear TS con resistencia fija |
+| Arnés batería / salida GNSS | Pareja compatible con JST PH de 2 contactos; polaridad según INTERFACES.md, no por colores del cable |
+| Arnés NTC | Pareja compatible con JST SH de 2 contactos |
+| Arnés ESP auxiliar | Pareja compatible con JST SH de 14 contactos; lleva la referencia 3V3 desde la Tiny y señales de control |
+| FPC Tiny | Tipo de contacto, orientación y longitud pendientes de la unidad física; J5 queda sin montar |
+| Cables / tornillería | Longitud y curvatura según integración mecánica; dos agujeros de 2.2 mm con separación de componentes por ambas caras |
 
-| Función | Selección | Condición |
-| --- | --- | --- |
-| FPC/FFC a Tiny-N8R8 | Fabricante/MPN, contactos, paso, huella, LCSC, clase, precio y stock TBD | Contrastar ambas placas y cable; no copiar símbolo 8/10 sin identificar anclajes |
-| Detector USB_VBUS | MPN y datos comerciales TBD | Umbrales, histéresis, caída tras desconexión, lógica segura, Ioff |
-| Switch USB fail-safe | MPN y datos comerciales TBD | Abrir D+/D− sin VBUS o Tiny apagada, incluso ROM/reset; validar integridad de señal |
-| Pads BOOT/RUN y auxiliares | Geometría TBD | Recuperación sin segundo pulsador exterior obligatorio |
+Los arneses y el NTC no forman parte del CPL SMD. Consulte [MANUFACTURING.md](rev-a/MANUFACTURING.md) para capacidades de montaje, vías en pad y revisión de rotaciones. La BOM de alternativas anterior permanece en [BOM_P1.md](BOM_P1.md), identificada como histórica.

@@ -1,3 +1,5 @@
+> ANTECEDENTE DE INVESTIGACIÓN. La revisión vigente con esquema y PCB ruteado está en [README.md](README.md) y [rev-a/DESIGN.md](rev-a/DESIGN.md). Las indicaciones de fase/pendiente de aprobación siguientes describen su fecha original.
+
 # Revisión P1: USB nativo y sustitución de Tiny-Adapter
 
 Estado: propuesta preferida pendiente de aprobación, sin esquemático. El propietario identifica la placa utilizada como **Waveshare ESP32-S3-Tiny-N8R8**. La Power Board sustituirá también la función del Tiny-Adapter y conservará Tiny como módulo externo. CP2102N queda fuera de la arquitectura preferida y de su BOM prevista.

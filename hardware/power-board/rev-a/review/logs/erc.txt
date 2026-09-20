@@ -1,0 +1,3 @@
+Se encontraron 0 violaciones
+Informe ERC guardado en /Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK/hardware/power-board/rev-a/review/erc.json
+Fontconfig error: Cannot load default config file: File not found

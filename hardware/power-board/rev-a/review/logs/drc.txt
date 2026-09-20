@@ -1,0 +1,5 @@
+Se encontraron 0 violaciones
+Se encontró 0 objetos no conectados
+Se encontraron 0 problemas de paridad esquemática
+Informe DRC guardado en /Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK/hardware/power-board/rev-a/review/drc.json
+Fontconfig error: Cannot load default config file: File not found

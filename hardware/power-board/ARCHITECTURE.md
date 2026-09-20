@@ -1,3 +1,5 @@
+> ANTECEDENTE DE INVESTIGACIÓN. La revisión vigente con esquema y PCB ruteado está en [README.md](README.md) y [rev-a/DESIGN.md](rev-a/DESIGN.md). Las indicaciones de fase/pendiente de aprobación siguientes describen su fecha original.
+
 # Arquitectura propuesta y alternativas
 
 Antecedente P1. El propietario autoriza comenzar D0 y priorizar compacidad; ver [diseño vigente](DESIGN_D0.md). La revisión USB vigente es [USB_NATIVE_REVIEW.md](USB_NATIVE_REVIEW.md). Los enlaces de fabricante están reunidos en [fuentes](datasheets/README.md).
