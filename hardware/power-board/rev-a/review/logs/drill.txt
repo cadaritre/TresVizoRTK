@@ -1,5 +1,0 @@
-Archivo '/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK/hardware/power-board/manufacturing/rev-a/gerbers/power-board-PTH.drl' creado
-Archivo '/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK/hardware/power-board/manufacturing/rev-a/gerbers/power-board-NPTH.drl' creado
-Archivo '/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK/hardware/power-board/manufacturing/rev-a/gerbers/power-board-PTH-drl_map.svg' creado.
-Archivo '/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK/hardware/power-board/manufacturing/rev-a/gerbers/power-board-NPTH-drl_map.svg' creado.
-Listo.

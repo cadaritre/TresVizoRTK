@@ -1,3 +1,5 @@
+> **PCB PERSONALIZADA CANCELADA — 20-09-2026.** Por indicación del propietario se retiraron sólo los archivos de diseño PCB, sus generadores y salidas de fabricación. Se conserva la documentación y los datasheets como antecedentes; los enlaces a archivos eliminados de abajo ya no son entregables vigentes. La propuesta actual utiliza [módulos comerciales](../power-modules/README.md). El case y el firmware no se modificaron en esta sustitución.
+
 # Power & Interface Board — Rev A
 
 Diseño digital del prototipo terminado: esquema jerárquico de ocho hojas y PCB **45 × 40 × 1.6 mm**, cuatro capas, montaje en ambas caras. Contiene 149 referencias eléctricas y 135 componentes poblados. USB nativo de la Tiny externa; ESP32, UM980 e IMU permanecen fuera de esta placa. CP2102N eliminado. Revisión del 20 de septiembre de 2026.

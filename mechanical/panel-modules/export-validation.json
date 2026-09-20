@@ -1,0 +1,59 @@
+{
+  "fcstd_solids": 76,
+  "fcstd_all_valid": true,
+  "step": [
+    {
+      "file": "panel-assembly.step",
+      "valid": true,
+      "solids": 21
+    },
+    {
+      "file": "case-integration.step",
+      "valid": true,
+      "solids": 3
+    }
+  ],
+  "stl": [
+    {
+      "file": "A5_ElectronicsTray.stl",
+      "closed": true,
+      "facets": 10236
+    },
+    {
+      "file": "A5_MainShell.stl",
+      "closed": true,
+      "facets": 17386
+    },
+    {
+      "file": "ButtonCap.stl",
+      "closed": true,
+      "facets": 1100
+    },
+    {
+      "file": "ButtonCartridge.stl",
+      "closed": true,
+      "facets": 1404
+    },
+    {
+      "file": "ChargeLens.stl",
+      "closed": true,
+      "facets": 914
+    },
+    {
+      "file": "ModulePanel.stl",
+      "closed": true,
+      "facets": 13992
+    },
+    {
+      "file": "StatusLens.stl",
+      "closed": true,
+      "facets": 914
+    },
+    {
+      "file": "fit-coupon.stl",
+      "closed": true,
+      "facets": 1584
+    }
+  ],
+  "a5_sha256_unchanged": true
+}

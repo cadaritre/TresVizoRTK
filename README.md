@@ -14,6 +14,8 @@ Consulta las [instrucciones del firmware](firmware/esp32/README.md) y la [eviden
 
 Consulta [el estado detallado](docs/project-status.md) antes de interpretar cualquier elemento como funcional.
 
+**Revisión de integración, 20/09/2026:** la propuesta vigente de alimentación usa [módulos comerciales](hardware/power-modules/README.md). La [revisión conjunta A5 + panel](docs/INTEGRATION_REVIEW.md) corrige interferencias del panel y documenta pendientes de montaje del cuerpo, power, cableado e inserto 5/8-11. El receptor completo todavía no está listo para impresión de armado. Las menciones anteriores a integrar una PCB personalizada describen el estado previo.
+
 ## Alcance previsto
 
 El prototipo busca llegar a:
@@ -77,5 +79,7 @@ No se han fijado GPIO, conectores, niveles eléctricos, dimensiones ni diseño d
 - [Identificación del hardware recibido](hardware/identification.md)
 - [Interfaces y conexiones](hardware/wiring.md)
 - [Concepto mecánico](mechanical/README.md)
+- [Revisión de integración mecánica y alimentación](docs/INTEGRATION_REVIEW.md)
+- [BOM mecánica y tornillería](mechanical/MECHANICAL_BOM.md)
 
 No se ha seleccionado una licencia. El contenido del repositorio no debe interpretarse como publicado bajo una licencia específica hasta que el propietario la defina expresamente.

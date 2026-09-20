@@ -1,0 +1,22 @@
+{
+  "objects": 62,
+  "printed": [
+    "ModulePanel",
+    "ButtonCap",
+    "ButtonCartridge",
+    "StatusLens",
+    "ChargeLens"
+  ],
+  "a5_intersections": [],
+  "functional_checks": {
+    "cap_against_panel_rest_mm3": 0.0,
+    "cap_against_panel_pressed_mm3": 0.0,
+    "cap_against_cartridge_pressed_mm3": 0.0,
+    "cartridge_against_panel_mm3": 0.0,
+    "usb_board_against_panel_mm3": 0.0,
+    "usb_connector_against_panel_mm3": 0.0,
+    "button_initial_gap_mm": 0.10000000000000142,
+    "button_hard_stop_travel_mm": 0.3999999999999986
+  },
+  "master_preserved": true
+}

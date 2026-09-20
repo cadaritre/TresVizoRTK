@@ -1,0 +1,3956 @@
+{
+  "scope": "Solidos nominales y reservas explicitamente declaradas; no ensayo fisico ni analisis estructural",
+  "freecad_version": [
+    "1",
+    "1",
+    "3",
+    "20260725 (Git shallow)",
+    "Unknown",
+    "2026/07/25 04:52:02",
+    "grafted,grafted",
+    "145529fe741292ff0b3977a01195bf0247425794"
+  ],
+  "source_sha256_before": "73fd95f536f6537bbcbc9e3633d12d050ab901e844b4a03dcd79d3889115f4fb",
+  "generator_sha256": "e8d09532432a415f7207ad17ebcdb7358d3614c0ea5b82c48062ca629021e4b3",
+  "panel_parameters_sha256": "c871faffb9a8cdf272d8fc73b7c5c5ea6a120b7c8507ca5e34d18d3d2af6e210",
+  "review_parameters_sha256": "f845d455a37f729fc59cec2b8ddaa8b3303328ab1afd15cb63eef72b8fc615ff",
+  "objects": [
+    {
+      "name": "ModulePanel",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 3873.46796,
+      "box": [
+        -14.19118,
+        12.10064,
+        89.0,
+        14.19118,
+        37.57727,
+        142.0
+      ]
+    },
+    {
+      "name": "ButtonCap",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 296.92265,
+      "box": [
+        -6.51746,
+        33.9,
+        103.49989,
+        6.51701,
+        37.26932,
+        116.5
+      ]
+    },
+    {
+      "name": "ButtonCartridge",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 940.70629,
+      "box": [
+        -12.0,
+        26.3,
+        103.5,
+        12.0,
+        33.5,
+        116.5
+      ]
+    },
+    {
+      "name": "TactileBody",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 126.0,
+      "box": [
+        -3.0,
+        28.8,
+        107.0,
+        3.0,
+        32.3,
+        113.0
+      ]
+    },
+    {
+      "name": "TactileStem",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 12.06372,
+      "box": [
+        -1.6,
+        32.3,
+        108.4,
+        1.6,
+        33.8,
+        111.6
+      ]
+    },
+    {
+      "name": "StatusLens",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 31.10335,
+      "box": [
+        -6.75,
+        33.7,
+        118.25,
+        -1.25,
+        37.27029,
+        123.75
+      ]
+    },
+    {
+      "name": "ChargeLens",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 31.10335,
+      "box": [
+        1.25,
+        33.7,
+        118.25,
+        6.75,
+        37.27031,
+        123.75
+      ]
+    },
+    {
+      "name": "RGBLed",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 149.5529,
+      "box": [
+        -6.5,
+        25.25,
+        118.5,
+        -1.5,
+        33.7,
+        123.5
+      ]
+    },
+    {
+      "name": "USBModule",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 702.94743,
+      "box": [
+        -10.16,
+        12.26064,
+        128.75,
+        10.16,
+        35.12064,
+        130.35
+      ]
+    },
+    {
+      "name": "USBReceptacle",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 187.6622,
+      "box": [
+        -4.47,
+        28.91364,
+        130.35,
+        4.47,
+        36.26364,
+        133.65
+      ]
+    },
+    {
+      "name": "USBPortInterior",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1.33047,
+      "box": [
+        -3.5,
+        35.46364,
+        131.0,
+        3.5,
+        35.56364,
+        133.0
+      ]
+    },
+    {
+      "name": "USBContactTongue",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 0.96,
+      "box": [
+        -3.0,
+        35.56364,
+        131.8,
+        3.0,
+        35.96364,
+        132.2
+      ]
+    },
+    {
+      "name": "USBChip",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 19.2,
+      "box": [
+        -2.0,
+        20.26064,
+        130.35,
+        2.0,
+        24.26064,
+        131.55
+      ]
+    },
+    {
+      "name": "USBScrew1",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 38.39026,
+      "box": [
+        -9.52,
+        12.90064,
+        125.35,
+        -5.72,
+        16.70064,
+        132.35
+      ]
+    },
+    {
+      "name": "USBScrew2",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 38.39026,
+      "box": [
+        -9.52,
+        30.68064,
+        125.35,
+        -5.72,
+        34.48064,
+        132.35
+      ]
+    },
+    {
+      "name": "USBScrew3",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 38.39026,
+      "box": [
+        5.72,
+        12.90064,
+        125.35,
+        9.52,
+        16.70064,
+        132.35
+      ]
+    },
+    {
+      "name": "USBScrew4",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 38.39026,
+      "box": [
+        5.72,
+        30.68064,
+        125.35,
+        9.52,
+        34.48064,
+        132.35
+      ]
+    },
+    {
+      "name": "ButtonScrew1",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 47.81504,
+      "box": [
+        -10.9,
+        24.3,
+        108.1,
+        -7.1,
+        34.3,
+        111.9
+      ]
+    },
+    {
+      "name": "ButtonScrew2",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 47.81504,
+      "box": [
+        7.1,
+        24.3,
+        108.1,
+        10.9,
+        34.3,
+        111.9
+      ]
+    },
+    {
+      "name": "A5_MainShell",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 79029.9645,
+      "box": [
+        -37.0,
+        -37.0,
+        12.0,
+        37.0,
+        37.0,
+        150.2
+      ]
+    },
+    {
+      "name": "A5_AntennaCap",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 17666.48253,
+      "box": [
+        -37.0,
+        -37.0,
+        144.4,
+        37.0,
+        37.0,
+        168.0
+      ]
+    },
+    {
+      "name": "A5_FlangedInsert",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 2630.0048,
+      "box": [
+        -18.25625,
+        -18.25625,
+        4.0,
+        18.25625,
+        18.25625,
+        15.90625
+      ]
+    },
+    {
+      "name": "A5_RadialNut1",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 45.90884,
+      "box": [
+        26.2,
+        -3.17543,
+        12.25,
+        28.6,
+        3.17543,
+        17.75
+      ]
+    },
+    {
+      "name": "A5_RadialBolt1",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 98.65269,
+      "box": [
+        24.15,
+        -2.85,
+        12.15,
+        33.8,
+        2.85,
+        17.85
+      ]
+    },
+    {
+      "name": "A5_RadialNut2",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 45.90884,
+      "box": [
+        -3.17543,
+        26.2,
+        12.25,
+        3.17543,
+        28.6,
+        17.75
+      ]
+    },
+    {
+      "name": "A5_RadialBolt2",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 98.65269,
+      "box": [
+        -2.85,
+        24.15,
+        12.15,
+        2.85,
+        33.8,
+        17.85
+      ]
+    },
+    {
+      "name": "A5_RadialNut3",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 45.90884,
+      "box": [
+        -28.6,
+        -3.17543,
+        12.25,
+        -26.2,
+        3.17543,
+        17.75
+      ]
+    },
+    {
+      "name": "A5_RadialBolt3",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 98.65269,
+      "box": [
+        -33.8,
+        -2.85,
+        12.15,
+        -24.15,
+        2.85,
+        17.85
+      ]
+    },
+    {
+      "name": "A5_RadialNut4",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 45.90884,
+      "box": [
+        -3.17543,
+        -28.6,
+        12.25,
+        3.17543,
+        -26.2,
+        17.75
+      ]
+    },
+    {
+      "name": "A5_RadialBolt4",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 98.65269,
+      "box": [
+        -2.85,
+        -33.8,
+        12.15,
+        2.85,
+        -24.15,
+        17.85
+      ]
+    },
+    {
+      "name": "A5_ModuleBolt12",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 183.47569,
+      "box": [
+        -24.85,
+        -10.7,
+        110.15,
+        -19.15,
+        10.95,
+        115.85
+      ]
+    },
+    {
+      "name": "A5_ModuleNut12",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 45.90884,
+      "box": [
+        -24.75,
+        -10.2,
+        109.82457,
+        -19.25,
+        -7.8,
+        116.17543
+      ]
+    },
+    {
+      "name": "A5_ModuleBolt22",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 183.47569,
+      "box": [
+        19.15,
+        -10.7,
+        110.15,
+        24.85,
+        10.95,
+        115.85
+      ]
+    },
+    {
+      "name": "A5_ModuleNut22",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 45.90884,
+      "box": [
+        19.25,
+        -10.2,
+        109.82457,
+        24.75,
+        -7.8,
+        116.17543
+      ]
+    },
+    {
+      "name": "A5_BatteryReserve",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 46368.0,
+      "box": [
+        -28.0,
+        -7.5,
+        38.0,
+        28.0,
+        4.5,
+        107.0
+      ]
+    },
+    {
+      "name": "A5_GNSSReserve",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 27648.0,
+      "box": [
+        -18.0,
+        12.5,
+        43.0,
+        18.0,
+        24.5,
+        107.0
+      ]
+    },
+    {
+      "name": "A5_SDReference",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 7056.0,
+      "box": [
+        -12.0,
+        -25.0,
+        49.0,
+        12.0,
+        -18.0,
+        91.0
+      ]
+    },
+    {
+      "name": "A5_IMUReserve",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 654.18053,
+      "box": [
+        -11.75,
+        -10.0,
+        123.8,
+        11.75,
+        8.0,
+        125.4
+      ]
+    },
+    {
+      "name": "A5_ESPReference",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1036.35,
+      "box": [
+        -9.0,
+        12.5,
+        139.0,
+        9.0,
+        14.95,
+        162.5
+      ]
+    },
+    {
+      "name": "A5_HA901Reserve",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 76447.51563,
+      "box": [
+        -23.0,
+        -23.0,
+        168.0,
+        23.0,
+        23.0,
+        214.0
+      ]
+    },
+    {
+      "name": "A5_CoaxRouteReserve",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 4069.85741,
+      "box": [
+        -3.5299,
+        -26.69469,
+        28.30531,
+        20.5299,
+        23.57081,
+        167.9
+      ]
+    },
+    {
+      "name": "A5_AntennaBolt1",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 75.22018,
+      "box": [
+        9.26814,
+        4.4,
+        161.5,
+        13.76814,
+        8.9,
+        172.0
+      ]
+    },
+    {
+      "name": "A5_AntennaBolt2",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 75.22018,
+      "box": [
+        -13.76814,
+        4.4,
+        161.5,
+        -9.26814,
+        8.9,
+        172.0
+      ]
+    },
+    {
+      "name": "A5_AntennaBolt3",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 75.22018,
+      "box": [
+        -2.25,
+        -15.55,
+        161.5,
+        2.25,
+        -11.05,
+        172.0
+      ]
+    },
+    {
+      "name": "A5_IMUTarget",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 12.825,
+      "box": [
+        -1.5,
+        -2.25,
+        125.4,
+        1.5,
+        2.25,
+        126.35
+      ]
+    },
+    {
+      "name": "A5_IMUPcbBolt1",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 98.66564,
+      "box": [
+        -11.5,
+        3.25,
+        113.4,
+        -7.0,
+        7.75,
+        127.9
+      ]
+    },
+    {
+      "name": "A5_IMUPcbNut1",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 33.48379,
+      "box": [
+        -12.13675,
+        3.0,
+        115.2,
+        -6.36325,
+        8.0,
+        117.2
+      ]
+    },
+    {
+      "name": "A5_IMUPcbBolt2",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 98.66564,
+      "box": [
+        7.0,
+        3.25,
+        113.4,
+        11.5,
+        7.75,
+        127.9
+      ]
+    },
+    {
+      "name": "A5_IMUPcbNut2",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 33.48379,
+      "box": [
+        6.36325,
+        3.0,
+        115.2,
+        12.13675,
+        8.0,
+        117.2
+      ]
+    },
+    {
+      "name": "A5_Chassis",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 71793.55742,
+      "box": [
+        -32.18,
+        -32.18,
+        0.0,
+        32.18,
+        32.18,
+        163.6
+      ]
+    },
+    {
+      "name": "A5_BatteryIMUCarrier",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 54787.05923,
+      "box": [
+        -30.3,
+        -18.0,
+        29.5,
+        30.3,
+        8.8,
+        123.8
+      ]
+    },
+    {
+      "name": "A5_IMUNutBar",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1074.79668,
+      "box": [
+        -15.0,
+        0.5,
+        115.0,
+        15.0,
+        10.5,
+        119.0
+      ]
+    },
+    {
+      "name": "A5_CapClosureBolt1",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 98.65269,
+      "box": [
+        19.58686,
+        19.58686,
+        144.35,
+        29.48635,
+        29.48635,
+        150.05
+      ]
+    },
+    {
+      "name": "A5_CapClosureNut1",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 45.90884,
+      "box": [
+        19.53352,
+        19.53352,
+        144.45,
+        25.72131,
+        25.72131,
+        149.95
+      ]
+    },
+    {
+      "name": "A5_CapClosureBolt2",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 98.65269,
+      "box": [
+        -29.48635,
+        -29.48635,
+        144.35,
+        -19.58686,
+        -19.58686,
+        150.05
+      ]
+    },
+    {
+      "name": "A5_CapClosureNut2",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 45.90884,
+      "box": [
+        -25.72131,
+        -25.72131,
+        144.45,
+        -19.53352,
+        -19.53352,
+        149.95
+      ]
+    },
+    {
+      "name": "A5_PanelBolt1",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 98.65269,
+      "box": [
+        -2.85,
+        28.5,
+        93.15,
+        2.85,
+        38.15,
+        98.85
+      ]
+    },
+    {
+      "name": "A5_PanelNut1",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 45.90884,
+      "box": [
+        -2.75,
+        31.5,
+        92.82457,
+        2.75,
+        33.9,
+        99.17543
+      ]
+    },
+    {
+      "name": "A5_PanelBolt2",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 98.65269,
+      "box": [
+        -2.85,
+        29.0,
+        136.15,
+        2.85,
+        38.65,
+        141.85
+      ]
+    },
+    {
+      "name": "A5_PanelNut2",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 45.90884,
+      "box": [
+        -2.75,
+        31.5,
+        135.82457,
+        2.75,
+        33.9,
+        142.17543
+      ]
+    },
+    {
+      "name": "TinyAdapterPosition",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1620.0,
+      "box": [
+        -9.0,
+        18.0,
+        143.0,
+        9.0,
+        23.0,
+        161.0
+      ]
+    },
+    {
+      "name": "TinyUSBPlugReserve",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 414.0,
+      "box": [
+        -4.5,
+        18.0,
+        133.8,
+        4.5,
+        23.0,
+        143.0
+      ]
+    }
+  ],
+  "all_pair_intersections": [
+    {
+      "part": "ModulePanel",
+      "against": "USBScrew1",
+      "volume_mm3": 2.96409,
+      "box": [
+        -8.62,
+        13.80064,
+        125.35,
+        -6.62,
+        15.80064,
+        128.75
+      ]
+    },
+    {
+      "part": "ModulePanel",
+      "against": "USBScrew2",
+      "volume_mm3": 2.96409,
+      "box": [
+        -8.62,
+        31.58064,
+        125.35,
+        -6.62,
+        33.58064,
+        128.75
+      ]
+    },
+    {
+      "part": "ModulePanel",
+      "against": "USBScrew3",
+      "volume_mm3": 2.96409,
+      "box": [
+        6.62,
+        13.80064,
+        125.35,
+        8.62,
+        15.80064,
+        128.75
+      ]
+    },
+    {
+      "part": "ModulePanel",
+      "against": "USBScrew4",
+      "volume_mm3": 2.96409,
+      "box": [
+        6.62,
+        31.58064,
+        125.35,
+        8.62,
+        33.58064,
+        128.75
+      ]
+    },
+    {
+      "part": "ModulePanel",
+      "against": "ButtonScrew1",
+      "volume_mm3": 5.73442,
+      "box": [
+        -10.0,
+        28.8,
+        109.0,
+        -8.0,
+        34.3,
+        111.0
+      ]
+    },
+    {
+      "part": "ModulePanel",
+      "against": "ButtonScrew2",
+      "volume_mm3": 5.7344,
+      "box": [
+        8.0,
+        28.8,
+        109.0,
+        10.0,
+        34.3,
+        111.0
+      ]
+    },
+    {
+      "part": "A5_HA901Reserve",
+      "against": "A5_AntennaBolt1",
+      "volume_mm3": 19.63495,
+      "box": [
+        10.26814,
+        5.4,
+        168.0,
+        12.76814,
+        7.9,
+        172.0
+      ]
+    },
+    {
+      "part": "A5_HA901Reserve",
+      "against": "A5_AntennaBolt2",
+      "volume_mm3": 19.63495,
+      "box": [
+        -12.76814,
+        5.4,
+        168.0,
+        -10.26814,
+        7.9,
+        172.0
+      ]
+    },
+    {
+      "part": "A5_HA901Reserve",
+      "against": "A5_AntennaBolt3",
+      "volume_mm3": 19.63495,
+      "box": [
+        -1.25,
+        -14.55,
+        168.0,
+        1.25,
+        -12.05,
+        172.0
+      ]
+    }
+  ],
+  "m2_head_intersections": [
+    {
+      "name": "USBScrew1",
+      "intersections": []
+    },
+    {
+      "name": "USBScrew2",
+      "intersections": []
+    },
+    {
+      "name": "USBScrew3",
+      "intersections": []
+    },
+    {
+      "name": "USBScrew4",
+      "intersections": []
+    },
+    {
+      "name": "ButtonScrew1",
+      "intersections": []
+    },
+    {
+      "name": "ButtonScrew2",
+      "intersections": []
+    }
+  ],
+  "a5_changes": [
+    {
+      "name": "MainShell",
+      "removed_mm3": 218.7223,
+      "added_mm3": 0.0,
+      "box_before": [
+        -37.0,
+        -37.0,
+        12.0,
+        37.0,
+        37.0,
+        150.2
+      ],
+      "box_after": [
+        -37.0,
+        -37.0,
+        12.0,
+        37.0,
+        37.0,
+        150.2
+      ]
+    },
+    {
+      "name": "Chassis",
+      "removed_mm3": 2367.35791,
+      "added_mm3": 0.0,
+      "box_before": [
+        -32.18,
+        -32.18,
+        0.0,
+        32.18,
+        32.18,
+        163.6
+      ],
+      "box_after": [
+        -32.18,
+        -32.18,
+        0.0,
+        32.18,
+        32.18,
+        163.6
+      ]
+    },
+    {
+      "name": "AntennaCap",
+      "removed_mm3": 0.0,
+      "added_mm3": 0.0,
+      "box_before": [
+        -37.0,
+        -37.0,
+        144.4,
+        37.0,
+        37.0,
+        168.0
+      ],
+      "box_after": [
+        -37.0,
+        -37.0,
+        144.4,
+        37.0,
+        37.0,
+        168.0
+      ]
+    },
+    {
+      "name": "BatteryIMUCarrier",
+      "removed_mm3": 0.0,
+      "added_mm3": 0.0,
+      "box_before": [
+        -30.3,
+        -18.0,
+        29.5,
+        30.3,
+        8.8,
+        123.8
+      ],
+      "box_after": [
+        -30.3,
+        -18.0,
+        29.5,
+        30.3,
+        8.8,
+        123.8
+      ]
+    },
+    {
+      "name": "IMUNutBar",
+      "removed_mm3": 0.0,
+      "added_mm3": 0.0,
+      "box_before": [
+        -15.0,
+        0.5,
+        115.0,
+        15.0,
+        10.5,
+        119.0
+      ],
+      "box_after": [
+        -15.0,
+        0.5,
+        115.0,
+        15.0,
+        10.5,
+        119.0
+      ]
+    },
+    {
+      "name": "IMUReserve",
+      "removed_mm3": 0.0,
+      "added_mm3": 0.0,
+      "box_before": [
+        -11.75,
+        -10.0,
+        123.8,
+        11.75,
+        8.0,
+        125.4
+      ],
+      "box_after": [
+        -11.75,
+        -10.0,
+        123.8,
+        11.75,
+        8.0,
+        125.4
+      ]
+    },
+    {
+      "name": "IMUTarget",
+      "removed_mm3": 0.0,
+      "added_mm3": 0.0,
+      "box_before": [
+        -1.5,
+        -2.25,
+        125.4,
+        1.5,
+        2.25,
+        126.35
+      ],
+      "box_after": [
+        -1.5,
+        -2.25,
+        125.4,
+        1.5,
+        2.25,
+        126.35
+      ]
+    },
+    {
+      "name": "ESPReference",
+      "removed_mm3": 0.0,
+      "added_mm3": 0.0,
+      "box_before": [
+        -9.0,
+        12.5,
+        139.0,
+        9.0,
+        14.95,
+        162.5
+      ],
+      "box_after": [
+        -9.0,
+        12.5,
+        139.0,
+        9.0,
+        14.95,
+        162.5
+      ]
+    },
+    {
+      "name": "GNSSReserve",
+      "removed_mm3": 0.0,
+      "added_mm3": 0.0,
+      "box_before": [
+        -18.0,
+        12.5,
+        43.0,
+        18.0,
+        24.5,
+        107.0
+      ],
+      "box_after": [
+        -18.0,
+        12.5,
+        43.0,
+        18.0,
+        24.5,
+        107.0
+      ]
+    },
+    {
+      "name": "SDReference",
+      "removed_mm3": 0.0,
+      "added_mm3": 0.0,
+      "box_before": [
+        -12.0,
+        -25.0,
+        49.0,
+        12.0,
+        -18.0,
+        91.0
+      ],
+      "box_after": [
+        -12.0,
+        -25.0,
+        49.0,
+        12.0,
+        -18.0,
+        91.0
+      ]
+    },
+    {
+      "name": "BatteryReserve",
+      "removed_mm3": 0.0,
+      "added_mm3": 0.0,
+      "box_before": [
+        -28.0,
+        -7.5,
+        38.0,
+        28.0,
+        4.5,
+        107.0
+      ],
+      "box_after": [
+        -28.0,
+        -7.5,
+        38.0,
+        28.0,
+        4.5,
+        107.0
+      ]
+    },
+    {
+      "name": "FlangedInsert",
+      "removed_mm3": 0.0,
+      "added_mm3": 0.0,
+      "box_before": [
+        -18.25625,
+        -18.25625,
+        4.0,
+        18.25625,
+        18.25625,
+        15.90625
+      ],
+      "box_after": [
+        -18.25625,
+        -18.25625,
+        4.0,
+        18.25625,
+        18.25625,
+        15.90625
+      ]
+    },
+    {
+      "name": "CoaxRouteReserve",
+      "removed_mm3": 0.0,
+      "added_mm3": 0.0,
+      "box_before": [
+        -3.5299,
+        -26.69469,
+        28.30531,
+        20.5299,
+        23.57081,
+        167.9
+      ],
+      "box_after": [
+        -3.5299,
+        -26.69469,
+        28.30531,
+        20.5299,
+        23.57081,
+        167.9
+      ]
+    }
+  ],
+  "preserved_front_logo_mm3": 0.0,
+  "panel_extraction_positive_y": [
+    {
+      "offset_mm": 0,
+      "intersections": []
+    },
+    {
+      "offset_mm": 2,
+      "intersections": []
+    },
+    {
+      "offset_mm": 4,
+      "intersections": []
+    },
+    {
+      "offset_mm": 6,
+      "intersections": []
+    },
+    {
+      "offset_mm": 8,
+      "intersections": []
+    },
+    {
+      "offset_mm": 10,
+      "intersections": []
+    },
+    {
+      "offset_mm": 12,
+      "intersections": []
+    },
+    {
+      "offset_mm": 14,
+      "intersections": []
+    },
+    {
+      "offset_mm": 16,
+      "intersections": []
+    },
+    {
+      "offset_mm": 18,
+      "intersections": []
+    },
+    {
+      "offset_mm": 20,
+      "intersections": []
+    },
+    {
+      "offset_mm": 22,
+      "intersections": []
+    },
+    {
+      "offset_mm": 24,
+      "intersections": []
+    },
+    {
+      "offset_mm": 26,
+      "intersections": []
+    },
+    {
+      "offset_mm": 28,
+      "intersections": []
+    },
+    {
+      "offset_mm": 30,
+      "intersections": []
+    },
+    {
+      "offset_mm": 32,
+      "intersections": []
+    },
+    {
+      "offset_mm": 34,
+      "intersections": []
+    },
+    {
+      "offset_mm": 36,
+      "intersections": []
+    },
+    {
+      "offset_mm": 38,
+      "intersections": []
+    },
+    {
+      "offset_mm": 40,
+      "intersections": []
+    }
+  ],
+  "shell_removal_positive_z": [
+    {
+      "offset_mm": 0,
+      "intersections": []
+    },
+    {
+      "offset_mm": 4,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 0.51359,
+          "box": [
+            17.0,
+            -25.58656,
+            40.84535,
+            19.5,
+            -22.716,
+            46.81643
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 1.47725,
+          "box": [
+            -29.09822,
+            -18.06096,
+            29.5,
+            29.09822,
+            -8.42038,
+            31.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 8,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 3.0552,
+          "box": [
+            17.0,
+            -25.75561,
+            39.5124,
+            19.53303,
+            -22.4253,
+            50.81581
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 0.03597,
+          "box": [
+            -27.62102,
+            -11.04841,
+            21.5,
+            27.62102,
+            -10.64564,
+            23.69611
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 16.80591,
+          "box": [
+            -30.01351,
+            -18.20344,
+            29.5,
+            30.01351,
+            5.00225,
+            35.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 12,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 8.95996,
+          "box": [
+            15.225,
+            -25.83094,
+            38.39331,
+            19.61215,
+            -22.10293,
+            54.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 0.17219,
+          "box": [
+            -27.70429,
+            -11.08172,
+            24.0,
+            27.70429,
+            -10.3976,
+            27.69611
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 59.75468,
+          "box": [
+            -30.3,
+            -18.34819,
+            29.5,
+            30.3,
+            5.0416,
+            39.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 16,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 0.01806,
+          "box": [
+            -18.06842,
+            24.35701,
+            43.0,
+            18.06842,
+            24.59312,
+            44.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 19.02362,
+          "box": [
+            15.225,
+            -26.69469,
+            37.13463,
+            19.81024,
+            -21.79101,
+            58.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 0.15354,
+          "box": [
+            -27.58291,
+            -11.03316,
+            28.0,
+            27.58291,
+            14.9535,
+            37.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 151.36002,
+          "box": [
+            -30.3,
+            -18.49526,
+            29.5,
+            30.3,
+            5.08157,
+            43.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 20,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 0.51546,
+          "box": [
+            -18.21054,
+            24.06247,
+            43.0,
+            18.21054,
+            24.78656,
+            48.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 33.66206,
+          "box": [
+            15.225,
+            -26.69469,
+            36.36855,
+            20.02222,
+            -19.93484,
+            62.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 0.53374,
+          "box": [
+            -26.30496,
+            14.18834,
+            35.71293,
+            26.30496,
+            15.06932,
+            41.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 237.29269,
+          "box": [
+            -30.3,
+            -18.55102,
+            32.0,
+            30.3,
+            5.12218,
+            47.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 24,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 2.41832,
+          "box": [
+            -18.35491,
+            23.76663,
+            43.0,
+            18.35491,
+            24.98307,
+            52.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 53.19014,
+          "box": [
+            15.225,
+            -26.69469,
+            35.69617,
+            20.2224,
+            -19.67661,
+            66.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            36.0,
+            26.50126,
+            15.18726,
+            45.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 288.55658,
+          "box": [
+            -30.301,
+            -18.55102,
+            36.0,
+            30.3,
+            5.15306,
+            51.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 28,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 6.68512,
+          "box": [
+            -18.50159,
+            23.46945,
+            43.0,
+            18.50159,
+            25.18272,
+            56.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 70.28935,
+          "box": [
+            15.225,
+            -26.04207,
+            39.09604,
+            20.34584,
+            -20.61106,
+            70.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            40.0,
+            26.50126,
+            15.18726,
+            49.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 283.19176,
+          "box": [
+            -30.30105,
+            -18.55102,
+            40.0,
+            30.3,
+            5.15306,
+            55.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 32,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 12.01998,
+          "box": [
+            -18.61315,
+            23.24564,
+            44.0,
+            18.61315,
+            25.33457,
+            60.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 73.14006,
+          "box": [
+            15.48705,
+            -26.09523,
+            44.0,
+            20.20199,
+            -22.13756,
+            74.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            44.0,
+            26.50126,
+            15.18726,
+            53.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 275.28971,
+          "box": [
+            -30.30105,
+            -18.32997,
+            44.0,
+            30.3,
+            5.15306,
+            59.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 36,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 12.01998,
+          "box": [
+            -18.61315,
+            23.24564,
+            48.0,
+            18.61315,
+            25.33457,
+            64.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 73.14006,
+          "box": [
+            15.48705,
+            -26.09523,
+            48.0,
+            20.20199,
+            -22.13756,
+            78.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            48.0,
+            26.50126,
+            15.18726,
+            57.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 286.86972,
+          "box": [
+            -30.30105,
+            -18.47675,
+            48.0,
+            30.3,
+            5.15306,
+            63.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 40,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 12.01998,
+          "box": [
+            -18.61315,
+            23.24564,
+            52.0,
+            18.61315,
+            25.33457,
+            68.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 73.14006,
+          "box": [
+            15.48705,
+            -26.09523,
+            52.0,
+            20.20199,
+            -22.13756,
+            82.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            52.0,
+            26.50126,
+            15.18726,
+            61.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 294.8581,
+          "box": [
+            -30.30105,
+            -18.55102,
+            52.0,
+            30.3,
+            5.15306,
+            67.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 44,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 12.01998,
+          "box": [
+            -18.61315,
+            23.24564,
+            56.0,
+            18.61315,
+            25.33457,
+            72.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 73.14006,
+          "box": [
+            15.48705,
+            -26.09523,
+            56.0,
+            20.20199,
+            -22.13756,
+            86.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            56.0,
+            26.50126,
+            15.18726,
+            65.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 294.8581,
+          "box": [
+            -30.30105,
+            -18.55102,
+            56.0,
+            30.3,
+            5.15306,
+            71.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 48,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 12.01998,
+          "box": [
+            -18.61315,
+            23.24564,
+            60.0,
+            18.61315,
+            25.33457,
+            76.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 73.14006,
+          "box": [
+            15.48705,
+            -26.09523,
+            60.0,
+            20.20199,
+            -22.13756,
+            90.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            60.0,
+            26.50126,
+            15.18726,
+            69.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 294.8581,
+          "box": [
+            -30.30105,
+            -18.55102,
+            60.0,
+            30.3,
+            5.15306,
+            75.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 52,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 12.01998,
+          "box": [
+            -18.61315,
+            23.24564,
+            64.0,
+            18.61315,
+            25.33457,
+            80.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 73.14006,
+          "box": [
+            15.48705,
+            -26.09523,
+            64.0,
+            20.20199,
+            -22.13756,
+            94.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            64.0,
+            26.50126,
+            15.18726,
+            73.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 294.8581,
+          "box": [
+            -30.30105,
+            -18.55102,
+            64.0,
+            30.3,
+            5.15306,
+            79.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 56,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 12.01998,
+          "box": [
+            -18.61315,
+            23.24564,
+            68.0,
+            18.61315,
+            25.33457,
+            84.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 73.14006,
+          "box": [
+            15.48705,
+            -26.09523,
+            68.0,
+            20.20199,
+            -22.13756,
+            98.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            68.0,
+            26.50126,
+            15.18726,
+            77.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 294.8581,
+          "box": [
+            -30.30105,
+            -18.55102,
+            68.0,
+            30.3,
+            5.15306,
+            83.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 60,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 12.01998,
+          "box": [
+            -18.61315,
+            23.24564,
+            72.0,
+            18.61315,
+            25.33457,
+            88.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 73.14006,
+          "box": [
+            15.48705,
+            -26.09523,
+            72.0,
+            20.20199,
+            -22.13756,
+            102.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            72.0,
+            26.50126,
+            15.18726,
+            81.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 294.8581,
+          "box": [
+            -30.30105,
+            -18.55102,
+            72.0,
+            30.3,
+            5.15306,
+            87.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 64,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 12.01998,
+          "box": [
+            -18.61315,
+            23.24564,
+            76.0,
+            18.61315,
+            25.33457,
+            92.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 73.14006,
+          "box": [
+            15.48705,
+            -26.09523,
+            76.0,
+            20.20199,
+            -22.13756,
+            106.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            76.0,
+            26.50126,
+            15.18726,
+            85.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 294.8581,
+          "box": [
+            -30.30105,
+            -18.55102,
+            76.0,
+            30.3,
+            5.15306,
+            91.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 68,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 12.01998,
+          "box": [
+            -18.61315,
+            23.24564,
+            80.0,
+            18.61315,
+            25.33457,
+            96.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 73.14006,
+          "box": [
+            15.48705,
+            -26.09523,
+            80.0,
+            20.20199,
+            -22.13756,
+            110.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            80.0,
+            26.50126,
+            15.18726,
+            89.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 294.8581,
+          "box": [
+            -30.30105,
+            -18.55102,
+            80.0,
+            30.3,
+            5.15306,
+            95.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 72,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 12.01998,
+          "box": [
+            -18.61315,
+            23.24564,
+            84.0,
+            18.61315,
+            25.33457,
+            100.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 73.14006,
+          "box": [
+            15.48705,
+            -26.09523,
+            84.0,
+            20.20199,
+            -22.13756,
+            114.81694
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            84.0,
+            26.50126,
+            15.18726,
+            93.59225
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 294.85344,
+          "box": [
+            -30.30105,
+            -18.55102,
+            84.0,
+            30.3,
+            5.15306,
+            99.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 76,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 12.01998,
+          "box": [
+            -18.61315,
+            23.24564,
+            88.0,
+            18.61315,
+            25.33457,
+            104.94813
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 73.03988,
+          "box": [
+            15.48705,
+            -26.09523,
+            88.0,
+            20.20199,
+            -22.13756,
+            117.67799
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40959,
+          "box": [
+            -26.50126,
+            13.72443,
+            88.0,
+            26.50126,
+            28.6,
+            124.4
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 293.14427,
+          "box": [
+            -30.30105,
+            -18.55102,
+            88.0,
+            30.3,
+            5.15306,
+            103.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 80,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 12.00192,
+          "box": [
+            -18.54267,
+            23.24564,
+            92.0,
+            18.54267,
+            25.23864,
+            107.0
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 72.41771,
+          "box": [
+            15.48705,
+            -26.09523,
+            92.0,
+            20.20199,
+            -22.13756,
+            118.8729
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.42417,
+          "box": [
+            -26.50126,
+            13.72443,
+            92.0,
+            26.50126,
+            28.6,
+            124.4
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 288.12489,
+          "box": [
+            -30.30105,
+            -18.55102,
+            92.0,
+            30.3,
+            5.15306,
+            107.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 84,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 11.50452,
+          "box": [
+            -18.39796,
+            23.24564,
+            96.0,
+            18.39796,
+            25.04167,
+            107.0
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 70.59509,
+          "box": [
+            15.225,
+            -26.09523,
+            96.0,
+            20.20199,
+            -22.13756,
+            119.75649
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.48886,
+          "box": [
+            -26.50126,
+            13.72443,
+            96.0,
+            26.50126,
+            28.6,
+            124.4
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 280.08921,
+          "box": [
+            -30.30105,
+            -18.55102,
+            96.0,
+            30.3,
+            5.15306,
+            111.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 88,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 9.60166,
+          "box": [
+            -18.25325,
+            23.24564,
+            100.0,
+            18.25325,
+            24.8447,
+            107.0
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 67.00386,
+          "box": [
+            15.225,
+            -26.01365,
+            100.0,
+            20.13883,
+            -22.13756,
+            120.57604
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.63099,
+          "box": [
+            -26.41806,
+            13.72443,
+            100.0,
+            26.41806,
+            28.6,
+            124.4
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 252.97841,
+          "box": [
+            -30.30105,
+            -18.36645,
+            100.0,
+            30.3,
+            5.15306,
+            115.23077
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 92,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_GNSSReserve",
+          "volume_mm3": 5.33486,
+          "box": [
+            -18.10853,
+            23.24564,
+            104.0,
+            18.10853,
+            24.64773,
+            107.0
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 60.90513,
+          "box": [
+            15.225,
+            -25.84889,
+            104.0,
+            20.01128,
+            -20.58997,
+            121.35745
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.4823,
+          "box": [
+            -26.20903,
+            13.72443,
+            104.0,
+            26.20903,
+            28.6,
+            124.4
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 208.89872,
+          "box": [
+            -30.30105,
+            -18.41521,
+            104.0,
+            30.3,
+            5.12562,
+            116.5
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 96,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 51.85358,
+          "box": [
+            15.225,
+            -26.69469,
+            108.0,
+            19.88037,
+            -20.404,
+            122.40894
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 1.10452,
+          "box": [
+            -13.03131,
+            27.36522,
+            117.0,
+            13.03131,
+            28.6,
+            124.4
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 123.02265,
+          "box": [
+            -30.30105,
+            -18.30751,
+            108.0,
+            30.3,
+            5.08542,
+            116.5
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 100,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 39.51346,
+          "box": [
+            15.225,
+            -26.69469,
+            112.0,
+            19.74691,
+            -20.21329,
+            123.05398
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.30843,
+          "box": [
+            -13.03874,
+            27.08494,
+            117.0,
+            13.03874,
+            28.6,
+            124.4
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 39.44287,
+          "box": [
+            -27.82247,
+            -18.03666,
+            112.0,
+            27.82247,
+            -11.89244,
+            116.5
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 104,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 23.616,
+          "box": [
+            15.225,
+            -26.69469,
+            116.0,
+            19.61918,
+            -20.01875,
+            123.64237
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 4.12315,
+          "box": [
+            -13.04631,
+            26.80408,
+            117.0,
+            13.04631,
+            28.6,
+            124.4
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 6.1715,
+          "box": [
+            -27.82247,
+            -18.01809,
+            116.0,
+            27.82247,
+            -11.98795,
+            116.5
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 108,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 6.34469,
+          "box": [
+            15.225,
+            -25.13326,
+            118.8935,
+            19.60625,
+            -19.81989,
+            123.64964
+          ]
+        },
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 4.21993,
+          "box": [
+            -13.05403,
+            26.52261,
+            120.0,
+            13.05403,
+            28.6,
+            124.4
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 112,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 1.8898,
+          "box": [
+            -13.01045,
+            26.36968,
+            124.0,
+            13.01045,
+            28.6,
+            124.4
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 116,
+      "intersections": []
+    },
+    {
+      "offset_mm": 120,
+      "intersections": []
+    },
+    {
+      "offset_mm": 124,
+      "intersections": []
+    },
+    {
+      "offset_mm": 128,
+      "intersections": []
+    },
+    {
+      "offset_mm": 132,
+      "intersections": []
+    },
+    {
+      "offset_mm": 136,
+      "intersections": []
+    },
+    {
+      "offset_mm": 140,
+      "intersections": []
+    },
+    {
+      "offset_mm": 144,
+      "intersections": []
+    },
+    {
+      "offset_mm": 148,
+      "intersections": []
+    },
+    {
+      "offset_mm": 152,
+      "intersections": []
+    },
+    {
+      "offset_mm": 156,
+      "intersections": []
+    },
+    {
+      "offset_mm": 160,
+      "intersections": []
+    },
+    {
+      "offset_mm": 164,
+      "intersections": []
+    }
+  ],
+  "shell_removal_negative_z": [
+    {
+      "offset_mm": 0,
+      "intersections": []
+    },
+    {
+      "offset_mm": 2,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 829.34511,
+          "box": [
+            -32.18,
+            -32.18,
+            10.0,
+            32.18,
+            32.18,
+            11.6
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 4,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 1732.45226,
+          "box": [
+            -32.18,
+            -32.18,
+            8.0,
+            32.18,
+            32.18,
+            11.6
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 8,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 3419.61192,
+          "box": [
+            -32.18,
+            -32.18,
+            4.0,
+            32.18,
+            32.18,
+            11.6
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 12,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 4702.35349,
+          "box": [
+            -32.18,
+            -32.18,
+            0.0,
+            32.18,
+            32.18,
+            11.6
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 20,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 3751.28647,
+          "box": [
+            -32.18,
+            -32.18,
+            0.0,
+            32.18,
+            32.18,
+            124.4
+          ]
+        }
+      ]
+    }
+  ],
+  "shell_on_bare_chassis_positive_z": [
+    {
+      "offset_mm": 0,
+      "intersections": []
+    },
+    {
+      "offset_mm": 4,
+      "intersections": []
+    },
+    {
+      "offset_mm": 8,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 0.03597,
+          "box": [
+            -27.62102,
+            -11.04841,
+            21.5,
+            27.62102,
+            -10.64564,
+            23.69611
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 12,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 0.17219,
+          "box": [
+            -27.70429,
+            -11.08172,
+            24.0,
+            27.70429,
+            -10.3976,
+            27.69611
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 20,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 0.53374,
+          "box": [
+            -26.30496,
+            14.18834,
+            35.71293,
+            26.30496,
+            15.06932,
+            41.59225
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 40,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.40935,
+          "box": [
+            -26.50126,
+            13.72443,
+            52.0,
+            26.50126,
+            15.18726,
+            61.59225
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 80,
+      "intersections": [
+        {
+          "part": "A5_MainShell",
+          "against": "A5_Chassis",
+          "volume_mm3": 2.42417,
+          "box": [
+            -26.50126,
+            13.72443,
+            92.0,
+            26.50126,
+            28.6,
+            124.4
+          ]
+        }
+      ]
+    },
+    {
+      "offset_mm": 120,
+      "intersections": []
+    },
+    {
+      "offset_mm": 160,
+      "intersections": []
+    }
+  ],
+  "carrier_removal_negative_y": [
+    {
+      "offset_mm": 0,
+      "intersections": []
+    },
+    {
+      "offset_mm": 2,
+      "intersections": []
+    },
+    {
+      "offset_mm": 4,
+      "intersections": []
+    },
+    {
+      "offset_mm": 6,
+      "intersections": []
+    },
+    {
+      "offset_mm": 8,
+      "intersections": []
+    },
+    {
+      "offset_mm": 10,
+      "intersections": []
+    },
+    {
+      "offset_mm": 12,
+      "intersections": []
+    },
+    {
+      "offset_mm": 14,
+      "intersections": []
+    },
+    {
+      "offset_mm": 16,
+      "intersections": []
+    },
+    {
+      "offset_mm": 18,
+      "intersections": []
+    },
+    {
+      "offset_mm": 20,
+      "intersections": []
+    },
+    {
+      "offset_mm": 22,
+      "intersections": []
+    },
+    {
+      "offset_mm": 24,
+      "intersections": []
+    }
+  ],
+  "motion_limits": "Muestreo discreto, no barrido continuo. Arnes desconectado, SD fuera para sacar cuna, coaxial libre; ver listas de obstaculos en script.",
+  "external_usb_plugs": [
+    {
+      "envelope_mm": [
+        13,
+        5.5,
+        25
+      ],
+      "basis": "ESTIMADO; sobremolde sin cable comercial elegido",
+      "intersections": [],
+      "clearances": [
+        {
+          "against": "ModulePanel",
+          "distance_mm": 0.0
+        },
+        {
+          "against": "A5_MainShell",
+          "distance_mm": 1.7342
+        }
+      ]
+    },
+    {
+      "envelope_mm": [
+        16,
+        8,
+        25
+      ],
+      "basis": "ESTIMADO; sobremolde sin cable comercial elegido",
+      "intersections": [
+        {
+          "against": "ModulePanel",
+          "volume_mm3": 28.97131,
+          "box": [
+            -8.01603,
+            36.26364,
+            128.0,
+            8.01603,
+            37.50909,
+            136.0
+          ]
+        }
+      ],
+      "clearances": [
+        {
+          "against": "ModulePanel",
+          "distance_mm": 0.0
+        },
+        {
+          "against": "A5_MainShell",
+          "distance_mm": 1.56364
+        }
+      ]
+    }
+  ],
+  "button_motion": [
+    {
+      "offset_mm": 0.0,
+      "intersections": []
+    },
+    {
+      "offset_mm": 0.05,
+      "intersections": []
+    },
+    {
+      "offset_mm": 0.1,
+      "intersections": []
+    },
+    {
+      "offset_mm": 0.15000000000000002,
+      "intersections": []
+    },
+    {
+      "offset_mm": 0.2,
+      "intersections": []
+    },
+    {
+      "offset_mm": 0.25,
+      "intersections": []
+    },
+    {
+      "offset_mm": 0.30000000000000004,
+      "intersections": []
+    },
+    {
+      "offset_mm": 0.35000000000000003,
+      "intersections": []
+    },
+    {
+      "offset_mm": 0.4,
+      "intersections": []
+    }
+  ],
+  "tool_checks": [
+    {
+      "screw": "USBScrew1",
+      "context": "panel fuera del case, llave recta diametro 3 mm",
+      "intersections": []
+    },
+    {
+      "screw": "USBScrew2",
+      "context": "panel fuera del case, llave recta diametro 3 mm",
+      "intersections": []
+    },
+    {
+      "screw": "USBScrew3",
+      "context": "panel fuera del case, llave recta diametro 3 mm",
+      "intersections": []
+    },
+    {
+      "screw": "USBScrew4",
+      "context": "panel fuera del case, llave recta diametro 3 mm",
+      "intersections": []
+    },
+    {
+      "screw": "A5_IMUPcbBolt1",
+      "context": "cuna fuera del case, llave recta diametro 3 mm",
+      "intersections": []
+    },
+    {
+      "screw": "A5_IMUPcbBolt2",
+      "context": "cuna fuera del case, llave recta diametro 3 mm",
+      "intersections": []
+    }
+  ],
+  "pole": {
+    "required": {
+      "required_thread": "5/8-11 UNC female, metal",
+      "nominal_major_diameter": 15.875,
+      "pitch": 2.309090909090909,
+      "selected_part_confirmed": false,
+      "candidate": "McMaster 90611A121, ya referenciado por A5",
+      "verified_mounting_hole_centers": null,
+      "actual_female_thread_depth": null,
+      "pole_male_thread_projection": null,
+      "pole_shoulder_diameter": null,
+      "retention_fasteners": null
+    },
+    "insert_box": [
+      -18.25625,
+      -18.25625,
+      4.0,
+      18.25625,
+      18.25625,
+      15.90625
+    ],
+    "cylinders": [
+      {
+        "radius": 18.25625,
+        "center": [
+          0.0,
+          0.0,
+          4.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "box": [
+          -18.25625,
+          -18.25625,
+          4.0,
+          18.25625,
+          18.25625,
+          6.38125
+        ]
+      },
+      {
+        "radius": 9.128125,
+        "center": [
+          0.0,
+          0.0,
+          6.38125
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "box": [
+          -9.12813,
+          -9.12813,
+          6.38125,
+          9.12813,
+          9.12813,
+          15.90625
+        ]
+      },
+      {
+        "radius": 7.9375,
+        "center": [
+          0.0,
+          0.0,
+          3.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "box": [
+          -7.9375,
+          -7.9375,
+          4.0,
+          7.9375,
+          7.9375,
+          15.90625
+        ]
+      }
+    ],
+    "axial_lift": [
+      {
+        "offset_mm": 0,
+        "intersections": []
+      },
+      {
+        "offset_mm": 0.3,
+        "intersections": []
+      },
+      {
+        "offset_mm": 1,
+        "intersections": []
+      },
+      {
+        "offset_mm": 2,
+        "intersections": []
+      },
+      {
+        "offset_mm": 5,
+        "intersections": [
+          {
+            "part": "insert",
+            "against": "chassis",
+            "volume_mm3": 41.31059,
+            "box": [
+              -17.25578,
+              5.9606,
+              9.3,
+              17.25578,
+              12.0866,
+              20.90625
+            ]
+          }
+        ]
+      }
+    ],
+    "rotation": [
+      {
+        "angle_deg": 0,
+        "intersections": []
+      },
+      {
+        "angle_deg": 30,
+        "intersections": []
+      },
+      {
+        "angle_deg": 60,
+        "intersections": []
+      },
+      {
+        "angle_deg": 90,
+        "intersections": []
+      }
+    ]
+  },
+  "battery_clearances": [
+    {
+      "against": "A5_BatteryIMUCarrier",
+      "distance_mm": 0.0
+    },
+    {
+      "against": "A5_Chassis",
+      "distance_mm": 0.8
+    },
+    {
+      "against": "A5_MainShell",
+      "distance_mm": 1.8928
+    },
+    {
+      "against": "A5_ModuleNut12",
+      "distance_mm": 2.84046
+    },
+    {
+      "against": "A5_ModuleNut22",
+      "distance_mm": 2.84046
+    },
+    {
+      "against": "A5_CoaxRouteReserve",
+      "distance_mm": 3.5
+    },
+    {
+      "against": "A5_ModuleBolt12",
+      "distance_mm": 4.5
+    },
+    {
+      "against": "A5_ModuleBolt22",
+      "distance_mm": 4.5
+    },
+    {
+      "against": "A5_IMUPcbBolt1",
+      "distance_mm": 6.4
+    },
+    {
+      "against": "A5_IMUPcbBolt2",
+      "distance_mm": 6.4
+    },
+    {
+      "against": "A5_GNSSReserve",
+      "distance_mm": 8.0
+    },
+    {
+      "against": "A5_IMUNutBar",
+      "distance_mm": 8.0
+    },
+    {
+      "against": "A5_IMUPcbNut1",
+      "distance_mm": 8.2
+    },
+    {
+      "against": "A5_IMUPcbNut2",
+      "distance_mm": 8.2
+    },
+    {
+      "against": "A5_SDReference",
+      "distance_mm": 10.5
+    }
+  ],
+  "power_module_studies": [
+    {
+      "name": "PowerBoostEnvelope",
+      "box": [
+        -11.5,
+        -28.5,
+        94,
+        23,
+        10,
+        45
+      ],
+      "basis": "23x45x10 publicado por Adafruit con USB-A. Se conserva conservador aunque USB-A no se monta. Posicion de estudio, sin soportes.",
+      "intersections": [],
+      "clearances": [
+        {
+          "against": "A5_BatteryIMUCarrier",
+          "distance_mm": 0.5
+        },
+        {
+          "against": "A5_MainShell",
+          "distance_mm": 2.62851
+        }
+      ]
+    },
+    {
+      "name": "SoftSwitchEnvelope",
+      "box": [
+        -12.7,
+        -26,
+        23,
+        25.4,
+        7.5,
+        25.4
+      ],
+      "basis": "PCB 25.4x25.4 publicada por SparkFun; espesor total 7.5 ESTIMADO, sin plugs ni sujecion.",
+      "intersections": [],
+      "clearances": [
+        {
+          "against": "A5_BatteryIMUCarrier",
+          "distance_mm": 0.5
+        },
+        {
+          "against": "A5_SDReference",
+          "distance_mm": 0.6
+        },
+        {
+          "against": "A5_MainShell",
+          "distance_mm": 1.1121
+        },
+        {
+          "against": "A5_Chassis",
+          "distance_mm": 1.2
+        },
+        {
+          "against": "A5_CoaxRouteReserve",
+          "distance_mm": 1.8
+        }
+      ]
+    },
+    {
+      "name": "PowerBoostServiceEnvelope",
+      "box": [
+        -14,
+        -31,
+        90,
+        28,
+        13,
+        57
+      ],
+      "basis": "ESTIMADO: reserva ampliada de conexiones y acceso para estudiar sensibilidad. No equivale a modelo de JST.",
+      "intersections": [
+        {
+          "against": "A5_MainShell",
+          "volume_mm3": 219.60302,
+          "box": [
+            -15.5369,
+            -34.0147,
+            90.0,
+            15.5369,
+            -27.20363,
+            147.0
+          ]
+        },
+        {
+          "against": "A5_AntennaCap",
+          "volume_mm3": 0.32236,
+          "box": [
+            -14.0,
+            -31.0,
+            144.4,
+            14.0,
+            -30.76426,
+            147.0
+          ]
+        },
+        {
+          "against": "A5_SDReference",
+          "volume_mm3": 168.0,
+          "box": [
+            -12.0,
+            -25.0,
+            90.0,
+            12.0,
+            -18.0,
+            91.0
+          ]
+        }
+      ],
+      "clearances": [
+        {
+          "against": "A5_MainShell",
+          "distance_mm": 0.0
+        },
+        {
+          "against": "A5_AntennaCap",
+          "distance_mm": 0.0
+        },
+        {
+          "against": "A5_SDReference",
+          "distance_mm": 0.0
+        },
+        {
+          "against": "A5_BatteryIMUCarrier",
+          "distance_mm": 0.0
+        },
+        {
+          "against": "A5_CoaxRouteReserve",
+          "distance_mm": 0.5
+        }
+      ]
+    },
+    {
+      "name": "SoftSwitch10mmEnvelope",
+      "box": [
+        -12.7,
+        -28.5,
+        23,
+        25.4,
+        10,
+        25.4
+      ],
+      "basis": "ESTIMADO: sensibilidad si altura ocupada aumenta a 10 mm manteniendo cara interior.",
+      "intersections": [
+        {
+          "against": "A5_MainShell",
+          "volume_mm3": 24.81939,
+          "box": [
+            -12.97471,
+            -29.11647,
+            23.0,
+            12.97471,
+            -27.2344,
+            45.03526
+          ]
+        }
+      ],
+      "clearances": [
+        {
+          "against": "A5_MainShell",
+          "distance_mm": 0.0
+        },
+        {
+          "against": "A5_BatteryIMUCarrier",
+          "distance_mm": 0.5
+        },
+        {
+          "against": "A5_SDReference",
+          "distance_mm": 0.6
+        },
+        {
+          "against": "A5_Chassis",
+          "distance_mm": 1.2
+        },
+        {
+          "against": "A5_CoaxRouteReserve",
+          "distance_mm": 1.8
+        }
+      ]
+    }
+  ],
+  "power_module_pair_intersections": [],
+  "wiring_corridors": [
+    {
+      "name": "FrontRightPowerUart",
+      "points": [
+        [
+          20,
+          20,
+          43
+        ],
+        [
+          20,
+          20,
+          130
+        ]
+      ],
+      "radius": 1.5,
+      "intersections": [],
+      "module_intersections": []
+    },
+    {
+      "name": "RearLeftSignals",
+      "points": [
+        [
+          -17,
+          -22,
+          51
+        ],
+        [
+          -17,
+          -22,
+          132
+        ]
+      ],
+      "radius": 1.5,
+      "intersections": [],
+      "module_intersections": []
+    },
+    {
+      "name": "ImuSideEntry",
+      "points": [
+        [
+          -20,
+          -15,
+          128
+        ],
+        [
+          -10,
+          -15,
+          128
+        ]
+      ],
+      "radius": 1.5,
+      "intersections": [],
+      "module_intersections": []
+    },
+    {
+      "name": "BatteryLeadUpper",
+      "points": [
+        [
+          -18,
+          0,
+          109
+        ],
+        [
+          -18,
+          -20,
+          109
+        ]
+      ],
+      "radius": 1.5,
+      "intersections": [
+        {
+          "against": "A5_BatteryIMUCarrier",
+          "volume_mm3": 82.823,
+          "box": [
+            -19.5,
+            -18.0,
+            107.5,
+            -16.5,
+            0.0,
+            110.5
+          ]
+        }
+      ],
+      "module_intersections": []
+    },
+    {
+      "name": "UsbToTinyLeft",
+      "points": [
+        [
+          -13,
+          19,
+          133
+        ],
+        [
+          -13,
+          19,
+          151
+        ]
+      ],
+      "radius": 2.0,
+      "intersections": [],
+      "module_intersections": []
+    },
+    {
+      "name": "ChargeLightStudy",
+      "points": [
+        [
+          16,
+          -20,
+          137
+        ],
+        [
+          16,
+          20,
+          137
+        ]
+      ],
+      "radius": 1.5,
+      "intersections": [
+        {
+          "against": "A5_CoaxRouteReserve",
+          "volume_mm3": 31.25144,
+          "box": [
+            14.5,
+            -3.71557,
+            133.02975,
+            18.775,
+            2.48003,
+            138.77876
+          ]
+        },
+        {
+          "against": "A5_Chassis",
+          "volume_mm3": 25.17685,
+          "box": [
+            14.5,
+            5.3,
+            135.5,
+            17.5,
+            9.3,
+            138.0
+          ]
+        }
+      ],
+      "module_intersections": []
+    }
+  ],
+  "exports": [
+    {
+      "path": "panel-modules/case-integration.step",
+      "valid": true,
+      "solids": 3,
+      "volume_mm3": 109519.09575
+    },
+    {
+      "path": "panel-modules/panel-assembly.step",
+      "valid": true,
+      "solids": 21,
+      "volume_mm3": 8592.19026
+    },
+    {
+      "path": "panel-modules/stl/A5_ElectronicsTray.stl",
+      "closed": true,
+      "facets": 10236
+    },
+    {
+      "path": "panel-modules/stl/A5_MainShell.stl",
+      "closed": true,
+      "facets": 17386
+    },
+    {
+      "path": "panel-modules/stl/ButtonCap.stl",
+      "closed": true,
+      "facets": 1100
+    },
+    {
+      "path": "panel-modules/stl/ButtonCartridge.stl",
+      "closed": true,
+      "facets": 1404
+    },
+    {
+      "path": "panel-modules/stl/ChargeLens.stl",
+      "closed": true,
+      "facets": 914
+    },
+    {
+      "path": "panel-modules/stl/ModulePanel.stl",
+      "closed": true,
+      "facets": 13992
+    },
+    {
+      "path": "panel-modules/stl/StatusLens.stl",
+      "closed": true,
+      "facets": 914
+    },
+    {
+      "path": "panel-modules/stl/fit-coupon.stl",
+      "closed": true,
+      "facets": 1584
+    },
+    {
+      "path": "integration-review/generated/case-integration.step",
+      "valid": true,
+      "solids": 3,
+      "volume_mm3": 154696.99495
+    },
+    {
+      "path": "integration-review/generated/panel-assembly.step",
+      "valid": true,
+      "solids": 21,
+      "volume_mm3": 8656.21155
+    },
+    {
+      "path": "integration-review/generated/stl/A5_Chassis.stl",
+      "closed": true,
+      "facets": 17652
+    },
+    {
+      "path": "integration-review/generated/stl/A5_MainShell.stl",
+      "closed": true,
+      "facets": 15522
+    },
+    {
+      "path": "integration-review/generated/stl/ButtonCap.stl",
+      "closed": true,
+      "facets": 1100
+    },
+    {
+      "path": "integration-review/generated/stl/ButtonCartridge.stl",
+      "closed": true,
+      "facets": 1404
+    },
+    {
+      "path": "integration-review/generated/stl/ChargeLens.stl",
+      "closed": true,
+      "facets": 914
+    },
+    {
+      "path": "integration-review/generated/stl/ModulePanel.stl",
+      "closed": true,
+      "facets": 13640
+    },
+    {
+      "path": "integration-review/generated/stl/StatusLens.stl",
+      "closed": true,
+      "facets": 914
+    },
+    {
+      "path": "integration-review/generated/stl/fit-coupon.stl",
+      "closed": true,
+      "facets": 1584
+    },
+    {
+      "path": "A5/print/01-cuerpo.stl",
+      "closed": true,
+      "facets": 12532
+    },
+    {
+      "path": "A5/print/02-chasis-base.stl",
+      "closed": true,
+      "facets": 14232
+    },
+    {
+      "path": "A5/print/03-cuna-bateria-imu.stl",
+      "closed": true,
+      "facets": 3822
+    },
+    {
+      "path": "A5/print/04-tapa-antena.stl",
+      "closed": true,
+      "facets": 4592
+    },
+    {
+      "path": "A5/print/05-panel.stl",
+      "closed": true,
+      "facets": 1444
+    },
+    {
+      "path": "A5/print/06-prensa-tuercas-imu.stl",
+      "closed": true,
+      "facets": 628
+    },
+    {
+      "path": "A5/print/07-plantilla-centrado.stl",
+      "closed": true,
+      "facets": 608
+    }
+  ],
+  "source_sha256_after": "73fd95f536f6537bbcbc9e3633d12d050ab901e844b4a03dcd79d3889115f4fb",
+  "master_preserved": true,
+  "scope_ready_for_complete_receiver_print": false,
+  "remaining_blockers": [
+    "Montaje/conectores de power y Tiny-Adapter",
+    "Retencion/engagement del inserto",
+    "Medidas de componentes recibidos, cableado completo y conectores",
+    "Prueba fisica electrica, termica y mecanica"
+  ]
+}

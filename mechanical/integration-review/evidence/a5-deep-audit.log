@@ -1,0 +1,17 @@
+A5 intersections [{'a': 'HA901Reserve', 'b': 'AntennaBolt1', 'volume': 19.63495, 'box': [10.2681, 5.4, 168.0, 12.7681, 7.9, 172.0]}, {'a': 'HA901Reserve', 'b': 'AntennaBolt2', 'volume': 19.63495, 'box': [-12.7681, 5.4, 168.0, -10.2681, 7.9, 172.0]}, {'a': 'HA901Reserve', 'b': 'AntennaBolt3', 'volume': 19.63495, 'box': [-1.25, -14.55, 168.0, 1.25, -12.05, 172.0]}]
+Insert lift 0 intersection 0.0
+Insert lift 0.3 intersection 0.0
+Insert lift 1 intersection 0.0
+Insert lift 5 intersection 41.310591405242405
+Insert lift 10 intersection 118.47217610802016
+Insert rotation 0 intersection 0.0
+Insert rotation 30 intersection 0.0
+Insert rotation 60 intersection 0.0
+Insert rotation 90 intersection 0.0
+Battery clearance BatteryIMUCarrier 0.0
+Battery clearance Chassis 0.7999999999999998
+Battery clearance SDReference 10.5
+Battery clearance GNSSReserve 8.0
+MainShell properties []
+ServiceCover properties []
+AntennaCap properties []

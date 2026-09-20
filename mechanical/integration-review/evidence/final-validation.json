@@ -1,0 +1,55 @@
+{
+  "checks": {
+    "master_preserved": true,
+    "panel_a5_no_intersections": true,
+    "m2_heads_clear": true,
+    "panel_extraction_samples_clear": true,
+    "carrier_extraction_samples_clear": true,
+    "button_samples_clear": true,
+    "exports_valid_or_closed": true,
+    "assembly_blockers_preserved_in_report": true,
+    "not_released_for_complete_receiver_print": true,
+    "preexisting_deletions_unchanged": true,
+    "git_head_unchanged": true
+  },
+  "fcstd_reopened": [
+    {
+      "path": "mechanical/integration-review/generated/TresVizo-panel-modules.FCStd",
+      "objects": 62,
+      "solids": 62,
+      "valid": true
+    },
+    {
+      "path": "mechanical/integration-review/generated/TresVizo-integration-review.FCStd",
+      "objects": 72,
+      "solids": 72,
+      "valid": true
+    }
+  ],
+  "original_artifacts": [
+    {
+      "path": "mechanical/A5/TresVizo-A5.FCStd",
+      "unchanged": true
+    },
+    {
+      "path": "mechanical/panel-modules/TresVizo-panel-modules.FCStd",
+      "unchanged": true
+    },
+    {
+      "path": "mechanical/panel-modules/fit-report.json",
+      "unchanged": true
+    },
+    {
+      "path": "mechanical/panel-modules/case-integration.step",
+      "unchanged": true
+    },
+    {
+      "path": "mechanical/panel-modules/panel-assembly.step",
+      "unchanged": true
+    }
+  ],
+  "head": "cc9f585",
+  "preexisting_deleted_files": 371,
+  "complete_receiver_ready": false,
+  "physical_tests_executed": false
+}

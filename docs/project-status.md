@@ -2,6 +2,8 @@
 
 Fecha de referencia: septiembre de 2026.
 
+**Actualización mecánica/power del 20/09:** existe CAD A5 y propuesta por módulos comerciales. La [revisión conjunta](INTEGRATION_REVIEW.md) corrige la integración local del panel, pero detecta bloqueo de montaje axial del cuerpo y pendientes de soportes power, arnés e inserto. No hay receptor completo liberado para imprimir o energizar. Las filas históricas que indican ausencia de CAD o propuesta de alimentación quedaron superadas por estos archivos; no implican validación física.
+
 ## Significado de los estados
 
 - **Previsto:** forma parte del alcance o de la arquitectura deseada, pero puede no estar diseñado ni implementado.

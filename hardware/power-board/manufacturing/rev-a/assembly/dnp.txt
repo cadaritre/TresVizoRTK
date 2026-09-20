@@ -1,3 +1,0 @@
-J5: no montar. Huella/cable candidatos sin comprobación física de la Tiny del usuario.
-JP1, JP2 y JP3: dejar abiertos, no son componentes.
-TP1–TP10: cobre, sin compra. H1/H2: taladros NPTH, sin compra.

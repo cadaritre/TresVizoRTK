@@ -1,3 +1,0 @@
-STEP file '/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK/hardware/power-board/manufacturing/rev-a/power-board-kicad.step' created.
-
-Tiempo de exportación 0.883 s

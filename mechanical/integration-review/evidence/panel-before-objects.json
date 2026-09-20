@@ -1,0 +1,1826 @@
+[
+  {
+    "name": "ModulePanel",
+    "label": "Panel curvo \u00b7 USB / luces / bot\u00f3n",
+    "box": [
+      -14.19118,
+      12.10064,
+      89.0,
+      14.19118,
+      37.57727,
+      142.0
+    ],
+    "volume": 3875.13735,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Sustituye ServiceCover s\u00f3lo en esta propuesta. Soportes integrados, M3 en Z96 y Z139.",
+      "PreviewShape": "<Shape object at 0x12b115820>",
+      "ShapeMaterial": "<Material at 0x12b11d210>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b115820>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "ButtonCap",
+    "label": "Bot\u00f3n al ras \u00b7 actuador cautivo",
+    "box": [
+      -6.51746,
+      33.9,
+      103.49989,
+      6.51701,
+      37.26932,
+      116.5
+    ],
+    "volume": 296.92265,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Propuesta para primera impresi\u00f3n de ajuste",
+      "PreviewShape": "<Shape object at 0x12b0ae740>",
+      "ShapeMaterial": "<Material at 0x12b0b6040>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b0ae740>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "ButtonCartridge",
+    "label": "Cartucho desmontable \u00b7 micro-switch 6 mm nominal",
+    "box": [
+      -12.0,
+      26.3,
+      103.5,
+      12.0,
+      33.5,
+      116.5
+    ],
+    "volume": 940.70629,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "AU-101 sin cotas publicadas: cuerpo 6 mm y altura 5 mm son supuestos ajustables, no cotas certificadas.",
+      "PreviewShape": "<Shape object at 0x12b1158a0>",
+      "ShapeMaterial": "<Material at 0x12b11d870>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b1158a0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "TactileBody",
+    "label": "Steren AU-101 \u00b7 volumen provisional",
+    "box": [
+      -3.0,
+      28.8,
+      107.0,
+      3.0,
+      32.3,
+      113.0
+    ],
+    "volume": 126.0,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Envolvente de referencia",
+      "PreviewShape": "<Shape object at 0x12b306e00>",
+      "ShapeMaterial": "<Material at 0x12b3d97f0>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b306e00>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "TactileStem",
+    "label": "V\u00e1stago micro-switch \u00b7 provisional",
+    "box": [
+      -1.6,
+      32.3,
+      108.4,
+      1.6,
+      33.8,
+      111.6
+    ],
+    "volume": 12.06372,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Envolvente de referencia",
+      "PreviewShape": "<Shape object at 0x12b306e00>",
+      "ShapeMaterial": "<Material at 0x12b3d97f0>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b306e00>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "StatusLens",
+    "label": "Difusor estado \u00b7 cara al ras",
+    "box": [
+      -6.75,
+      33.7,
+      118.25,
+      -1.25,
+      37.27029,
+      123.75
+    ],
+    "volume": 31.10335,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Resina transl\u00facida / PMMA; probar brillo y retener con silicona neutra. Sin estanqueidad certificada.",
+      "PreviewShape": "<Shape object at 0x12b306e00>",
+      "ShapeMaterial": "<Material at 0x12b3d9890>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b306e00>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "ChargeLens",
+    "label": "Difusor carga \u00b7 cara al ras",
+    "box": [
+      1.25,
+      33.7,
+      118.25,
+      6.75,
+      37.27031,
+      123.75
+    ],
+    "volume": 31.10335,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Resina transl\u00facida / PMMA; probar brillo y retener con silicona neutra. Sin estanqueidad certificada.",
+      "PreviewShape": "<Shape object at 0x12b306e00>",
+      "ShapeMaterial": "<Material at 0x12a82b7e0>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b306e00>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "RGBLed",
+    "label": "LED Steren \u00d85 \u00d7 8.45 \u00b7 cuerpo sin patas",
+    "box": [
+      -6.5,
+      25.25,
+      118.5,
+      -1.5,
+      33.7,
+      123.5
+    ],
+    "volume": 149.5529,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Envolvente de referencia",
+      "PreviewShape": "<Shape object at 0x12b306e00>",
+      "ShapeMaterial": "<Material at 0x12a82b7e0>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b306e00>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "USBModule",
+    "label": "Adafruit 5871 \u00b7 placa comercial",
+    "box": [
+      -10.16,
+      12.26064,
+      128.75,
+      10.16,
+      35.12064,
+      130.35
+    ],
+    "volume": 702.94743,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Contorno y agujeros: Eagle oficial. Espesor 1.6 mm provisional.",
+      "PreviewShape": "<Shape object at 0x12b0ae740>",
+      "ShapeMaterial": "<Material at 0x12b0b6740>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b0ae740>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "USBReceptacle",
+    "label": "USB-C \u00b7 envolvente y boca",
+    "box": [
+      -4.47,
+      28.91364,
+      130.35,
+      4.47,
+      36.26364,
+      133.65
+    ],
+    "volume": 187.6622,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Anchura/profundidad del footprint CUSB31. Altura 3.3 mm provisional.",
+      "PreviewShape": "<Shape object at 0x12b306e00>",
+      "ShapeMaterial": "<Material at 0x12a82b7e0>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b306e00>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "USBPortInterior",
+    "label": "Interior USB-C \u00b7 visualizaci\u00f3n",
+    "box": [
+      -3.5,
+      35.46364,
+      131.0,
+      3.5,
+      35.56364,
+      133.0
+    ],
+    "volume": 1.33047,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Envolvente de referencia",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "USBContactTongue",
+    "label": "Leng\u00fceta USB-C \u00b7 visualizaci\u00f3n",
+    "box": [
+      -3.0,
+      35.56364,
+      131.8,
+      3.0,
+      35.96364,
+      132.2
+    ],
+    "volume": 0.96,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Envolvente de referencia",
+      "PreviewShape": "<Shape object at 0x12adba040>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12adba040>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "USBChip",
+    "label": "TS3USB30 \u00b7 reserva de componentes",
+    "box": [
+      -2.0,
+      20.26064,
+      130.35,
+      2.0,
+      24.26064,
+      131.55
+    ],
+    "volume": 19.2,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Envolvente de referencia",
+      "PreviewShape": "<Shape object at 0x12adba9d0>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12adba9d0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "USBScrew1",
+    "label": "M2 \u00d7 5 \u00b7 montaje USB",
+    "box": [
+      -9.42,
+      13.00064,
+      125.35,
+      -5.82,
+      16.60064,
+      131.65
+    ],
+    "volume": 27.40883,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Envolvente de referencia",
+      "PreviewShape": "<Shape object at 0x12b306e00>",
+      "ShapeMaterial": "<Material at 0x12b3da990>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b306e00>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "USBScrew2",
+    "label": "M2 \u00d7 5 \u00b7 montaje USB001",
+    "box": [
+      -9.42,
+      30.78064,
+      125.35,
+      -5.82,
+      34.38064,
+      131.65
+    ],
+    "volume": 27.40883,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Envolvente de referencia",
+      "PreviewShape": "<Shape object at 0x12b306e00>",
+      "ShapeMaterial": "<Material at 0x12b3da990>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b306e00>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "USBScrew3",
+    "label": "M2 \u00d7 5 \u00b7 montaje USB002",
+    "box": [
+      5.82,
+      13.00064,
+      125.35,
+      9.42,
+      16.60064,
+      131.65
+    ],
+    "volume": 27.40883,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Envolvente de referencia",
+      "PreviewShape": "<Shape object at 0x12adba9d0>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12adba9d0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "USBScrew4",
+    "label": "M2 \u00d7 5 \u00b7 montaje USB003",
+    "box": [
+      5.82,
+      30.78064,
+      125.35,
+      9.42,
+      34.38064,
+      131.65
+    ],
+    "volume": 27.40883,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Envolvente de referencia",
+      "PreviewShape": "<Shape object at 0x12adf3d80>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12adf3d80>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "ButtonScrew1",
+    "label": "M2 \u00d7 8 \u00b7 cartucho bot\u00f3n",
+    "box": [
+      -10.8,
+      24.9,
+      108.2,
+      -7.2,
+      34.3,
+      111.8
+    ],
+    "volume": 36.93256,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Envolvente de referencia",
+      "PreviewShape": "<Shape object at 0x12adfb5f0>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12adfb5f0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "ButtonScrew2",
+    "label": "M2 \u00d7 8 \u00b7 cartucho bot\u00f3n001",
+    "box": [
+      7.2,
+      24.9,
+      108.2,
+      10.8,
+      34.3,
+      111.8
+    ],
+    "volume": 36.93256,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Envolvente de referencia",
+      "PreviewShape": "<Shape object at 0x12add5740>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5740>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_MainShell",
+    "label": "A5 01 / cuerpo con simbolo 3 + hexagono grabado \u00b7 modificaci\u00f3n propuesta",
+    "box": [
+      -37.0,
+      -37.0,
+      12.0,
+      37.0,
+      37.0,
+      150.2
+    ],
+    "volume": 77800.76708,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b115820>",
+      "ShapeMaterial": "<Material at 0x12b11e010>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b115820>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_Base",
+    "label": "A5 02 / BASE UNICA - asiento de brida y apoyos \u00b7 A5",
+    "box": [
+      -32.18,
+      -32.18,
+      0.0,
+      32.18,
+      32.18,
+      28.0
+    ],
+    "volume": 34857.79709,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b115820>",
+      "ShapeMaterial": "<Material at 0x12b11e710>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b115820>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_ElectronicsTray",
+    "label": "A5 04 / BANDEJA 4 mm - GNSS + USB + ESP + biestable \u00b7 modificaci\u00f3n propuesta",
+    "box": [
+      -26.0,
+      5.3,
+      28.0,
+      26.0,
+      28.0,
+      165.0
+    ],
+    "volume": 27843.25096,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b306e00>",
+      "ShapeMaterial": "<Material at 0x12b3dab30>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b306e00>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_BatteryCradle",
+    "label": "A5 05 / CUNA BATERIA + soporte microSD integrado \u00b7 A5",
+    "box": [
+      -30.3,
+      -18.0,
+      29.5,
+      30.3,
+      5.0,
+      116.5
+    ],
+    "volume": 29495.22109,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b115820>",
+      "ShapeMaterial": "<Material at 0x12b11f470>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b115820>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUSeat",
+    "label": "IMU / asiento ajustable - dos M2.5 \u00b7 A5",
+    "box": [
+      -26.0,
+      -16.0,
+      111.0,
+      26.0,
+      15.7,
+      123.8
+    ],
+    "volume": 4618.11391,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b0ae740>",
+      "ShapeMaterial": "<Material at 0x12b0b6e40>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b0ae740>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_AntennaCap",
+    "label": "A5 06 / tapa antena HA-901A - 3 pasos M2.5 \u00b7 A5",
+    "box": [
+      -37.0,
+      -37.0,
+      144.4,
+      37.0,
+      37.0,
+      168.0
+    ],
+    "volume": 16099.56419,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b115820>",
+      "ShapeMaterial": "<Material at 0x12b11fc10>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b115820>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_FlangedInsert",
+    "label": "PENDIENTE plano / inserto con brida 5-8-11 UNC \u00b7 A5",
+    "box": [
+      -18.25625,
+      -18.25625,
+      4.0,
+      18.25625,
+      18.25625,
+      15.90625
+    ],
+    "volume": 2630.0048,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b3d9930>",
+      "ShapeMaterial": "<Material at 0x12b3dab30>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b3d9930>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_RadialNut1",
+    "label": "REF tuerca cautiva M3 radial / 1 \u00b7 A5",
+    "box": [
+      26.0,
+      -3.17543,
+      12.25,
+      28.4,
+      3.17543,
+      17.75
+    ],
+    "volume": 44.75902,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b0ae740>",
+      "ShapeMaterial": "<Material at 0x12b0b7540>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b0ae740>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_RadialBolt1",
+    "label": "REF tornillo radial M3 x 8 / 1 \u00b7 A5",
+    "box": [
+      24.5,
+      -2.75,
+      12.25,
+      34.2,
+      2.75,
+      17.75
+    ],
+    "volume": 93.23069,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b3d9930>",
+      "ShapeMaterial": "<Material at 0x12b3dab30>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b3d9930>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_RadialNut2",
+    "label": "REF tuerca cautiva M3 radial / 2 \u00b7 A5",
+    "box": [
+      -3.17543,
+      26.0,
+      12.25,
+      3.17543,
+      28.4,
+      17.75
+    ],
+    "volume": 44.75902,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b3d9930>",
+      "ShapeMaterial": "<Material at 0x12b3dabd0>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b3d9930>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_RadialBolt2",
+    "label": "REF tornillo radial M3 x 8 / 2 \u00b7 A5",
+    "box": [
+      -2.75,
+      24.5,
+      12.25,
+      2.75,
+      34.2,
+      17.75
+    ],
+    "volume": 93.23069,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b3d9930>",
+      "ShapeMaterial": "<Material at 0x12b3dac70>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b3d9930>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_RadialNut3",
+    "label": "REF tuerca cautiva M3 radial / 3 \u00b7 A5",
+    "box": [
+      -28.4,
+      -3.17543,
+      12.25,
+      -26.0,
+      3.17543,
+      17.75
+    ],
+    "volume": 44.75902,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b3d9930>",
+      "ShapeMaterial": "<Material at 0x12b30d3c0>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b3d9930>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_RadialBolt3",
+    "label": "REF tornillo radial M3 x 8 / 3 \u00b7 A5",
+    "box": [
+      -34.2,
+      -2.75,
+      12.25,
+      -24.5,
+      2.75,
+      17.75
+    ],
+    "volume": 93.23069,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12addba30>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12addba30>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_RadialNut4",
+    "label": "REF tuerca cautiva M3 radial / 4 \u00b7 A5",
+    "box": [
+      -3.17543,
+      -28.4,
+      12.25,
+      3.17543,
+      -26.0,
+      17.75
+    ],
+    "volume": 44.75902,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12adfb5f0>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12adfb5f0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_RadialBolt4",
+    "label": "REF tornillo radial M3 x 8 / 4 \u00b7 A5",
+    "box": [
+      -2.75,
+      -34.2,
+      12.25,
+      2.75,
+      -24.5,
+      17.75
+    ],
+    "volume": 93.23069,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_TrayBolt1",
+    "label": "M3 x 35 / base-bandeja 1 \u00b7 A5",
+    "box": [
+      -20.85,
+      7.65,
+      0.3,
+      -15.15,
+      13.35,
+      37.2
+    ],
+    "volume": 279.66536,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12adfb5f0>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12adfb5f0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_TrayWasher1",
+    "label": "Arandela M3 / base-bandeja \u00b7 A5",
+    "box": [
+      -21.5,
+      7.0,
+      32.0,
+      -14.5,
+      14.0,
+      32.5
+    ],
+    "volume": 15.22102,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_TrayNut1",
+    "label": "Tuerca M3 / base-bandeja \u00b7 A5",
+    "box": [
+      -20.75,
+      7.32457,
+      32.5,
+      -15.25,
+      13.67543,
+      34.9
+    ],
+    "volume": 45.90884,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b11fad0>",
+      "ShapeMaterial": "<Material at 0x12b120970>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b11fad0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_ModuleBolt11",
+    "label": "M3 x 20 / union bandejas 1-1 \u00b7 A5",
+    "box": [
+      -27.35,
+      -10.7,
+      30.15,
+      -21.65,
+      11.0,
+      35.85
+    ],
+    "volume": 175.48387,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b120fd0>",
+      "ShapeMaterial": "<Material at 0x12b121110>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b120fd0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_ModuleNut11",
+    "label": "Tuerca M3 / union bandejas \u00b7 A5",
+    "box": [
+      -27.25,
+      -10.0,
+      29.82457,
+      -21.75,
+      -7.6,
+      36.17543
+    ],
+    "volume": 45.90884,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b11fad0>",
+      "ShapeMaterial": "<Material at 0x12b121810>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b11fad0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_ModuleBolt12",
+    "label": "M3 x 25 / union bandejas 1-2 \u00b7 A5",
+    "box": [
+      -24.85,
+      -15.7,
+      110.15,
+      -19.15,
+      11.0,
+      115.85
+    ],
+    "volume": 208.50986,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b3d9930>",
+      "ShapeMaterial": "<Material at 0x12b30e120>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b3d9930>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_ModuleNut12",
+    "label": "Tuerca M3 / union bandejas001 \u00b7 A5",
+    "box": [
+      -24.75,
+      -12.0,
+      109.82457,
+      -19.25,
+      -9.6,
+      116.17543
+    ],
+    "volume": 45.90884,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b0ae740>",
+      "ShapeMaterial": "<Material at 0x12b0b7c40>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b0ae740>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUBolt1",
+    "label": "M3 x 12 / soporte IMU fijo \u00b7 A5",
+    "box": [
+      -24.85,
+      3.7,
+      117.15,
+      -19.15,
+      17.4,
+      122.85
+    ],
+    "volume": 122.64228,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b0ae740>",
+      "ShapeMaterial": "<Material at 0x12b0b8340>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b0ae740>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUNut1",
+    "label": "Tuerca M3 / soporte IMU fijo \u00b7 A5",
+    "box": [
+      -24.75,
+      5.4,
+      116.82457,
+      -19.25,
+      7.8,
+      123.17543
+    ],
+    "volume": 45.90884,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b11ded0>",
+      "ShapeMaterial": "<Material at 0x12b121810>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b11ded0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_TrayBolt2",
+    "label": "M3 x 35 / base-bandeja 2 \u00b7 A5",
+    "box": [
+      15.15,
+      7.65,
+      0.3,
+      20.85,
+      13.35,
+      37.2
+    ],
+    "volume": 279.66536,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b11fad0>",
+      "ShapeMaterial": "<Material at 0x12b121f10>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b11fad0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_TrayWasher2",
+    "label": "Arandela M3 / base-bandeja001 \u00b7 A5",
+    "box": [
+      14.5,
+      7.0,
+      32.0,
+      21.5,
+      14.0,
+      32.5
+    ],
+    "volume": 15.22102,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12adfb5f0>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12adfb5f0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_TrayNut2",
+    "label": "Tuerca M3 / base-bandeja001 \u00b7 A5",
+    "box": [
+      15.25,
+      7.32457,
+      32.5,
+      20.75,
+      13.67543,
+      34.9
+    ],
+    "volume": 45.90884,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12adf3d80>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12adf3d80>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_ModuleBolt21",
+    "label": "M3 x 20 / union bandejas 2-1 \u00b7 A5",
+    "box": [
+      21.65,
+      -10.7,
+      30.15,
+      27.35,
+      11.0,
+      35.85
+    ],
+    "volume": 175.48387,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12adf3d80>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12adf3d80>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_ModuleNut21",
+    "label": "Tuerca M3 / union bandejas002 \u00b7 A5",
+    "box": [
+      21.75,
+      -10.0,
+      29.82457,
+      27.25,
+      -7.6,
+      36.17543
+    ],
+    "volume": 45.90884,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12adf3d80>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12adf3d80>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_ModuleBolt22",
+    "label": "M3 x 25 / union bandejas 2-2 \u00b7 A5",
+    "box": [
+      19.15,
+      -15.7,
+      110.15,
+      24.85,
+      11.0,
+      115.85
+    ],
+    "volume": 208.50986,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12adf3d80>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12adf3d80>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_ModuleNut22",
+    "label": "Tuerca M3 / union bandejas003 \u00b7 A5",
+    "box": [
+      19.25,
+      -12.0,
+      109.82457,
+      24.75,
+      -9.6,
+      116.17543
+    ],
+    "volume": 45.90884,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b11ded0>",
+      "ShapeMaterial": "<Material at 0x12b122610>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b11ded0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUBolt2",
+    "label": "M3 x 12 / soporte IMU fijo001 \u00b7 A5",
+    "box": [
+      19.15,
+      3.7,
+      117.15,
+      24.85,
+      17.4,
+      122.85
+    ],
+    "volume": 122.64228,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b11fad0>",
+      "ShapeMaterial": "<Material at 0x12b122d10>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b11fad0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUNut2",
+    "label": "Tuerca M3 / soporte IMU fijo001 \u00b7 A5",
+    "box": [
+      19.25,
+      5.4,
+      116.82457,
+      24.75,
+      7.8,
+      123.17543
+    ],
+    "volume": 45.90884,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b11ded0>",
+      "ShapeMaterial": "<Material at 0x12b123410>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b11ded0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_BatteryReserve",
+    "label": "RESERVA bateria 56 x 12 x 69 \u00b7 A5",
+    "box": [
+      -28.0,
+      -7.5,
+      38.0,
+      28.0,
+      4.5,
+      107.0
+    ],
+    "volume": 46368.0,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b11ded0>",
+      "ShapeMaterial": "<Material at 0x12b123b10>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b11ded0>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_GNSSReserve",
+    "label": "RESERVA carrier UM980 / 36 x 12 x 64 \u00b7 A5",
+    "box": [
+      -18.0,
+      12.5,
+      43.0,
+      18.0,
+      24.5,
+      107.0
+    ],
+    "volume": 27648.0,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b3d9930>",
+      "ShapeMaterial": "<Material at 0x12b30e820>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b3d9930>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_SDReference",
+    "label": "RESERVA microSD / familia 24 x 7 x 42 \u00b7 A5",
+    "box": [
+      -12.0,
+      -25.0,
+      49.0,
+      12.0,
+      -18.0,
+      91.0
+    ],
+    "volume": 7056.0,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b30e960>",
+      "ShapeMaterial": "<Material at 0x12b30f6c0>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b30e960>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUReserve",
+    "label": "REF BMI088 V1.0 / PCB 23.5x18 - posicion ajustable \u00b7 A5",
+    "box": [
+      -11.75,
+      -10.0,
+      123.8,
+      11.75,
+      8.0,
+      125.4
+    ],
+    "volume": 654.18053,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b30e960>",
+      "ShapeMaterial": "<Material at 0x12b30fd20>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b30e960>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_ESPReference",
+    "label": "ESP32 Tiny 18 x 23.5 x 2.45 \u00b7 A5",
+    "box": [
+      -9.0,
+      12.5,
+      139.0,
+      9.0,
+      14.95,
+      162.5
+    ],
+    "volume": 1036.35,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_HA901Reserve",
+    "label": "RESERVA antena externa HA901 / \u00d846 x 46 \u00b7 A5",
+    "box": [
+      -23.0,
+      -23.0,
+      168.0,
+      23.0,
+      23.0,
+      214.0
+    ],
+    "volume": 76447.51563,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_CoaxRouteReserve",
+    "label": "AZUL / recorrido coaxial \u00d85, radio minimo 10 \u00b7 A5",
+    "box": [
+      -3.5299,
+      -26.69469,
+      28.30531,
+      20.5299,
+      23.57081,
+      167.9
+    ],
+    "volume": 4069.85741,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b0ae740>",
+      "ShapeMaterial": "<Material at 0x12b0b9140>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b0ae740>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_AntennaBolt1",
+    "label": "M2.5 x 8 / antena HA-901A 1 \u00b7 A5",
+    "box": [
+      9.26814,
+      4.4,
+      162.0,
+      13.76814,
+      8.9,
+      172.5
+    ],
+    "volume": 75.22018,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b0ae740>",
+      "ShapeMaterial": "<Material at 0x12b0b9840>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b0ae740>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_AntennaWasher1",
+    "label": "Arandela 2.7 x 6 x 0.5 / antena 1 \u00b7 A5",
+    "box": [
+      8.51814,
+      3.65,
+      164.5,
+      14.51814,
+      9.65,
+      165.0
+    ],
+    "volume": 11.27439,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b0ae740>",
+      "ShapeMaterial": "<Material at 0x12b0b9f40>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b0ae740>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_AntennaBolt2",
+    "label": "M2.5 x 8 / antena HA-901A 2 \u00b7 A5",
+    "box": [
+      -13.76814,
+      4.4,
+      162.0,
+      -9.26814,
+      8.9,
+      172.5
+    ],
+    "volume": 75.22018,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_AntennaWasher2",
+    "label": "Arandela 2.7 x 6 x 0.5 / antena 2 \u00b7 A5",
+    "box": [
+      -14.51814,
+      3.65,
+      164.5,
+      -8.51814,
+      9.65,
+      165.0
+    ],
+    "volume": 11.27439,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_AntennaBolt3",
+    "label": "M2.5 x 8 / antena HA-901A 3 \u00b7 A5",
+    "box": [
+      -2.25,
+      -15.55,
+      162.0,
+      2.25,
+      -11.05,
+      172.5
+    ],
+    "volume": 75.22018,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_AntennaWasher3",
+    "label": "Arandela 2.7 x 6 x 0.5 / antena 3 \u00b7 A5",
+    "box": [
+      -3.0,
+      -16.3,
+      164.5,
+      3.0,
+      -10.3,
+      165.0
+    ],
+    "volume": 11.27439,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUTarget",
+    "label": "DATUM / centro nominal encapsulado BMI088 - no medicion \u00b7 A5",
+    "box": [
+      -1.5,
+      -2.25,
+      125.4,
+      1.5,
+      2.25,
+      126.35
+    ],
+    "volume": 12.825,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUPcbBolt1",
+    "label": "M2.5 x 10 / fijacion PCB IMU 1 \u00b7 A5",
+    "box": [
+      -11.5,
+      3.25,
+      115.9,
+      -7.0,
+      7.75,
+      128.4
+    ],
+    "volume": 88.84817,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUPcbWasher1",
+    "label": "Arandela PA 2.7 x 6 x 0.5 / IMU 1 \u00b7 A5",
+    "box": [
+      -12.25,
+      2.5,
+      125.4,
+      -6.25,
+      8.5,
+      125.9
+    ],
+    "volume": 11.27439,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUPcbBottomWasher1",
+    "label": "Arandela ancha M3 3.2 x 9 x 0.8 / IMU 1 \u00b7 A5",
+    "box": [
+      -13.75,
+      1.0,
+      118.2,
+      -4.75,
+      10.0,
+      119.0
+    ],
+    "volume": 44.45982,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUPcbNut1",
+    "label": "Tuerca M2.5 / IMU 1 \u00b7 A5",
+    "box": [
+      -12.13675,
+      3.0,
+      116.2,
+      -6.36325,
+      8.0,
+      118.2
+    ],
+    "volume": 33.48379,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUPcbBolt2",
+    "label": "M2.5 x 10 / fijacion PCB IMU 2 \u00b7 A5",
+    "box": [
+      7.0,
+      3.25,
+      115.9,
+      11.5,
+      7.75,
+      128.4
+    ],
+    "volume": 88.84817,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUPcbWasher2",
+    "label": "Arandela PA 2.7 x 6 x 0.5 / IMU 2 \u00b7 A5",
+    "box": [
+      6.25,
+      2.5,
+      125.4,
+      12.25,
+      8.5,
+      125.9
+    ],
+    "volume": 11.27439,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUPcbBottomWasher2",
+    "label": "Arandela ancha M3 3.2 x 9 x 0.8 / IMU 2 \u00b7 A5",
+    "box": [
+      4.75,
+      1.0,
+      118.2,
+      13.75,
+      10.0,
+      119.0
+    ],
+    "volume": 44.45982,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "A5_IMUPcbNut2",
+    "label": "Tuerca M2.5 / IMU 2 \u00b7 A5",
+    "box": [
+      6.36325,
+      3.0,
+      116.2,
+      12.13675,
+      8.0,
+      118.2
+    ],
+    "volume": 33.48379,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Copia embebida de A5; maestro conservado.",
+      "PreviewShape": "<Shape object at 0x12b30e960>",
+      "ShapeMaterial": "<Material at 0x12b30fd20>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12b30e960>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "TinyAdapterPosition",
+    "label": "Tiny-Adapter original \u00b7 nueva reserva vertical",
+    "box": [
+      -9.0,
+      18.0,
+      143.0,
+      9.0,
+      23.0,
+      161.0
+    ],
+    "volume": 1620.0,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Posici\u00f3n propuesta; retenci\u00f3n interior y FPC/cable se terminan al integrar m\u00f3dulos reales.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  },
+  {
+    "name": "TinyUSBPlugReserve",
+    "label": "Reserva enchufe USB-C interno",
+    "box": [
+      -4.5,
+      18.0,
+      133.8,
+      4.5,
+      23.0,
+      143.0
+    ],
+    "volume": 414.0,
+    "solids": 1,
+    "valid": true,
+    "properties": {
+      "BaseFeature": "None",
+      "Estado": "Enchufe compacto de 9.2 mm: reserva de dise\u00f1o, sin producto cerrado.",
+      "PreviewShape": "<Shape object at 0x12add5170>",
+      "ShapeMaterial": "<Material at 0x12adc6e50>",
+      "Suppressed": "False",
+      "SuppressedShape": "<Shape object at 0x12add5170>",
+      "_ElementMapVersion": "15.70200.5"
+    }
+  }
+]

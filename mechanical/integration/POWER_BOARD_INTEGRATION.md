@@ -1,5 +1,7 @@
 # Integración de Power Board Rev A
 
+> **Antecedente cancelado:** describe la PCB personalizada y exportaciones retiradas previamente por el propietario. La integración vigente de módulos comerciales se revisa en [INTEGRATION_REVIEW.md](../../docs/INTEGRATION_REVIEW.md). No ejecutar el adaptador de esta carpeta como si representara PowerBoost/SparkFun ni usar este volumen como prueba de ajuste actual.
+
 La Power Board se entrega como **un nuevo componente del assembly existente**. Sólo modela la nueva PCB, sus componentes, conectores y reservas de acceso. El propietario autorizó una placa compacta y adaptación de la integración por el responsable de la carcasa; esta entrega no cambia carcasa ni módulos externos.
 
 ## Archivos y marco local

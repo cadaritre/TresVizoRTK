@@ -1,6 +1,0 @@
-(kicad_pcb (version 20241229) (generator "pcbnew")
-(general (thickness 1.6)) (paper "A4")
-(layers (0 "F.Cu" signal) (2 "In1.Cu" power) (4 "In2.Cu" power) (31 "B.Cu" signal) (44 "Edge.Cuts" user) (49 "F.Fab" user))
-(setup (pad_to_mask_clearance 0))
-(gr_rect (start -17.5 -15) (end 17.5 15) (stroke (width 0.05) (type default)) (fill none) (layer "Edge.Cuts"))
-(gr_text "D0 35x30 - OUTLINE ONLY" (at 0 0) (layer "F.Fab") (effects (font (size 1 1) (thickness 0.15)))))

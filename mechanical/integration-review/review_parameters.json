@@ -1,0 +1,44 @@
+{
+  "units": "mm",
+  "status": "Reservas de estudio; no son posiciones de montaje aprobadas ni piezas medidas",
+  "collision_threshold_mm3": 0.001,
+  "power_module_studies": {
+    "PowerBoostEnvelope": {
+      "box": [-11.5, -28.5, 94, 23, 10, 45],
+      "basis": "23x45x10 publicado por Adafruit con USB-A. Se conserva conservador aunque USB-A no se monta. Posicion de estudio, sin soportes."
+    },
+    "SoftSwitchEnvelope": {
+      "box": [-12.7, -26, 23, 25.4, 7.5, 25.4],
+      "basis": "PCB 25.4x25.4 publicada por SparkFun; espesor total 7.5 ESTIMADO, sin plugs ni sujecion."
+    },
+    "PowerBoostServiceEnvelope": {
+      "box": [-14, -31, 90, 28, 13, 57],
+      "basis": "ESTIMADO: reserva ampliada de conexiones y acceso para estudiar sensibilidad. No equivale a modelo de JST."
+    },
+    "SoftSwitch10mmEnvelope": {
+      "box": [-12.7, -28.5, 23, 25.4, 10, 25.4],
+      "basis": "ESTIMADO: sensibilidad si altura ocupada aumenta a 10 mm manteniendo cara interior."
+    }
+  },
+  "wiring_corridors": {
+    "FrontRightPowerUart": {"points": [[20,20,43],[20,20,130]], "radius": 1.5},
+    "RearLeftSignals": {"points": [[-17,-22,51],[-17,-22,132]], "radius": 1.5},
+    "ImuSideEntry": {"points": [[-20,-15,128],[-10,-15,128]], "radius": 1.5},
+    "BatteryLeadUpper": {"points": [[-18,0,109],[-18,-20,109]], "radius": 1.5},
+    "UsbToTinyLeft": {"points": [[-13,19,133],[-13,19,151]], "radius": 2.0},
+    "ChargeLightStudy": {"points": [[16,-20,137],[16,20,137]], "radius": 1.5}
+  },
+  "corridor_basis": "ESTIMADO: volumen de tramo recto. No acredita terminales, radios de curva, longitud FPC ni rutas completas; se informan invasiones sin recortar obstaculos.",
+  "pole": {
+    "required_thread": "5/8-11 UNC female, metal",
+    "nominal_major_diameter": 15.875,
+    "pitch": 2.309090909090909,
+    "selected_part_confirmed": false,
+    "candidate": "McMaster 90611A121, ya referenciado por A5",
+    "verified_mounting_hole_centers": null,
+    "actual_female_thread_depth": null,
+    "pole_male_thread_projection": null,
+    "pole_shoulder_diameter": null,
+    "retention_fasteners": null
+  }
+}
