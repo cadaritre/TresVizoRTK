@@ -71,3 +71,7 @@ El inventario está parcialmente identificado y el primer flash del ESP32 está 
 ## Trabajo futuro adicional
 
 Una vez validada la arquitectura básica, podrá estudiarse un modo de puntos remotos que combine una dirección de apuntado con una distancia introducida desde un distanciómetro externo. No forma parte de la validación inicial.
+
+## Registro, base y distribución de correcciones
+
+El alcance ampliado, los comandos investigados, referencias de altura, sesiones PPK y los roles de entrada/publicación/caster local se detallan en [registro, base y NTRIP](recording-base-ntrip.md).

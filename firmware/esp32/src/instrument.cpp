@@ -1,6 +1,7 @@
 #include "instrument.h"
 #include "gnss_receiver.h"
 #include "config_rules.h"
+#include "base_plan.h"
 
 #include <Preferences.h>
 #include <WiFi.h>
@@ -329,7 +330,74 @@ int changeAccessKey(JsonVariantConst body, JsonDocument& response) {
 const String& accessKey() { return key; }
 const String& apName() { return networkName; }
 
+int previewBase(JsonVariantConst body, JsonDocument& response) {
+    if (!body.is<JsonObjectConst>()) { error(response, "invalid_plan", "Se esperaba un plan de base."); return 400; }
+    for (JsonPairConst field : body.as<JsonObjectConst>()) {
+        const String name = field.key().c_str();
+        if (name != "method" && name != "station_id" && name != "datum" && name != "coordinate_epoch" &&
+            name != "latitude_deg" && name != "longitude_deg" && name != "ellipsoid_height_m" &&
+            name != "antenna_vertical_m" && name != "height_point" && name != "average_seconds" && name != "reuse_distance_m") {
+            error(response, "invalid_plan", "Campo de plan desconocido."); return 400;
+        }
+    }
+    if (!body["station_id"].is<unsigned>() || body["station_id"].as<unsigned>() > 4095) {
+        error(response, "invalid_station", "Identificador de estación: 0 a 4095."); return 400;
+    }
+    const String method = body["method"] | "";
+    JsonDocument plan;
+    plan["station_id"] = body["station_id"];
+    plan["method"] = method;
+    if (method == "known") {
+        if (!validString(body["datum"], config_rules::deviceName) ||
+            !body["latitude_deg"].is<double>() || !body["longitude_deg"].is<double>() ||
+            !body["ellipsoid_height_m"].is<double>() || !body["antenna_vertical_m"].is<double>() ||
+            (!body["coordinate_epoch"].isNull() && (!body["coordinate_epoch"].is<double>() ||
+                body["coordinate_epoch"].as<double>() < 1900 || body["coordinate_epoch"].as<double>() > 2200))) {
+            error(response, "invalid_coordinates", "Revisa coordenadas numéricas, datum y época decimal opcional."); return 400;
+        }
+        const String point = body["height_point"] | "";
+        double arp;
+        if ((point != "marker" && point != "arp") || !base_plan::known(body["latitude_deg"], body["longitude_deg"],
+            body["ellipsoid_height_m"], body["antenna_vertical_m"], point == "marker", arp)) {
+            error(response, "invalid_height", "Coordenadas o alturas fuera de rango; usa altura elipsoidal y medida vertical."); return 400;
+        }
+        for (const char* field : {"datum", "coordinate_epoch", "latitude_deg", "longitude_deg", "ellipsoid_height_m", "antenna_vertical_m", "height_point"}) plan[field] = body[field];
+        plan["arp_ellipsoid_height_m"] = arp;
+        plan["height_reference"] = "ellipsoidal";
+        plan["datum_transformed"] = false;
+    } else if (method == "average") {
+        if (!body["average_seconds"].is<unsigned>() || !body["reuse_distance_m"].is<double>() ||
+            !base_plan::average(body["average_seconds"], body["reuse_distance_m"])) {
+            error(response, "invalid_average", "Promedio: 1–3600 s; reutilización: 0–10 m."); return 400;
+        }
+        plan["average_seconds"] = body["average_seconds"];
+        plan["reuse_distance_m"] = body["reuse_distance_m"];
+    } else { error(response, "invalid_method", "Elige coordenadas conocidas o promedio."); return 400; }
+    response["schema_version"] = 1;
+    response["applied"] = false;
+    response["persisted"] = false;
+    response["plan"] = plan.as<JsonVariant>();
+    response["message"] = "Plan preparado. No enviado al GPS ni guardado en el equipo. Datum, antena y aplicación física pendientes de verificación.";
+    return 200;
+}
+
 int request(const String& method, const String& path, JsonVariantConst body, JsonDocument& response) {
+    if (method == "POST" && path == "/api/base/plan") return previewBase(body, response);
+    if (method == "GET" && path == "/api/operations") {
+        response["base"]["state"] = "not_integrated";
+        response["base"]["can_preview"] = true;
+        response["base"]["can_apply"] = false;
+        response["recording"]["state"] = "storage_not_integrated";
+        response["recording"]["can_start"] = false;
+        response["recording"]["can_stop"] = false;
+        response["recording"]["can_export"] = false;
+        response["recording"]["sessions"] = nullptr;
+        for (const char* role : {"input", "publisher", "local_caster"}) {
+            response["corrections"][role]["state"] = "not_integrated";
+            response["corrections"][role]["can_start"] = false;
+        }
+        return 200;
+    }
     if (method == "GET" && path == "/api/status") { status(response); return 200; }
     if (method == "GET" && path == "/api/config") { config(response); return 200; }
     if (method == "PUT" && path == "/api/config") return saveConfig(body, response);

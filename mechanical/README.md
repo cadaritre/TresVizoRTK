@@ -1,12 +1,15 @@
 # Diseño mecánico
 
-Revisión actual: [A3 — base imprimible para el jalón](cad/README-A3.md). Sustituye el montaje de placas metálicas por una base con alojamiento hexagonal, tapa y calce impresos. Sólo requiere tornillería comercial. Conserva la entrada bajo la antena y el recorrido coaxial A2.
+**Criterio de rediseño actual: [simplificación para impresión y montaje — A4](research/redesign-for-printing.md).** Se propone base de una pieza con inserto comercial atornillable y bandejas interiores que se impriman acostadas. Es una revisión de arquitectura; todavía no existe un CAD A4 terminado. El [CAD A3](cad/README-A3.md) queda como antecedente y no satisface este nuevo criterio de simplicidad.
 
 El concepto es una carcasa cilíndrica impresa en 3D, inspirada en el Reach RX, para un receptor montado sobre jalón. A3 retiene una tuerca comercial 5/8-11 y deja la HA-901A arriba con su envolvente original. Las [fuentes iniciales](research/component-dimensions.md) se complementan con las referencias de cada revisión. A0/A1/A2 se conservan como historial; sus montajes anteriores no son la propuesta actual. Todavía no es un modelo validado para fabricar y montar el receptor completo.
 
 ## Criterios previstos
 
 - Fabricar todas las piezas estructurales adicionales por impresión 3D; sólo tornillos, tuercas y arandelas comerciales de metal. No exigir placas ni casquillos metálicos a medida.
+- Preferir para el jalón un inserto con brida comprado terminado, sujeto directamente a una base impresa de una pieza. Su rosca objetivo es 5/8-11 UNC; no confundirla con 3/8-16.
+- Sustituir la jaula de postes largos por bandejas con apoyo amplio, nervios cortos y orientación de impresión definida. Integrar soportes de placas cuando no complique impresión o acceso.
+- Usar ranuras cortas sólo en placas que admitan ajuste, con retención contra giro y protección de pistas. Mantener referencias mecánicas controladas para IMU y antena/conector.
 - Mantener la antena y el montaje del jalón alineados mecánicamente.
 - Montar la IMU rígidamente y cerca del eje del jalón.
 - Incorporar una referencia física inequívoca de “frente” en la carcasa.

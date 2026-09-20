@@ -3,6 +3,9 @@ const $ = (id) => document.getElementById(id);
 const pageNames = {
   overview: "Resumen",
   connections: "Conexiones",
+  base: "Base / rover",
+  recording: "Registro / PPK",
+  corrections: "Correcciones",
   settings: "Configuración",
   diagnostics: "Diagnóstico",
 };
@@ -357,3 +360,57 @@ window.addEventListener("beforeunload", (event) => {
 });
 goTo(location.hash.slice(1));
 poll();
+
+
+let preparedBase = null;
+function invalidateBasePlan() {
+  preparedBase = null;
+  $("base-export").disabled = true;
+  text("base-result", "Cambios sin validar. El plan no se guarda ni aplica al equipo.");
+}
+$("base-plan-form").addEventListener("input", invalidateBasePlan);
+$("base-method").addEventListener("change", () => {
+  const known = $("base-method").value === "known";
+  $("base-known").hidden = !known;
+  $("base-known").disabled = !known;
+  $("base-average").hidden = known;
+  $("base-average").disabled = known;
+  invalidateBasePlan();
+});
+$("base-plan-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const method = $("base-method").value;
+  const plan = { method, station_id: Number($("base-id").value) };
+  if (method === "known") Object.assign(plan, {
+    latitude_deg: Number($("base-lat").value), longitude_deg: Number($("base-lon").value),
+    datum: $("base-datum").value.trim(), coordinate_epoch: $("base-epoch").value === "" ? null : Number($("base-epoch").value),
+    height_point: $("base-height-point").value, ellipsoid_height_m: Number($("base-height").value),
+    antenna_vertical_m: Number($("base-antenna").value),
+  });
+  else Object.assign(plan, { average_seconds: Number($("base-seconds").value), reuse_distance_m: Number($("base-reuse").value) });
+  const marker = ++basePlanRequest;
+  try {
+    const result = await api("/api/base/plan", "POST", plan);
+    if (marker !== basePlanRequest) return;
+    preparedBase = result;
+    $("base-export").disabled = false;
+    text("base-result", result.message + (result.plan.arp_ellipsoid_height_m !== undefined ?
+      ` Altura elipsoidal ARP: ${result.plan.arp_ellipsoid_height_m.toFixed(4)} m.` :
+      " El promedio no garantiza exactitud absoluta."));
+  } catch (error) {
+    if (marker !== basePlanRequest) return;
+    preparedBase = null;
+    $("base-export").disabled = true;
+    text("base-result", error.message);
+  }
+});
+let basePlanRequest = 0;
+$("base-plan-form").addEventListener("input", () => { ++basePlanRequest; });
+$("base-plan-form").addEventListener("change", () => { ++basePlanRequest; });
+$("base-export").addEventListener("click", () => {
+  if (!preparedBase) return;
+  const url = URL.createObjectURL(new Blob([JSON.stringify(preparedBase, null, 2)], { type: "application/json" }));
+  const link = document.createElement("a");
+  link.href = url; link.download = "tresvizo-base-plan.json"; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});

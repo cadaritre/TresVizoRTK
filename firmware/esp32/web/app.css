@@ -1173,3 +1173,14 @@ dialog form > .button {
     line-height: 19px;
   }
 }
+
+/* Apartados de operación: navegación completa también en pantallas pequeñas. */
+fieldset { border: 1px solid var(--line, #dfe4ec); border-radius: 12px; padding: 18px; margin: 20px 0; min-width: 0; }
+fieldset[hidden] { display: none; }
+legend { padding: 0 8px; font-weight: 600; }
+fieldset:disabled { opacity: .65; }
+#base-result { overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: visible; }
+  .nav-item { width: auto; min-width: 0; flex-direction: column; font-size: 10px; padding: 8px 3px; }
+}

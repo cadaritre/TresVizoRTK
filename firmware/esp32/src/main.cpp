@@ -216,7 +216,7 @@ void setup() {
             if (httpd_register_uri_handler(server, &route) != ESP_OK) Serial.println("Error al registrar ruta HTTP.");
         }
     } else Serial.println("Error al iniciar el servidor web. Consola USB disponible.");
-    Serial.println("TresVizo RTK 0.2.0. Consola JSON USB disponible.");
+    Serial.println("TresVizo RTK 0.3.0. Consola JSON USB disponible.");
 }
 
 void loop() {

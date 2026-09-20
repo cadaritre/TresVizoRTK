@@ -1,5 +1,7 @@
 # A3 — base imprimible para el jalón
 
+**Antecedente: pendiente de reconstrucción según el [criterio A4 para impresión y montaje](../research/redesign-for-printing.md).** A3 conserva una jaula de postes largos y demasiados soportes separados; sus pruebas geométricas no resuelven esos problemas.
+
 La estructura del montaje se fabrica por impresión 3D. **Sólo se compran tornillos, tuercas y arandelas comerciales.** A3 elimina las tres placas, los ocho casquillos y el calce metálicos de A1/A2. Conserva la antena exterior y el recorrido coaxial de A2.
 
 ## Cómo se sujeta
@@ -44,7 +46,7 @@ Para la base, colocar la cara Z=0 en la cama; para tapa y calce, sus caras plana
 
 ## Verificación y límites
 
-Se verifican sólidos individuales, intersecciones entre piezas, mallas cerradas, inserción vertical de la tuerca principal y de las cuatro tuercas radiales, paso de las tres envolventes de espárrago y conservación del espacio coaxial Ø5 de A2. Los resultados numéricos quedan en `cad-checks.json`; `reopen-checks.json` comprueba reapertura nativa/STEP. Las entradas de tuercas se ensayan geométricamente antes de cerrar la tapa y colocar el bastidor.
+Se verificaron **42 sólidos válidos, 13 mallas imprimibles cerradas y ninguna intersección entre piezas** mayor a 0.02 mm³. Se comprobó la inserción vertical de la tuerca principal y de las cuatro tuercas radiales, el paso de las tres envolventes de espárrago y la conservación del espacio coaxial Ø5 de A2. El giro de prueba de 30° de la tuerca interfiere con el hexágono, y los desplazamientos axiales de ±1 mm encuentran el suelo o la tapa, confirmando la retención geométrica. Esto no mide resistencia. Los resultados numéricos quedan en `cad-checks.json`; `reopen-checks.json` comprueba reapertura nativa/STEP. Las entradas de tuercas se ensayan geométricamente antes de cerrar la tapa y colocar el bastidor.
 
 La estructura es un prototipo pendiente de prueba física de ajuste y carga. Conserva los pendientes de A2: patrones de algunas placas/antena, conectores y fijación/sellado del coaxial, batería y alimentación. **El encendido tampoco está resuelto:** `LatchReserve` sólo reserva espacio al módulo biestable; no hay un pulsador exterior ni circuito de alimentación verificado. No confundir la ausencia de botón de medición con la necesidad de resolver el encendido.
 

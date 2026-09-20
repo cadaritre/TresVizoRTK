@@ -119,7 +119,7 @@ def serve(device, port):
                 path = assets[self.path]
                 mime = mimetypes.guess_type(path)[0] or "application/octet-stream"
                 return self.respond(200, path.read_bytes(), mime)
-            if self.path not in {"/api/status", "/api/config", "/api/restart"}:
+            if self.path not in {"/api/status", "/api/config", "/api/restart", "/api/operations", "/api/base/plan"}:
                 return self.respond(404, {"error": "not_found"})
             if self.headers.get("X-TresVizo-Client") != "portal":
                 return self.respond(403, {"error": "client_header_required"})

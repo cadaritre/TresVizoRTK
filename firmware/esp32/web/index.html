@@ -31,6 +31,9 @@
         <button class="nav-item" data-page="connections">
           <span aria-hidden="true">⌁</span> Conexiones
         </button>
+        <button class="nav-item" data-page="base"><span aria-hidden="true">⌖</span> Base / rover</button>
+        <button class="nav-item" data-page="recording"><span aria-hidden="true">◉</span> Registro / PPK</button>
+        <button class="nav-item" data-page="corrections"><span aria-hidden="true">⇄</span> Correcciones</button>
         <button class="nav-item" data-page="settings">
           <span aria-hidden="true">☷</span> Configuración
         </button>
@@ -41,7 +44,7 @@
       <div class="sidebar-bottom">
         <span class="eyebrow">TRESVIZO INGENIERÍA</span>
         <p>Tecnología que<br />conecta con el terreno.</p>
-        <span class="version">PROTOTIPO <b>0.1.0</b></span>
+        <span class="version">PROTOTIPO <b>0.3.0</b></span>
       </div>
     </aside>
     <div class="workspace">
@@ -293,6 +296,46 @@
               </p>
             </article>
           </div>
+        </section>
+        <section class="page" id="page-base" aria-labelledby="base-title" hidden>
+          <div class="page-heading"><div><p class="eyebrow">FUNCIÓN DEL RECEPTOR</p><h1 id="base-title">Base / rover</h1><p class="intro">Prepara la estación y comprueba sus referencias antes de aplicarla.</p></div></div>
+          <div class="notice">El cambio de modo aún requiere integrar el enlace al GPS. Preparar un plan no cambia el modo del receptor.</div>
+          <div class="two-columns lower">
+            <article class="panel"><h2>Modo del equipo</h2><p>Modo efectivo: <strong>No consultado</strong></p><button class="button secondary" disabled>Activar rover topográfico</button><p>El rover recibirá correcciones desde la app por BLE o desde un caster por Wi-Fi.</p><button class="button secondary" data-page="corrections">Ver correcciones ↗</button></article>
+            <article class="panel"><h2>Base con referencia conocida</h2><p>Conserva el datum, la época y el origen de tus coordenadas. La altura del punto y la altura de antena son valores distintos.</p><p>El promedio autónomo sirve para establecer una referencia local; no garantiza coordenadas centimétricas absolutas.</p></article>
+          </div>
+          <form id="base-plan-form" class="panel lower">
+            <h2>Preparar estación base</h2>
+            <label for="base-method">Origen de coordenadas</label><select id="base-method"><option value="known">Coordenadas conocidas</option><option value="average">Promedio del receptor</option></select>
+            <label for="base-id">Identificador de estación</label><input id="base-id" type="number" min="0" max="4095" step="1" value="1" required />
+            <fieldset id="base-known"><legend>Coordenadas y antena</legend>
+              <div class="two-columns"><div><label for="base-lat">Latitud (grados decimales)</label><input id="base-lat" type="number" min="-90" max="90" step="any" required /></div><div><label for="base-lon">Longitud (grados decimales)</label><input id="base-lon" type="number" min="-180" max="180" step="any" required /></div></div>
+              <label for="base-datum">Datum / marco de referencia</label><input id="base-datum" maxlength="32" placeholder="Marco de las coordenadas de origen" required /><small class="field-help">Declararlo no transforma las coordenadas. Se comprobará su compatibilidad con el receptor.</small>
+              <label for="base-epoch">Época de coordenadas (año decimal, opcional)</label><input id="base-epoch" type="number" min="1900" max="2200" step="any" />
+              <label for="base-height-point">La altura corresponde a</label><select id="base-height-point"><option value="marker">Punto materializado en el terreno</option><option value="arp">Punto de referencia de antena (ARP)</option></select>
+              <label for="base-height">Altura elipsoidal (m)</label><input id="base-height" type="number" min="-30000" max="30000" step="any" required />
+              <label for="base-antenna">Altura vertical del punto al ARP (m)</label><input id="base-antenna" type="number" min="0" max="100" step="any" required /><small class="field-help">Medición vertical, no inclinada. Si la coordenada ya es del ARP, no se vuelve a sumar. Alturas ortométricas requieren conversión previa.</small>
+            </fieldset>
+            <fieldset id="base-average" hidden disabled><legend>Promedio autónomo</legend><label for="base-seconds">Tiempo máximo (s)</label><input id="base-seconds" type="number" min="1" max="3600" step="1" value="300" required /><label for="base-reuse">Distancia de reutilización de coordenada guardada (m)</label><input id="base-reuse" type="number" min="0" max="10" step="any" value="0" required /><small class="field-help">Cero solicita una nueva solución promedio. Este parámetro no es una tolerancia de precisión garantizada.</small></fieldset>
+            <div class="save-bar"><button class="button primary" type="submit">Validar y preparar plan</button><button id="base-export" class="button secondary" type="button" disabled>Exportar plan JSON</button><button class="button secondary" type="button" disabled>Aplicar base al GPS</button></div>
+            <p id="base-result" role="status">El plan se prepara en memoria y se puede descargar; todavía no se guarda ni aplica en el equipo.</p>
+          </form>
+        </section>
+        <section class="page" id="page-recording" aria-labelledby="recording-title" hidden>
+          <div class="page-heading"><div><p class="eyebrow">OBSERVACIONES Y SESIONES</p><h1 id="recording-title">Registro / PPK</h1><p class="intro">Graba observaciones para procesarlas después y conserva el contexto de cada sesión.</p></div></div>
+          <div class="notice" id="recording-availability">Registro sin habilitar: falta integrar la microSD y las observaciones crudas del GNSS.</div>
+          <div class="two-columns lower"><article class="panel"><h2>Nueva sesión</h2><fieldset disabled><legend>Opciones de grabación pendientes</legend><label for="record-name">Nombre de sesión</label><input id="record-name" placeholder="Nombre del levantamiento" /><label for="record-role">Tipo de sesión</label><select id="record-role"><option>Rover cinemático</option><option>Base estática</option></select><label for="record-rate">Frecuencia de observaciones</label><select id="record-rate"><option>1 Hz</option><option>5 Hz</option><option>10 Hz · pendiente de validar</option></select><label for="record-antenna">Modelo de antena</label><input id="record-antenna" placeholder="Identificación de la antena" /><label for="record-height">Altura vertical al ARP (m)</label><input id="record-height" type="number" min="0" step="any" /></fieldset><div class="save-bar"><button class="button primary" disabled>Iniciar grabación</button><button class="button secondary" disabled>Detener y cerrar</button></div><small class="field-help">Detener deberá vaciar las colas y cerrar el archivo antes de confirmar que puede apagarse.</small></article>
+          <article class="panel"><h2>Estado de grabación</h2><dl class="solution-values"><div><dt>Sesión activa</dt><dd>No disponible</dd></div><div><dt>Tiempo / bytes</dt><dd>—</dd></div><div><dt>Espacio en microSD</dt><dd>Sin lectura</dd></div><div><dt>Épocas perdidas</dt><dd>Sin medición</dd></div></dl><p>La grabación deberá continuar aunque se cierre el panel o se desconecte la app.</p><p>Los datos crudos permiten postproceso; un CSV de posiciones no los sustituye.</p></article></div>
+          <article class="panel lower"><h2>Sesiones y exportación</h2><p>No se puede consultar el catálogo hasta integrar el almacenamiento.</p><div class="save-bar"><button class="button secondary" disabled>Descargar datos nativos + metadatos</button><button class="button secondary" disabled>Exportar RINEX OBS / NAV</button><button class="button secondary" disabled>Exportar soluciones CSV</button></div><p>Las descargas serán por Wi-Fi. La conversión RINEX y el cálculo PPK requieren validación y se realizarán inicialmente fuera del ESP32.</p></article>
+        </section>
+        <section class="page" id="page-corrections" aria-labelledby="corrections-title" hidden>
+          <div class="page-heading"><div><p class="eyebrow">RTCM Y CONECTIVIDAD</p><h1 id="corrections-title">Correcciones</h1><p class="intro">Recibe correcciones como rover o distribuye las de tu base.</p></div></div>
+          <div class="notice" id="corrections-availability">Los transportes NTRIP están pendientes de integración. Ninguna conexión se inicia desde estos controles todavía.</div>
+          <div class="two-columns lower">
+            <article class="panel"><h2>Entrada NTRIP · rover</h2><p>App con internet → BLE → ESP32 → GPS, o conexión directa del ESP32 al caster por Wi-Fi.</p><fieldset disabled><legend>Fuente de correcciones</legend><label for="ntrip-input-path">Transporte</label><select id="ntrip-input-path"><option>Desde app por BLE</option><option>Directo por Wi-Fi</option></select><label for="ntrip-input-host">Caster (hostname o IP)</label><input id="ntrip-input-host" /><label for="ntrip-input-port">Puerto</label><input id="ntrip-input-port" type="number" value="2101" /><label for="ntrip-input-mount">Mountpoint</label><input id="ntrip-input-mount" /><label for="ntrip-input-user">Usuario</label><input id="ntrip-input-user" autocomplete="off" /><label for="ntrip-input-pass">Contraseña</label><input id="ntrip-input-pass" type="password" autocomplete="new-password" /><label class="checkbox-label"><input type="checkbox" /> TLS</label><label class="checkbox-label"><input type="checkbox" /> Enviar GGA al caster cuando lo requiera</label></fieldset><button class="button primary" disabled>Conectar entrada</button><p>Estado: sin integrar · RTCM recibido: — · Edad de correcciones: —</p></article>
+            <article class="panel"><h2>Publicación NTRIP · base</h2><p>GPS → ESP32 → caster externo → rovers. Las credenciales de publicación pueden ser diferentes de las de recepción.</p><fieldset disabled><legend>Destino de publicación</legend><label for="ntrip-output-host">Caster destino (hostname o IP LAN)</label><input id="ntrip-output-host" /><label for="ntrip-output-port">Puerto</label><input id="ntrip-output-port" type="number" value="2101" /><label for="ntrip-output-mount">Mountpoint de la base</label><input id="ntrip-output-mount" /><label for="ntrip-output-user">Usuario de fuente</label><input id="ntrip-output-user" autocomplete="off" /><label for="ntrip-output-pass">Contraseña de fuente</label><input id="ntrip-output-pass" type="password" autocomplete="new-password" /><label for="ntrip-output-version">Protocolo</label><select id="ntrip-output-version"><option>NTRIP v2</option><option>NTRIP v1</option></select><label class="checkbox-label"><input type="checkbox" /> TLS</label></fieldset><button class="button primary" disabled>Iniciar publicación</button><p>Estado: sin integrar · RTCM enviado: — · Reconexiones: —</p></article>
+          </div>
+          <article class="panel lower"><h2>Caster propio · red local</h2><p>Previsto dentro del ESP32, o en una Mac/PC/Raspberry Pi de la misma red. La opción externa usa la publicación NTRIP de arriba hacia la IP LAN del servidor.</p><fieldset disabled><legend>Caster integrado en el ESP32 · pendiente</legend><label for="caster-network">Red de acceso</label><select id="caster-network"><option>Wi-Fi del equipo (AP)</option><option>Red local del sitio (LAN)</option></select><label for="caster-port">Puerto local</label><input id="caster-port" type="number" value="2101" /><label for="caster-mount">Mountpoint local</label><input id="caster-mount" value="TRESVIZO" /><label for="caster-user">Usuario rover</label><input id="caster-user" autocomplete="off" /><label for="caster-pass">Contraseña rover</label><input id="caster-pass" type="password" autocomplete="new-password" /><label for="caster-clients">Límite propuesto de rovers</label><input id="caster-clients" type="number" value="2" /></fieldset><button class="button primary" disabled>Iniciar caster local</button><p>Dirección disponible: — · Clientes conectados: — · Capacidad pendiente de pruebas.</p><p>La distribución local no necesita internet. Los rovers deben alcanzar la IP y puerto del caster; el panel web y el caster son servicios distintos.</p></article>
         </section>
         <section
           class="page"

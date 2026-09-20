@@ -53,3 +53,12 @@ Los comandos y precauciones específicas del puerto están en el [README del fir
 - Panel local recargado y revisado en navegador: versión 0.2.0, conectado al ESP32, sin enlace GNSS y sin coordenadas inventadas.
 - El UM980 por USB a la Mac entrega UTC a 10.00 Hz en el segmento continuo observado, con 0 duplicados y máximo intervalo de llegada de 102 ms. Se detectó una discontinuidad inicial de hora. No hubo solución válida: calidad 0, satélites usados 0. Son épocas de mensajes, no diez posiciones válidas por segundo.
 - Quedan pendientes prueba Wi-Fi desde otro cliente con la nueva clave, cableado y adquisición física UART, BLE, RTCM y sensores. El refresco HTTP sigue siendo diagnóstico, no la tasa de adquisición.
+
+
+## Actualización 0.3.0 — apartados de registro/base/NTRIP
+
+- Compilación y carga verificadas. Captura de GNSS y modo del receptor no modificados en esta entrega.
+- `tests/operations_smoke.py`: 27 comprobaciones de capacidades, coordenadas, límites, tipos, autenticación, altura ARP sin doble suma y conservación de ajustes. La primera ejecución detectó un error de comparación en la prueba (ID de solicitud variable); se corrigió para comparar el cuerpo de configuración y la ejecución posterior pasó.
+- `base_plan_test.cpp`: límites y cálculo con AddressSanitizer/UndefinedBehaviorSanitizer. Pasó también `tests/gnss_panel_test.js`.
+- Navegador: revisados los tres apartados, controles pendientes deshabilitados y un plan sintético con altura del punto 100 m + antena 2 m que devolvió ARP 102 m. Plan de prueba retirado recargando, sin persistencia ni aplicación al GPS.
+- Ajustada y revisada visualmente la navegación de siete apartados en pantalla estrecha. Grabación real, RINEX, aplicación de base y conexiones NTRIP no probadas porque sus controladores siguen pendientes.

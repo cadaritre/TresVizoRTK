@@ -53,3 +53,8 @@ UM980 identificado por USB y salida GGA activada temporalmente a 0.1 s. Parser c
 ## Firmware cargado: 0.2.0
 
 Clave de acceso actualizada por USB y persistencia comprobada. Panel GNSS conectado a la API y adquisición UART opcional preparada; UART desactivada mientras las placas sigan separadas. Repetidas las 28 pruebas de hardware con éxito. La captura del UM980 en la Mac entrega UTC a 10 Hz, todavía sin solución válida. BLE continúa pendiente de implementación; su papel principal de operación/correcciones está definido en la arquitectura.
+
+
+## Firmware cargado: 0.3.0 — apartados de operación
+
+Agregados Base / rover, Registro / PPK y Correcciones con entrada NTRIP, publicación externa y caster local. Preparación y exportación de planes de base operativas; aplicación física, grabación, RINEX y transportes todavía no integrados. Pasaron 27 comprobaciones de la API en el ESP32 y pruebas del cálculo de alturas con sanitizadores. El plan de implementación y comandos investigados está en [registro, base y NTRIP](recording-base-ntrip.md).

@@ -96,3 +96,7 @@ La IMU y GNSS aportarán mediciones con tiempos y marcos de referencia distintos
 - **Interfaz GNSS:** pendiente de confirmar en la carrier real, incluidos niveles, tasas y señales temporales.
 
 Los detalles eléctricos se mantienen en [interfaces y conexiones](../hardware/wiring.md). Las decisiones deben reflejarse también en [el estado del proyecto](project-status.md).
+
+## Registro, base y distribución de correcciones
+
+El alcance ampliado, los comandos investigados, referencias de altura, sesiones PPK y los roles de entrada/publicación/caster local se detallan en [registro, base y NTRIP](recording-base-ntrip.md).

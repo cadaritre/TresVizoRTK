@@ -1,6 +1,6 @@
 # Firmware inicial del instrumento
 
-Versión 0.2.0 para el ESP32-S3 conectado por USB. El perfil usa 4 MB de flash comprobados por esptool. La placa de referencia de PlatformIO aporta la configuración de CPU/USB; no identifica la carrier como DevKitC ni autoriza sus pines externos. PSRAM desactivada en esta etapa.
+Versión 0.3.0 para el ESP32-S3 conectado por USB. El perfil usa 4 MB de flash comprobados por esptool. La placa de referencia de PlatformIO aporta la configuración de CPU/USB; no identifica la carrier como DevKitC ni autoriza sus pines externos. PSRAM desactivada en esta etapa.
 
 ## Funciones implementadas
 
@@ -99,3 +99,12 @@ La prueba de hardware guarda ajustes temporales, reinicia el equipo y restaura l
 Con el puente detenido, ejecutar `python tools/usb_console.py set-access` e introducir dos veces la nueva clave en el prompt oculto. La operación solo existe por USB, requiere la clave actual (la consola la recupera por acceso físico), valida 8–63 caracteres ASCII imprimibles y reinicia después de guardar en NVS. Una solicitud inválida no cambia la clave. La clave anterior permanece activa hasta el reinicio; la nueva no se incluye en la respuesta ni en estado/configuración. No pasar credenciales como argumentos del shell ni guardarlas en el repositorio.
 
 El panel representa estado GNSS, calidad y coordenadas recibidas por el ESP32, diferenciando datos antiguos y falta de posición. La tarea UART y el parser compartido se describen en [adquisición GNSS](../../docs/gnss-bringup.md). La UART sigue desactivada por defecto hasta verificar y conectar las placas; tener ambas conectadas por USB a la Mac no las comunica entre sí.
+
+
+## Apartados de operación (0.3.0)
+
+El panel incluye Base / rover, Registro / PPK y Correcciones (entrada, publicación y caster local). El preparador de base valida datos y calcula altura elipsoidal ARP; permite exportar un plan JSON. No aplica comandos ni persiste ese plan. Los controles de registro/transferencia/cambio de modo permanecen deshabilitados con su motivo real.
+
+- `GET /api/operations`: capacidades actuales; catálogo de sesiones nulo mientras no pueda consultarse almacenamiento.
+- `POST /api/base/plan`: preparación autenticada con `method` (`known`/`average`) e `station_id`; devuelve `applied: false` y `persisted: false`. Los campos y límites se describen en [registro, base y NTRIP](../../docs/recording-base-ntrip.md).
+- `python tests/operations_smoke.py`: valida la API en el ESP32 sin cambiar modo, guardar coordenadas ni transmitir correcciones.

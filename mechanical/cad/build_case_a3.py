@@ -94,7 +94,8 @@ def build():
     for x,y in bolt_xy: cap=cap.cut(a0.cyl(2.25,7,x,y,17))
     add(plastic,'UpperRetainer','IMPRIMIR tapa de retencion / 3.3 mm',cap,(0.86,0.55,0.22),
         'Retiene tuerca contra salida axial; 4 M4 pasantes sujetan base, tapa y bastidor.')
-    nut=source.PoleNut.Shape.copy(); nut.translate(V(0,0,C['nut_z']-a1.C['nut_z']))
+    nut=a1.hexagon(C['nut_af_max'],C['nut_height_max'],C['nut_z'])
+    nut=nut.cut(a0.cyl(15.875/2,C['nut_height_max']+2,z=C['nut_z']-1))
     add(hardware,'PoleNut','COMPRAR tuerca hexagonal 5-8-11 UNC',nut,(0.88,0.68,0.25),
         'Tuerca comercial, NO imprimir. Geometria nominal simplificada sin helice; AF y altura segun HN58.',C['nut_source'])
     shim_z=C['nut_z']+C['nut_height_max']
@@ -145,6 +146,14 @@ def build():
         n=nut.copy(); n.translate(V(0,0,k*0.5))
         if n.common(base).Volume>0.02: insertion.append(k*0.5)
     audit['assembly_checks']['main_nut_vertical_insertion_collisions']=insertion
+    rotated=nut.copy(); rotated.rotate(V(),V(0,0,1),30)
+    raised=nut.copy(); raised.translate(V(0,0,1))
+    lowered=nut.copy(); lowered.translate(V(0,0,-1))
+    retention={'rotation_30deg_block_volume_mm3':rotated.common(base).Volume,
+               'upward_1mm_block_volume_mm3':raised.common(cap).Volume,
+               'downward_1mm_block_volume_mm3':lowered.common(base).Volume}
+    audit['assembly_checks']['retention_geometric_checks']=retention
+    assert all(v>0.02 for v in retention.values()),retention
     radial=[]
     for i in range(1,5):
         for k in range(25):
