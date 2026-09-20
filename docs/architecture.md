@@ -4,6 +4,8 @@ La arquitectura separa el procesamiento del receptor GNSS, la coordinación del 
 
 El producto previsto es un receptor GNSS RTK de triple banda con IMU y lector microSD. El software del ESP32-S3 debe concentrar la configuración y operación del instrumento, con robustez y experiencia de uso tipo Emlid como referencia de producto, sin asumir equivalencia funcional ni rendimiento demostrado. La app topográfica es un desarrollo independiente, todavía sin iniciar.
 
+La versión 0.1.0 implementa el arranque del ESP32, un panel web de configuración y diagnóstico, Wi-Fi AP/STA y persistencia de ajustes. El resto de las responsabilidades siguientes describe el alcance previsto; consulta el [estado](project-status.md) para distinguirlo de lo implementado.
+
 La cobertura de triple banda deberá verificarse para el conjunto real de receptor, firmware y antena. Las interfaces eléctricas y los modelos de placa siguen pendientes de identificación.
 
 ## Responsabilidades
@@ -30,7 +32,7 @@ El UM980 es el receptor principal previsto. El ZED-F9P queda disponible para pru
 - Exponer a la app un protocolo propio del instrumento.
 - Gestionar estado, energía y apagado seguro.
 
-El firmware será responsable del estado y la configuración efectiva del equipo. La interfaz de usuario para configurarlo queda por definir; la app podrá consultar y solicitar ajustes mediante el protocolo propio. Todavía no se ha elegido una interfaz web, pantalla u otro mecanismo de configuración.
+El firmware será responsable del estado y la configuración efectiva del equipo. La interfaz inicial es un panel web alojado en la flash del ESP32, accesible por su red Wi-Fi. Para desarrollo existe un puente local USB que muestra los mismos archivos del panel y consulta el ESP32 real. La app futura podrá consultar y solicitar ajustes mediante el protocolo propio.
 
 La robustez deberá demostrarse con pruebas de desconexión y reconexión, pérdida de correcciones, reinicios, configuración inválida, falta de espacio y cierre o recuperación de registros. Los diagnósticos deberán permitir conocer el estado real de cada subsistema.
 
@@ -60,7 +62,7 @@ La app no debe depender directamente de comandos Unicore, UBX ni de detalles int
 3. El ESP32 normaliza la información al protocolo del instrumento.
 4. La app recibe control y telemetría principalmente por BLE.
 
-El objetivo de telemetría hacia la app es 20 Hz, pendiente de pruebas de rendimiento, latencia, consumo y estabilidad.
+El requisito mínimo es recibir 10 épocas GNSS distintas por segundo y entregarlas a la app; el objetivo ampliado es 20 Hz. Deben medirse frecuencia de medición, llegada, pérdidas y antigüedad por separado. El refresco de diagnósticos HTTP (2 s por defecto) no gobierna la adquisición UART. Frecuencia y latencia extremo a extremo siguen pendientes de validación.
 
 ### Correcciones NTRIP directas
 
@@ -69,9 +71,13 @@ El objetivo de telemetría hacia la app es 20 Hz, pendiente de pruebas de rendim
 3. El ESP32 entrega RTCM compatible al receptor GNSS.
 4. El sistema supervisa antigüedad, continuidad y pérdida de correcciones.
 
-### Transporte futuro de correcciones por BLE
+### Correcciones y operación principal por BLE (pendiente de implementar)
 
-Como alternativa, la app podría obtener RTCM desde NTRIP y reenviarlo al ESP32 por BLE. Este flujo se documenta únicamente como transporte de correcciones; BLE no se plantea como acceso genérico del ESP32 a Internet.
+La app obtendrá RTCM desde NTRIP usando el internet del teléfono y lo reenviará al ESP32 por BLE. El ESP32 lo entregará al GNSS. Este es el flujo principal solicitado; NTRIP directo por Wi-Fi queda como opción. BLE no proporciona acceso genérico del ESP32 a Internet.
+
+El control BLE deberá cubrir configuración del instrumento, estado, solución, correcciones y control de registro. Las descargas de archivos grandes se realizarán por Wi-Fi. La app debe manejar reconexión, continuidad en segundo plano y antigüedad de las correcciones; la recepción UART y el registro no deben depender de tener el panel abierto.
+
+Referencia: [Emlid BLE y sus excepciones Wi-Fi](https://community.emlid.com/t/bluetooth-is-now-main-connectivity-option-for-r-series-reach-receivers/42233). Describe una experiencia de operación, no compatibilidad con el protocolo propietario de Emlid. En Emlid también existen funciones de registro, reportes y actualización que requieren Wi-Fi u otra conexión a internet.
 
 ### Registro y postproceso
 
@@ -85,7 +91,7 @@ La IMU y GNSS aportarán mediciones con tiempos y marcos de referencia distintos
 
 - **BLE:** control y telemetría principal con la app.
 - **Wi-Fi:** acceso del ESP32 a NTRIP mediante el hotspot del teléfono y posible transferencia de archivos.
-- **USB:** desarrollo, diagnóstico y posible transferencia de archivos.
+- **USB:** desarrollo, carga y consola JSON de diagnóstico/configuración implementados; transferencia de archivos futura.
 - **microSD:** persistencia local de observaciones y diagnósticos.
 - **Interfaz GNSS:** pendiente de confirmar en la carrier real, incluidos niveles, tasas y señales temporales.
 

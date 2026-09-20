@@ -4,6 +4,7 @@
 #include <freertos/semphr.h>
 #include "config_rules.h"
 #include "instrument.h"
+#include "gnss_receiver.h"
 #include "web_assets.h"
 
 namespace {
@@ -78,8 +79,9 @@ esp_err_t handleHttp(httpd_req_t* request) {
             return httpd_resp_send(request, reinterpret_cast<const char*>(asset.data), asset.size);
         }
     }
-    char suppliedKey[25] = {};
-    if (httpd_req_get_hdr_value_len(request, "X-Device-Key") != 24 ||
+    char suppliedKey[64] = {};
+    if (httpd_req_get_hdr_value_len(request, "X-Device-Key") < 8 ||
+        httpd_req_get_hdr_value_len(request, "X-Device-Key") > 63 ||
         httpd_req_get_hdr_value_str(request, "X-Device-Key", suppliedKey, sizeof(suppliedKey)) != ESP_OK ||
         !authenticated(suppliedKey)) {
         response["error"] = "unauthorized";
@@ -89,7 +91,9 @@ esp_err_t handleHttp(httpd_req_t* request) {
     }
     char payload[config_rules::kMaxRequestBytes + 1];
     size_t received = 0;
+    const uint32_t receiveStartedAt = millis();
     while (received < request->content_len) {
+        if (config_rules::elapsed(millis(), receiveStartedAt, 5000)) return ESP_FAIL;
         const int count = httpd_req_recv(request, payload + received, request->content_len - received);
         if (count <= 0) return ESP_FAIL;
         received += count;
@@ -144,7 +148,17 @@ void handleSerialLine() {
         return;
     }
     JsonDocument body;
+    if (input["method"] == "PUT" && input["path"] == "/api/access") {
+        if (xSemaphoreTake(instrumentMutex, pdMS_TO_TICKS(1000)) == pdTRUE) {
+            output["status"] = instrument::changeAccessKey(input["body"].as<JsonVariantConst>(), body);
+            xSemaphoreGive(instrumentMutex);
+        } else {
+            output["status"] = 503;
+            body["error"] = "busy";
+        }
+    } else {
     output["status"] = dispatch(input["method"] | "", input["path"] | "", input["body"].as<JsonVariantConst>(), body);
+    }
     output["body"] = body;
     serialReply(output);
 }
@@ -185,6 +199,7 @@ void setup() {
         return;
     }
     instrument::begin();
+    gnss_receiver::begin();
     httpd_config_t configuration = HTTPD_DEFAULT_CONFIG();
     configuration.uri_match_fn = httpd_uri_match_wildcard;
     configuration.stack_size = 8192;
@@ -201,7 +216,7 @@ void setup() {
             if (httpd_register_uri_handler(server, &route) != ESP_OK) Serial.println("Error al registrar ruta HTTP.");
         }
     } else Serial.println("Error al iniciar el servidor web. Consola USB disponible.");
-    Serial.println("TresVizo RTK 0.1.0. Consola JSON USB disponible.");
+    Serial.println("TresVizo RTK 0.2.0. Consola JSON USB disponible.");
 }
 
 void loop() {

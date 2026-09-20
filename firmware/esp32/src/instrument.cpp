@@ -1,4 +1,5 @@
 #include "instrument.h"
+#include "gnss_receiver.h"
 #include "config_rules.h"
 
 #include <Preferences.h>
@@ -152,8 +153,10 @@ int saveConfig(JsonVariantConst body, JsonDocument& response) {
         error(response, "save_failed", "No se pudieron guardar los ajustes. La configuración activa se conserva.");
         return 503;
     }
-    pendingNetwork = nextSsid != stationSsid || nextPassword != stationPassword;
-    if (pendingNetwork) networkChangedAt = millis();
+    if (nextSsid != stationSsid || nextPassword != stationPassword) {
+        pendingNetwork = true;
+        networkChangedAt = millis();
+    }
     deviceName = nextName;
     stationSsid = nextSsid;
     stationPassword = nextPassword;
@@ -207,6 +210,41 @@ void status(JsonDocument& response) {
     response["solution"]["height_reference"] = nullptr;
     response["solution"]["measurement_time"] = nullptr;
     response["solution"]["arrival_time_us"] = nullptr;
+    const auto gnss = gnss_receiver::snapshot();
+    JsonObject health = response["subsystems"]["gnss"].as<JsonObject>();
+    health["state"] = gnss.start_failed ? "start_failed" : "not_integrated";
+    health["accepted_gga"] = gnss.accepted;
+    health["rejected_gga"] = gnss.rejected;
+    health["line_overflows"] = gnss.overflow;
+    health["uart_errors"] = gnss.uart_errors;
+    if (gnss.enabled) {
+        const uint64_t now = esp_timer_get_time();
+        const uint64_t age = now - gnss.solution.arrival_us;
+        const bool fresh = gnss.accepted && age <= 500000;
+        health["state"] = !gnss.accepted ? "waiting_data" : (fresh ? "receiving" : "stale");
+        if (gnss.accepted) health["age_ms"] = age / 1000;
+        if (fresh) {
+            auto out = response["solution"].as<JsonObject>();
+            out["quality_code"] = gnss.solution.quality;
+            static const char* const qualities[] = {"invalid", "standalone", "differential",
+                "pps", "rtk_fixed", "rtk_float", "dead_reckoning", "manual", "simulated"};
+            out["fix"] = qualities[gnss.solution.quality];
+            if (gnss.solution.has_satellites) out["satellites_used"] = gnss.solution.satellites;
+            out["arrival_time_us"] = gnss.solution.arrival_us;
+            if (gnss.solution.has_utc) out["utc_time_of_day_ms"] = gnss.solution.utc_ms;
+            // GGA no aporta fecha ni demuestra el datum configurado.
+            if (gnss.solution.has_position) {
+                out["latitude_deg"] = gnss.solution.latitude_deg;
+                out["longitude_deg"] = gnss.solution.longitude_deg;
+                if (std::isfinite(gnss.solution.altitude_msl_m)) {
+                    out["height_m"] = gnss.solution.altitude_msl_m;
+                    out["height_reference"] = "receiver_msl";
+                }
+                if (std::isfinite(gnss.solution.geoid_separation_m))
+                    out["geoid_separation_m"] = gnss.solution.geoid_separation_m;
+            }
+        }
+    }
 }
 }
 
@@ -239,7 +277,7 @@ void begin() {
     }
     WiFi.persistent(false);
     WiFi.mode(WIFI_AP_STA); // radio activa para la fuente de entropía del RNG
-    if (key.length() != 24) {
+    if (!config_rules::password(key.c_str())) {
         char randomKey[25];
         snprintf(randomKey, sizeof(randomKey), "%08lx%08lx%08lx",
             static_cast<unsigned long>(esp_random()), static_cast<unsigned long>(esp_random()),
@@ -266,6 +304,26 @@ void tick() {
     }
     if (!pendingNetwork && !stationSsid.isEmpty() && WiFi.status() != WL_CONNECTED &&
         config_rules::elapsed(now, lastConnectionAttempt, 30000)) connectStation();
+}
+
+int changeAccessKey(JsonVariantConst body, JsonDocument& response) {
+    if (pendingRestart) { error(response, "restarting", "Reinicio en curso."); return 409; }
+    if (!body.is<JsonObjectConst>() || body.size() != 1 ||
+        !validString(body["access_key"], config_rules::password)) {
+        error(response, "invalid_key", "La clave debe tener entre 8 y 63 caracteres ASCII imprimibles.");
+        return 400;
+    }
+    const String next = body["access_key"].as<const char*>();
+    if (next == key) { response["changed"] = false; return 200; }
+    if (!storageReady || preferences.putString("access_key", next) != next.length()) {
+        error(response, "storage_failed", "No se pudo guardar la clave."); return 503;
+    }
+    // Mantener la clave activa inmutable hasta reiniciar evita carreras con HTTP.
+    pendingRestart = true;
+    restartRequestedAt = millis();
+    response["changed"] = true;
+    response["restarting"] = true;
+    return 202;
 }
 
 const String& accessKey() { return key; }

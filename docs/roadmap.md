@@ -2,6 +2,10 @@
 
 Las etapas son deliberadamente pequeñas. Cada una debe dejar evidencia reproducible y actualizar [el estado del proyecto](project-status.md) antes de considerar completada una capacidad.
 
+## Avance al 19 de septiembre de 2026
+
+El inventario está parcialmente identificado y el primer flash del ESP32 está realizado. Por solicitud del propietario se adelantó una base del panel web, ajustes persistentes y Wi-Fi para poder configurar el instrumento desde el inicio. Esto no completa las etapas de comunicaciones ni integración: GNSS, IMU, sincronización, microSD, NTRIP y BLE siguen pendientes. Consultar [las comprobaciones del firmware](firmware-validation.md).
+
 ## 1. Identificación del hardware
 
 - Inventariar placas, revisiones, conectores, antena y accesorios recibidos.

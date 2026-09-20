@@ -2,6 +2,8 @@
 
 Este documento identifica las conexiones que deberán resolverse. No constituye un esquema, no asigna GPIO y no confirma compatibilidad eléctrica.
 
+Al 19 de septiembre de 2026, el propietario confirma que solo el ESP32 está conectado por USB a la Mac; no hay módulos cableados entre sí. El firmware inicial no configura GPIO para GNSS, IMU, microSD ni interruptor.
+
 ## Matriz de interfaces
 
 | Enlace | Uso previsto | Aspectos por verificar antes de conectar |

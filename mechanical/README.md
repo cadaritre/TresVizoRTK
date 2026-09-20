@@ -1,9 +1,12 @@
 # Diseño mecánico
 
-El concepto inicial es una carcasa cilíndrica impresa en 3D para un receptor montado sobre jalón. Todavía no existen dimensiones ni modelos CAD validados.
+Revisión actual: [A3 — base imprimible para el jalón](cad/README-A3.md). Sustituye el montaje de placas metálicas por una base con alojamiento hexagonal, tapa y calce impresos. Sólo requiere tornillería comercial. Conserva la entrada bajo la antena y el recorrido coaxial A2.
+
+El concepto es una carcasa cilíndrica impresa en 3D, inspirada en el Reach RX, para un receptor montado sobre jalón. A3 retiene una tuerca comercial 5/8-11 y deja la HA-901A arriba con su envolvente original. Las [fuentes iniciales](research/component-dimensions.md) se complementan con las referencias de cada revisión. A0/A1/A2 se conservan como historial; sus montajes anteriores no son la propuesta actual. Todavía no es un modelo validado para fabricar y montar el receptor completo.
 
 ## Criterios previstos
 
+- Fabricar todas las piezas estructurales adicionales por impresión 3D; sólo tornillos, tuercas y arandelas comerciales de metal. No exigir placas ni casquillos metálicos a medida.
 - Mantener la antena y el montaje del jalón alineados mecánicamente.
 - Montar la IMU rígidamente y cerca del eje del jalón.
 - Incorporar una referencia física inequívoca de “frente” en la carcasa.
@@ -11,6 +14,7 @@ El concepto inicial es una carcasa cilíndrica impresa en 3D para un receptor mo
 - Proteger cableado y conectores sin imponer radios de curvatura o esfuerzos no permitidos.
 - Considerar ventilación, disipación, sellado y mantenimiento después de conocer el consumo y los componentes reales.
 - Omitir un botón dedicado para medir; la operación de medición se realizará desde la aplicación.
+- Integrar el encendido exterior cuando se defina pulsador y alimentación. La reserva del módulo biestable no equivale a un botón funcional; sigue pendiente.
 
 ## Referencias y mediciones necesarias
 
@@ -28,8 +32,7 @@ La calibración de offsets mecánicos y la inicialización dinámica de una solu
 
 ## Directorios
 
-- `cad/`: futuros archivos fuente del modelo mecánico.
+- `cad/`: revisiones A0–A3, generadores y parámetros del estudio mecánico.
 - `exports/`: exportaciones deliberadamente versionadas para fabricación o revisión.
 
 No debe añadirse geometría ficticia para completar estos directorios.
-

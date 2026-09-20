@@ -1,24 +1,20 @@
 # Entorno de desarrollo
 
-El desarrollo se realizará inicialmente desde macOS. Todavía no se han fijado framework, versiones, placa de compilación ni cadena de herramientas.
+El desarrollo inicial se realiza en macOS con VS Code y la extensión PlatformIO ya instalados. La primera versión usa PlatformIO Core 6.2.0, plataforma Espressif32 6.12.0, Arduino-ESP32 2.0.17 y ArduinoJson 7.4.2. Las dependencias se declaran en `firmware/esp32/platformio.ini`.
 
-## Herramientas consideradas
+El chip conectado por USB reportó 4 MB de flash y 2 MB de PSRAM. Se eligió un perfil genérico ESP32-S3 con flash de 4 MB, DIO a 80 MHz y PSRAM desactivada. Esta selección no asigna GPIO externos ni supone que la carrier sea DevKitC. El primer arranque y las comprobaciones se documentan en [validación](firmware-validation.md).
 
-- **Editor:** Visual Studio Code es una opción considerada.
-- **Firmware:** PlatformIO es una opción considerada para gestionar compilación, carga y monitorización.
-- **Control de versiones:** Git, preservando la identidad y las reglas definidas en [AGENTS.md](../AGENTS.md).
-- **Documentación técnica:** manuales oficiales correspondientes a la revisión exacta de cada módulo o carrier.
-- **Diseño electrónico, CAD y aplicación móvil:** herramientas pendientes de seleccionar cuando se conozcan requisitos y formatos reales.
+## Flujo inicial
 
-La mención de VS Code y PlatformIO no fija una decisión. Antes de crear configuraciones debe confirmarse que la placa ESP32-S3 recibida, su memoria y el framework seleccionado son compatibles.
+1. Abrir `firmware/esp32/` como proyecto de PlatformIO en VS Code.
+2. Compilar con `pio run` y seleccionar el puerto detectado antes de cargar.
+3. Detener monitores o el puente USB antes de una carga o prueba que requiera el puerto.
+4. Usar `tools/usb_console.py` para consultar el instrumento o abrir el panel en la Mac.
+5. Ejecutar las pruebas adecuadas y actualizar el estado con la evidencia obtenida.
 
-## Preparación pendiente
+Los comandos completos, recuperación de acceso Wi-Fi y límites del prototipo están en el [README del firmware](../firmware/esp32/README.md). El respaldo previo al primer flash está en `logs/local/`, ignorado por Git.
 
-1. Identificar físicamente la placa ESP32-S3 y documentar su variante.
-2. Verificar métodos de programación, consola y recuperación indicados por el fabricante.
-3. Elegir framework y versiones con criterios reproducibles.
-4. Crear la configuración mínima de compilación solo cuando una tarea futura lo autorice.
-5. Registrar comandos de preparación y validación sin depender de ajustes globales no documentados.
+El framework de la app móvil, CAD y herramientas de diseño electrónico siguen pendientes. La identificación de GPIO externos requiere las revisiones reales y manuales correspondientes.
 
 ## Prácticas de desarrollo
 
@@ -35,3 +31,5 @@ La mención de VS Code y PlatformIO no fija una decisión. Antes de crear config
 
 Cada cambio futuro debe indicar qué comprobaciones se realizaron y qué quedó pendiente. Una compilación no demuestra funcionamiento eléctrico; una comunicación no demuestra sincronización; una solución FIX no demuestra precisión. Los resultados de campo deberán incluir método, referencia, condiciones y datos suficientes para repetición.
 
+
+La preparación de GNSS por USB, parser compartido, compilación de pruebas y captura pasiva se describe en [primera adquisición GNSS](gnss-bringup.md).

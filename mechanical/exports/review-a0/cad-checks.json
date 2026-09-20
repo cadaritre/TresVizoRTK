@@ -1,0 +1,185 @@
+{
+  "revision": "A0 - estudio de envolvente, no liberado a fabricacion",
+  "units": "mm",
+  "parts": [
+    {
+      "name": "MainShell",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 78324.797
+    },
+    {
+      "name": "Radome",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 32188.755
+    },
+    {
+      "name": "Base",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 23574.927
+    },
+    {
+      "name": "ServiceCover",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 3181.276
+    },
+    {
+      "name": "Frame",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 27591.098
+    },
+    {
+      "name": "IMUPlate",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 4022.225
+    },
+    {
+      "name": "AntennaPlate",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 6246.096
+    },
+    {
+      "name": "GNSSPlate",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 7799.814
+    },
+    {
+      "name": "SDPlate",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 5474.982
+    },
+    {
+      "name": "ESPPlate",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1331.0
+    },
+    {
+      "name": "USBPlate",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1181.204
+    },
+    {
+      "name": "BatteryReserve",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 46368.0
+    },
+    {
+      "name": "GNSSReserve",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 27648.0
+    },
+    {
+      "name": "IMUReserve",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 5376.0
+    },
+    {
+      "name": "AntennaReserve",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 76447.516
+    },
+    {
+      "name": "ESPReference",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1036.35
+    },
+    {
+      "name": "USBReference",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1620.0
+    },
+    {
+      "name": "SDReference",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 7056.0
+    },
+    {
+      "name": "LatchReserve",
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 3024.0
+    }
+  ],
+  "collisions": [],
+  "scope": "Solidos CAD y reservas A0. No valida componentes recibidos, sujetadores, cableado, sellado, RF ni resistencia.",
+  "axial_extraction_collisions_sampled_10mm": [],
+  "meshes": [
+    {
+      "name": "MainShell",
+      "closed": true,
+      "facets": 10900
+    },
+    {
+      "name": "Radome",
+      "closed": true,
+      "facets": 5134
+    },
+    {
+      "name": "Base",
+      "closed": true,
+      "facets": 5886
+    },
+    {
+      "name": "ServiceCover",
+      "closed": true,
+      "facets": 1720
+    },
+    {
+      "name": "Frame",
+      "closed": true,
+      "facets": 13172
+    },
+    {
+      "name": "IMUPlate",
+      "closed": true,
+      "facets": 1204
+    },
+    {
+      "name": "AntennaPlate",
+      "closed": true,
+      "facets": 2032
+    },
+    {
+      "name": "GNSSPlate",
+      "closed": true,
+      "facets": 1372
+    },
+    {
+      "name": "SDPlate",
+      "closed": true,
+      "facets": 4076
+    },
+    {
+      "name": "ESPPlate",
+      "closed": true,
+      "facets": 12
+    },
+    {
+      "name": "USBPlate",
+      "closed": true,
+      "facets": 2716
+    }
+  ],
+  "step_roundtrip": {
+    "structure_solids": 11,
+    "with_reserves_solids": 19,
+    "all_solids_valid": true
+  }
+}

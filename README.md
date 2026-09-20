@@ -8,7 +8,9 @@ El objetivo de desarrollo es alcanzar aproximadamente 2 cm de precisión en cond
 
 ## Estado actual
 
-El repositorio se encuentra en su etapa inicial de organización y documentación. No hay firmware, aplicación, diseño electrónico ni modelo mecánico implementado o validado. Se ha recibido la mayoría de los componentes, pero falta completar su identificación y verificación; la batería continúa pendiente.
+Ya existe una primera versión de firmware, compilada y cargada al ESP32-S3 conectado por USB. Incluye un panel web con la identidad de TresVizo, diagnóstico real y ajustes persistentes. GNSS, IMU, microSD, NTRIP y BLE siguen sin integrar. No hay aplicación móvil, diseño electrónico ni modelo mecánico implementados. La batería continúa pendiente.
+
+Consulta las [instrucciones del firmware](firmware/esp32/README.md) y la [evidencia de validación](docs/firmware-validation.md).
 
 Consulta [el estado detallado](docs/project-status.md) antes de interpretar cualquier elemento como funcional.
 
@@ -43,11 +45,12 @@ La base considerada incluye:
 
 - Unicore UM980 en una placa de desarrollo o carrier como GNSS principal.
 - u-blox ZED-F9P disponible para posibles pruebas.
-- ESP32-S3; se considera una Waveshare ESP32-S3-Tiny N8R8, con variante física por confirmar.
+- ESP32-S3-Tiny: la captura selecciona Tiny y el chip conectado reporta 4 MB de flash y 2 MB de PSRAM; no corresponde al perfil N8R8 considerado inicialmente.
 - Bosch BMI088 en breakout.
 - Lector y tarjeta microSD, con módulo o socket e interfaz por confirmar.
-- Antena multibanda HA-901A, con unidad y especificaciones por confirmar.
+- Antena Helix, cuya compra confirmó el propietario; modelo y bandas por verificar. La HA-901A mencionada inicialmente no está confirmada.
 - Batería LiPo de una celda, nominal 3.7 V y aproximadamente 5000 mAh, aún pendiente.
+- Módulo de interruptor biestable para estudiar el encendido, aún sin verificar ni integrar.
 - Carcasa cilíndrica impresa en 3D y montaje sobre jalón.
 
 No se han fijado GPIO, conectores, niveles eléctricos, dimensiones ni diseño de alimentación. La disponibilidad de PPS en la carrier UM980 concreta está pendiente de verificación. Consulta la [lista de materiales](hardware/bom.md) y las [conexiones pendientes](hardware/wiring.md).
@@ -71,6 +74,7 @@ No se han fijado GPIO, conectores, niveles eléctricos, dimensiones ni diseño d
 - [Hoja de ruta](docs/roadmap.md)
 - [Entorno y prácticas de desarrollo](docs/development.md)
 - [Lista de materiales](hardware/bom.md)
+- [Identificación del hardware recibido](hardware/identification.md)
 - [Interfaces y conexiones](hardware/wiring.md)
 - [Concepto mecánico](mechanical/README.md)
 

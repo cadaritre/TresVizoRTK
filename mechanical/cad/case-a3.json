@@ -1,0 +1,17 @@
+{
+  "revision": "A3 - montaje imprimible del jalon",
+  "units": "mm",
+  "pole_thread": "5/8-11 UNC",
+  "nut_af_max": 23.8252,
+  "nut_height_max": 14.1986,
+  "nut_z": 4.0,
+  "hex_pocket_af": 24.25,
+  "retainer_radius": 25.4,
+  "retainer_z": 18.7,
+  "retainer_top": 22.0,
+  "stud_clearance_diameter": 17.2,
+  "stud_cavity_depth": 26.5,
+  "stud_cavity_roof": 28.0,
+  "mount_bolt_radius": 19.0,
+  "nut_source": "https://lhdottie.com/pdf/product-specification-sheet/HN58"
+}

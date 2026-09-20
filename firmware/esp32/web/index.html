@@ -1,68 +1,529 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#281a39"><title>TresVizo RTK · Control del instrumento</title><link rel="stylesheet" href="/app.css"><script src="/app.js" defer></script></head>
-<body>
-<a class="skip-link" href="#main">Ir al contenido</a>
-<aside class="sidebar">
-  <a class="brand" href="#overview" aria-label="TresVizo RTK, inicio"><img src="/assets/tresvizo-logo.png" alt="3Vizo" width="158" height="71"><span>RTK <i>CONTROL</i></span></a>
-  <div class="nav-label">INSTRUMENTO</div>
-  <nav aria-label="Navegación principal">
-    <button class="nav-item active" data-page="overview" aria-current="page"><span aria-hidden="true">◫</span> Resumen</button>
-    <button class="nav-item" data-page="connections"><span aria-hidden="true">⌁</span> Conexiones</button>
-    <button class="nav-item" data-page="settings"><span aria-hidden="true">☷</span> Configuración</button>
-    <button class="nav-item" data-page="diagnostics"><span aria-hidden="true">◎</span> Diagnóstico</button>
-  </nav>
-  <div class="sidebar-bottom"><span class="eyebrow">TRESVIZO INGENIERÍA</span><p>Tecnología que<br>conecta con el terreno.</p><span class="version">PROTOTIPO <b>0.1.0</b></span></div>
-</aside>
-<div class="workspace">
-<header class="topbar"><div><b>TresVizo RTK</b><span class="slash">/</span><span id="page-title">Resumen</span></div><div class="connection-pill" id="connection-pill"><span class="dot"></span><span id="connection-text">Conectando…</span></div></header>
-<main id="main" tabindex="-1">
-<div class="notice" id="offline-notice" role="status" hidden>No hay comunicación con el instrumento. Verifica el enlace; volveremos a intentar automáticamente.</div>
-<section class="page" id="page-overview" aria-labelledby="overview-title">
-  <div class="page-heading"><div><p class="eyebrow">CENTRO DE CONTROL</p><h1 id="overview-title">Tu instrumento.<br><span>Todo a la vista.</span></h1><p class="intro">Estado, conexiones y configuración de tu TresVizo RTK.</p></div><span class="stage-tag"><span class="dot"></span> Puesta en marcha</span></div>
-  <div class="overview-grid">
-    <article class="instrument-card"><div class="card-top"><span class="eyebrow">RECEPTOR GNSS RTK</span><span class="outline-badge">TRIPLE BANDA · OBJETIVO</span></div><h2 id="device-name">TresVizo RTK</h2>
-      <div class="instrument-diagram" aria-label="Esquema conceptual del instrumento, sin mediciones"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="cross horizontal"></div><div class="cross vertical"></div><div class="receiver"><div class="receiver-top"></div><div class="receiver-body"><span>3VIZO</span><small>RTK</small></div><div class="receiver-stem"></div></div><span class="diagram-label label-gnss">GNSS</span><span class="diagram-label label-imu">IMU</span><span class="diagram-label label-sd">microSD</span></div>
-      <div class="instrument-bottom"><span><i class="dot"></i> Integración de sensores pendiente</span><span>01 / PROTOTIPO</span></div>
-    </article>
-    <article class="solution-card"><div class="card-top"><span class="eyebrow">SOLUCIÓN GNSS</span><span class="badge muted">Sin integrar</span></div><div class="empty-solution"><span class="target-icon" aria-hidden="true">⌖</span><h2>Aún no hay posición</h2><p>El receptor GNSS se integrará después de confirmar su placa y conexiones.</p></div><dl class="solution-values"><div><dt>Latitud</dt><dd>— <small>°</small></dd></div><div><dt>Longitud</dt><dd>— <small>°</small></dd></div><div><dt>Altura / referencia</dt><dd>—</dd></div><div><dt>Estado RTK</dt><dd>Sin datos</dd></div></dl><p class="card-footnote">La posición y su calidad aparecerán al recibir mediciones reales.</p></article>
-  </div>
-  <div class="metric-grid">
-    <article class="metric"><span class="metric-label">TIEMPO ENCENDIDO <i>◷</i></span><strong id="uptime" data-live>—</strong><small>Desde el último arranque</small></article>
-    <article class="metric"><span class="metric-label">MEMORIA LIBRE <i>▥</i></span><strong id="heap" data-live>—</strong><small>RAM interna del ESP32</small></article>
-    <article class="metric"><span class="metric-label">RED DEL EQUIPO <i>⌁</i></span><strong class="small-value" id="ap-name" data-live>—</strong><small id="ap-summary">Esperando conexión</small></article>
-    <article class="metric"><span class="metric-label">FIRMWARE <i>◈</i></span><strong id="firmware" data-live>—</strong><small>Primera versión del instrumento</small></article>
-  </div>
-  <div class="section-heading"><h2>Componentes del equipo</h2><span>Estado de integración</span></div>
-  <div class="component-grid">
-    <article class="component"><span class="component-icon" aria-hidden="true">⌖</span><div><h3>Receptor GNSS</h3><p>Unicore UM980 · previsto</p></div><span class="status-label">Pendiente</span></article>
-    <article class="component"><span class="component-icon" aria-hidden="true">⊕</span><div><h3>Unidad inercial</h3><p>BMI088 · 6 ejes</p></div><span class="status-label">Pendiente</span></article>
-    <article class="component"><span class="component-icon" aria-hidden="true">▤</span><div><h3>Almacenamiento</h3><p>Lector microSD · SPI</p></div><span class="status-label">Pendiente</span></article>
-  </div>
-</section>
-<section class="page" id="page-connections" aria-labelledby="connections-title" hidden>
-  <div class="page-heading"><div><p class="eyebrow">COMUNICACIONES</p><h1 id="connections-title">Siempre en contacto.</h1><p class="intro">Accede al instrumento y prepara su conexión a Internet.</p></div></div>
-  <div class="two-columns">
-    <article class="panel"><div class="card-top"><h2>Wi-Fi del instrumento</h2><span class="badge" id="ap-state">Consultando</span></div><p>Red privada para entrar al panel desde el teléfono o la computadora.</p><dl class="detail-list"><div><dt>Nombre de red</dt><dd id="network-ap-name" data-live>—</dd></div><div><dt>Dirección del panel</dt><dd id="network-ap-ip" data-live>—</dd></div><div><dt>Dispositivos conectados</dt><dd id="network-clients" data-live>—</dd></div><div><dt>Protección</dt><dd>WPA2 · clave del equipo</dd></div></dl><p class="hint">La clave se consulta por USB. Esta red permanece disponible al configurar un hotspot.</p></article>
-    <article class="panel"><div class="card-top"><h2>Hotspot / red externa</h2><span class="badge muted" id="station-state">Sin configurar</span></div><p>Conecta el ESP32 a una red Wi-Fi de 2.4 GHz. NTRIP se incorporará en una siguiente etapa.</p><dl class="detail-list"><div><dt>Red</dt><dd id="station-ssid" data-live>—</dd></div><div><dt>Dirección IP</dt><dd id="station-ip" data-live>—</dd></div><div><dt>Señal</dt><dd id="station-rssi" data-live>—</dd></div></dl><button class="button primary" data-page="settings">Configurar conexión ↗</button></article>
-  </div>
-  <div class="two-columns lower"><article class="panel"><h2>Correcciones NTRIP</h2><span class="badge muted">Pendiente de desarrollo</span><p>La conexión al caster y el envío de RTCM estarán disponibles al integrar el receptor.</p></article><article class="panel"><h2>Bluetooth LE</h2><span class="badge muted">Pendiente de desarrollo</span><p>Enlace previsto para la futura aplicación de levantamientos, replanteos y trazo.</p></article></div>
-</section>
-<section class="page" id="page-settings" aria-labelledby="settings-title" hidden>
-  <div class="page-heading"><div><p class="eyebrow">AJUSTES DEL INSTRUMENTO</p><h1 id="settings-title">A tu manera.</h1><p class="intro">Los ajustes se guardan en el ESP32 y se conservan al reiniciar.</p></div></div>
-  <form id="settings-form" class="settings-layout"><div class="settings-main">
-    <article class="panel"><h2>General</h2><p>Identifica tu equipo y elige la frecuencia de actualización del panel.</p><label for="device-name-input">Nombre del instrumento</label><input id="device-name-input" name="device_name" maxlength="32" required autocomplete="off" placeholder="TresVizo RTK"><small class="field-help">Hasta 32 caracteres: letras sin acentos, números, espacios o guiones.</small><label for="refresh-input">Actualización del panel</label><select id="refresh-input" name="refresh_ms"><option value="1000">Cada segundo</option><option value="2000">Cada 2 segundos</option><option value="5000">Cada 5 segundos</option></select><small class="field-help">Este intervalo solo cambia el panel; no la tasa de medición GNSS.</small></article>
-    <article class="panel"><h2>Conexión a hotspot</h2><p>Usa una red protegida de 2.4 GHz. El panel funciona también sin una red externa.</p><label for="wifi-ssid-input">Nombre de la red (SSID)</label><input id="wifi-ssid-input" name="wifi_ssid" autocomplete="off" placeholder="Hotspot del teléfono"><label for="wifi-password-input">Contraseña de la red</label><input id="wifi-password-input" name="wifi_password" type="password" maxlength="63" autocomplete="new-password" placeholder="Contraseña del hotspot"><small class="field-help" id="password-help">Entre 8 y 63 caracteres. La contraseña no se devuelve al navegador.</small><label class="checkbox-label"><input type="checkbox" id="forget-wifi"> Olvidar la red externa guardada</label></article>
-    <div class="save-bar"><span id="save-message" role="status">Carga los ajustes para comenzar.</span><button type="button" class="button secondary" id="reload-settings">Recargar</button><button type="submit" class="button primary" id="save-settings" disabled>Guardar ajustes ↗</button></div>
-  </div><aside class="settings-aside"><span class="eyebrow">SIGUIENTE ETAPA</span><h2>Preparado para crecer.</h2><p>Los controles del GNSS, base/rover, IMU y registros se habilitarán conforme se integren y prueben sus módulos.</p><hr><p>Actualmente puedes configurar el nombre, el panel y la conexión Wi-Fi del instrumento.</p></aside></form>
-</section>
-<section class="page" id="page-diagnostics" aria-labelledby="diagnostics-title" hidden>
-  <div class="page-heading"><div><p class="eyebrow">SISTEMA</p><h1 id="diagnostics-title">Conoce tu equipo.</h1><p class="intro">Información obtenida directamente del ESP32 conectado.</p></div><button class="button secondary" id="export-diagnostics" disabled>Descargar diagnóstico ↓</button></div>
-  <div class="two-columns"><article class="panel"><h2>Controlador</h2><dl class="detail-list"><div><dt>Procesador</dt><dd id="diag-chip" data-live>—</dd></div><div><dt>Frecuencia CPU</dt><dd id="diag-cpu" data-live>—</dd></div><div><dt>Flash detectada</dt><dd id="diag-flash" data-live>—</dd></div><div><dt>PSRAM habilitada</dt><dd id="diag-psram" data-live>—</dd></div><div><dt>Mínimo de RAM libre</dt><dd id="diag-min-heap" data-live>—</dd></div><div><dt>Motivo de reinicio</dt><dd id="diag-reset" data-live>—</dd></div><div><dt>Almacenamiento de ajustes</dt><dd id="diag-config" data-live>—</dd></div></dl></article>
-    <article class="panel"><h2>Alcance de esta versión</h2><ul class="feature-list"><li><span>✓</span> Panel web integrado en el ESP32</li><li><span>✓</span> Configuración persistente y acceso protegido</li><li><span>✓</span> Wi-Fi del equipo y conexión a hotspot</li><li>○ &nbsp; GNSS / RTK y correcciones NTRIP</li><li>○ &nbsp; IMU y compensación de inclinación</li><li>○ &nbsp; Registro en microSD y Bluetooth LE</li></ul><p class="hint">Las capacidades topográficas siguen pendientes de integración y validación.</p></article></div>
-  <article class="panel restart-panel"><div><h2>Reiniciar instrumento</h2><p>Los ajustes guardados se conservarán. El enlace se interrumpirá brevemente.</p></div><button class="button secondary" id="restart-button" disabled>Reiniciar</button></article>
-</section>
-<footer class="footer"><span>3VIZO <b>INGENIERÍA</b> · Control del instrumento</span><span id="last-updated">Esperando datos del equipo</span></footer>
-</main></div>
-<dialog id="login-dialog" aria-labelledby="login-title"><form id="login-form"><img src="/assets/tresvizo-logo.png" width="134" height="60" alt="3Vizo"><p class="eyebrow">ACCESO AL INSTRUMENTO</p><h2 id="login-title">Conecta con tu equipo.</h2><p>Introduce la misma clave que utilizas para conectarte a la red Wi-Fi del instrumento.</p><label for="access-key">Clave del instrumento</label><input id="access-key" type="password" required autocomplete="off"><p class="field-help">Puedes consultarla desde la consola USB del equipo.</p><p id="login-message" role="alert"></p><button class="button primary" type="submit">Entrar al panel ↗</button></form></dialog>
-<dialog id="restart-dialog" aria-labelledby="restart-title"><h2 id="restart-title">¿Reiniciar el instrumento?</h2><p>Se perderá temporalmente la conexión. Los ajustes sin guardar no se aplicarán.</p><div class="dialog-actions"><button class="button secondary" id="cancel-restart">Cancelar</button><button class="button primary" id="confirm-restart">Sí, reiniciar</button></div></dialog>
-</body></html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#281a39" />
+    <title>TresVizo RTK · Control del instrumento</title>
+    <link rel="stylesheet" href="/app.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Ir al contenido</a>
+    <aside class="sidebar">
+      <a class="brand" href="#overview" aria-label="TresVizo RTK, inicio"
+        ><img
+          src="/assets/tresvizo-logo.png"
+          alt="3Vizo"
+          width="158"
+          height="71"
+        /><span>RTK <i>CONTROL</i></span></a
+      >
+      <div class="nav-label">INSTRUMENTO</div>
+      <nav aria-label="Navegación principal">
+        <button
+          class="nav-item active"
+          data-page="overview"
+          aria-current="page"
+        >
+          <span aria-hidden="true">◫</span> Resumen
+        </button>
+        <button class="nav-item" data-page="connections">
+          <span aria-hidden="true">⌁</span> Conexiones
+        </button>
+        <button class="nav-item" data-page="settings">
+          <span aria-hidden="true">☷</span> Configuración
+        </button>
+        <button class="nav-item" data-page="diagnostics">
+          <span aria-hidden="true">◎</span> Diagnóstico
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <span class="eyebrow">TRESVIZO INGENIERÍA</span>
+        <p>Tecnología que<br />conecta con el terreno.</p>
+        <span class="version">PROTOTIPO <b>0.1.0</b></span>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div>
+          <b>TresVizo RTK</b><span class="slash">/</span
+          ><span id="page-title">Resumen</span>
+        </div>
+        <div class="connection-pill" id="connection-pill">
+          <span class="dot"></span><span id="connection-text">Conectando…</span>
+        </div>
+      </header>
+      <main id="main" tabindex="-1">
+        <div class="notice" id="offline-notice" role="status" hidden>
+          No hay comunicación con el instrumento. Verifica el enlace; volveremos
+          a intentar automáticamente.
+        </div>
+        <section
+          class="page"
+          id="page-overview"
+          aria-labelledby="overview-title"
+        >
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">CENTRO DE CONTROL</p>
+              <h1 id="overview-title">
+                Tu instrumento.<br /><span>Todo a la vista.</span>
+              </h1>
+              <p class="intro">
+                Estado, conexiones y configuración de tu TresVizo RTK.
+              </p>
+            </div>
+            <span class="stage-tag"
+              ><span class="dot"></span> Puesta en marcha</span
+            >
+          </div>
+          <div class="overview-grid">
+            <article class="instrument-card">
+              <div class="card-top">
+                <span class="eyebrow">RECEPTOR GNSS RTK</span
+                ><span class="outline-badge">TRIPLE BANDA · OBJETIVO</span>
+              </div>
+              <h2 id="device-name">TresVizo RTK</h2>
+              <div
+                class="instrument-diagram"
+                aria-label="Esquema conceptual del instrumento, sin mediciones"
+              >
+                <div class="orbit orbit-one"></div>
+                <div class="orbit orbit-two"></div>
+                <div class="cross horizontal"></div>
+                <div class="cross vertical"></div>
+                <div class="receiver">
+                  <div class="receiver-top"></div>
+                  <div class="receiver-body">
+                    <span>3VIZO</span><small>RTK</small>
+                  </div>
+                  <div class="receiver-stem"></div>
+                </div>
+                <span class="diagram-label label-gnss">GNSS</span
+                ><span class="diagram-label label-imu">IMU</span
+                ><span class="diagram-label label-sd">microSD</span>
+              </div>
+              <div class="instrument-bottom">
+                <span
+                  ><i class="dot"></i> Integración de sensores pendiente</span
+                ><span>01 / PROTOTIPO</span>
+              </div>
+            </article>
+            <article class="solution-card">
+              <div class="card-top">
+                <span class="eyebrow">SOLUCIÓN GNSS</span
+                ><span id="gnss-state" class="badge muted">Sin enlace GNSS</span>
+              </div>
+              <div class="empty-solution">
+                <span class="target-icon" aria-hidden="true">⌖</span>
+                <h2 id="gnss-title">Aún no hay posición</h2>
+                <p id="gnss-description">Esperando conexión del receptor al ESP32.</p>
+              </div>
+              <dl class="solution-values">
+                <div>
+                  <dt>Latitud</dt>
+                  <dd id="gnss-latitude" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>Longitud</dt>
+                  <dd id="gnss-longitude" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>Altura / referencia</dt>
+                  <dd id="gnss-height" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>Solución del receptor</dt>
+                  <dd id="gnss-quality" data-live>Sin datos</dd>
+                </div>
+              </dl>
+              <p class="card-footnote">
+                La posición y su calidad aparecerán al recibir mediciones
+                reales.
+              </p>
+            </article>
+          </div>
+          <div class="metric-grid">
+            <article class="metric">
+              <span class="metric-label">TIEMPO ENCENDIDO <i>◷</i></span
+              ><strong id="uptime" data-live>—</strong
+              ><small>Desde el último arranque</small>
+            </article>
+            <article class="metric">
+              <span class="metric-label">MEMORIA LIBRE <i>▥</i></span
+              ><strong id="heap" data-live>—</strong
+              ><small>RAM interna del ESP32</small>
+            </article>
+            <article class="metric">
+              <span class="metric-label">RED DEL EQUIPO <i>⌁</i></span
+              ><strong class="small-value" id="ap-name" data-live>—</strong
+              ><small id="ap-summary">Esperando conexión</small>
+            </article>
+            <article class="metric">
+              <span class="metric-label">FIRMWARE <i>◈</i></span
+              ><strong id="firmware" data-live>—</strong
+              ><small>Primera versión del instrumento</small>
+            </article>
+          </div>
+          <div class="section-heading">
+            <h2>Componentes del equipo</h2>
+            <span>Estado de integración</span>
+          </div>
+          <div class="component-grid">
+            <article class="component">
+              <span class="component-icon" aria-hidden="true">⌖</span>
+              <div>
+                <h3>Receptor GNSS</h3>
+                <p>Unicore UM980 · previsto</p>
+              </div>
+              <span class="status-label">Pendiente</span>
+            </article>
+            <article class="component">
+              <span class="component-icon" aria-hidden="true">⊕</span>
+              <div>
+                <h3>Unidad inercial</h3>
+                <p>BMI088 · 6 ejes</p>
+              </div>
+              <span class="status-label">Pendiente</span>
+            </article>
+            <article class="component">
+              <span class="component-icon" aria-hidden="true">▤</span>
+              <div>
+                <h3>Almacenamiento</h3>
+                <p>Lector microSD · SPI</p>
+              </div>
+              <span class="status-label">Pendiente</span>
+            </article>
+          </div>
+        </section>
+        <section
+          class="page"
+          id="page-connections"
+          aria-labelledby="connections-title"
+          hidden
+        >
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">COMUNICACIONES</p>
+              <h1 id="connections-title">Siempre en contacto.</h1>
+              <p class="intro">
+                Accede al instrumento y prepara su conexión a Internet.
+              </p>
+            </div>
+          </div>
+          <div class="two-columns">
+            <article class="panel">
+              <div class="card-top">
+                <h2>Wi-Fi del instrumento</h2>
+                <span class="badge" id="ap-state">Consultando</span>
+              </div>
+              <p>
+                Red privada para entrar al panel desde el teléfono o la
+                computadora.
+              </p>
+              <dl class="detail-list">
+                <div>
+                  <dt>Nombre de red</dt>
+                  <dd id="network-ap-name" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>Dirección del panel</dt>
+                  <dd id="network-ap-ip" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>Dispositivos conectados</dt>
+                  <dd id="network-clients" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>Protección</dt>
+                  <dd>WPA2 · clave del equipo</dd>
+                </div>
+              </dl>
+              <p class="hint">
+                La clave se consulta por USB. Esta red permanece disponible al
+                configurar un hotspot.
+              </p>
+            </article>
+            <article class="panel">
+              <div class="card-top">
+                <h2>Hotspot / red externa</h2>
+                <span class="badge muted" id="station-state"
+                  >Sin configurar</span
+                >
+              </div>
+              <p>
+                Conecta el ESP32 a una red Wi-Fi de 2.4 GHz. NTRIP se
+                incorporará en una siguiente etapa.
+              </p>
+              <dl class="detail-list">
+                <div>
+                  <dt>Red</dt>
+                  <dd id="station-ssid" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>Dirección IP</dt>
+                  <dd id="station-ip" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>Señal</dt>
+                  <dd id="station-rssi" data-live>—</dd>
+                </div>
+              </dl>
+              <button class="button primary" data-page="settings">
+                Configurar conexión ↗
+              </button>
+            </article>
+          </div>
+          <div class="two-columns lower">
+            <article class="panel">
+              <h2>Correcciones NTRIP</h2>
+              <span class="badge muted">Pendiente de desarrollo</span>
+              <p>
+                La conexión al caster y el envío de RTCM estarán disponibles al
+                integrar el receptor.
+              </p>
+            </article>
+            <article class="panel">
+              <h2>Bluetooth LE</h2>
+              <span class="badge muted">Pendiente de desarrollo</span>
+              <p>
+                Enlace previsto para la futura aplicación de levantamientos,
+                replanteos y trazo.
+              </p>
+            </article>
+          </div>
+        </section>
+        <section
+          class="page"
+          id="page-settings"
+          aria-labelledby="settings-title"
+          hidden
+        >
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">AJUSTES DEL INSTRUMENTO</p>
+              <h1 id="settings-title">A tu manera.</h1>
+              <p class="intro">
+                Los ajustes se guardan en el ESP32 y se conservan al reiniciar.
+              </p>
+            </div>
+          </div>
+          <form id="settings-form" class="settings-layout">
+            <div class="settings-main">
+              <article class="panel">
+                <h2>General</h2>
+                <p>
+                  Identifica tu equipo y elige la frecuencia de actualización
+                  del panel.
+                </p>
+                <label for="device-name-input">Nombre del instrumento</label
+                ><input
+                  id="device-name-input"
+                  name="device_name"
+                  maxlength="32"
+                  required
+                  autocomplete="off"
+                  placeholder="TresVizo RTK"
+                /><small class="field-help"
+                  >Hasta 32 caracteres: letras sin acentos, números, espacios o
+                  guiones.</small
+                ><label for="refresh-input">Actualización del panel</label
+                ><select id="refresh-input" name="refresh_ms">
+                  <option value="1000">Cada segundo</option>
+                  <option value="2000">Cada 2 segundos</option>
+                  <option value="5000">Cada 5 segundos</option></select
+                ><small class="field-help"
+                  >Este intervalo solo cambia el panel; no la tasa de medición
+                  GNSS.</small
+                >
+              </article>
+              <article class="panel">
+                <h2>Conexión a hotspot</h2>
+                <p>
+                  Usa una red protegida de 2.4 GHz. El panel funciona también
+                  sin una red externa.
+                </p>
+                <label for="wifi-ssid-input">Nombre de la red (SSID)</label
+                ><input
+                  id="wifi-ssid-input"
+                  name="wifi_ssid"
+                  autocomplete="off"
+                  placeholder="Hotspot del teléfono"
+                /><label for="wifi-password-input">Contraseña de la red</label
+                ><input
+                  id="wifi-password-input"
+                  name="wifi_password"
+                  type="password"
+                  maxlength="63"
+                  autocomplete="new-password"
+                  placeholder="Contraseña del hotspot"
+                /><small class="field-help" id="password-help"
+                  >Entre 8 y 63 caracteres. La contraseña no se devuelve al
+                  navegador.</small
+                ><label class="checkbox-label"
+                  ><input type="checkbox" id="forget-wifi" /> Olvidar la red
+                  externa guardada</label
+                >
+              </article>
+              <div class="save-bar">
+                <span id="save-message" role="status"
+                  >Carga los ajustes para comenzar.</span
+                ><button
+                  type="button"
+                  class="button secondary"
+                  id="reload-settings"
+                >
+                  Recargar</button
+                ><button
+                  type="submit"
+                  class="button primary"
+                  id="save-settings"
+                  disabled
+                >
+                  Guardar ajustes ↗
+                </button>
+              </div>
+            </div>
+            <aside class="settings-aside">
+              <span class="eyebrow">SIGUIENTE ETAPA</span>
+              <h2>Preparado para crecer.</h2>
+              <p>
+                Los controles del GNSS, base/rover, IMU y registros se
+                habilitarán conforme se integren y prueben sus módulos.
+              </p>
+              <hr />
+              <p>
+                Actualmente puedes configurar el nombre, el panel y la conexión
+                Wi-Fi del instrumento.
+              </p>
+            </aside>
+          </form>
+        </section>
+        <section
+          class="page"
+          id="page-diagnostics"
+          aria-labelledby="diagnostics-title"
+          hidden
+        >
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">SISTEMA</p>
+              <h1 id="diagnostics-title">Conoce tu equipo.</h1>
+              <p class="intro">
+                Información obtenida directamente del ESP32 conectado.
+              </p>
+            </div>
+            <button class="button secondary" id="export-diagnostics" disabled>
+              Descargar diagnóstico ↓
+            </button>
+          </div>
+          <div class="two-columns">
+            <article class="panel">
+              <h2>Controlador</h2>
+              <dl class="detail-list">
+                <div>
+                  <dt>Procesador</dt>
+                  <dd id="diag-chip" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>Frecuencia CPU</dt>
+                  <dd id="diag-cpu" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>Flash detectada</dt>
+                  <dd id="diag-flash" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>PSRAM habilitada</dt>
+                  <dd id="diag-psram" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>Mínimo de RAM libre</dt>
+                  <dd id="diag-min-heap" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>Motivo de reinicio</dt>
+                  <dd id="diag-reset" data-live>—</dd>
+                </div>
+                <div>
+                  <dt>Almacenamiento de ajustes</dt>
+                  <dd id="diag-config" data-live>—</dd>
+                </div>
+              </dl>
+            </article>
+            <article class="panel">
+              <h2>Alcance de esta versión</h2>
+              <ul class="feature-list">
+                <li><span>✓</span> Panel web integrado en el ESP32</li>
+                <li>
+                  <span>✓</span> Configuración persistente y acceso protegido
+                </li>
+                <li><span>✓</span> Wi-Fi del equipo y conexión a hotspot</li>
+                <li>○ &nbsp; GNSS / RTK y correcciones NTRIP</li>
+                <li>○ &nbsp; IMU y compensación de inclinación</li>
+                <li>○ &nbsp; Registro en microSD y Bluetooth LE</li>
+              </ul>
+              <p class="hint">
+                Las capacidades topográficas siguen pendientes de integración y
+                validación.
+              </p>
+            </article>
+          </div>
+          <article class="panel restart-panel">
+            <div>
+              <h2>Reiniciar instrumento</h2>
+              <p>
+                Los ajustes guardados se conservarán. El enlace se interrumpirá
+                brevemente.
+              </p>
+            </div>
+            <button class="button secondary" id="restart-button" disabled>
+              Reiniciar
+            </button>
+          </article>
+        </section>
+        <footer class="footer">
+          <span>3VIZO <b>INGENIERÍA</b> · Control del instrumento</span
+          ><span id="last-updated">Esperando datos del equipo</span>
+        </footer>
+      </main>
+    </div>
+    <dialog id="login-dialog" aria-labelledby="login-title">
+      <form id="login-form">
+        <img
+          src="/assets/tresvizo-logo.png"
+          width="134"
+          height="60"
+          alt="3Vizo"
+        />
+        <p class="eyebrow">ACCESO AL INSTRUMENTO</p>
+        <h2 id="login-title">Conecta con tu equipo.</h2>
+        <p>
+          Introduce la misma clave que utilizas para conectarte a la red Wi-Fi
+          del instrumento.
+        </p>
+        <label for="access-key">Clave del instrumento</label
+        ><input id="access-key" type="password" required autocomplete="off" />
+        <p class="field-help">
+          Puedes consultarla desde la consola USB del equipo.
+        </p>
+        <p id="login-message" role="alert"></p>
+        <button class="button primary" type="submit">Entrar al panel ↗</button>
+      </form>
+    </dialog>
+    <dialog id="restart-dialog" aria-labelledby="restart-title">
+      <h2 id="restart-title">¿Reiniciar el instrumento?</h2>
+      <p>
+        Se perderá temporalmente la conexión. Los ajustes sin guardar no se
+        aplicarán.
+      </p>
+      <div class="dialog-actions">
+        <button class="button secondary" id="cancel-restart">Cancelar</button
+        ><button class="button primary" id="confirm-restart">
+          Sí, reiniciar
+        </button>
+      </div>
+    </dialog>
+  </body>
+</html>

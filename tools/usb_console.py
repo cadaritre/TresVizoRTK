@@ -2,6 +2,7 @@
 """Consola y puente local USB para TresVizo RTK; no simula el instrumento."""
 import argparse
 import json
+import getpass
 import mimetypes
 import threading
 import time
@@ -75,7 +76,7 @@ class Instrument:
     def request(self, method, path, body=None):
         with self.lock:
             try:
-                if path == "/api/access":
+                if method == "GET" and path == "/api/access":
                     return self._exchange(method, path, body)
                 if self.key is None:
                     access = self._exchange("GET", "/api/access")
@@ -150,6 +151,8 @@ def serve(device, port):
     print("Solo accesible desde esta Mac. Ctrl+C para detener. Sin datos simulados.", flush=True)
     try:
         server.serve_forever()
+    except KeyboardInterrupt:
+        print("Puente USB detenido.", flush=True)
     finally:
         server.server_close()
         device.close()
@@ -158,13 +161,19 @@ def serve(device, port):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", help="Puerto USB del ESP32; se detecta si hay uno solo.")
-    parser.add_argument("command", choices=["access", "status", "config", "serve"])
+    parser.add_argument("command", choices=["access", "set-access", "status", "config", "serve"])
     parser.add_argument("--http-port", type=int, default=8765)
     args = parser.parse_args()
     device = Instrument(args.port or detect_port())
     try:
         if args.command == "serve":
             serve(device, args.http_port)
+        elif args.command == "set-access":
+            key = getpass.getpass("Nueva clave Wi-Fi/panel: ")
+            if key != getpass.getpass("Repite la clave: "):
+                raise ValueError("Las claves no coinciden.")
+            result = device.request("PUT", "/api/access", {"access_key": key})
+            print(json.dumps(result, ensure_ascii=False))
         else:
             result = device.request("GET", f"/api/{args.command}")
             print(json.dumps(result, ensure_ascii=False, indent=2))
