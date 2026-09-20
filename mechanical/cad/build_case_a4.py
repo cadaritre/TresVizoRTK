@@ -11,6 +11,7 @@ import FreeCAD as App
 import Part
 import MeshPart
 import build_case_a3 as a3
+from case_branding import engrave_shell
 
 a2, a1, a0 = a3.a2, a3.a1, a3.a0
 V=App.Vector
@@ -140,8 +141,9 @@ def build():
         shell=shell.fuse(box(8,2.8 if z==96 else 3.5,7,-4,31.2,z-3.5))
         shell=shell.cut(hex_y(5.8,2.8,0,31.1,z))
         shell=shell.cut(cyl(1.7,12,0,30,z,Y))
-    add(plastic,'MainShell','A4 01 / cuerpo y alojamientos de tuercas integrados',shell,
-        (.79,.81,.79),'Silueta A3 conservada; collar con tuercas M3. Sin grado IP.', 'MainShell')
+    shell,_=engrave_shell(shell,C['branding'])
+    add(plastic,'MainShell','A4 01 / cuerpo con simbolo 3 + hexagono grabado',shell,
+        (.79,.81,.79),'Logo original sin VIZO: 36 mm alto, grabado radial 0.6 mm bajo portillo. Collar con tuercas M3. Sin grado IP.', 'MainShell',url=C['branding']['source'])
     add(plastic,'ServiceCover','A4 07 / portillo de servicio',source.ServiceCover.Shape.copy(),dark,
         'Portillo desmontable. No equivale a un pulsador exterior ni resuelve la carga.','ServiceCover')
 

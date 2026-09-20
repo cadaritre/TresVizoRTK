@@ -4,12 +4,33 @@
 
 ## Abrir
 
+- En este Mac, `Abrir A4.app` abre directamente las tres vistas con la copia oficial de FreeCAD 1.0.2 ubicada en `~/Applications/FreeCAD-1.0.2.app`. El acceso depende de esa instalación local; no contiene FreeCAD ni es portable a otro ordenador. No utiliza una macro de arranque.
 - `TresVizo-case-A4.FCStd`: conjunto completo; las reservas electrónicas interiores están ocultas inicialmente.
 - **`TresVizo-case-A4-INTERIOR.FCStd`**: muestra la estructura nueva, los componentes reservados y el coaxial azul. Es la vista más clara para revisar la simplificación.
 - `TresVizo-case-A4-EXPLODED.FCStd`: las siete piezas impresas separadas. Es un despiece de revisión, no posiciones de montaje.
 - `../exports/review-a4/a4-overview.png`: lámina extraída del CAD real.
 
 A0–A3 se conservan. No renombrar A3 como A4 ni usar la fecha del esquema anterior para identificar el CAD.
+
+### Símbolo TresVizo integrado
+
+El cuerpo principal lleva el **3, sus cuatro trazos y el hexágono**, sin «VIZO», tomados del [logo publicado en tresvizo.com](https://tresvizo.com/). Es un grabado de **36 mm de alto y 0.6 mm de profundidad radial**, centrado a Z=60 mm en el frente +Y, debajo del portillo. Sigue la curvatura exterior y pertenece al mismo sólido del cuerpo: no añade placas, adhesivos ni piezas de montaje. La pared nominal restante en la zona es 2.2 mm; la impresión real todavía requiere prueba.
+
+`branding/tresvizo-logo-source.png` conserva el original descargado; `branding/tresvizo-symbol.svg` y `.json` contienen el contorno utilizado, con una simplificación máxima objetivo de 0.65 píxeles (aproximadamente 0.053 mm a este tamaño). `case_branding.py` realiza el grabado y `case-a4.json` define su tamaño y ubicación. El cuerpo actualizado aparece tanto en el conjunto como en el despiece; se actualizan su STL, su STEP y el STEP general. El documento interior permanece igual porque oculta el cuerpo.
+
+`../exports/review-a4/branding-checks.json` registra un sólido válido, seis regiones grabadas, malla cerrada y cero material añadido o retirado del interior. `gui-checks.json` registra el guardado y la reapertura del modelo con logo en FreeCAD 1.0.2.
+
+### Cierres en macOS y reparación del 19 de septiembre
+
+Los tres documentos A4 se reconstruyeron como sólidos `Part::Feature`, con BREP independiente y proveedores visuales nuevos, conservando la geometría. Se guardaron y reabrieron desde FreeCAD. La restauración correcta del archivo no implica que la aplicación sea estable.
+
+Los cierres posteriores de FreeCAD 1.1.3 ocurrieron en `QMacAccessibilityElement dealloc`, dentro de Qt 6.8.3. Coinciden con el [fallo confirmado de FreeCAD en macOS 26](https://github.com/FreeCAD/FreeCAD/issues/30720). `QT_ACCESSIBILITY=0` y el modo seguro **no corrigieron** los cierres observados en este Mac. El intento de lanzar `open_case_a4.FCMacro` también produjo «Unknown file»; el acceso ahora pasa los tres `.FCStd` directamente.
+
+La [distribución oficial 1.0.2 para Apple Silicon](https://github.com/FreeCAD/FreeCAD/releases/tag/1.0.2) usa Qt 5.15.15 y se instaló por separado para comprobar las vistas A4 sin sustituir `/Applications/FreeCAD.app`. Su descarga se comprobó contra el SHA256 publicado en esa versión.
+
+**Prueba GUI completada a las 21:57:** apertura, validación de colores y proveedores visuales, guardado de copias y reapertura de las tres vistas (43, 7 y 38 sólidos válidos). La sesión duró aproximadamente siete minutos hasta cerrarla deliberadamente, sin un nuevo cierre inesperado. Después se abrió otra instancia desde `Abrir A4.app`, que cargó los tres archivos canónicos sin errores de lectura. El acceso usa Launch Services de macOS; la ejecución directa del binario desde el acceso anterior no disponía de permiso para leer todos los archivos en Documentos.
+
+Los resultados están en `../exports/review-a4/gui-checks.json` y `gui-launch-checks.json`; la prueba anterior con Qt 6 se conserva en `gui-checks-qt6.json`. Estas comprobaciones no equivalen a una garantía de estabilidad indefinida. En este Mac, usar el acceso indicado: abrir un `.FCStd` por doble clic puede seguir llamando a la instalación 1.1.3 con Qt 6.
 
 ## Qué cambió realmente
 

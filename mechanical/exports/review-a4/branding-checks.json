@@ -1,0 +1,21 @@
+{
+  "modified_at": "2026-09-19T22:06:18",
+  "config": {
+    "symbol": "3 y hexagono, incluidos cuatro trazos; sin VIZO",
+    "source": "https://tresvizo.com/",
+    "height_mm": 36.0,
+    "center_z_mm": 60.0,
+    "depth_mm": 0.6,
+    "location": "frente +Y del cuerpo, debajo del portillo"
+  },
+  "valid": true,
+  "solids": 1,
+  "removed_regions": 6,
+  "added_volume_mm3": 0.0,
+  "removed_volume_mm3": 223.45582741526576,
+  "remaining_nominal_wall_mm": 2.1999999999999997,
+  "interior_geometry_unchanged": true,
+  "source_sha256": "0398a2a70783ea0c75f958b906ac1fed7870e34d3445bb8163750f91de84273e",
+  "stl_closed": true,
+  "stl_volume_relative_error": 8.68517548646204e-05
+}

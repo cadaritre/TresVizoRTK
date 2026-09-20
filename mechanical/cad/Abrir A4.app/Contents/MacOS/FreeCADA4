@@ -1,0 +1,6 @@
+#!/bin/zsh
+set -eu
+A4_CAD_DIR="$(cd -- "$(dirname -- "$0")/../../.." && pwd)"
+A4_FREECAD="$HOME/Applications/FreeCAD-1.0.2.app"
+# Launch Services entrega cada archivo a la aplicacion con su acceso de macOS.
+exec /usr/bin/open -n -a "$A4_FREECAD" "$A4_CAD_DIR/TresVizo-case-A4.FCStd" "$A4_CAD_DIR/TresVizo-case-A4-EXPLODED.FCStd" "$A4_CAD_DIR/TresVizo-case-A4-INTERIOR.FCStd"

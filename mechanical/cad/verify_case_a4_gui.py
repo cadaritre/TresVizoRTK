@@ -1,22 +1,29 @@
 """Ejecutar dentro de FreeCAD GUI: restaura, guarda y reabre cada vista A4.
 
-Valida proveedores visuales, colores, visibilidad y triangulacion real.
+Valida proveedores visuales, colores, visibilidad y restauracion en la GUI.
 La inspeccion de las ventanas 3D se realiza ademas desde la interfaz.
 """
 from pathlib import Path
 from datetime import datetime
 import json
 import hashlib
+import os
 import FreeCAD as App
 import FreeCADGui as Gui
+from PySide import QtCore
 
-cad=Path(__file__).resolve().parent
-out=cad.parent/'exports/review-a4'
+cad=Path(os.environ.get('TRESVIZO_CAD_DIR',Path(__file__).resolve().parent))
+out=Path(os.environ.get('TRESVIZO_GUI_REPORT_DIR',cad.parent/'exports/review-a4'))
+out.mkdir(parents=True,exist_ok=True)
+roundtrip=out/'gui-roundtrip'
+roundtrip.mkdir(exist_ok=True)
 reports=[]
 Gui.activateWorkbench('PartWorkbench')
 for suffix in ('','-EXPLODED','-INTERIOR'):
     path=cad/f'TresVizo-case-A4{suffix}.FCStd'
-    doc=App.openDocument(str(path))
+    doc=next((d for d in App.listDocuments().values() if d.FileName==str(path)),None)
+    if doc is None:
+        doc=App.openDocument(str(path))
     App.setActiveDocument(doc.Name)
     objects=[o for o in doc.Objects if o.TypeId=='Part::Feature']
     for obj in objects:
@@ -29,9 +36,11 @@ for suffix in ('','-EXPLODED','-INTERIOR'):
     doc.recompute()
     Gui.activeDocument().activeView().fitAll()
     Gui.updateGui()
-    doc.save()
+    # Guardar una copia evita modificar el documento de entrega durante la prueba.
+    copy_path=roundtrip/path.name
+    doc.saveAs(str(copy_path))
     App.closeDocument(doc.Name)
-    doc=App.openDocument(str(path))
+    doc=App.openDocument(str(copy_path))
     App.setActiveDocument(doc.Name)
     Gui.activeDocument().activeView().fitAll()
     Gui.updateGui()
@@ -39,10 +48,16 @@ for suffix in ('','-EXPLODED','-INTERIOR'):
     assert len(valid)==len(objects),suffix
     assert all(o.Shape.isValid() and o.ViewObject is not None for o in valid),suffix
     reports.append({'file':path.name,'restored_view_providers':len(valid),
-        'saved_with_FreeCAD_GUI':True,'reopened_with_FreeCAD_GUI':True,
-        'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
+        'roundtrip_copy_saved_with_FreeCAD_GUI':True,'roundtrip_copy_reopened_with_FreeCAD_GUI':True,
+        'source_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),
+        'copy_sha256':hashlib.sha256(copy_path.read_bytes()).hexdigest()})
+    App.closeDocument(doc.Name)
+    doc=App.openDocument(str(path))
+    Gui.activeDocument().activeView().fitAll()
 (out/'gui-checks.json').write_text(json.dumps({
     'tested_at':datetime.now().isoformat(timespec='seconds'),
-    'version':App.Version(),'launch':'QT_ACCESSIBILITY=0 --safe-mode',
+    'version':App.Version(),'qt_version':QtCore.qVersion(),
+    'executable_home':App.getHomePath(),'pid':os.getpid(),
+    'scope':'Restauracion, guardado y reapertura; no certifica estabilidad prolongada.',
     'documents':reports},ensure_ascii=False,indent=2)+'\n')
 App.Console.PrintMessage('A4: tres documentos guardados y reabiertos en FreeCAD GUI.\n')
