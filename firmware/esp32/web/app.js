@@ -1,11 +1,14 @@
 "use strict";
 const $ = (id) => document.getElementById(id);
+// Orden deliberado: lo que se usa parado en el terreno va primero; la plomería
+// interna (UART, memoria, versiones) vive al final, en Diagnóstico.
 const pageNames = {
-  overview: "Resumen",
-  connections: "Conexiones",
+  field: "Campo",
   base: "Base / rover",
-  recording: "Registro / PPK",
   corrections: "Correcciones",
+  recording: "Registro / PPK",
+  gps: "GPS avanzado",
+  connections: "Conexiones",
   settings: "Configuración",
   diagnostics: "Diagnóstico",
 };
@@ -24,7 +27,7 @@ function message(value, error = false) {
   $("save-message").classList.toggle("error", error);
 }
 function goTo(page) {
-  if (!pageNames[page]) page = "overview";
+  if (!pageNames[page]) page = "field";
   document.querySelectorAll(".page").forEach((el) => {
     el.hidden = el.id !== `page-${page}`;
   });
@@ -145,6 +148,23 @@ function renderGnss(data) {
   text("gnss-height", position && Number.isFinite(solution.height_m) ?
     `${solution.height_m.toFixed(3)} m · ${solution.height_reference === "receiver_msl" ? "MSL del receptor" : solution.height_reference === "ellipsoidal_user_configured" ? "Elipsoidal configurada" : "Referencia no confirmada"}` : "—");
   text("gnss-quality", current ? qualities[solution.fix] || "Sin datos" : "Sin datos vigentes");
+
+  // --- Vista de campo -------------------------------------------------
+  // Se lee de un vistazo y de lejos. Nunca muestra una posición que no esté
+  // vigente: en el terreno una coordenada vieja es peor que ninguna.
+  text("field-quality", current ? qualities[solution.fix] || "Sin datos" : state === "stale" ? "Datos antiguos" : "Sin solución");
+  text("field-latitude", position ? `${solution.latitude_deg.toFixed(8)}°` : "—");
+  text("field-longitude", position ? `${solution.longitude_deg.toFixed(8)}°` : "—");
+  text("field-height", position && Number.isFinite(solution.height_m) ? `${solution.height_m.toFixed(3)} m` : "—");
+  text("field-height-reference", !position ? "—" :
+    solution.height_reference === "receiver_msl" ? "MSL del receptor" :
+    solution.height_reference === "ellipsoidal_user_configured" ? "Elipsoidal configurada" : "Referencia no confirmada");
+  text("field-satellites", current && Number.isFinite(solution.satellites_used) ? String(solution.satellites_used) : "—");
+  text("field-hdop", current && Number.isFinite(solution.hdop) ? solution.hdop.toFixed(1) : "—");
+  text("field-age", Number.isFinite(health?.age_ms) ? `${(health.age_ms / 1000).toFixed(1)} s` : "—");
+  // Tramas RTCM entregadas al receptor: es el dato que dice si las correcciones
+  // llegaron de verdad, no solo si el caster las envió.
+  text("field-corrections", Number.isFinite(health?.correction_frames_sent) ? String(health.correction_frames_sent) : "—");
 }
 
 function renderStatus(data) {

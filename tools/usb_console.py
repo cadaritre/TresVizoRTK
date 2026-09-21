@@ -4,9 +4,7 @@ import argparse
 from collections import deque
 import json
 import getpass
-import fcntl
 import mimetypes
-import termios
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -16,6 +14,14 @@ from gnss.receiver import Receiver
 
 import serial
 from serial.tools import list_ports
+
+# TIOCEXCL solo existe en POSIX. En Windows el puerto ya se abre en exclusiva y
+# pyserial rechaza una segunda apertura, así que no hace falta refuerzo.
+try:
+    import fcntl
+    import termios
+except ImportError:  # Windows
+    fcntl = termios = None
 
 ROOT = Path(__file__).resolve().parents[1]
 WEB = ROOT / "firmware" / "esp32" / "web"
@@ -52,13 +58,14 @@ class Instrument:
         connection.rts = False
         connection.port = self.port
         connection.open()
-        try:
-            # flock de pyserial es consultivo; impedir también nuevas aperturas
-            # del monitor serie que podrían cambiar DTR/RTS durante una OTA.
-            fcntl.ioctl(connection.fileno(), termios.TIOCEXCL)
-        except OSError:
-            connection.close()
-            raise
+        if fcntl is not None:
+            try:
+                # flock de pyserial es consultivo; impedir también nuevas aperturas
+                # del monitor serie que podrían cambiar DTR/RTS durante una OTA.
+                fcntl.ioctl(connection.fileno(), termios.TIOCEXCL)
+            except OSError:
+                connection.close()
+                raise
         self.connection = connection
 
     def _exchange(self, method, path, body=None, key=None):
@@ -248,11 +255,22 @@ def main():
             gps = Receiver(args.gnss_port, ROOT / "captures" / "local" / "sessions") if args.gnss_port else None
             serve(device, args.http_port, gps)
         elif args.command == "set-access":
-            key = getpass.getpass("Nueva clave Wi-Fi/panel: ")
+            key = getpass.getpass("Nueva clave de acceso al panel/API: ")
             if key != getpass.getpass("Repite la clave: "):
                 raise ValueError("Las claves no coinciden.")
             result = device.request("PUT", "/api/access", {"access_key": key})
             print(json.dumps(result, ensure_ascii=False))
+        elif args.command == "access":
+            result = device.request("GET", "/api/access")
+            body = result.get("body", {})
+            # Desde 0.6.0 son dos credenciales distintas; mostrarlas etiquetadas
+            # evita que se confundan al escribirlas en el teléfono.
+            print(f'Red Wi-Fi          : {body.get("ap_ssid")}')
+            print(f'Contraseña Wi-Fi   : {body.get("ap_password")}')
+            print(f'Clave del panel/API: {body.get("access_key")}')
+            print(f'PIN de emparejamiento BLE: {body.get("ble_pairing_pin")}')
+            print(f'Panel              : {body.get("ap_url")}')
+            print("\nSalida privada: no la subas al repositorio ni la compartas.")
         else:
             result = device.request("GET", f"/api/{args.command}")
             print(json.dumps(result, ensure_ascii=False, indent=2))

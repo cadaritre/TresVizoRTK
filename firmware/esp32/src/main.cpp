@@ -142,6 +142,9 @@ void handleSerialLine() {
     if (input["method"] == "GET" && input["path"] == "/api/access") {
         output["status"] = 200;
         output["body"]["ap_ssid"] = instrument::apName();
+        // Dos credenciales distintas desde 0.6.0: la del Wi-Fi solo deja entrar
+        // a la red; la de acceso es la que autoriza la API y el panel.
+        output["body"]["ap_password"] = instrument::apPassword();
         output["body"]["access_key"] = instrument::accessKey();
         output["body"]["ble_pairing_pin"] = ble_transport::passkey();
         output["body"]["ap_url"] = "http://192.168.4.1";
@@ -228,7 +231,7 @@ void setup() {
             if (httpd_register_uri_handler(server, &route) != ESP_OK) Serial.println("Error al registrar ruta HTTP.");
         }
     } else Serial.println("Error al iniciar el servidor web. Consola USB disponible.");
-    Serial.println("TresVizo RTK 0.5.0. Consola JSON USB disponible.");
+    Serial.printf("TresVizo RTK %s. Consola JSON USB disponible.\n", instrument::kVersion);
 }
 
 void loop() {

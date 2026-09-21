@@ -19,4 +19,23 @@ int main() {
     for (int i = 0; i < 5000; ++i) parser.feed(0xff, consume);
     for (const auto byte : packet) parser.feed(byte, consume);
     assert(count == 3);
+
+    // Resincronización: basura con 0xD3 intercalados no debe perder la trama
+    // siguiente ni dejar el buffer bloqueado.
+    gnss::Rtcm3Parser noisy;
+    unsigned recovered = 0;
+    auto collect = [&](const uint8_t*, size_t size) { assert(size == packet.size()); ++recovered; };
+    for (int i = 0; i < 40; ++i) { noisy.feed(0xd3, collect); noisy.feed(0xff, collect); }
+    for (const auto byte : packet) noisy.feed(byte, collect);
+    assert(recovered == 1);
+
+    // Cabecera con la longitud máxima y CRC inválido: ocupa el buffer entero y
+    // el parser debe recuperarse para aceptar la trama siguiente.
+    gnss::Rtcm3Parser flooded;
+    unsigned after = 0;
+    auto tally = [&](const uint8_t*, size_t) { ++after; };
+    flooded.feed(0xd3, tally); flooded.feed(0x03, tally); flooded.feed(0xff, tally);
+    for (int i = 0; i < 4000; ++i) flooded.feed(0x00, tally);
+    for (const auto byte : packet) flooded.feed(byte, tally);
+    assert(after == 1);
 }
