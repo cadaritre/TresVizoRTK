@@ -5,6 +5,9 @@
 #include "gnss_control.h"
 #include "sd_recorder.h"
 #include "wire_filter.h"
+#ifdef TRESVIZO_TASK_WDT
+#include <esp_task_wdt.h>
+#endif
 
 #if defined(TRESVIZO_GNSS_RX) || defined(TRESVIZO_GNSS_TX) || defined(TRESVIZO_GNSS_BAUD)
 #if !defined(TRESVIZO_GNSS_RX) || !defined(TRESVIZO_GNSS_TX) || !defined(TRESVIZO_GNSS_BAUD)
@@ -21,21 +24,46 @@ Snapshot state;
 HardwareSerial uart(2);
 struct Correction { uint32_t arrival, generation; uint16_t length; uint8_t bytes[1029]; };
 QueueHandle_t corrections = nullptr;
+
+// Fuera de la pila de la tarea: la trama son 1029 bytes y "gnss_rx" tiene 4 KiB.
+Correction outbound = {};
+constexpr size_t kBlock = 512;
+uint8_t rawBlock[kBlock];
+char textBlock[kBlock];
+
 void acquire(void*) {
     gnss::GgaParser parser;
     gnss::WireFilter filter;
     gnss::Gga solution;
-    Correction outbound = {};
     size_t sent = 0;
+#ifdef TRESVIZO_TASK_WDT
+    // Desactivado por defecto: cambia el comportamiento ante un bloqueo a reinicio
+    // y todavia no se ha ensayado en campo. Habilitar con -DTRESVIZO_TASK_WDT.
+    esp_task_wdt_add(nullptr);
+#endif
     for (;;) {
-        // Un bloque acotado permite atender otras tareas con entrada continua.
-        for (size_t budget = 0; budget < 4096 && uart.available(); ++budget) {
-            const char byte=static_cast<char>(uart.read());
-            sd_recorder::feed(uint8_t(byte));
-            filter.feed(uint8_t(byte),millis(),[&](char text){
-                parser.feed(text, esp_timer_get_time(), solution);
-                gnss_control::feed(text);
-            });
+#ifdef TRESVIZO_TASK_WDT
+        esp_task_wdt_reset();
+#endif
+        // Se lee por bloques y se entrega por bloques: antes cada byte costaba un
+        // xStreamBufferSend y una toma de semaforo desde esta misma tarea.
+        for (size_t budget = 0; budget < 4096 && uart.available(); budget += kBlock) {
+            const size_t wanted = uart.available() < int(kBlock) ? size_t(uart.available()) : kBlock;
+            const size_t got = uart.read(rawBlock, wanted);
+            if (!got) break;
+            sd_recorder::feed(rawBlock, got);
+            // Una marca por bloque leido del driver, no una por byte: el instante
+            // sigue siendo de llegada al ESP32, no de medicion del receptor.
+            const uint64_t arrival = esp_timer_get_time();
+            const uint32_t now = millis();
+            size_t textLength = 0;
+            for (size_t i = 0; i < got; ++i) {
+                filter.feed(rawBlock[i], now, [&](char character) {
+                    parser.feed(character, arrival, solution);
+                    textBlock[textLength++] = character;
+                });
+            }
+            if (textLength) gnss_control::feed(textBlock, textLength);
         }
         if (!outbound.length) gnss_control::tick(uart);
         if (!gnss_control::busy() && !outbound.length && xQueueReceive(corrections, &outbound, 0) == pdTRUE) sent = 0;
@@ -59,6 +87,8 @@ void acquire(void*) {
         state.accepted = parser.accepted;
         state.rejected = parser.rejected;
         state.overflow = parser.overflow;
+        state.native_valid = filter.native_valid;
+        state.native_invalid = filter.native_invalid;
         portEXIT_CRITICAL(&lock);
         vTaskDelay(1);
     }
@@ -80,7 +110,12 @@ void begin() {
         portEXIT_CRITICAL(&lock);
     });
     corrections = xQueueCreate(4, sizeof(Correction));
-    if (!corrections) { state.start_failed = true; return; }
+    if (!corrections) {
+        portENTER_CRITICAL(&lock);
+        state.start_failed = true;
+        portEXIT_CRITICAL(&lock);
+        return;
+    }
     uart.begin(TRESVIZO_GNSS_BAUD, SERIAL_8N1, TRESVIZO_GNSS_RX, TRESVIZO_GNSS_TX);
     // La tarea UART no depende del temporizador HTTP ni del mutex de configuración.
     const bool started = uart && xTaskCreate(acquire, "gnss_rx", 4096, nullptr, 2, nullptr) == pdPASS;

@@ -54,7 +54,17 @@ void begin(){
  available=true;phase="idle";
 #endif
 }
-void feed(uint8_t byte){if(!recording)return;++inFlight;if(recording && queue && xStreamBufferSend(queue,&byte,1,0)!=1)++dropped;--inFlight;}
+void feed(const uint8_t* data,size_t length){
+ if(!recording||!length)return;
+ ++inFlight;
+ // Segunda comprobacion tras marcar inFlight: el cierre espera a que no haya
+ // productores en vuelo antes de cerrar el archivo.
+ if(recording && queue){
+  const size_t stored=xStreamBufferSend(queue,data,length,0);
+  if(stored!=length)dropped+=length-stored;
+ }
+ --inFlight;
+}
 void status(JsonObject out){
  if(!mutex){out["state"]="start_failed";return;}
  xSemaphoreTake(mutex,portMAX_DELAY);out["state"]=phase;out["available"]=available;out["active"]=recording.load();out["session_id"]=id;out["bytes"]=written;out["dropped_bytes"]=dropped.load();out["storage"]="microsd";out["max_session_bytes"]=64*1024*1024;out["rinex_available"]=false;xSemaphoreGive(mutex);
@@ -94,11 +104,12 @@ int request(const String& method,const String& path,JsonVariantConst body,JsonDo
  }
  if(method=="POST" && path=="/api/recording/read"){
   String session=body["session_id"]|"";bool valid=session.length()==24 && body["session_id"].as<JsonString>().size()==24 && body["offset"].is<uint32_t>();
-  for(char c:session)if(!isxdigit(c))valid=false;
+  // isxdigit() con char con signo es comportamiento indefinido para bytes >0x7F.
+  for(char c:session)if(!isxdigit(static_cast<unsigned char>(c)))valid=false;
   if(valid && !file){
-   String path="/sessions/"+session+"/stream.bin";
-   if(!SD.exists(path.c_str()))path="/sessions/"+session+"/stream.part";
-   File input=SD.open(path.c_str(),FILE_READ);
+   String file_path="/sessions/"+session+"/stream.bin";
+   if(!SD.exists(file_path.c_str()))file_path="/sessions/"+session+"/stream.part";
+   File input=SD.open(file_path.c_str(),FILE_READ);
    if(input){uint32_t offset=body["offset"];if(offset<=input.size()&&input.seek(offset)){
     uint8_t block[384],encoded[513];size_t n=input.read(block,sizeof(block)),encodedSize=0;mbedtls_base64_encode(encoded,sizeof(encoded),&encodedSize,block,n);
     out["offset"]=offset;out["size"]=input.size();out["data"]=String(reinterpret_cast<char*>(encoded),encodedSize);out["next_offset"]=offset+n;code=200;

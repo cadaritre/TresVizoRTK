@@ -5,26 +5,68 @@
 #include <atomic>
 namespace gnss_control {
 namespace {
+constexpr unsigned kMaxCommands = 20;
+// Presupuesto total del trabajo. El limite por comando solo corre una vez
+// enviado; sin este, un puerto que nunca acepte escritura dejaba el trabajo
+// en "running" para siempre y bloqueaba NTRIP, grabacion y cambio de clave.
+constexpr uint32_t kJobBudgetMs = 20000;
+constexpr uint32_t kCommandTimeoutMs = 4000;
+
 SemaphoreHandle_t mutex;
-String commands[10], mode, version, action, failure;
+String commands[kMaxCommands], mode, version, action, failure;
 String expectedMode;
+String maskReadback;
 unsigned count=0, index=0;
-bool sent=false, ack=false, readback=false;
-uint32_t started=0, job=0;
+bool sent=false, ack=false, readback=false, overflowed=false;
+uint32_t started=0, launched=0, job=0;
 std::atomic<uint32_t> modeAt{0};
 std::atomic<bool> running{false}, rover{false}, ellipsoid{false};
 const char* phase="idle";
 char line[1024]; size_t length=0;
+
+// Configuracion avanzada conocida. Solo se actualiza cuando el receptor
+// confirma el comando; no se muestra como estado leido si no se leyo.
+struct Profile {
+    double elevation_deg = 5.0;      // valor por defecto del receptor segun manual N4
+    bool elevation_known = false;
+    bool gps = true, bds = true, glo = true, gal = true, qzss = true;
+    bool constellations_known = false;
+    String outputs;                  // resumen de salidas NMEA aplicadas
+    String rtcm;                     // resumen del perfil RTCM aplicado
+    int dgps_timeout_s = -1;         // -1 = desconocido
+    bool saved = false;              // SAVECONFIG confirmado en esta sesion
+} profileState;
+
 void finish(const char* state, const char* error="") { phase=state;failure=error;running=false; }
-void add(const String& c) { if(count<10) commands[count++]=c; }
-bool needsReply() { return commands[index]=="MODE" || commands[index]=="VERSIONA"; }
+bool add(const String& c) { if(count>=kMaxCommands){overflowed=true;return false;} commands[count++]=c; return true; }
+bool needsReply() {
+    const String& c = commands[index];
+    return c=="MODE" || c=="VERSIONA" || c=="MASK";
+}
+
+// Tasas admitidas por el UM980 segun manual N4: 1/2/5/10/20 Hz -> 1/0.5/0.2/0.1/0.05.
+// No se usa 1.0/hz con un decimal porque 20 Hz necesita dos.
+const char* rateFor(unsigned hz) {
+    switch (hz) {
+        case 1: return "1";
+        case 2: return "0.5";
+        case 5: return "0.2";
+        case 10: return "0.1";
+        case 20: return "0.05";
+        default: return nullptr;
+    }
+}
+bool validRate(unsigned hz) { return rateFor(hz) != nullptr; }
+
 void acceptLine() {
     line[length]=0; char* star=strrchr(line,'*');
     if(!star || (strlen(star+1)!=2 && strlen(star+1)!=8)) return;
     char* end=nullptr; unsigned long expected=strtoul(star+1,&end,16);
     if(*end) return;
     uint32_t sum=0;
-    if(strlen(star+1)==2) {for(char* p=line;p<star;++p) sum^=*p;}
+    // XOR de control Unicore: incluye el '$' inicial (ver docs/usb-bench.md).
+    // El CRC32 de los mensajes '#' se calcula desde el caracter siguiente.
+    if(strlen(star+1)==2) {for(char* p=line;p<star;++p) sum^=uint8_t(*p);}
     else {for(char* p=line+1;p<star;++p) {sum^=uint8_t(*p);for(int bit=0;bit<8;++bit)sum=(sum>>1)^((sum&1)?0xedb88320U:0);}}
     if(sum!=expected) return;
     *star=0;
@@ -45,6 +87,12 @@ void acceptLine() {
         char* p=strchr(line,';');if(!p)return;
         version=String(p+1).substring(0,192);readback=true;
     }
+    // Respuesta de la consulta MASK: varias lineas "$CONFIG,MASK,<valor>".
+    if(commands[index]=="MASK" && !strncmp(line,"$CONFIG,MASK,",13)) {
+        const String value=String(line+13);
+        if(maskReadback.length()<192){if(maskReadback.length())maskReadback+=" | ";maskReadback+=value;}
+        readback=true;
+    }
 }
 int prepare(const String& name, JsonDocument& out) {
     if(!gnss_receiver::snapshot().enabled) {out["message"]="UART no disponible.";return 503;}
@@ -52,28 +100,50 @@ int prepare(const String& name, JsonDocument& out) {
     if(running) {out["message"]="Operación GNSS en curso.";return 409;}
     JsonDocument router;correction_router::status(router.to<JsonObject>());
     if(router["active_source"]!="none") {out["message"]="Detén las correcciones antes de configurar el GPS.";return 409;}
-    count=index=0;sent=ack=readback=false;failure="";expectedMode="";action=name;
+    count=index=0;sent=ack=readback=false;overflowed=false;failure="";expectedMode="";action=name;
     return 0;
 }
 int launch(JsonDocument& out) {
-    phase="running";running=true;++job;out["job_id"]=job;out["state"]=phase;out["saved"]=false;return 202;
+    if(overflowed||!count){out["message"]="La operación generó demasiados comandos; no se envió nada.";return 400;}
+    phase="running";running=true;++job;launched=millis();
+    out["job_id"]=job;out["state"]=phase;out["saved"]=profileState.saved;return 202;
+}
+
+// Aplica al perfil conocido lo que el trabajo recien confirmado pidio.
+void commitProfile() {
+    if(action=="mask"){profileState.elevation_known=true;}
+    else if(action=="constellations"){profileState.constellations_known=true;}
+    else if(action=="save"){profileState.saved=true;}
+}
+
+bool boolField(JsonVariantConst body,const char* name,bool& target){
+    if(body[name].isNull())return true;
+    if(!body[name].is<bool>())return false;
+    target=body[name].as<bool>();return true;
 }
 }
 void begin(){mutex=xSemaphoreCreateMutex();}
 bool busy(){return running;}
 bool roverReady(){return rover && !running && millis()-modeAt.load()<30000;}
 const char* heightReference(){return ellipsoid?"ellipsoidal_user_configured":"receiver_msl";}
-void feed(char byte) {
-    if(!mutex || xSemaphoreTake(mutex,portMAX_DELAY)!=pdTRUE)return;
-    if(byte=='$'||byte=='#')length=0;
-    if(byte=='\n') {if(length)acceptLine();length=0;}
-    else if(byte!='\r') {if(length<sizeof(line)-1)line[length++]=byte;else length=0;}
+
+void feed(const char* data, size_t size) {
+    if(!mutex || !size || xSemaphoreTake(mutex,portMAX_DELAY)!=pdTRUE)return;
+    for(size_t i=0;i<size;++i){
+        const char byte=data[i];
+        if(byte=='$'||byte=='#')length=0;
+        if(byte=='\n') {if(length)acceptLine();length=0;}
+        else if(byte!='\r') {if(length<sizeof(line)-1)line[length++]=byte;else length=0;}
+    }
     xSemaphoreGive(mutex);
 }
+
 void tick(HardwareSerial& uart) {
     if(!mutex || xSemaphoreTake(mutex,portMAX_DELAY)!=pdTRUE)return;
     if(running) {
-        if(!sent) {
+        if(millis()-launched>kJobBudgetMs) {
+            finish("partial_or_unknown","Se agotó el tiempo del trabajo; consulta el estado antes de repetir.");
+        } else if(!sent) {
             String wire=commands[index]+"\r\n";
             if(uart.availableForWrite()>=int(wire.length())) {
                 uart.write(reinterpret_cast<const uint8_t*>(wire.c_str()),wire.length());
@@ -82,20 +152,74 @@ void tick(HardwareSerial& uart) {
         } else if(ack && (!needsReply() || readback)) {
             if(++index==count) {
                 if(expectedMode.length() && !mode.startsWith(expectedMode))finish("partial_or_unknown","Modo leído distinto del solicitado.");
-                else finish(action=="base"?"base_mode_confirmed_coordinates_unverified":"confirmed");
+                else {commitProfile();finish(action=="base"?"base_mode_confirmed_coordinates_unverified":"confirmed");}
             } else sent=false;
-        } else if(millis()-started>4000) finish("partial_or_unknown","Sin ACK/lectura a tiempo; consulta antes de repetir.");
+        } else if(millis()-started>kCommandTimeoutMs) finish("partial_or_unknown","Sin ACK/lectura a tiempo; consulta antes de repetir.");
     }
     xSemaphoreGive(mutex);
 }
+
 int start(JsonVariantConst body,JsonDocument& out) {
     if(!mutex)return 503;
     if(!body.is<JsonObjectConst>() || !body["action"].is<const char*>())return 400;
     String name=body["action"].as<const char*>();
     if(body["action"].as<JsonString>().size()!=name.length())return 400;
-    if(name!="query" && name!="rover" && name!="telemetry" && name!="raw_profile")return 400;
-    if(body.size()!=(name=="telemetry"?2:1))return 400;
-    if(name=="telemetry" && (!body["hz"].is<unsigned>() || (body["hz"]!=1 && body["hz"]!=5 && body["hz"]!=10)))return 400;
+
+    // --- Validacion previa fuera del mutex; nada se envia si algo no cuadra. ---
+    unsigned telemetryHz=0, dgpsSeconds=0;
+    double elevation=0;
+    bool wantGps=true,wantBds=true,wantGlo=true,wantGal=true,wantQzss=true;
+
+    if(name=="query"||name=="rover"||name=="raw_profile"||name=="config_query"||name=="stop_outputs") {
+        if(body.size()!=1)return 400;
+    } else if(name=="telemetry") {
+        if(body.size()!=2||!body["hz"].is<unsigned>()||!validRate(body["hz"].as<unsigned>()))return 400;
+        telemetryHz=body["hz"];
+    } else if(name=="mask") {
+        if(body.size()!=2||!body["elevation_deg"].is<double>())return 400;
+        elevation=body["elevation_deg"].as<double>();
+        // Rango del manual N4: -90 a 90 grados.
+        if(!(elevation>=-90.0&&elevation<=90.0))return 400;
+    } else if(name=="constellations") {
+        if(body.size()<2||body.size()>6)return 400;
+        if(!boolField(body,"gps",wantGps)||!boolField(body,"bds",wantBds)||!boolField(body,"glo",wantGlo)||
+           !boolField(body,"gal",wantGal)||!boolField(body,"qzss",wantQzss))return 400;
+        for(JsonPairConst field:body.as<JsonObjectConst>()){
+            const String key=field.key().c_str();
+            if(key!="action"&&key!="gps"&&key!="bds"&&key!="glo"&&key!="gal"&&key!="qzss")return 400;
+        }
+        // Deshabilitar todo dejaria el receptor sin seguimiento posible.
+        if(!wantGps&&!wantBds&&!wantGlo&&!wantGal&&!wantQzss){
+            out["message"]="Deja al menos una constelación habilitada.";return 400;
+        }
+    } else if(name=="dgps_timeout") {
+        if(body.size()!=2||!body["seconds"].is<unsigned>())return 400;
+        dgpsSeconds=body["seconds"];
+        // Manual N4: 0 desactiva DGPS; 1-1800 segundos.
+        if(dgpsSeconds>1800)return 400;
+    } else if(name=="outputs"||name=="rtcm_base") {
+        if(body.size()!=2||!body["messages"].is<JsonArrayConst>())return 400;
+        JsonArrayConst list=body["messages"].as<JsonArrayConst>();
+        if(!list.size()||list.size()>8)return 400;
+        for(JsonVariantConst entry:list){
+            if(!entry.is<JsonObjectConst>()||entry.size()!=2)return 400;
+            if(!entry["name"].is<const char*>()||!entry["hz"].is<unsigned>()||!validRate(entry["hz"].as<unsigned>()))return 400;
+            const String messageName=entry["name"].as<const char*>();
+            if(name=="outputs"){
+                // Solo sentencias NMEA con prefijo GP, como exige el manual N4.
+                if(messageName!="GPGGA"&&messageName!="GPGSV"&&messageName!="GPGST"&&messageName!="GPRMC"&&
+                   messageName!="GPVTG"&&messageName!="GPZDA"&&messageName!="GPGSA")return 400;
+            } else {
+                if(messageName!="RTCM1005"&&messageName!="RTCM1006"&&messageName!="RTCM1033"&&
+                   messageName!="RTCM1074"&&messageName!="RTCM1084"&&messageName!="RTCM1094"&&
+                   messageName!="RTCM1114"&&messageName!="RTCM1124")return 400;
+            }
+        }
+    } else if(name=="save") {
+        // SAVECONFIG escribe la NVM del receptor: exige confirmacion explicita.
+        if(body.size()!=2||body["confirm"]!=true)return 400;
+    } else return 400;
+
     xSemaphoreTake(mutex,portMAX_DELAY);
     int code=prepare(name,out);
     if(!code) {
@@ -104,12 +228,43 @@ int start(JsonVariantConst body,JsonDocument& out) {
             for(const char* log:{"GPSEPHB","GLOEPHB","GALEPHB","BDSEPHB","BD3EPHB"})add(String(log)+" COM2 30");
         }
         if(name=="query") {add("VERSIONA");add("MODE");}
+        if(name=="config_query") {maskReadback="";add("MASK");}
         if(name=="rover") {rover=false;mode="";add("MODE ROVER SURVEY");add("CONFIG UNDULATION AUTO");add("MODE");expectedMode="MODE ROVER SURVEY";}
-        if(name=="telemetry")add("GPGGA COM2 "+String(1.0/body["hz"].as<unsigned>(),1));
+        if(name=="telemetry") add(String("GPGGA COM2 ")+rateFor(telemetryHz));
+        if(name=="stop_outputs") add("UNLOG COM2");
+        if(name=="mask") {
+            add("MASK "+String(elevation,2));
+            profileState.elevation_deg=elevation;
+        }
+        if(name=="constellations") {
+            const char* names[5]={"GPS","BDS","GLO","GAL","QZSS"};
+            const bool wanted[5]={wantGps,wantBds,wantGlo,wantGal,wantQzss};
+            for(int i=0;i<5;++i)add(String(wanted[i]?"UNMASK ":"MASK ")+names[i]);
+            profileState.gps=wantGps;profileState.bds=wantBds;profileState.glo=wantGlo;
+            profileState.gal=wantGal;profileState.qzss=wantQzss;
+        }
+        if(name=="dgps_timeout") {
+            add("CONFIG DGPS TIMEOUT "+String(dgpsSeconds));
+            profileState.dgps_timeout_s=int(dgpsSeconds);
+        }
+        if(name=="outputs"||name=="rtcm_base") {
+            String summary;
+            for(JsonVariantConst entry:body["messages"].as<JsonArrayConst>()){
+                const String messageName=entry["name"].as<const char*>();
+                const unsigned hz=entry["hz"];
+                add(messageName+" COM2 "+rateFor(hz));
+                if(summary.length())summary+=", ";
+                summary+=messageName+" "+String(hz)+" Hz";
+            }
+            if(name=="outputs")profileState.outputs=summary;else profileState.rtcm=summary;
+        }
+        if(name=="save") add("SAVECONFIG");
         code=launch(out);
+        if(code!=202)finish("idle","");
     }
     xSemaphoreGive(mutex);return code;
 }
+
 int applyBase(JsonVariantConst plan,JsonDocument& out) {
     if(!mutex)return 503;
     if(plan["method"]=="known") {
@@ -125,15 +280,39 @@ int applyBase(JsonVariantConst plan,JsonDocument& out) {
             command+=String(plan["latitude_deg"].as<double>(),11)+" "+String(plan["longitude_deg"].as<double>(),11)+" "+String(plan["arp_ellipsoid_height_m"].as<double>(),4);
         } else command+="TIME "+String(plan["average_seconds"].as<unsigned>())+" "+String(plan["reuse_distance_m"].as<double>(),4);
         add(command);add("MODE");expectedMode="MODE BASE";code=launch(out);
+        if(code!=202)finish("idle","");
     }
     xSemaphoreGive(mutex);return code;
 }
+
 void status(JsonObject out){
     if(!mutex){out["state"]="unavailable";return;}
     xSemaphoreTake(mutex,portMAX_DELAY);
     out["state"]=phase;out["job_id"]=job;out["action"]=action;out["completed_commands"]=index;
-    out["mode"]=mode;out["version"]=version;out["error"]=failure;out["saved"]=false;
+    out["total_commands"]=count;
+    out["mode"]=mode;out["version"]=version;out["error"]=failure;out["saved"]=profileState.saved;
     out["base_coordinates_verified"]=false;out["source"]="esp32_uart";
+    xSemaphoreGive(mutex);
+}
+
+void profile(JsonObject out){
+    if(!mutex){out["available"]=false;return;}
+    xSemaphoreTake(mutex,portMAX_DELAY);
+    out["available"]=true;
+    // elevation_known distingue "lo aplicamos nosotros" de "es el valor por defecto del manual".
+    out["elevation_mask_deg"]=profileState.elevation_deg;
+    out["elevation_mask_applied"]=profileState.elevation_known;
+    JsonObject systems=out["constellations"].to<JsonObject>();
+    systems["gps"]=profileState.gps;systems["bds"]=profileState.bds;systems["glo"]=profileState.glo;
+    systems["gal"]=profileState.gal;systems["qzss"]=profileState.qzss;
+    out["constellations_applied"]=profileState.constellations_known;
+    out["nmea_outputs"]=profileState.outputs;
+    out["rtcm_profile"]=profileState.rtcm;
+    if(profileState.dgps_timeout_s>=0)out["dgps_timeout_s"]=profileState.dgps_timeout_s;
+    else out["dgps_timeout_s"]=nullptr;
+    out["height_reference"]=heightReference();
+    out["mask_readback"]=maskReadback;
+    out["persisted_to_receiver"]=profileState.saved;
     xSemaphoreGive(mutex);
 }
 }
