@@ -122,3 +122,88 @@ Las pruebas del controlador OTA están en `tests/update_smoke.py`; `--install` e
 ## Versión 0.5.0
 
 Control bidireccional UM980, PSRAM verificada y cliente NTRIP directo; microSD preparada sin activar pines hasta cableado. Ver [servicios autónomos](../../docs/esp32-services.md) para API, límites y pruebas. BLE comprobado con la Mac: cifrado, autenticación, fragmentación y consulta del UM980 a través del ESP32.
+
+
+## Versión 0.6.0
+
+### Credenciales separadas — leer antes de actualizar
+
+La contraseña del Wi-Fi propio y la clave del panel/API dejan de ser la misma
+cadena. **Al arrancar esta versión sobre un equipo anterior se genera una
+contraseña Wi-Fi nueva**, de modo que el teléfono no podrá reconectarse con la
+credencial guardada. Con el puente detenido:
+
+```sh
+python tools/usb_console.py access
+```
+
+Ese comando ahora imprime las dos credenciales etiquetadas por separado, más el PIN
+de emparejamiento BLE. Su salida es privada: no subirla al repositorio.
+`set-access` sigue cambiando únicamente la clave del panel/API; la rotación de la
+contraseña del AP desde el panel está pendiente.
+
+El motivo del cambio: hasta 0.5.0, dar acceso al Wi-Fi equivalía a entregar el
+control total del instrumento, incluida la carga de firmware, que no está firmado.
+
+### Panel reorganizado para campo
+
+Pantalla inicial **Campo**, con calidad de solución y coordenadas en un mismo
+bloque grande, más satélites, HDOP, edad de la última época y tramas RTCM
+entregadas al receptor. UART, memoria, versiones y estado de integración pasan a
+Diagnóstico. Criterio completo en [panel de campo](../../docs/panel-campo.md).
+
+### Configuración avanzada del GPS
+
+Nueva sección del panel y nuevas acciones de `POST /api/gnss/control`: máscara de
+elevación, constelaciones, salidas NMEA, perfil RTCM de base, edad máxima de
+correcciones, detener salidas, leer configuración y `SAVECONFIG` con confirmación
+explícita. Las tasas admitidas pasan a 1, 2, 5, 10 y 20 Hz. Sintaxis verificada
+contra el manual Unicore N4 R1.6; comandos y límites en
+[configuración avanzada del receptor](../../docs/gps-advanced.md).
+
+Sigue sin existir un endpoint de comando libre: cada acción arma una secuencia fija
+validada antes de enviar nada al receptor.
+
+### Cambios en la API
+
+| Ruta | Cambio |
+| --- | --- |
+| `GET /api/gnss/profile` | Nueva. Configuración avanzada conocida, distinguiendo lo aplicado de lo asumido por defecto. |
+| `GET /api/status` | `solution.hdop` añadido; `solution.measurement_time` retirado por estar siempre vacío y sin consumidores. |
+| `GET /api/status` | `subsystems.gnss` añade `correction_frames_sent`, `correction_frames_dropped`, `native_frames_valid` y `native_frames_invalid`. |
+| `POST /api/gnss/control` | Acciones nuevas y tasas 2 y 20 Hz; `GET` añade `total_commands`. |
+| `GET /api/access` (solo USB) | Añade `ap_password`. |
+
+### Correcciones de la auditoría
+
+Plazo global para los trabajos GNSS, consumo de la UART por bloques en vez de por
+byte, resincronización del parser RTCM sin coste cuadrático, `Correction` fuera de
+la pila de la tarea, cabeceras NTRIP sin concatenación cuadrática, y castes
+explícitos en `isxdigit`/`isalnum`. El detalle está en
+[el estado del proyecto](../../docs/project-status.md).
+
+El watchdog de las tareas propias existe tras `-DTRESVIZO_TASK_WDT` pero queda
+**desactivado por defecto**: convierte un bloqueo en un reinicio y ese cambio no se
+ha ensayado.
+
+### Verificación de esta entrega
+
+Ejecutado y correcto:
+
+```sh
+node --check web/app.js
+node tests/gnss_panel_test.js
+python -m py_compile tests/device_services_smoke.py tools/usb_console.py
+```
+
+**No ejecutado:** compilación del firmware, carga al ESP32 y
+`tests/device_services_smoke.py`. La máquina de trabajo no tiene compilador C++ ni
+PlatformIO, y el receptor no estaba conectado. Nada de esta versión se ha
+comprobado sobre el equipo real.
+
+### Herramientas en Windows
+
+`tools/usb_console.py` importaba `fcntl` y `termios`, que solo existen en POSIX, de
+modo que no arrancaba en Windows. Ahora esos módulos son opcionales: en Windows el
+puerto ya se abre en exclusiva y pyserial rechaza una segunda apertura, así que no
+hace falta el refuerzo con `TIOCEXCL`.

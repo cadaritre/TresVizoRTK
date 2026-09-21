@@ -8,7 +8,9 @@ El objetivo de desarrollo es alcanzar aproximadamente 2 cm de precisión en cond
 
 ## Estado actual
 
-Ya existe una primera versión de firmware, compilada y cargada al ESP32-S3 conectado por USB. Incluye un panel web con la identidad de TresVizo, diagnóstico real y ajustes persistentes. En 0.5.0 se probaron el enlace UART con UM980, control BLE cifrado y 2 MB de PSRAM. La salida GGA por UART se comprobó a 10 Hz; la precisión y la telemetría de posición en exterior siguen pendientes. La entrada NTRIP está implementada, pendiente de prueba con caster real. IMU sigue sin integrar y microSD está preparada en código, deshabilitada hasta conectar y validar el hardware. No hay aplicación móvil ni diseño electrónico fabricable. La carcasa cuenta con una [V1 mecánica para el primer prototipo completo](mechanical/v1/README.md), con módulos comerciales y una reserva de batería; todavía no se ha impreso ni ensayado físicamente.
+Ya existe una primera versión de firmware, compilada y cargada al ESP32-S3 conectado por USB. Incluye un panel web con la identidad de TresVizo, diagnóstico real y ajustes persistentes. En 0.5.0 se probaron el enlace UART con UM980, control BLE cifrado y 2 MB de PSRAM. La salida GGA por UART se comprobó a 10 Hz; la precisión y la telemetría de posición en exterior siguen pendientes. La entrada NTRIP está implementada, pendiente de prueba con caster real. IMU sigue sin integrar y microSD está preparada en código, deshabilitada hasta conectar y validar el hardware.
+
+**0.6.0** añade una [auditoría del firmware con sus correcciones](docs/project-status.md), un [panel reorganizado para uso en campo](docs/panel-campo.md) y [configuración avanzada del receptor](docs/gps-advanced.md) con sintaxis verificada contra el manual Unicore N4. También separa la contraseña del Wi-Fi propio de la clave de la API: **al actualizar, el equipo genera una contraseña Wi-Fi nueva que debe leerse por USB**. Esta versión **no se ha compilado ni cargado al equipo**, y ninguno de sus comandos nuevos se ha ejecutado contra el UM980 real. No hay aplicación móvil ni diseño electrónico fabricable. La carcasa cuenta con una [V1 mecánica para el primer prototipo completo](mechanical/v1/README.md), con módulos comerciales y una reserva de batería; todavía no se ha impreso ni ensayado físicamente.
 
 Consulta las [instrucciones del firmware](firmware/esp32/README.md) y la [evidencia de validación](docs/firmware-validation.md).
 
@@ -74,6 +76,8 @@ El enlace GNSS usa RX del ESP32 en GPIO18 y TX en GPIO17, con GND común; ambos 
 - [Arquitectura del sistema](docs/architecture.md)
 - [Estado del proyecto](docs/project-status.md)
 - [Servicios actuales del ESP32 (0.5.0)](docs/esp32-services.md)
+- [Configuración avanzada del receptor (0.6.0)](docs/gps-advanced.md)
+- [Panel reorganizado para campo (0.6.0)](docs/panel-campo.md)
 - [Hoja de ruta](docs/roadmap.md)
 - [Entorno y prácticas de desarrollo](docs/development.md)
 - [Lista de materiales](hardware/bom.md)

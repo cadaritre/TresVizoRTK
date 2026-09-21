@@ -10,6 +10,7 @@ assets = [
     ("/app.css", "app.css", "text/css; charset=utf-8"),
     ("/update.js", "update.js", "application/javascript; charset=utf-8"),
     ("/bench.js", "bench.js", "application/javascript; charset=utf-8"),
+    ("/gps.js", "gps.js", "application/javascript; charset=utf-8"),
     ("/app.js", "app.js", "application/javascript; charset=utf-8"),
     ("/assets/tresvizo-logo.png", "assets/tresvizo-logo.png", "image/png"),
 ]

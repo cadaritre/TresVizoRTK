@@ -36,3 +36,16 @@ La preparación de GNSS por USB, parser compartido, compilación de pruebas y ca
 
 
 Desde 0.5.0 se habilita PSRAM Quad y se comprueba memoria en la placa. UART GPIO18/17 habilitada desde 0.4.1. Las menciones iniciales a interfaces desactivadas corresponden al primer arranque; ver [servicios actuales](esp32-services.md).
+
+## Trabajo desde Windows
+
+`tools/usb_console.py` funciona en Windows desde 0.6.0: `fcntl` y `termios` pasaron
+a ser importaciones opcionales. El resto de la documentación asume macOS, con rutas
+`/dev/cu.*`; en Windows los puertos son `COMn` y se listan con
+`Get-CimInstance Win32_PnPEntity`. El ESP32-S3 aparece con VID `303A` y PID `1001`;
+la carrier del UM980 usa un CH340, VID `1A86` PID `7523`.
+
+Compilar el firmware sigue requiriendo PlatformIO, y las pruebas C++ un compilador
+con `-std=c++11`. La entrega 0.6.0 se escribió en una máquina sin ninguno de los
+dos: su verificación se limitó al panel, las herramientas y las pruebas de
+JavaScript y Python.

@@ -96,3 +96,84 @@ El panel prioriza UART del ESP32 sobre el banco USB de la Mac. Pasaron las prueb
 - Controlador SD de flujo original, cola, cierre, catálogo y lectura por bloques preparado. Perfil con SD compilado, pero nunca cargado; pines de esa compilación son solo para verificar código. El propietario confirma lector desconectado. Perfil instalado mantiene SD not_configured, sin conducir pines supuestos.
 - Pruebas: 24 comprobaciones API de servicios; 27 de operaciones; 29 de hardware; 14 Python GNSS y 3 NTRIP de banco. Parser de binario con sanitizadores y render GNSS JS superados. Primera prueba corta de frecuencia capturó transición; se añadió estabilización y cálculo por tiempo real del ESP32: 4.96 y 10.12 Hz en ventanas de unos 5 s. Pruebas históricas se actualizaron para UART activo y respuesta 503 de SD ausente.
 - Firmware instalado por OTA, arranque confirmado y ajustes conservados. Detalles y límites: [servicios del ESP32](esp32-services.md).
+
+## 0.6.0 — 2026-09-20: auditoría del firmware, panel de campo y GPS avanzado
+
+Esta sección sustituye los estados anteriores de los componentes que menciona.
+
+### Auditoría del firmware
+
+Revisión completa de las 2065 líneas del firmware. Corregido:
+
+| Hallazgo | Corrección |
+| --- | --- |
+| Tramas RTCM entregadas al receptor no se publicaban en ninguna API | `correction_frames_sent` y `correction_frames_dropped` expuestos en `subsystems.gnss` y en la vista de Campo |
+| Un trabajo GNSS podía quedar en `running` indefinidamente: el plazo de 4 s solo corría tras enviar el comando, y vivía en la rama `else` del caso «aún no enviado» | Plazo global de 20 s desde el lanzamiento, independiente del envío |
+| `isxdigit()` e `isalnum()` con `char` con signo: comportamiento indefinido con bytes >0x7F procedentes de JSON | Cast explícito a `unsigned char` |
+| Un `xStreamBufferSend` y una toma de semáforo **por byte** desde la tarea UART | Lectura y entrega por bloques de 512 bytes |
+| `Rtcm3Parser` hacía `memmove` de hasta 1028 bytes por cada byte de ruido | Resincronización buscando el siguiente `0xD3` con un solo `memmove` |
+| `Correction` de 1039 bytes como local en una tarea de 4 KiB | Movido fuera de la pila |
+| Cabeceras NTRIP concatenadas byte a byte sobre `String` | Buffer fijo, lectura byte a byte conservada a propósito para no tragarse RTCM del flujo |
+| El bucle de cabeceras NTRIP usaba `client.connected()` sin `|| available()` | Corregido; un caster que cierre rápido ya no pierde cabeceras |
+| `mbedtls_base64_encode` sin comprobar retorno | Comprobado; si falla no se envía una credencial vacía |
+| `hdop` se parseaba y nunca se publicaba | Expuesto en `solution.hdop` |
+| `measurement_time` siempre nulo y sin consumidores | Retirado de la API |
+| Contadores del binario nativo Unicore invisibles | `native_frames_valid` / `native_frames_invalid` expuestos |
+| `String path` sombreaba el parámetro `path` | Renombrado |
+
+No corregido a propósito: el watchdog de las tareas propias queda tras
+`-DTRESVIZO_TASK_WDT`, **desactivado por defecto**, porque convierte un bloqueo en
+un reinicio y ese cambio de comportamiento no se ha ensayado.
+
+Descartado tras verificación: la doble convención de checksum entre `nmea_gga.h` y
+`gnss_control.cpp` no es un error. El XOR de control Unicore incluye el `$`/`#`
+inicial, como ya documentaba [el banco USB](usb-bench.md); el de NMEA no.
+
+### Credenciales separadas
+
+Hasta 0.5.0 la contraseña del Wi-Fi propio y la clave de la API eran la misma
+cadena. Quien recibía acceso a la red obtenía control total del equipo, incluida
+la carga de firmware, que no está firmado. Desde 0.6.0 son dos credenciales
+independientes en NVS.
+
+**Al actualizar desde una versión anterior, el equipo genera una contraseña Wi-Fi
+nueva.** Hay que leerla por USB con `python tools/usb_console.py access` antes de
+volver a conectarse a la red del instrumento. La rotación de la contraseña del AP
+desde el panel sigue pendiente.
+
+### Panel reorganizado
+
+Vista de Campo como pantalla inicial, con coordenadas y calidad en un solo bloque
+grande; UART, memoria y versiones trasladadas a Diagnóstico. Criterio y límites en
+[panel de campo](panel-campo.md).
+
+### Configuración avanzada del GPS
+
+Máscara de elevación, constelaciones, salidas NMEA, perfil RTCM de base, edad
+máxima de correcciones, lectura de configuración y persistencia explícita con
+`SAVECONFIG`. Sintaxis verificada contra el manual Unicore N4 R1.6; las tasas se
+amplían a 1/2/5/10/20 Hz. Detalle y límites en
+[configuración avanzada del receptor](gps-advanced.md).
+
+### Pruebas realizadas
+
+- `node --check` sobre los cinco archivos JS del panel: correcto.
+- `tests/gnss_panel_test.js`: pasa sin cambios, incluida la ocultación de posiciones
+  no vigentes.
+- Comprobación cruzada de que los 74 identificadores que el JS manipula existen en
+  `index.html`, y de equilibrio de etiquetas por sección.
+- Vista previa del panel servida localmente y revisada a 1280 px y a ancho de
+  teléfono.
+- `python -m py_compile` sobre las herramientas y pruebas modificadas.
+
+### Pruebas pendientes
+
+- **Nada de esto se ha compilado para el ESP32 ni cargado al equipo.** No hay
+  compilador C++ ni PlatformIO en la máquina donde se hizo el trabajo.
+- Ningún comando nuevo se ejecutó contra el UM980 real; los puertos se
+  desconectaron durante la sesión.
+- `tests/device_services_smoke.py` se amplió con la validación de la configuración
+  avanzada y la lectura del perfil, pero no se ejecutó.
+- Sin medir: efecto del consumo por bloques sobre la tasa sostenida, presupuesto
+  del enlace con varias sentencias a tasa alta, y comportamiento del panel con luz
+  solar directa.

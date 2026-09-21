@@ -40,3 +40,20 @@ El PIN se guarda en NVS la primera vez para conservarlo entre reinicios; se cons
 - Manual Unicore N4 R1.6 y CRC consultados en `docs/usb-bench.md`.
 - SDK instalado Arduino-ESP32 2.0.17: `esp32-hal-psram.c`, configuración `esp32s3/dio_qspi`, `BLESecurity`.
 - [Bleak en macOS](https://bleak.readthedocs.io/en/latest/backends/macos.html): emparejamiento al acceder a características protegidas.
+
+## Evolución 0.6.0
+
+El control UART descrito arriba se amplía con máscara de elevación,
+constelaciones, salidas NMEA, perfil RTCM de base, edad máxima de correcciones y
+persistencia explícita; las tasas pasan a 1/2/5/10/20 Hz. Contrato completo,
+sintaxis verificada y límites en [configuración avanzada del receptor](gps-advanced.md).
+
+Se mantiene que no existe endpoint de comando libre. Cambia la afirmación «no se
+envía SAVECONFIG»: ahora puede enviarse, pero solo mediante una acción propia que
+exige confirmación explícita, y sigue sin enviarse en ninguna otra operación.
+
+La entrega del RTCM al receptor deja de ser invisible: `subsystems.gnss` publica
+`correction_frames_sent` y `correction_frames_dropped`, y el binario nativo Unicore
+publica `native_frames_valid` y `native_frames_invalid`. El consumo de la UART pasa
+a hacerse por bloques en vez de byte a byte. Las correcciones de la auditoría están
+en [el estado del proyecto](project-status.md).

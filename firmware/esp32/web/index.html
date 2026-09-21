@@ -10,6 +10,7 @@
     <script src="/bench.js" defer></script>
     <script src="/update.js" defer></script>
     <script src="/device.js" defer></script>
+    <script src="/gps.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Ir al contenido</a>
@@ -24,30 +25,21 @@
       >
       <div class="nav-label">INSTRUMENTO</div>
       <nav aria-label="Navegación principal">
-        <button
-          class="nav-item active"
-          data-page="overview"
-          aria-current="page"
-        >
-          <span aria-hidden="true">◫</span> Resumen
+        <button class="nav-item active" data-page="field" aria-current="page">
+          <span aria-hidden="true">⌖</span> Campo
         </button>
-        <button class="nav-item" data-page="connections">
-          <span aria-hidden="true">⌁</span> Conexiones
-        </button>
-        <button class="nav-item" data-page="base"><span aria-hidden="true">⌖</span> Base / rover</button>
-        <button class="nav-item" data-page="recording"><span aria-hidden="true">◉</span> Registro / PPK</button>
+        <button class="nav-item" data-page="base"><span aria-hidden="true">◎</span> Base / rover</button>
         <button class="nav-item" data-page="corrections"><span aria-hidden="true">⇄</span> Correcciones</button>
-        <button class="nav-item" data-page="settings">
-          <span aria-hidden="true">☷</span> Configuración
-        </button>
-        <button class="nav-item" data-page="diagnostics">
-          <span aria-hidden="true">◎</span> Diagnóstico
-        </button>
+        <button class="nav-item" data-page="recording"><span aria-hidden="true">◉</span> Registro / PPK</button>
+        <button class="nav-item" data-page="gps"><span aria-hidden="true">⚙</span> GPS avanzado</button>
+        <button class="nav-item" data-page="connections"><span aria-hidden="true">⌁</span> Conexiones</button>
+        <button class="nav-item" data-page="settings"><span aria-hidden="true">☷</span> Configuración</button>
+        <button class="nav-item" data-page="diagnostics"><span aria-hidden="true">▤</span> Diagnóstico</button>
       </nav>
       <div class="sidebar-bottom">
         <span class="eyebrow">TRESVIZO INGENIERÍA</span>
         <p>Tecnología que<br />conecta con el terreno.</p>
-        <span class="version">PROTOTIPO <b>0.5.0</b></span>
+        <span class="version">PROTOTIPO <b>0.6.0</b></span>
       </div>
     </aside>
     <div class="workspace">
@@ -65,90 +57,63 @@
           No hay comunicación con el instrumento. Verifica el enlace; volveremos
           a intentar automáticamente.
         </div>
-        <section
-          class="page"
-          id="page-overview"
-          aria-labelledby="overview-title"
-        >
-          <div class="page-heading">
-            <div>
-              <p class="eyebrow">CENTRO DE CONTROL</p>
-              <h1 id="overview-title">
-                Tu instrumento.<br /><span>Todo a la vista.</span>
-              </h1>
-              <p class="intro">
-                Estado, conexiones y configuración de tu TresVizo RTK.
-              </p>
+        <section class="page" id="page-field" aria-labelledby="field-title">
+          <h1 class="visually-hidden" id="field-title">Vista de campo</h1>
+          <p class="field-device">
+            <span id="device-name" data-live>TresVizo RTK</span>
+            <span class="field-note">Los valores se ocultan en cuanto dejan de estar vigentes.</span>
+          </p>
+          <!-- Bloque unico de lectura rapida: calidad y coordenadas juntas.
+               Nunca muestra una posicion que no este vigente. -->
+          <article class="field-hero">
+            <div class="field-quality-block">
+              <span class="field-label">SOLUCIÓN</span>
+              <strong id="field-quality" data-live>Sin solución</strong>
+              <span class="field-sub">Estado informado por el receptor. No es una
+                garantía de exactitud.</span>
             </div>
-            <span class="stage-tag"
-              ><span class="dot"></span> Puesta en marcha</span
-            >
+            <dl class="field-coords">
+              <div>
+                <dt>Latitud</dt>
+                <dd id="field-latitude" data-live>—</dd>
+              </div>
+              <div>
+                <dt>Longitud</dt>
+                <dd id="field-longitude" data-live>—</dd>
+              </div>
+              <div>
+                <dt>Altura</dt>
+                <dd id="field-height" data-live>—</dd>
+                <span class="field-note" id="field-height-reference" data-live>—</span>
+              </div>
+            </dl>
+          </article>
+          <div class="field-strip">
+            <article class="field-chip">
+              <span class="field-label">SATÉLITES</span>
+              <strong id="field-satellites" data-live>—</strong>
+            </article>
+            <article class="field-chip">
+              <span class="field-label">HDOP</span>
+              <strong id="field-hdop" data-live>—</strong>
+              <span class="field-note">Geometría, no metros</span>
+            </article>
+            <article class="field-chip">
+              <span class="field-label">EDAD</span>
+              <strong id="field-age" data-live>—</strong>
+              <span class="field-note">Desde la última época</span>
+            </article>
+            <article class="field-chip">
+              <span class="field-label">RTCM AL GPS</span>
+              <strong id="field-corrections" data-live>—</strong>
+              <span class="field-note">Tramas entregadas</span>
+            </article>
           </div>
-          <div class="overview-grid">
-            <article class="instrument-card">
-              <div class="card-top">
-                <span class="eyebrow">RECEPTOR GNSS RTK</span
-                ><span class="outline-badge">TRIPLE BANDA · OBJETIVO</span>
-              </div>
-              <h2 id="device-name">TresVizo RTK</h2>
-              <div
-                class="instrument-diagram"
-                aria-label="Esquema conceptual del instrumento, sin mediciones"
-              >
-                <div class="orbit orbit-one"></div>
-                <div class="orbit orbit-two"></div>
-                <div class="cross horizontal"></div>
-                <div class="cross vertical"></div>
-                <div class="receiver">
-                  <div class="receiver-top"></div>
-                  <div class="receiver-body">
-                    <span>3VIZO</span><small>RTK</small>
-                  </div>
-                  <div class="receiver-stem"></div>
-                </div>
-                <span class="diagram-label label-gnss">GNSS</span
-                ><span class="diagram-label label-imu">IMU</span
-                ><span class="diagram-label label-sd">microSD</span>
-              </div>
-              <div class="instrument-bottom">
-                <span
-                  ><i class="dot"></i> GNSS por UART · IMU y microSD pendientes</span
-                ><span>01 / PROTOTIPO</span>
-              </div>
-            </article>
-            <article class="solution-card">
-              <div class="card-top">
-                <span class="eyebrow">SOLUCIÓN GNSS</span
-                ><span id="gnss-state" class="badge muted">Sin enlace GNSS</span>
-              </div>
-              <div class="empty-solution">
-                <span class="target-icon" aria-hidden="true">⌖</span>
-                <h2 id="gnss-title">Aún no hay posición</h2>
-                <p id="gnss-description">Esperando conexión del receptor al ESP32.</p>
-              </div>
-              <dl class="solution-values">
-                <div>
-                  <dt>Latitud</dt>
-                  <dd id="gnss-latitude" data-live>—</dd>
-                </div>
-                <div>
-                  <dt>Longitud</dt>
-                  <dd id="gnss-longitude" data-live>—</dd>
-                </div>
-                <div>
-                  <dt>Altura / referencia</dt>
-                  <dd id="gnss-height" data-live>—</dd>
-                </div>
-                <div>
-                  <dt>Solución del receptor</dt>
-                  <dd id="gnss-quality" data-live>Sin datos</dd>
-                </div>
-              </dl>
-              <p class="card-footnote">
-                La posición y su calidad aparecerán al recibir mediciones
-                reales.
-              </p>
-            </article>
+          <div class="field-actions">
+            <button class="button primary" data-page="corrections">Correcciones</button>
+            <button class="button secondary" data-page="recording">Registro</button>
+            <button class="button secondary" data-page="base">Base / rover</button>
+            <button class="button secondary" data-page="gps">GPS avanzado</button>
           </div>
           <article class="panel bench-panel" id="bench-panel" hidden>
             <div class="card-top"><h2>GPS conectado a la Mac</h2><span class="badge" id="bench-state">Consultando</span></div>
@@ -171,58 +136,127 @@
             <p class="hint">Identificador de señal NMEA del receptor. Una señal no equivale a un satélite adicional.</p>
             <div class="signal-list" id="bench-signals"></div>
           </article>
-          <div class="metric-grid">
-            <article class="metric">
-              <span class="metric-label">TIEMPO ENCENDIDO <i>◷</i></span
-              ><strong id="uptime" data-live>—</strong
-              ><small>Desde el último arranque</small>
-            </article>
-            <article class="metric">
-              <span class="metric-label">MEMORIA LIBRE <i>▥</i></span
-              ><strong id="heap" data-live>—</strong
-              ><small>RAM interna del ESP32</small>
-            </article>
-            <article class="metric">
-              <span class="metric-label">RED DEL EQUIPO <i>⌁</i></span
-              ><strong class="small-value" id="ap-name" data-live>—</strong
-              ><small id="ap-summary">Esperando conexión</small>
-            </article>
-            <article class="metric">
-              <span class="metric-label">FIRMWARE <i>◈</i></span
-              ><strong id="firmware" data-live>—</strong
-              ><small>Control autónomo en desarrollo</small>
-            </article>
+        </section>
+        <section class="page" id="page-gps" aria-labelledby="gps-title" hidden>
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">RECEPTOR</p>
+              <h1 id="gps-title">Configuración avanzada del GPS</h1>
+              <p class="intro">
+                Comandos verificados contra el manual Unicore N4 R1.6. Cada
+                operación se envía por UART y espera su confirmación. Los cambios
+                son temporales hasta que los guardes en el receptor.
+              </p>
+            </div>
           </div>
-          <div class="section-heading">
-            <h2>Componentes del equipo</h2>
-            <span>Estado de integración</span>
-          </div>
-          <div class="component-grid">
-            <article class="component">
-              <span class="component-icon" aria-hidden="true">⌖</span>
-              <div>
-                <h3>Receptor GNSS</h3>
-                <p>Unicore UM980 · UART 115200</p>
-              </div>
-              <span class="status-label">UART habilitada</span>
-            </article>
-            <article class="component">
-              <span class="component-icon" aria-hidden="true">⊕</span>
-              <div>
-                <h3>Unidad inercial</h3>
-                <p>BMI088 · 6 ejes</p>
-              </div>
-              <span class="status-label">Pendiente</span>
-            </article>
-            <article class="component">
-              <span class="component-icon" aria-hidden="true">▤</span>
-              <div>
-                <h3>Almacenamiento</h3>
-                <p>Lector microSD · SPI</p>
-              </div>
-              <span class="status-label">Pendiente</span>
-            </article>
-          </div>
+          <p id="gps-availability" class="hint">Consultando el receptor…</p>
+
+          <article class="panel">
+            <h2>Máscara de elevación</h2>
+            <p>Ángulo por debajo del cual el receptor ignora satélites. Valor de
+              fábrica: 5°. Rango admitido: −90° a 90°.</p>
+            <form id="gps-mask-form" class="inline-form">
+              <label for="gps-mask">Ángulo en grados</label>
+              <input type="number" id="gps-mask" min="-90" max="90" step="0.5" value="5" required />
+              <button class="button secondary" type="submit">Aplicar máscara</button>
+            </form>
+            <p class="hint">Subirla reduce multitrayecto bajo obstáculos pero deja
+              menos satélites; no mejora por sí sola la exactitud.</p>
+            <p id="gps-mask-message" role="status"></p>
+          </article>
+
+          <article class="panel">
+            <h2>Constelaciones</h2>
+            <p>Habilita o deshabilita el seguimiento por sistema. Debe quedar al
+              menos uno activo.</p>
+            <form id="gps-constellations-form" class="checkbox-grid">
+              <label><input type="checkbox" id="gps-sys-gps" checked /> GPS</label>
+              <label><input type="checkbox" id="gps-sys-bds" checked /> BeiDou</label>
+              <label><input type="checkbox" id="gps-sys-glo" checked /> GLONASS</label>
+              <label><input type="checkbox" id="gps-sys-gal" checked /> Galileo</label>
+              <label><input type="checkbox" id="gps-sys-qzss" checked /> QZSS</label>
+              <button class="button secondary" type="submit">Aplicar constelaciones</button>
+            </form>
+            <p class="hint">Se envía MASK o UNMASK por sistema. El manual advierte
+              no mezclar máscaras por sistema con máscaras por satélite.</p>
+            <p id="gps-constellations-message" role="status"></p>
+          </article>
+
+          <article class="panel">
+            <h2>Salidas NMEA</h2>
+            <p>Sentencias que el receptor emite por COM2 y su frecuencia. GPGGA es
+              la que alimenta la posición del panel.</p>
+            <form id="gps-outputs-form" class="output-grid">
+              <div class="output-row" data-message="GPGGA"><label><input type="checkbox" checked /> GPGGA</label><select><option value="1">1 Hz</option><option value="2">2 Hz</option><option value="5">5 Hz</option><option value="10" selected>10 Hz</option><option value="20">20 Hz</option></select></div>
+              <div class="output-row" data-message="GPGST"><label><input type="checkbox" /> GPGST</label><select><option value="1" selected>1 Hz</option><option value="2">2 Hz</option><option value="5">5 Hz</option><option value="10">10 Hz</option></select></div>
+              <div class="output-row" data-message="GPRMC"><label><input type="checkbox" /> GPRMC</label><select><option value="1" selected>1 Hz</option><option value="2">2 Hz</option><option value="5">5 Hz</option><option value="10">10 Hz</option></select></div>
+              <div class="output-row" data-message="GPGSV"><label><input type="checkbox" /> GPGSV</label><select><option value="1" selected>1 Hz</option><option value="2">2 Hz</option></select></div>
+              <div class="output-row" data-message="GPGSA"><label><input type="checkbox" /> GPGSA</label><select><option value="1" selected>1 Hz</option><option value="2">2 Hz</option></select></div>
+              <button class="button secondary" type="submit">Aplicar salidas</button>
+            </form>
+            <p class="hint">Una tasa alta en varias sentencias puede saturar el
+              enlace de 115200 baudios. La tasa de mensaje no es la tasa de
+              solución del receptor.</p>
+            <p id="gps-outputs-message" role="status"></p>
+          </article>
+
+          <article class="panel">
+            <h2>Perfil RTCM de base</h2>
+            <p>Mensajes que publica el receptor cuando opera como base. Solo tiene
+              efecto con la base ya configurada y verificada.</p>
+            <form id="gps-rtcm-form" class="output-grid">
+              <div class="output-row" data-message="RTCM1005"><label><input type="checkbox" checked /> 1005 · posición de estación</label><select><option value="1">1 Hz</option><option value="5" selected>5 Hz</option></select></div>
+              <div class="output-row" data-message="RTCM1033"><label><input type="checkbox" checked /> 1033 · descripción</label><select><option value="1">1 Hz</option><option value="5" selected>5 Hz</option></select></div>
+              <div class="output-row" data-message="RTCM1074"><label><input type="checkbox" checked /> 1074 · GPS MSM4</label><select><option value="1" selected>1 Hz</option><option value="2">2 Hz</option></select></div>
+              <div class="output-row" data-message="RTCM1084"><label><input type="checkbox" checked /> 1084 · GLONASS MSM4</label><select><option value="1" selected>1 Hz</option><option value="2">2 Hz</option></select></div>
+              <div class="output-row" data-message="RTCM1094"><label><input type="checkbox" checked /> 1094 · Galileo MSM4</label><select><option value="1" selected>1 Hz</option><option value="2">2 Hz</option></select></div>
+              <div class="output-row" data-message="RTCM1124"><label><input type="checkbox" checked /> 1124 · BeiDou MSM4</label><select><option value="1" selected>1 Hz</option><option value="2">2 Hz</option></select></div>
+              <button class="button secondary" type="submit">Aplicar perfil RTCM</button>
+            </form>
+            <p class="hint">1006 incorpora altura de antena y exige verificar su
+              configuración antes de usarlo; no se ofrece todavía.</p>
+            <p id="gps-rtcm-message" role="status"></p>
+          </article>
+
+          <article class="panel">
+            <h2>Edad máxima de correcciones</h2>
+            <p>Descarta correcciones diferenciales más viejas que este valor.
+              0 desactiva el cálculo diferencial. Rango: 0 a 1800 s.</p>
+            <form id="gps-dgps-form" class="inline-form">
+              <label for="gps-dgps">Segundos</label>
+              <input type="number" id="gps-dgps" min="0" max="1800" step="1" value="60" required />
+              <button class="button secondary" type="submit">Aplicar</button>
+            </form>
+            <p id="gps-dgps-message" role="status"></p>
+          </article>
+
+          <article class="panel">
+            <h2>Estado y persistencia</h2>
+            <dl class="detail-list">
+              <div><dt>Máscara aplicada</dt><dd id="gps-state-mask">—</dd></div>
+              <div><dt>Constelaciones</dt><dd id="gps-state-systems">—</dd></div>
+              <div><dt>Salidas NMEA</dt><dd id="gps-state-outputs">—</dd></div>
+              <div><dt>Perfil RTCM</dt><dd id="gps-state-rtcm">—</dd></div>
+              <div><dt>Edad de correcciones</dt><dd id="gps-state-dgps">—</dd></div>
+              <div><dt>Referencia de altura</dt><dd id="gps-state-height">—</dd></div>
+              <div><dt>Lectura MASK del receptor</dt><dd id="gps-state-readback">—</dd></div>
+              <div><dt>Guardado en el receptor</dt><dd id="gps-state-saved">—</dd></div>
+            </dl>
+            <p class="hint">Este resumen refleja lo que este firmware aplicó o leyó,
+              no una consulta continua al UM980.</p>
+            <div class="button-row">
+              <button class="button secondary" id="gps-query">Leer configuración del receptor</button>
+              <button class="button secondary" id="gps-stop-outputs">Detener todas las salidas de COM2</button>
+            </div>
+            <p class="warning-box">Guardar escribe la memoria no volátil del receptor.
+              Sin guardar, esta configuración se pierde al apagar el GPS. Con guardar,
+              sobrevive al apagado y también sobrevive una configuración errónea.</p>
+            <div class="button-row">
+              <label><input type="checkbox" id="gps-save-confirm" /> Entiendo que se escribirá la memoria del receptor</label>
+              <button class="button primary" id="gps-save" disabled>Guardar en el receptor</button>
+            </div>
+            <p id="gps-message" role="status"></p>
+          </article>
         </section>
         <section
           class="page"
@@ -338,7 +372,7 @@
             <div class="save-bar"><button class="button primary" type="submit">Validar y preparar plan</button><button id="base-export" class="button secondary" type="button" disabled>Exportar plan JSON</button></div>
             <p id="base-result" role="status">Prepara y revisa el plan; después puedes aplicarlo desde el control UART de esta página.</p>
           </form>
-        <article class="panel lower"><h2>GPS conectado al ESP32</h2><p>Comandos por UART. La adquisición continúa durante las consultas. Cambios temporales: no se envía SAVECONFIG.</p><div class="button-row"><button class="button secondary" id="device-query">Consultar versión y modo</button><button class="button secondary" id="device-rover">Configurar rover</button></div><label for="device-hz">Frecuencia GGA</label><select id="device-hz"><option value="1">1 Hz</option><option value="5">5 Hz</option><option value="10" selected>10 Hz</option></select><button class="button secondary" id="device-rate">Aplicar frecuencia</button><p id="device-control-state"></p><p id="device-version"></p><p id="device-control-error" role="status"></p><p id="device-control-message" role="status"></p><button class="button primary" id="device-base-apply">Aplicar plan de base al ESP32</button><p id="device-base-message" role="status"></p><p>La lectura de modo base no verifica las coordenadas. No publicar correcciones hasta comprobar coordenadas, referencia de altura y convergencia.</p></article><article class="panel bench-panel" id="bench-base" hidden><h2>Aplicar al GPS por USB de la Mac</h2><p>La base conocida requiere WGS84 y altura elipsoidal. El promedio puede guardar coordenadas en la memoria del GPS y no garantiza precisión absoluta.</p><button class="button primary" type="button" id="bench-base-apply">Aplicar el plan validado al GPS USB</button><p id="bench-base-message" role="status"></p></article></section>
+        <article class="panel lower"><h2>GPS conectado al ESP32</h2><p>Comandos por UART. La adquisición continúa durante las consultas. Cambios temporales: no se envía SAVECONFIG.</p><div class="button-row"><button class="button secondary" id="device-query">Consultar versión y modo</button><button class="button secondary" id="device-rover">Configurar rover</button></div><label for="device-hz">Frecuencia GGA</label><select id="device-hz"><option value="1">1 Hz</option><option value="2">2 Hz</option><option value="5">5 Hz</option><option value="10" selected>10 Hz</option><option value="20">20 Hz</option></select><button class="button secondary" id="device-rate">Aplicar frecuencia</button><p id="device-control-state"></p><p id="device-version"></p><p id="device-control-error" role="status"></p><p id="device-control-message" role="status"></p><button class="button primary" id="device-base-apply">Aplicar plan de base al ESP32</button><p id="device-base-message" role="status"></p><p>La lectura de modo base no verifica las coordenadas. No publicar correcciones hasta comprobar coordenadas, referencia de altura y convergencia.</p></article><article class="panel bench-panel" id="bench-base" hidden><h2>Aplicar al GPS por USB de la Mac</h2><p>La base conocida requiere WGS84 y altura elipsoidal. El promedio puede guardar coordenadas en la memoria del GPS y no garantiza precisión absoluta.</p><button class="button primary" type="button" id="bench-base-apply">Aplicar el plan validado al GPS USB</button><p id="bench-base-message" role="status"></p></article></section>
         <section class="page" id="page-recording" aria-labelledby="recording-title" hidden>
           <div class="page-heading"><div><p class="eyebrow">OBSERVACIONES Y SESIONES</p><h1 id="recording-title">Registro / PPK</h1><p class="intro">Graba observaciones para procesarlas después y conserva el contexto de cada sesión.</p></div></div>
 <article class="panel"><h2>Grabación autónoma · microSD</h2><p>El lector está pendiente de cableado. Los controles se habilitan cuando el firmware detecta la tarjeta con pines verificados.</p><p>Registro del flujo original Unicore. Observaciones a 1 Hz; GGA a 10 Hz es independiente. No es un cálculo PPK ni una validación de precisión.</p><div class="button-row"><button class="button secondary" id="sd-profile" disabled>Preparar observaciones</button><button class="button primary" id="sd-start" disabled>Iniciar microSD</button><button class="button secondary" id="sd-stop" disabled>Detener y cerrar</button></div><p id="sd-state" role="status"></p><p id="sd-message" role="status"></p><p>Espera al cierre confirmado antes de apagar. Límite inicial de 64 MiB por sesión. Ante un cierre interrumpido se conserva el archivo parcial; FAT y alimentación deben validarse físicamente.</p><div id="sd-sessions"></div></article>
@@ -594,6 +628,82 @@
               Reiniciar
             </button>
           </article>
+          <div class="section-heading">
+            <h2>Detalle de la solución GNSS</h2>
+            <span>Lectura extendida y estado del enlace</span>
+          </div>
+          <article class="panel">
+            <div class="card-top">
+              <span class="eyebrow">SOLUCIÓN GNSS</span
+              ><span id="gnss-state" class="badge muted">Sin enlace GNSS</span>
+            </div>
+            <h3 id="gnss-title">Aún no hay posición</h3>
+            <p id="gnss-description">Esperando conexión del receptor al ESP32.</p>
+            <dl class="detail-list">
+              <div><dt>Latitud</dt><dd id="gnss-latitude" data-live>—</dd></div>
+              <div><dt>Longitud</dt><dd id="gnss-longitude" data-live>—</dd></div>
+              <div><dt>Altura / referencia</dt><dd id="gnss-height" data-live>—</dd></div>
+              <div><dt>Solución del receptor</dt><dd id="gnss-quality" data-live>Sin datos</dd></div>
+            </dl>
+            <p class="hint">La vista de Campo muestra lo mismo en grande. Aquí se
+              conserva el detalle y el estado textual del enlace.</p>
+          </article>
+          <div class="section-heading">
+            <h2>Recursos del controlador</h2>
+            <span>Plomería interna del ESP32</span>
+          </div>
+          <div class="metric-grid">
+            <article class="metric">
+              <span class="metric-label">TIEMPO ENCENDIDO <i>◷</i></span
+              ><strong id="uptime" data-live>—</strong
+              ><small>Desde el último arranque</small>
+            </article>
+            <article class="metric">
+              <span class="metric-label">MEMORIA LIBRE <i>▥</i></span
+              ><strong id="heap" data-live>—</strong
+              ><small>RAM interna del ESP32</small>
+            </article>
+            <article class="metric">
+              <span class="metric-label">RED DEL EQUIPO <i>⌁</i></span
+              ><strong class="small-value" id="ap-name" data-live>—</strong
+              ><small id="ap-summary">Esperando conexión</small>
+            </article>
+            <article class="metric">
+              <span class="metric-label">FIRMWARE <i>◈</i></span
+              ><strong id="firmware" data-live>—</strong
+              ><small>Control autónomo en desarrollo</small>
+            </article>
+          </div>
+          <div class="section-heading">
+            <h2>Componentes del equipo</h2>
+            <span>Estado de integración</span>
+          </div>
+          <div class="component-grid">
+            <article class="component">
+              <span class="component-icon" aria-hidden="true">⌖</span>
+              <div>
+                <h3>Receptor GNSS</h3>
+                <p>Unicore UM980 · UART 115200</p>
+              </div>
+              <span class="status-label">UART habilitada</span>
+            </article>
+            <article class="component">
+              <span class="component-icon" aria-hidden="true">⊕</span>
+              <div>
+                <h3>Unidad inercial</h3>
+                <p>BMI088 · 6 ejes</p>
+              </div>
+              <span class="status-label">Pendiente</span>
+            </article>
+            <article class="component">
+              <span class="component-icon" aria-hidden="true">▤</span>
+              <div>
+                <h3>Almacenamiento</h3>
+                <p>Lector microSD · SPI</p>
+              </div>
+              <span class="status-label">Pendiente</span>
+            </article>
+          </div>
         </section>
         <footer class="footer">
           <span>3VIZO <b>INGENIERÍA</b> · Control del instrumento</span
