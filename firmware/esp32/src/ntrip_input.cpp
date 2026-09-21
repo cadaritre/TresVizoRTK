@@ -7,6 +7,8 @@
 #include <WiFiClient.h>
 #include <mbedtls/base64.h>
 #include <atomic>
+#include <cctype>
+#include <cstring>
 namespace ntrip_input {
 namespace {
 struct Config {String host,mount,user,password;uint16_t port=2101;};
@@ -21,6 +23,8 @@ bool valid(JsonVariantConst field,size_t max,bool empty=false){
  return true;
 }
 bool current(uint32_t id){return wanted && generation==id && !firmware_update::busy();}
+// Fuera de la pila del worker (6 KiB) y con una sola tarea usandolo.
+char header[2049];
 void worker(void*) {
  WiFiClient client;gnss::Rtcm3Parser parser;unsigned backoff=1000;
  for(;;){
@@ -30,18 +34,26 @@ void worker(void*) {
   state="connecting";failure="";client.setTimeout(2000);
   if(client.connect(c.host.c_str(),c.port,2000) && current(id)) {
    String credentials=c.user+":"+c.password;unsigned char encoded[264];size_t encodedSize=0;
-   mbedtls_base64_encode(encoded,sizeof(encoded),&encodedSize,reinterpret_cast<const uint8_t*>(credentials.c_str()),credentials.length());
-   String header="GET /"+c.mount+" HTTP/1.0\r\nHost: "+c.host+"\r\nUser-Agent: NTRIP TresVizo/0.5\r\nAuthorization: Basic "+String(reinterpret_cast<char*>(encoded),encodedSize)+"\r\nConnection: close\r\n\r\n";
-   client.print(header);credentials="";header="";memset(encoded,0,sizeof(encoded));
-   String response;uint32_t start=millis();bool accepted=false,headersDone=false;
-   while(current(id) && millis()-start<5000 && response.length()<2048 && client.connected()){
-    if(!client.available()){vTaskDelay(1);continue;}
-    response+=char(client.read());
-    if(response=="ICY 200 OK\r\n"){accepted=headersDone=true;break;}
-    if(response.endsWith("\r\n\r\n")){
-     accepted=response.startsWith("HTTP/1.0 200 ")||response.startsWith("HTTP/1.1 200 ");
-     String lower=response;lower.toLowerCase();
-     if(lower.indexOf("transfer-encoding:")>=0 || lower.indexOf("content-encoding:")>=0)accepted=false;
+   const int encodeError=mbedtls_base64_encode(encoded,sizeof(encoded),&encodedSize,reinterpret_cast<const uint8_t*>(credentials.c_str()),credentials.length());
+   credentials="";
+   if(encodeError||!encodedSize){
+    memset(encoded,0,sizeof(encoded));client.stop();failure="credentials_encode_failed";
+    state="retry_wait";vTaskDelay(pdMS_TO_TICKS(1000));continue;
+   }
+   String request="GET /"+c.mount+" HTTP/1.0\r\nHost: "+c.host+"\r\nUser-Agent: NTRIP TresVizo/0.5\r\nAuthorization: Basic "+String(reinterpret_cast<char*>(encoded),encodedSize)+"\r\nConnection: close\r\n\r\n";
+   client.print(request);request="";memset(encoded,0,sizeof(encoded));
+   // Lectura byte a byte deliberada: un bloque se tragaria RTCM del flujo. Se
+   // acumula en un buffer fijo porque concatenar String por byte era cuadratico.
+   size_t headerLength=0;uint32_t start=millis();bool accepted=false,headersDone=false;
+   while(current(id) && millis()-start<5000 && headerLength<sizeof(header)-1 && (client.connected()||client.available())){
+    const int byte=client.read();
+    if(byte<0){vTaskDelay(1);continue;}
+    header[headerLength++]=char(byte);header[headerLength]=0;
+    if(headerLength==12 && !memcmp(header,"ICY 200 OK\r\n",12)){accepted=headersDone=true;break;}
+    if(headerLength>=4 && !memcmp(header+headerLength-4,"\r\n\r\n",4)){
+     accepted=!strncmp(header,"HTTP/1.0 200 ",13)||!strncmp(header,"HTTP/1.1 200 ",13);
+     for(size_t i=0;i<headerLength;++i)header[i]=char(tolower(static_cast<unsigned char>(header[i])));
+     if(strstr(header,"transfer-encoding:")||strstr(header,"content-encoding:"))accepted=false;
      headersDone=true;break;
     }
    }
@@ -78,8 +90,9 @@ int request(const String& method,JsonVariantConst body,JsonDocument& out){
  if(body["action"]=="stop" && body.size()==1){wanted=false;++generation;correction_router::select("none");xSemaphoreTake(lock,portMAX_DELAY);config.password="";xSemaphoreGive(lock);state="stopping";status(out.to<JsonObject>());return 200;}
  if(body["action"]!="start"||body.size()!=6||!valid(body["host"],128)||!valid(body["mountpoint"],96)||!valid(body["username"],64,true)||!valid(body["password"],128,true)||!body["port"].is<unsigned>()||body["port"].as<unsigned>()<1||body["port"].as<unsigned>()>65535)return 400;
  String host=body["host"].as<const char*>(),mount=body["mountpoint"].as<const char*>(),user=body["username"].as<const char*>();
- for(char c:host)if(!isalnum(c)&&c!='.'&&c!='-')return 400;
- for(char c:mount)if(!isalnum(c)&&c!='_'&&c!='-'&&c!='.')return 400;
+ // Cast explicito: isalnum() con char con signo es comportamiento indefinido.
+ for(char c:host)if(!isalnum(static_cast<unsigned char>(c))&&c!='.'&&c!='-')return 400;
+ for(char c:mount)if(!isalnum(static_cast<unsigned char>(c))&&c!='_'&&c!='-'&&c!='.')return 400;
  if(user.indexOf(':')>=0)return 400;
  if(!ready)return 503;
  if(active() || strcmp(state.load(),"stopped")!=0 || !gnss_control::roverReady()){out["message"]="Detén la conexión anterior y consulta/confirma modo rover primero.";return 409;}
