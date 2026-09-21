@@ -22,7 +22,18 @@ String deviceName = "TresVizo RTK";
 String stationSsid;
 String stationPassword;
 String key;
+String apKey;
 String networkName;
+
+// Genera una credencial aleatoria de 96 bits en hexadecimal. La radio ya está
+// activa cuando se llama, de modo que el RNG dispone de su fuente de entropía.
+String randomCredential() {
+    char value[25];
+    snprintf(value, sizeof(value), "%08lx%08lx%08lx",
+        static_cast<unsigned long>(esp_random()), static_cast<unsigned long>(esp_random()),
+        static_cast<unsigned long>(esp_random()));
+    return String(value);
+}
 uint32_t refreshMs = 2000;
 uint32_t revision = 0;
 bool storageReady = false;
@@ -220,7 +231,7 @@ void status(JsonDocument& response) {
     response["solution"]["longitude_deg"] = nullptr;
     response["solution"]["height_m"] = nullptr;
     response["solution"]["height_reference"] = nullptr;
-    response["solution"]["measurement_time"] = nullptr;
+    response["solution"]["hdop"] = nullptr;
     response["solution"]["arrival_time_us"] = nullptr;
     const auto gnss = gnss_receiver::snapshot();
     JsonObject health = response["subsystems"]["gnss"].as<JsonObject>();
@@ -229,6 +240,13 @@ void status(JsonDocument& response) {
     health["rejected_gga"] = gnss.rejected;
     health["line_overflows"] = gnss.overflow;
     health["uart_errors"] = gnss.uart_errors;
+    // Ultimo salto de la cadena RTK: sin estas cifras no se puede saber si el
+    // RTCM aceptado por el router llegó realmente al receptor.
+    health["correction_frames_sent"] = gnss.correction_frames_sent;
+    health["correction_frames_dropped"] = gnss.correction_frames_dropped;
+    // Salud del binario nativo Unicore; es el formato de OBSVMB usado para PPK.
+    health["native_frames_valid"] = gnss.native_valid;
+    health["native_frames_invalid"] = gnss.native_invalid;
     if (gnss.enabled) {
         const uint64_t now = esp_timer_get_time();
         const uint64_t age = now - gnss.solution.arrival_us;
@@ -242,6 +260,7 @@ void status(JsonDocument& response) {
                 "pps", "rtk_fixed", "rtk_float", "dead_reckoning", "manual", "simulated"};
             out["fix"] = qualities[gnss.solution.quality];
             if (gnss.solution.has_satellites) out["satellites_used"] = gnss.solution.satellites;
+            if (std::isfinite(gnss.solution.hdop)) out["hdop"] = gnss.solution.hdop;
             out["arrival_time_us"] = gnss.solution.arrival_us;
             if (gnss.solution.has_utc) out["utc_time_of_day_ms"] = gnss.solution.utc_ms;
             // GGA no aporta fecha ni demuestra el datum configurado.
@@ -290,12 +309,18 @@ void begin() {
     WiFi.persistent(false);
     WiFi.mode(WIFI_AP_STA); // radio activa para la fuente de entropía del RNG
     if (!config_rules::password(key.c_str())) {
-        char randomKey[25];
-        snprintf(randomKey, sizeof(randomKey), "%08lx%08lx%08lx",
-            static_cast<unsigned long>(esp_random()), static_cast<unsigned long>(esp_random()),
-            static_cast<unsigned long>(esp_random()));
-        key = randomKey;
+        key = randomCredential();
         if (storageReady && preferences.putString("access_key", key) != key.length()) storageReady = false;
+    }
+    // Credencial del AP separada de la clave de API. Hasta 0.5.0 eran la misma
+    // cadena: quien recibía el Wi-Fi obtenía también control total del equipo,
+    // incluida la carga de firmware sin firma. Un equipo actualizado desde una
+    // versión anterior genera aquí una contraseña Wi-Fi nueva; hay que leerla
+    // por USB con `usb_console.py access`.
+    if (storageReady) apKey = preferences.getString("ap_password", "");
+    if (!config_rules::password(apKey.c_str())) {
+        apKey = randomCredential();
+        if (storageReady && preferences.putString("ap_password", apKey) != apKey.length()) storageReady = false;
     }
     char suffix[5];
     snprintf(suffix, sizeof(suffix), "%04X", static_cast<unsigned int>(ESP.getEfuseMac() >> 32) & 0xffff);
@@ -303,7 +328,7 @@ void begin() {
     WiFi.setAutoReconnect(true);
     WiFi.setHostname("tresvizo-rtk");
     WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
-    apReady = WiFi.softAP(networkName.c_str(), key.c_str(), 1, false, 4);
+    apReady = WiFi.softAP(networkName.c_str(), apKey.c_str(), 1, false, 4);
     connectStation();
 }
 
@@ -340,6 +365,7 @@ int changeAccessKey(JsonVariantConst body, JsonDocument& response) {
 }
 
 const String& accessKey() { return key; }
+const String& apPassword() { return apKey; }
 const String& apName() { return networkName; }
 
 int previewBase(JsonVariantConst body, JsonDocument& response) {
@@ -406,6 +432,10 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         if(method=="POST")return gnss_control::start(body,response);
         return 400;
     }
+    // Configuración avanzada conocida del receptor: máscara, constelaciones,
+    // salidas, perfil RTCM y persistencia. Refleja lo aplicado o leído por este
+    // firmware, no una consulta continua al UM980.
+    if(path=="/api/gnss/profile" && method=="GET"){gnss_control::profile(response.to<JsonObject>());return 200;}
     if(path=="/api/base/apply" && method=="POST") {
         JsonDocument preview;int code=previewBase(body,preview);
         if(code!=200){response=preview;return code;}
