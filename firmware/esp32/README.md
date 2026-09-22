@@ -1,8 +1,8 @@
 # Firmware inicial del instrumento
 
-Versión 0.5.0 para el ESP32-S3 conectado por USB. El perfil usa 4 MB de flash comprobados por esptool. La placa de referencia de PlatformIO aporta la configuración de CPU/USB; no identifica la carrier como DevKitC ni autoriza sus pines externos. PSRAM Quad de 2 MB habilitada, con prueba de integridad y métricas separadas de RAM interna.
+Versión 0.6.0 para el ESP32-S3 conectado por USB. El perfil usa 4 MB de flash comprobados por esptool. La placa de referencia de PlatformIO aporta la configuración de CPU/USB; no identifica la carrier como DevKitC ni autoriza sus pines externos. PSRAM Quad de 2 MB habilitada, con prueba de integridad y métricas separadas de RAM interna.
 
-## Funciones implementadas
+## Funciones del primer firmware
 
 - Arranque sin esperar a que se conecte una consola USB.
 - Red Wi-Fi propia protegida con una clave aleatoria por equipo, persistida en NVS y recuperable por acceso físico USB.
@@ -14,7 +14,7 @@ Versión 0.5.0 para el ESP32-S3 conectado por USB. El perfil usa 4 MB de flash c
 - Consola JSON USB con buffer acotado, tiempo límite y recuperación tras mensajes demasiado grandes.
 - Reinicio solicitado y exportación de diagnóstico sin contraseñas ni nombres de redes.
 
-GNSS, IMU, microSD, NTRIP, BLE, modos base/rover y compensación de inclinación no están implementados. No se inicializan sus GPIO. No hay posiciones ni soluciones FIX simuladas. La app de campo sigue sin iniciarse.
+Esa lista describe el primer firmware. GNSS, microSD, NTRIP, BLE y modos base/rover llegaron después; su estado real está en las secciones de versión de más abajo. Siguen sin implementarse la IMU y la compensación de inclinación, y la app de campo sigue sin iniciarse. No hay posiciones ni soluciones FIX simuladas.
 
 ## Compilar y cargar desde macOS
 

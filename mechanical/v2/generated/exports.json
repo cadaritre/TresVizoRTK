@@ -1,0 +1,68 @@
+{
+ "piezas": [
+  {
+   "pieza": "01-base-rosca",
+   "etiqueta": "Base con rosca 5/8",
+   "triangulos": 2384,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 22.44,
+   "stl": "01-base-rosca.stl"
+  },
+  {
+   "pieza": "02-tubo-logo",
+   "etiqueta": "Tubo con logo grabado",
+   "triangulos": 11944,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 48.83,
+   "stl": "02-tubo-logo.stl"
+  },
+  {
+   "pieza": "03-tapa-antena",
+   "etiqueta": "Tapa de antena",
+   "triangulos": 2514,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 14.77,
+   "stl": "03-tapa-antena.stl"
+  },
+  {
+   "pieza": "04-trineo-universal",
+   "etiqueta": "Trineo universal",
+   "triangulos": 1556,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 9.58,
+   "stl": "04-trineo-universal.stl"
+  },
+  {
+   "pieza": "05-tapa-panel",
+   "etiqueta": "Tapa del panel principal",
+   "triangulos": 1624,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 3.79,
+   "stl": "05-tapa-panel.stl"
+  },
+  {
+   "pieza": "06-tapa-panel-aux",
+   "etiqueta": "Tapa del panel auxiliar",
+   "triangulos": 848,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 2.04,
+   "stl": "06-tapa-panel-aux.stl"
+  }
+ ],
+ "todas_cerradas": true,
+ "interferencias": [],
+ "sin_interferencias": true,
+ "deflexion_lineal": 0.05
+}

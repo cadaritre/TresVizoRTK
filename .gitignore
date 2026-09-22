@@ -79,3 +79,6 @@ logs/local/
 /mechanical/legacy/
 /mechanical/**/*.FCStd1
 /mechanical/**/*.FCBak
+
+# Worktrees auxiliares creados durante el desarrollo; no son parte del proyecto.
+.claude/worktrees/

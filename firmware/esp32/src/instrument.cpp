@@ -12,6 +12,7 @@
 
 #include <Preferences.h>
 #include <WiFi.h>
+#include <atomic>
 #include <esp_system.h>
 #include <esp_timer.h>
 
@@ -44,6 +45,9 @@ uint32_t networkChangedAt = 0;
 uint32_t lastConnectionAttempt = 0;
 bool pendingRestart = false;
 uint32_t restartRequestedAt = 0;
+// Espejo atómico de stationSsid: la tarea NTRIP lo lee sin tomar el mutex del
+// instrumento, y leer el String directamente sería una carrera con saveConfig.
+std::atomic<bool> stationPresent{false};
 
 void error(JsonDocument& response, const char* code, const char* message) {
     response["error"] = code;
@@ -178,6 +182,7 @@ int saveConfig(JsonVariantConst body, JsonDocument& response) {
     }
     deviceName = nextName;
     stationSsid = nextSsid;
+    stationPresent = !stationSsid.isEmpty();
     stationPassword = nextPassword;
     refreshMs = nextRefresh;
     ++revision;
@@ -306,6 +311,7 @@ void begin() {
             }
         }
     }
+    stationPresent = !stationSsid.isEmpty();
     WiFi.persistent(false);
     WiFi.mode(WIFI_AP_STA); // radio activa para la fuente de entropía del RNG
     if (!config_rules::password(key.c_str())) {
@@ -366,6 +372,7 @@ int changeAccessKey(JsonVariantConst body, JsonDocument& response) {
 
 const String& accessKey() { return key; }
 const String& apPassword() { return apKey; }
+bool stationConfigured() { return stationPresent.load(); }
 const String& apName() { return networkName; }
 
 int previewBase(JsonVariantConst body, JsonDocument& response) {

@@ -10,13 +10,13 @@ El objetivo de desarrollo es alcanzar aproximadamente 2 cm de precisión en cond
 
 Ya existe una primera versión de firmware, compilada y cargada al ESP32-S3 conectado por USB. Incluye un panel web con la identidad de TresVizo, diagnóstico real y ajustes persistentes. En 0.5.0 se probaron el enlace UART con UM980, control BLE cifrado y 2 MB de PSRAM. La salida GGA por UART se comprobó a 10 Hz; la precisión y la telemetría de posición en exterior siguen pendientes. La entrada NTRIP está implementada, pendiente de prueba con caster real. IMU sigue sin integrar y microSD está preparada en código, deshabilitada hasta conectar y validar el hardware.
 
-**0.6.0** añade una [auditoría del firmware con sus correcciones](docs/project-status.md), un [panel reorganizado para uso en campo](docs/panel-campo.md) y [configuración avanzada del receptor](docs/gps-advanced.md) con sintaxis verificada contra el manual Unicore N4. También separa la contraseña del Wi-Fi propio de la clave de la API: **al actualizar, el equipo genera una contraseña Wi-Fi nueva que debe leerse por USB**. Esta versión **no se ha compilado ni cargado al equipo**, y ninguno de sus comandos nuevos se ha ejecutado contra el UM980 real. No hay aplicación móvil ni diseño electrónico fabricable. La carcasa cuenta con una [V1 mecánica para el primer prototipo completo](mechanical/v1/README.md), con módulos comerciales y una reserva de batería; todavía no se ha impreso ni ensayado físicamente.
+**0.6.0** añade una [auditoría del firmware con sus correcciones](docs/project-status.md), un [panel reorganizado para uso en campo](docs/panel-campo.md) y [configuración avanzada del receptor](docs/gps-advanced.md) con sintaxis verificada contra el manual Unicore N4. También separa la contraseña del Wi-Fi propio de la clave de la API: **al actualizar, el equipo genera una contraseña Wi-Fi nueva que debe leerse por USB**. Esta versión **no se ha compilado ni cargado al equipo**, y ninguno de sus comandos nuevos se ha ejecutado contra el UM980 real. No hay aplicación móvil ni diseño electrónico fabricable. La carcasa vigente es la [V2 mecánica](mechanical/v2/README.md), con módulos comerciales y una reserva de batería; todavía no se ha impreso ni ensayado físicamente.
 
 Consulta las [instrucciones del firmware](firmware/esp32/README.md) y la [evidencia de validación](docs/firmware-validation.md).
 
 Consulta [el estado detallado](docs/project-status.md) antes de interpretar cualquier elemento como funcional.
 
-**V1 mecánica, 20/09/2026:** [modelo, STEP/STL y montaje](mechanical/v1/README.md) con paso del cuerpo corregido, bandejas power, retención McMaster 90611A121 y tres carpetas en FreeCAD 1.0.2. La [validación y estado de impresión](docs/INTEGRATION_REVIEW.md) corresponden al prototipo completo; alimentación por [módulos comerciales](hardware/power-modules/README.md). Las referencias anteriores a una PCB personalizada son antecedentes.
+**V2 mecánica, 22/09/2026:** [modelo, STEP/STL y montaje](mechanical/v2/README.md). Rediseño desde cero tras [auditar V1](mechanical/AUDITORIA-V1.md): pasa de Ø74 × 164 mm a **Ø54 × 107 mm**, de 231 a 101 cm³ de material, de 10 piezas impresas a 6 y de 19 tornillos con 13 tuercas a 11 tornillos con 2. El interior deja de tener alojamientos a la medida de cada componente y pasa a una rejilla de anclaje universal. **Nada se ha impreso ni ensayado**, y el montaje del inserto del jalón sigue sin resolver. Alimentación por [módulos comerciales](hardware/power-modules/README.md). Las referencias anteriores a una PCB personalizada son antecedentes.
 
 ## Alcance previsto
 
@@ -83,8 +83,9 @@ El enlace GNSS usa RX del ESP32 en GPIO18 y TX en GPIO17, con GND común; ambos 
 - [Lista de materiales](hardware/bom.md)
 - [Identificación del hardware recibido](hardware/identification.md)
 - [Interfaces y conexiones](hardware/wiring.md)
-- [Concepto mecánico](mechanical/README.md)
-- [Revisión de integración mecánica y alimentación](docs/INTEGRATION_REVIEW.md)
-- [BOM mecánica y tornillería](mechanical/MECHANICAL_BOM.md)
+- [Mecánica vigente, V2](mechanical/README.md)
+- [Auditoría de la carcasa V1](mechanical/AUDITORIA-V1.md)
+- [BOM de tornillería](mechanical/v2/BOM-TORNILLERIA.md)
+- [Revisión de integración de V1, antecedente](docs/INTEGRATION_REVIEW.md)
 
 No se ha seleccionado una licencia. El contenido del repositorio no debe interpretarse como publicado bajo una licencia específica hasta que el propietario la defina expresamente.

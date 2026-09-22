@@ -99,7 +99,7 @@ int prepare(const String& name, JsonDocument& out) {
     if(sd_recorder::active()){out["message"]="Cierra la grabación antes de configurar el GPS.";return 409;}
     if(running) {out["message"]="Operación GNSS en curso.";return 409;}
     JsonDocument router;correction_router::status(router.to<JsonObject>());
-    if(router["active_source"]!="none") {out["message"]="Detén las correcciones antes de configurar el GPS.";return 409;}
+    if(router["active_source"]!="none") {out["message"]="Hay correcciones activas. Pulsa «Detener» en el apartado de correcciones y repite; configurar el GPS con una fuente activa mezclaría comandos con RTCM.";return 409;}
     count=index=0;sent=ack=readback=false;overflowed=false;failure="";expectedMode="";action=name;
     return 0;
 }

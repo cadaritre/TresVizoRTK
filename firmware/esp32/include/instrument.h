@@ -13,5 +13,8 @@ const String& accessKey();
 // API: unirse al AP ya no entrega el control del instrumento.
 const String& apPassword();
 const String& apName();
+// ¿Hay una red externa configurada? NTRIP por Wi-Fi no puede salir sin ella.
+// Se consulta desde la tarea NTRIP, así que no expone la cadena del SSID.
+bool stationConfigured();
 int request(const String& method, const String& path, JsonVariantConst body, JsonDocument& response);
 }

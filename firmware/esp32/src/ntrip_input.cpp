@@ -1,5 +1,6 @@
 #include "ntrip_input.h"
 #include "gnss_control.h"
+#include "instrument.h"
 #include "correction_router.h"
 #include "firmware_update.h"
 #include "rtcm3.h"
@@ -83,7 +84,7 @@ void worker(void*) {
 }
 void begin(){lock=xSemaphoreCreateMutex();if(lock)ready=xTaskCreate(worker,"ntrip_rx",6144,nullptr,1,nullptr)==pdPASS;}
 bool active(){return wanted;}
-void status(JsonObject out){out["state"]=state.load();out["error"]=failure.load();out["available"]=ready;out["enabled"]=wanted.load();out["frames_forwarded"]=frames.load();out["frames_dropped"]=rejected.load();out["bytes_received"]=bytes.load();out["reconnects"]=reconnects.load();out["rtcm_crc_errors"]=crcErrors.load();out["tls_supported"]=false;out["gga_vrs_supported"]=false;out["credentials_persisted"]=false;}
+void status(JsonObject out){out["state"]=state.load();out["error"]=failure.load();out["available"]=ready;out["enabled"]=wanted.load();out["network_configured"]=instrument::stationConfigured();out["frames_forwarded"]=frames.load();out["frames_dropped"]=rejected.load();out["bytes_received"]=bytes.load();out["reconnects"]=reconnects.load();out["rtcm_crc_errors"]=crcErrors.load();out["tls_supported"]=false;out["gga_vrs_supported"]=false;out["credentials_persisted"]=false;}
 int request(const String& method,JsonVariantConst body,JsonDocument& out){
  if(method=="GET"){status(out.to<JsonObject>());return 200;}
  if(method!="POST"||!body.is<JsonObjectConst>())return 400;
@@ -95,7 +96,11 @@ int request(const String& method,JsonVariantConst body,JsonDocument& out){
  for(char c:mount)if(!isalnum(static_cast<unsigned char>(c))&&c!='_'&&c!='-'&&c!='.')return 400;
  if(user.indexOf(':')>=0)return 400;
  if(!ready)return 503;
- if(active() || strcmp(state.load(),"stopped")!=0 || !gnss_control::roverReady()){out["message"]="Detén la conexión anterior y consulta/confirma modo rover primero.";return 409;}
+ // Sin red externa configurada la tarea se quedaría en waiting_network para
+ // siempre, que parece un problema pasajero y no lo es.
+ if(!instrument::stationConfigured()){out["message"]="No hay red Wi-Fi configurada. Añade tu hotspot de 2.4 GHz en Configuración antes de conectar NTRIP.";return 409;}
+ if(active() || strcmp(state.load(),"stopped")!=0){out["message"]="Hay una conexión NTRIP activa. Pulsa «Detener» en este mismo apartado y vuelve a intentarlo.";return 409;}
+ if(!gnss_control::roverReady()){out["message"]="Consulta y confirma el modo rover del receptor antes de conectar.";return 409;}
  xSemaphoreTake(lock,portMAX_DELAY);config.host=host;config.mount=mount;config.user=user;config.password=body["password"].as<const char*>();config.port=body["port"];xSemaphoreGive(lock);
  correction_router::select("ntrip");++generation;wanted=true;state="starting";status(out.to<JsonObject>());return 202;
 }

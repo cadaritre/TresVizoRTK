@@ -1,6 +1,6 @@
 # Compra de componentes desde México
 
-> Actualización mecánica: para la variante de integración revisada, la [BOM mecánica](../../mechanical/MECHANICAL_BOM.md) sustituye los tornillos de panel avellanados por 2 M3×8 ISO7380 de cabeza botón y define los M2 con cabeza ISO4762 Ø3.8×2. El resto de esta página conserva la consulta comercial original; no es una compra ni una verificación de stock posterior.
+> Actualización mecánica: para la variante de integración revisada, la [BOM de tornillería de V2](../../mechanical/v2/BOM-TORNILLERIA.md) sustituye esta lista: V2 usa M3 y M2, y todos sus tornillos roscan en el propio plástico. El resto de esta página conserva la consulta comercial original; no es una compra ni una verificación de stock posterior.
 
 Consulta del **20 de septiembre de 2026**. Precios publicados por unidad, antes de envío y cargos que correspondan. Existencia web no garantiza inventario en una sucursal de Chihuahua. No se realizó ninguna compra.
 
@@ -40,4 +40,4 @@ El biestable que ya posee el proyecto sigue siendo candidato para reutilizar. Ha
 | Fusibles y cable de potencia | Según WIRING, tras medir picos y verificar batería. No sustituir un fusible por una protección de celda. |
 | Difusores / guía de carga | Dos piezas translúcidas según STL; guía desde los LEDs del cargador. Trayectoria/longitud y brillo aún por probar. |
 
-Los consumibles de esta última tabla no tienen una oferta ni precio verificados en esta consulta; son requisitos de montaje, no una cotización cerrada. El [CAD vigente V1](../../mechanical/v1/README.md) contiene los soportes y las holguras para prototipar.
+Los consumibles de esta última tabla no tienen una oferta ni precio verificados en esta consulta; son requisitos de montaje, no una cotización cerrada. El [CAD vigente V1](../../mechanical/v2/README.md) contiene los soportes y las holguras para prototipar.

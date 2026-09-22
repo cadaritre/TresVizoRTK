@@ -1,0 +1,109 @@
+{
+ "altura_total_mm": 106.91,
+ "diametro_exterior_mm": 54.0,
+ "plano_alturas": {
+  "piso_interior": 15.91,
+  "techo_interior": 99.91,
+  "largo_util_mm": 84.0,
+  "cara_montaje_antena": 106.91
+ },
+ "piezas": [
+  {
+   "pieza": "01-base-rosca",
+   "etiqueta": "Base con rosca 5/8",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 22.44,
+   "caja": [
+    54.0,
+    54.0,
+    15.91
+   ],
+   "z": [
+    0.0,
+    15.91
+   ]
+  },
+  {
+   "pieza": "02-tubo-logo",
+   "etiqueta": "Tubo con logo grabado",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 48.83,
+   "caja": [
+    54.0,
+    54.0,
+    93.91
+   ],
+   "z": [
+    8.0,
+    101.91
+   ]
+  },
+  {
+   "pieza": "03-tapa-antena",
+   "etiqueta": "Tapa de antena",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 14.77,
+   "caja": [
+    54.0,
+    54.0,
+    18.0
+   ],
+   "z": [
+    88.91,
+    106.91
+   ]
+  },
+  {
+   "pieza": "04-trineo-universal",
+   "etiqueta": "Trineo universal",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 9.58,
+   "caja": [
+    40.01,
+    20.5,
+    83.0
+   ],
+   "z": [
+    12.41,
+    95.41
+   ]
+  },
+  {
+   "pieza": "05-tapa-panel",
+   "etiqueta": "Tapa del panel principal",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 3.79,
+   "caja": [
+    28.91,
+    6.31,
+    57.4
+   ],
+   "z": [
+    25.3,
+    82.7
+   ]
+  },
+  {
+   "pieza": "06-tapa-panel-aux",
+   "etiqueta": "Tapa del panel auxiliar",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 2.04,
+   "caja": [
+    4.68,
+    22.28,
+    39.4
+   ],
+   "z": [
+    34.3,
+    73.7
+   ]
+  }
+ ],
+ "volumen_total_cm3": 101.45
+}

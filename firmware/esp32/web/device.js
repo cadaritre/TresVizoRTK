@@ -19,6 +19,19 @@
   $('device-ntrip-form').addEventListener('submit',async(event)=>{
     event.preventDefault();
     try{
+      // Detener siempre antes de arrancar. Con una conexion anterior viva, el
+      // router queda con la fuente en 'ntrip' y eso rechaza la consulta de modo
+      // que hace falta para arrancar: sin esto no hay forma de corregir una
+      // credencial equivocada desde el panel.
+      const previous=await api('/api/ntrip/input');
+      if(previous.enabled || previous.state!=='stopped'){
+        text('device-ntrip-state','Cerrando la conexión anterior…');
+        await api('/api/ntrip/input','POST',{action:'stop'});
+        for(let i=0;i<20;++i){
+          await new Promise(resolve=>setTimeout(resolve,150));
+          if((await api('/api/ntrip/input')).state==='stopped')break;
+        }
+      }
       await api('/api/gnss/control','POST',{action:'query'});
       let modeConfirmed=false;
       for(let i=0;i<25;++i){
@@ -71,7 +84,10 @@
         }));
       }
       const n=await api('/api/ntrip/input');
-      text('device-ntrip-state',`${n.state} · ${n.frames_forwarded} tramas enviadas · ${n.frames_dropped} descartadas · ${n.error || ''}`);
+      // waiting_network sin red configurada no es un problema pasajero: decirlo.
+      text('device-ntrip-state',n.network_configured===false
+        ? 'Sin red Wi-Fi configurada. Añade tu hotspot de 2.4 GHz en Configuración; NTRIP no puede salir sin internet.'
+        : `${n.state} · ${n.frames_forwarded} tramas enviadas · ${n.frames_dropped} descartadas · ${n.error || ''}`);
     }catch(error){text('device-control-state','Sin respuesta del instrumento');}
     setTimeout(poll,2000);
   }

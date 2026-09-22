@@ -1,8 +1,14 @@
-# Integración resuelta — TresVizo V1
+# Integración de TresVizo V1 — antecedente
 
-**READY FOR FIRST FULL PROTOTYPE PRINT: YES.** `scope_ready_for_first_full_prototype_print = true`.
+> **Documento histórico.** V1 quedó sustituida por [V2](../mechanical/v2/README.md)
+> el 22/09/2026 y sus archivos se retiraron del repositorio. Se conserva esta
+> página porque documenta decisiones de integración —alimentación, arnés, datum
+> del IMU, retención del inserto— que siguen siendo válidas y que V2 hereda o
+> resuelve de otra forma. Los motivos del rediseño están en
+> [la auditoría](../mechanical/AUDITORIA-V1.md).
 
-Paquete de trabajo: [FreeCAD V1](../mechanical/v1/generated/TresVizo-V1.FCStd), [STEP completo](../mechanical/v1/generated/TresVizo-V1-assembly.step), [STL](../mechanical/v1/generated/stl/), [montaje e impresión](../mechanical/v1/README.md). Abrir con **FreeCAD 1.0.2**. Fuente reproducible: Python/FreeCAD y parámetros en `mechanical/v1/`; A5 original conservado byte a byte.
+**READY FOR FIRST FULL PROTOTYPE PRINT: YES**, referido a V1 y en su momento.
+V1 nunca se imprimió.
 
 | Problema | Solución | Cambio geométrico | Validación |
 | --- | --- | --- | --- |
@@ -22,13 +28,13 @@ La silueta, altura, logo/FRONT +Y, BMI088, antena centrada y posición exterior 
 
 ## Tornillería final
 
-**19 tornillos:** 10 M3×8, 2 M3×20, 3 M2.5×8, 2 M2.5×12 y 2 M2×5. **13 tuercas:** 11 M3 y 2 M2.5. Un inserto McMaster y diez bridas de 2.5 mm. Dos llaves: Allen 2 y 1.5 mm. [BOM por ubicación](../mechanical/MECHANICAL_BOM.md).
+**19 tornillos:** 10 M3×8, 2 M3×20, 3 M2.5×8, 2 M2.5×12 y 2 M2×5. **13 tuercas:** 11 M3 y 2 M2.5. Un inserto McMaster y diez bridas de 2.5 mm. Dos llaves: Allen 2 y 1.5 mm. BOM por ubicación, retirada con V1.
 
 Frente a **21 tornillos / 12 tuercas / 6 combinaciones**, V1 queda en **19 / 13 / 5**. Se eliminan cinco tornillos del alcance previo y se añaden tres para el inserto antes sin sujeción. Las tuercas aumentan una; no se disimula como reducción. M3 domina con 12/19. M2/M2.5 se mantienen únicamente por USB comercial, antena y fijación/ajuste del BMI088.
 
 ## Evidencia y alcance
 
-Resultado: **70 sólidos válidos, 18 recorridos (1162 posiciones), 19 accesos de herramienta, cero interferencias no previstas, 11 STL cerrados y STEP completo reimportado con 60 sólidos válidos**. Resultado cuantitativo final en [validation.json](../mechanical/v1/generated/validation.json) y [exports.json](../mechanical/v1/generated/exports.json). Se comprueba regeneración desde A5+panel, sólidos, pares en posición final, secuencia de montaje/remoción, plantilla, USB/botón, herramientas, retención del inserto y exportaciones. Las intersecciones permitidas se limitan a pilotos de rosca, roscas de antena simplificadas y unión de corredores del mismo arnés; las cabezas se prueban aparte.
+Resultado: **70 sólidos válidos, 18 recorridos (1162 posiciones), 19 accesos de herramienta, cero interferencias no previstas, 11 STL cerrados y STEP completo reimportado con 60 sólidos válidos**. Resultado cuantitativo final en `validation.json` y `exports.json`. Se comprueba regeneración desde A5+panel, sólidos, pares en posición final, secuencia de montaje/remoción, plantilla, USB/botón, herramientas, retención del inserto y exportaciones. Las intersecciones permitidas se limitan a pilotos de rosca, roscas de antena simplificadas y unión de corredores del mismo arnés; las cabezas se prueban aparte.
 
 Muestreo de traslación a 1 mm y botón a 0.05 mm, no barrido continuo certificado. El coaxial se conecta con el cuerpo ya colocado; no se simula como una varilla rígida atravesando el cuello. No se ha impreso ni probado resistencia, temperatura, estanqueidad o precisión topográfica. El cableado sigue la arquitectura comercial de [WIRING](../hardware/power-modules/WIRING.md); esta entrega no cambia firmware ni declara conformidad USB.
 

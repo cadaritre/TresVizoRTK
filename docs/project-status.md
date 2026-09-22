@@ -177,3 +177,52 @@ amplían a 1/2/5/10/20 Hz. Detalle y límites en
 - Sin medir: efecto del consumo por bloques sobre la tasa sostenida, presupuesto
   del enlace con varias sentencias a tasa alta, y comportamiento del panel con luz
   solar directa.
+
+## V2 mecánica — 2026-09-22
+
+La carcasa se rehízo desde cero. V1 se retiró del repositorio; sus archivos ya no
+están y [la revisión de integración](INTEGRATION_REVIEW.md) queda como antecedente
+histórico. Los motivos están en [la auditoría](../mechanical/AUDITORIA-V1.md).
+
+| | V1 medida | V2 generada |
+| --- | ---: | ---: |
+| Diámetro exterior | 74 mm | **54 mm** |
+| Altura del cuerpo | 164 mm | **106.9 mm** |
+| Material | 231 cm³ | **101.5 cm³** |
+| Piezas impresas | 10 + plantilla | **6** |
+| Tornillos | 19 | **11** |
+| Tuercas | 13 | **0 en la carcasa, 2 en el IMU** |
+
+El cambio de fondo no es el tamaño: **el interior dejó de tener alojamientos con
+forma de cada componente**. V1 daba 0.4 mm de holgura a módulos cuyo propio
+documento registraba 3 mm de variación entre versiones, y atornillaba placas a
+patrones de agujeros que el repositorio declara no conocer. V2 usa una rejilla de
+anclaje universal: ranuras cada 10 mm en tres separaciones, y todo se sujeta con
+brida contra un plano liso. Cambiar de módulo no obliga a reimprimir nada.
+
+Solo tres cosas conservan posición definida: antena, rosca 5/8" e IMU. El IMU
+mantiene el criterio de A5 —plantilla, ajuste y bloqueo rígido— porque es lo mejor
+que tenía el diseño anterior.
+
+### Comprobado
+
+Seis piezas, un sólido cada una, mallas cerradas y manifold, cero interferencias
+entre piezas y cero enlaces rotos en la documentación. El generador regenera el
+conjunto completo desde `parameters.json` y falla con código distinto de cero si
+algo no cuadra. El logo se reconstruyó desde el DXF vectorial del propietario y se
+contrastó contra un trazado independiente del PNG: misma topología, 1.55 % de
+diferencia de área atribuible al grosor del borde.
+
+### Sin comprobar
+
+- **Nada se ha impreso.** Sin datos de resistencia, ajuste, temperatura ni
+  estanqueidad.
+- **El inserto del jalón no se puede montar tal como está**: su brida de 36.5 mm
+  no pasa por ninguna de las dos aberturas de 18 mm de su alojamiento. Hay que
+  resolverlo antes de imprimir la base.
+- La captura del inserto sin tornillos, el ajuste de la bayoneta impresa y la
+  resistencia del roscado de M3 en PETG no tienen ensayo.
+- Las envolventes de los componentes siguen saliendo de cotas publicadas que el
+  repositorio declara no verificadas.
+- La antena sigue sin confirmar. Su patrón es paramétrico: si llega otra, se
+  cambian dos números y se reimprime solo la tapa.
