@@ -4,13 +4,12 @@
 #include <ArduinoJson.h>
 
 namespace instrument {
-constexpr const char* kVersion = "0.6.0";
+constexpr const char* kVersion = "0.6.1";
 void begin();
 void tick();
-int changeAccessKey(JsonVariantConst body, JsonDocument& response);
-const String& accessKey();
-// Contraseña de la red Wi-Fi propia. Desde 0.6.0 es distinta de la clave de
-// API: unirse al AP ya no entrega el control del instrumento.
+// Contraseña de la red Wi-Fi propia. Es la única credencial del equipo: el
+// panel y la API no piden clave. Sale de fábrica con un valor conocido y
+// tecleable, y se cambia desde Configuración.
 const String& apPassword();
 const String& apName();
 // ¿Hay una red externa configurada? NTRIP por Wi-Fi no puede salir sin ella.

@@ -19,22 +19,20 @@
 namespace instrument {
 namespace {
 Preferences preferences;
-String deviceName = "TresVizo RTK";
+// El equipo se llama MeridianV y el nombre no se edita: la red que emite debe
+// ser reconocible en campo sin consultar a nadie. 3Vizo es la marca del panel.
+constexpr const char* kDeviceName = "MeridianV";
+String deviceName = kDeviceName;
 String stationSsid;
 String stationPassword;
-String key;
 String apKey;
 String networkName;
 
-// Genera una credencial aleatoria de 96 bits en hexadecimal. La radio ya está
-// activa cuando se llama, de modo que el RNG dispone de su fuente de entropía.
-String randomCredential() {
-    char value[25];
-    snprintf(value, sizeof(value), "%08lx%08lx%08lx",
-        static_cast<unsigned long>(esp_random()), static_cast<unsigned long>(esp_random()),
-        static_cast<unsigned long>(esp_random()));
-    return String(value);
-}
+// Contraseña de fábrica del Wi-Fi propio. Deliberadamente fija y tecleable: la
+// aleatoria de 0.6.0 era imposible de escribir en un teléfono a media jornada.
+// Va escrita en el repositorio, así que no protege de nadie que lo lea; el
+// propietario la cambia desde Configuración cuando quiera otra.
+constexpr const char* kDefaultApPassword = "TresVIzoRTK";
 uint32_t refreshMs = 2000;
 uint32_t revision = 0;
 bool storageReady = false;
@@ -45,9 +43,32 @@ uint32_t networkChangedAt = 0;
 uint32_t lastConnectionAttempt = 0;
 bool pendingRestart = false;
 uint32_t restartRequestedAt = 0;
-// Espejo atómico de stationSsid: la tarea NTRIP lo lee sin tomar el mutex del
-// instrumento, y leer el String directamente sería una carrera con saveConfig.
+// Espejo atómico de la existencia de redes guardadas: la tarea NTRIP lo lee
+// sin tomar el mutex del instrumento, y leer los String directamente sería una
+// carrera con saveConfig.
 std::atomic<bool> stationPresent{false};
+
+// Tope deliberado de redes guardadas. La partición NVS son 20 KB y ahí conviven
+// además la clave del panel, la contraseña del AP y el PIN de emparejamiento.
+// Cada entrada ronda los 125 bytes entre SSID, contraseña y envoltura JSON.
+constexpr size_t kMaxNetworks = 5;
+struct SavedNetwork {
+    String ssid;
+    String password;
+};
+SavedNetwork networks[kMaxNetworks];
+size_t networkCount = 0;
+
+// El escaneo es asíncrono porque uno bloqueante detendría el servidor HTTP
+// varios segundos. Aun así la radio recorre los canales y el AP propio se
+// interrumpe mientras tanto: quien mire el panel desde la red del equipo verá
+// un corte. No es un fallo del panel.
+enum class ScanState : uint8_t { idle, running, ready, failed };
+ScanState scanState = ScanState::idle;
+uint32_t scanStartedAt = 0;
+uint32_t scanFinishedAt = 0;
+int scanFound = 0;
+bool joinRequested = false;
 
 void error(JsonDocument& response, const char* code, const char* message) {
     response["error"] = code;
@@ -61,14 +82,105 @@ void config(JsonDocument& response) {
     response["refresh_ms"] = refreshMs;
     response["wifi_ssid"] = stationSsid;
     response["wifi_password_saved"] = !stationPassword.isEmpty();
+    // Las contraseñas guardadas no salen nunca del equipo: solo el nombre y si
+    // hay credencial almacenada.
+    JsonArray saved = response["networks"].to<JsonArray>();
+    for (size_t i = 0; i < networkCount; ++i) {
+        JsonObject item = saved.add<JsonObject>();
+        item["ssid"] = networks[i].ssid;
+        item["has_password"] = !networks[i].password.isEmpty();
+    }
+    response["networks_max"] = kMaxNetworks;
+    response["ap_ssid"] = networkName;
+    // El panel no pide clave, así que ocultar la del AP aquí no protegería nada
+    // y en cambio impediría leerla para unir un teléfono.
+    response["ap_password"] = apKey;
     response["persistence_ready"] = storageReady;
     response["stored_config_valid"] = configValid;
 }
 
-void connectStation() {
+int findNetwork(const String& ssid) {
+    for (size_t i = 0; i < networkCount; ++i) {
+        if (networks[i].ssid == ssid) return static_cast<int>(i);
+    }
+    return -1;
+}
+
+void startScan() {
+    WiFi.scanDelete();
+    scanFound = 0;
+    scanStartedAt = millis();
+    scanState = WiFi.scanNetworks(true, false) == WIFI_SCAN_RUNNING
+        ? ScanState::running : ScanState::failed;
+    if (scanState == ScanState::failed) scanFinishedAt = scanStartedAt;
+}
+
+void connectTo(const SavedNetwork& network) {
     WiFi.disconnect(false, false);
     lastConnectionAttempt = millis();
-    if (!stationSsid.isEmpty()) WiFi.begin(stationSsid.c_str(), stationPassword.c_str());
+    stationSsid = network.ssid;
+    stationPassword = network.password;
+    WiFi.begin(network.ssid.c_str(), network.password.c_str());
+}
+
+// Elige, entre las redes guardadas que el escaneo vio de verdad, la de mejor
+// señal. No intenta una red que no esté a la vista: esperar el tiempo de espera
+// de asociación sobre una red ausente retrasa la que sí está.
+bool joinBestVisible() {
+    int best = -1;
+    int32_t bestRssi = 0;
+    for (int i = 0; i < scanFound; ++i) {
+        const int index = findNetwork(WiFi.SSID(i));
+        if (index < 0) continue;
+        const int32_t rssi = WiFi.RSSI(i);
+        if (best < 0 || rssi > bestRssi) {
+            best = index;
+            bestRssi = rssi;
+        }
+    }
+    if (best < 0) return false;
+    connectTo(networks[best]);
+    return true;
+}
+
+// Persiste el registro completo. Recibe la lista candidata en vez de leer la
+// activa para no publicar ajustes que no llegaron a escribirse.
+bool persistConfig(uint32_t nextRevision, const String& name, uint32_t refresh,
+                   const SavedNetwork* list, size_t count) {
+    if (!storageReady) return false;
+    JsonDocument record;
+    record["schema_version"] = 2;
+    record["revision"] = nextRevision;
+    record["device_name"] = name;
+    record["refresh_ms"] = refresh;
+    JsonArray saved = record["networks"].to<JsonArray>();
+    for (size_t i = 0; i < count; ++i) {
+        JsonObject item = saved.add<JsonObject>();
+        item["ssid"] = list[i].ssid;
+        item["password"] = list[i].password;
+    }
+    String encoded;
+    serializeJson(record, encoded);
+    // Una única entrada NVS: no publicar ajustes parcialmente persistidos.
+    return preferences.putString("config", encoded) == encoded.length();
+}
+
+void adoptNetworks(const SavedNetwork* list, size_t count) {
+    for (size_t i = 0; i < kMaxNetworks; ++i) {
+        networks[i].ssid = i < count ? list[i].ssid : String();
+        networks[i].password = i < count ? list[i].password : String();
+    }
+    networkCount = count;
+    stationPresent = count > 0;
+    // Si la red a la que se está enlazado ya no figura en la lista, soltarla y
+    // volver a buscar. Seguir asociado a una red que el usuario acaba de borrar
+    // contradice lo que muestra el panel.
+    if (!count || (!stationSsid.isEmpty() && findNetwork(stationSsid) < 0)) {
+        WiFi.disconnect(false, false);
+        stationSsid = "";
+        stationPassword = "";
+        joinRequested = count > 0;
+    }
 }
 
 bool validString(JsonVariantConst field, bool (*rule)(const char*)) {
@@ -89,7 +201,8 @@ int saveConfig(JsonVariantConst body, JsonDocument& response) {
         }
         const String name = pair.key().c_str();
         if (name != "revision" && name != "device_name" && name != "refresh_ms" &&
-            name != "wifi_ssid" && name != "wifi_password" && name != "forget_wifi") {
+            name != "wifi_ssid" && name != "wifi_password" && name != "forget_wifi" &&
+            name != "ap_password") {
             error(response, "unknown_setting", "La solicitud contiene un ajuste no admitido.");
             return 400;
         }
@@ -99,15 +212,16 @@ int saveConfig(JsonVariantConst body, JsonDocument& response) {
         return 409;
     }
     String nextName = deviceName;
-    String nextSsid = stationSsid;
-    String nextPassword = stationPassword;
+    String requestedSsid;
+    String requestedPassword;
+    bool hasSsid = false;
     uint32_t nextRefresh = refreshMs;
-    if (!body["device_name"].isNull()) {
-        if (!validString(body["device_name"], config_rules::deviceName)) {
-            error(response, "invalid_name", "Usa entre 1 y 32 letras sin acentos, números, espacios, guiones o guiones bajos.");
-            return 400;
-        }
-        nextName = body["device_name"].as<const char*>();
+    // El nombre del equipo es fijo. Se sigue admitiendo el campo para no romper
+    // clientes antiguos, pero se ignora: cambiarlo renombraría la red del
+    // instrumento y dejaría de ser reconocible en campo.
+    if (!body["device_name"].isNull() && !validString(body["device_name"], config_rules::deviceName)) {
+        error(response, "invalid_name", "Usa entre 1 y 32 letras sin acentos, números, espacios, guiones o guiones bajos.");
+        return 400;
     }
     if (!body["refresh_ms"].isNull()) {
         if (!body["refresh_ms"].is<uint32_t>() || !config_rules::refresh(body["refresh_ms"].as<uint32_t>())) {
@@ -115,6 +229,14 @@ int saveConfig(JsonVariantConst body, JsonDocument& response) {
             return 400;
         }
         nextRefresh = body["refresh_ms"].as<uint32_t>();
+    }
+    String nextApKey = apKey;
+    if (!body["ap_password"].isNull()) {
+        if (!validString(body["ap_password"], config_rules::password)) {
+            error(response, "invalid_ap_password", "La contraseña del Wi-Fi del equipo debe tener entre 8 y 63 caracteres ASCII imprimibles.");
+            return 400;
+        }
+        nextApKey = body["ap_password"].as<const char*>();
     }
     if (!body["forget_wifi"].isNull() && !body["forget_wifi"].is<bool>()) {
         error(response, "invalid_wifi", "La opción de olvidar red debe ser booleana.");
@@ -125,8 +247,8 @@ int saveConfig(JsonVariantConst body, JsonDocument& response) {
             error(response, "invalid_ssid", "El nombre de red no puede superar 32 bytes ni contener controles.");
             return 400;
         }
-        nextSsid = body["wifi_ssid"].as<const char*>();
-        if (nextSsid != stationSsid) nextPassword = "";
+        requestedSsid = body["wifi_ssid"].as<const char*>();
+        hasSsid = !requestedSsid.isEmpty();
     }
     if (!body["wifi_password"].isNull()) {
         if (!body["wifi_password"].is<const char*>()) {
@@ -139,58 +261,219 @@ int saveConfig(JsonVariantConst body, JsonDocument& response) {
             error(response, "invalid_password", "Usa entre 8 y 63 caracteres ASCII imprimibles.");
             return 400;
         }
-        if (value.size()) nextPassword = value.c_str();
-    }
-    if (body["forget_wifi"] == true) {
-        nextSsid = "";
-        nextPassword = "";
-    }
-    if (nextSsid.isEmpty()) nextPassword = "";
-    if (!nextSsid.isEmpty() && nextPassword.isEmpty()) {
-        error(response, "password_required", "Introduce la contraseña de la red seleccionada. Solo se admiten redes protegidas.");
-        return 400;
+        if (value.size()) requestedPassword = value.c_str();
     }
     if (!storageReady) {
         error(response, "storage_unavailable", "No se pudo abrir el almacenamiento interno de ajustes.");
         return 503;
     }
+    // La lista candidata se arma aparte y solo se adopta si el registro llegó a
+    // escribirse. Así un fallo de NVS deja intacta la configuración activa.
+    SavedNetwork candidate[kMaxNetworks];
+    size_t candidateCount = networkCount;
+    for (size_t i = 0; i < networkCount; ++i) candidate[i] = networks[i];
+    bool networksChanged = false;
+    if (body["forget_wifi"] == true) {
+        networksChanged = candidateCount > 0;
+        candidateCount = 0;
+    } else if (hasSsid) {
+        const int existing = findNetwork(requestedSsid);
+        String password = requestedPassword;
+        if (password.isEmpty()) {
+            if (existing < 0) {
+                error(response, "password_required", "Introduce la contraseña de la red seleccionada. Solo se admiten redes protegidas.");
+                return 400;
+            }
+            password = candidate[existing].password;
+        }
+        if (existing >= 0) {
+            networksChanged = candidate[existing].password != password;
+            candidate[existing].password = password;
+        } else if (candidateCount == kMaxNetworks) {
+            error(response, "networks_full", "Se alcanzó el máximo de redes guardadas de este equipo. Olvida una antes de añadir otra.");
+            return 409;
+        } else {
+            candidate[candidateCount].ssid = requestedSsid;
+            candidate[candidateCount].password = password;
+            ++candidateCount;
+            networksChanged = true;
+        }
+    }
     const bool changed = nextName != deviceName || nextRefresh != refreshMs ||
-        nextSsid != stationSsid || nextPassword != stationPassword || !configValid;
+        networksChanged || nextApKey != apKey || !configValid;
     if (!changed) {
         config(response);
         response["saved"] = true;
         response["changed"] = false;
         return 200;
     }
-    JsonDocument record;
-    record["schema_version"] = 1;
-    record["revision"] = revision + 1;
-    record["device_name"] = nextName;
-    record["refresh_ms"] = nextRefresh;
-    record["wifi_ssid"] = nextSsid;
-    record["wifi_password"] = nextPassword;
-    String encoded;
-    serializeJson(record, encoded);
-    // Una única entrada NVS: no publicar ajustes parcialmente persistidos.
-    if (preferences.putString("config", encoded) != encoded.length()) {
+    if (!persistConfig(revision + 1, nextName, nextRefresh, candidate, candidateCount)) {
         error(response, "save_failed", "No se pudieron guardar los ajustes. La configuración activa se conserva.");
         return 503;
     }
-    if (nextSsid != stationSsid || nextPassword != stationPassword) {
+    if (networksChanged) {
         pendingNetwork = true;
         networkChangedAt = millis();
     }
     deviceName = nextName;
-    stationSsid = nextSsid;
-    stationPresent = !stationSsid.isEmpty();
-    stationPassword = nextPassword;
     refreshMs = nextRefresh;
+    adoptNetworks(candidate, candidateCount);
     ++revision;
     configValid = true;
+    // La contraseña del AP vive en su propia entrada NVS, no en el registro de
+    // ajustes: se escribe aparte y se informa si esa parte no llegó a guardarse.
+    bool apSaved = true;
+    if (nextApKey != apKey) {
+        apSaved = preferences.putString("ap_password", nextApKey) == nextApKey.length() &&
+            preferences.putBool("ap_custom", true) != 0;
+        if (apSaved) {
+            apKey = nextApKey;
+            // Reaplicar el AP corta a quien estuviera conectado a la red del equipo.
+            apReady = WiFi.softAP(networkName.c_str(), apKey.c_str(), 1, false, 4);
+        }
+    }
     config(response);
     response["saved"] = true;
     response["changed"] = true;
+    response["ap_password_saved"] = apSaved;
+    if (!apSaved) {
+        response["message"] = "Los ajustes se guardaron, pero la contraseña del Wi-Fi del equipo no. Sigue activa la anterior.";
+    }
     return 200;
+}
+
+// Tope de redes informadas por escaneo. Un entorno urbano devuelve decenas y la
+// respuesta se arma entera en memoria antes de enviarse.
+constexpr int kMaxScanReported = 20;
+
+int wifiNetworks(const String& method, JsonVariantConst body, JsonDocument& response) {
+    if (method == "GET") {
+        config(response);
+        return 200;
+    }
+    if (!body.is<JsonObjectConst>()) {
+        error(response, "invalid_request", "Se esperaba un objeto con la red.");
+        return 400;
+    }
+    for (JsonPairConst pair : body.as<JsonObjectConst>()) {
+        const String name = pair.key().c_str();
+        if (name != "ssid" && name != "password" && name != "forget") {
+            error(response, "unknown_setting", "La solicitud contiene un campo no admitido.");
+            return 400;
+        }
+    }
+    if (!storageReady) {
+        error(response, "storage_unavailable", "No se pudo abrir el almacenamiento interno de ajustes.");
+        return 503;
+    }
+    SavedNetwork candidate[kMaxNetworks];
+    size_t count = networkCount;
+    for (size_t i = 0; i < networkCount; ++i) candidate[i] = networks[i];
+    if (!body["forget"].isNull()) {
+        if (!validString(body["forget"], config_rules::ssid)) {
+            error(response, "invalid_ssid", "El nombre de red no puede superar 32 bytes ni contener controles.");
+            return 400;
+        }
+        const int index = findNetwork(body["forget"].as<const char*>());
+        if (index < 0) {
+            error(response, "not_found", "Esa red no está guardada.");
+            return 404;
+        }
+        for (size_t i = static_cast<size_t>(index); i + 1 < count; ++i) candidate[i] = candidate[i + 1];
+        --count;
+        candidate[count].ssid = "";
+        candidate[count].password = "";
+    } else {
+        if (!validString(body["ssid"], config_rules::ssid)) {
+            error(response, "invalid_ssid", "El nombre de red no puede superar 32 bytes ni contener controles.");
+            return 400;
+        }
+        const String ssid = body["ssid"].as<const char*>();
+        if (ssid.isEmpty()) {
+            error(response, "invalid_ssid", "Indica el nombre de la red.");
+            return 400;
+        }
+        const int index = findNetwork(ssid);
+        String password;
+        if (!body["password"].isNull()) {
+            if (!validString(body["password"], config_rules::password)) {
+                error(response, "invalid_password", "Usa entre 8 y 63 caracteres ASCII imprimibles.");
+                return 400;
+            }
+            password = body["password"].as<const char*>();
+        }
+        if (password.isEmpty()) {
+            if (index < 0) {
+                error(response, "password_required", "Introduce la contraseña de la red. Solo se admiten redes protegidas.");
+                return 400;
+            }
+            password = candidate[index].password;
+        }
+        if (index >= 0) {
+            candidate[index].password = password;
+        } else if (count == kMaxNetworks) {
+            error(response, "networks_full", "Se alcanzó el máximo de redes guardadas de este equipo. Olvida una antes de añadir otra.");
+            return 409;
+        } else {
+            candidate[count].ssid = ssid;
+            candidate[count].password = password;
+            ++count;
+        }
+    }
+    if (!persistConfig(revision + 1, deviceName, refreshMs, candidate, count)) {
+        error(response, "save_failed", "No se pudieron guardar las redes. La lista activa se conserva.");
+        return 503;
+    }
+    adoptNetworks(candidate, count);
+    ++revision;
+    configValid = true;
+    pendingNetwork = true;
+    networkChangedAt = millis();
+    config(response);
+    response["saved"] = true;
+    return 200;
+}
+
+int wifiScan(const String& method, JsonDocument& response) {
+    if (method == "POST") {
+        if (firmware_update::busy()) {
+            error(response, "busy", "Hay una carga de firmware en curso. Espera a que termine antes de escanear.");
+            return 409;
+        }
+        // Escanear obliga a la radio a recorrer los canales: una sesión NTRIP en
+        // marcha perdería la conexión con el caster a media corrección.
+        if (ntrip_input::active()) {
+            error(response, "busy", "Hay correcciones NTRIP activas. Detenlas antes de buscar redes: el escaneo interrumpe la radio.");
+            return 409;
+        }
+        if (scanState != ScanState::running) startScan();
+    }
+    response["state"] = scanState == ScanState::running ? "scanning"
+        : (scanState == ScanState::ready ? "ready"
+        : (scanState == ScanState::failed ? "failed" : "idle"));
+    response["networks_max"] = kMaxNetworks;
+    response["networks_saved"] = networkCount;
+    // El escaneo interrumpe el AP propio mientras recorre los canales.
+    response["disrupts_ap"] = true;
+    JsonArray found = response["networks"].to<JsonArray>();
+    if (scanState == ScanState::ready) {
+        const int reported = scanFound < kMaxScanReported ? scanFound : kMaxScanReported;
+        for (int i = 0; i < reported; ++i) {
+            const String ssid = WiFi.SSID(i);
+            if (ssid.isEmpty()) continue; // red oculta: no se puede guardar por nombre
+            JsonObject item = found.add<JsonObject>();
+            item["ssid"] = ssid;
+            item["rssi_dbm"] = WiFi.RSSI(i);
+            item["secure"] = WiFi.encryptionType(i) != WIFI_AUTH_OPEN;
+            item["saved"] = findNetwork(ssid) >= 0;
+        }
+        response["truncated"] = scanFound > kMaxScanReported;
+        response["age_ms"] = millis() - scanFinishedAt;
+    } else {
+        response["truncated"] = false;
+        response["age_ms"] = nullptr;
+    }
+    return method == "POST" ? 202 : 200;
 }
 
 void status(JsonDocument& response) {
@@ -216,8 +499,10 @@ void status(JsonDocument& response) {
     wifi["ap_ip"] = WiFi.softAPIP().toString();
     wifi["ap_clients"] = WiFi.softAPgetStationNum();
     const bool connected = WiFi.status() == WL_CONNECTED;
-    wifi["station_state"] = stationSsid.isEmpty() ? "not_configured" : (connected ? "connected" : "connecting");
+    wifi["station_state"] = !networkCount ? "not_configured"
+        : (connected ? "connected" : (scanState == ScanState::running ? "scanning" : "connecting"));
     wifi["station_ssid"] = stationSsid;
+    wifi["networks_saved"] = networkCount;
     if (connected) {
         wifi["station_ip"] = WiFi.localIP().toString();
         wifi["rssi_dbm"] = WiFi.RSSI();
@@ -237,6 +522,9 @@ void status(JsonDocument& response) {
     response["solution"]["height_m"] = nullptr;
     response["solution"]["height_reference"] = nullptr;
     response["solution"]["hdop"] = nullptr;
+    // Estimación del receptor, no exactitud verificada. Nula mientras no llegue GST.
+    response["solution"]["horizontal_sigma_m"] = nullptr;
+    response["solution"]["vertical_sigma_m"] = nullptr;
     response["solution"]["arrival_time_us"] = nullptr;
     const auto gnss = gnss_receiver::snapshot();
     JsonObject health = response["subsystems"]["gnss"].as<JsonObject>();
@@ -266,6 +554,14 @@ void status(JsonDocument& response) {
             out["fix"] = qualities[gnss.solution.quality];
             if (gnss.solution.has_satellites) out["satellites_used"] = gnss.solution.satellites;
             if (std::isfinite(gnss.solution.hdop)) out["hdop"] = gnss.solution.hdop;
+            // GST llega en su propia trama: solo se publica si es tan reciente
+            // como la posición, para no mezclar una sigma vieja con un fix nuevo.
+            if (gnss.precision_accepted && now - gnss.precision.arrival_us <= 2000000) {
+                if (std::isfinite(gnss.precision.horizontal_sigma_m))
+                    out["horizontal_sigma_m"] = gnss.precision.horizontal_sigma_m;
+                if (std::isfinite(gnss.precision.altitude_sigma_m))
+                    out["vertical_sigma_m"] = gnss.precision.altitude_sigma_m;
+            }
             out["arrival_time_us"] = gnss.solution.arrival_us;
             if (gnss.solution.has_utc) out["utc_time_of_day_ms"] = gnss.solution.utc_ms;
             // GGA no aporta fecha ni demuestra el datum configurado.
@@ -287,55 +583,84 @@ void status(JsonDocument& response) {
 void begin() {
     storageReady = preferences.begin("tresvizo", false);
     if (storageReady) {
-        key = preferences.getString("access_key", "");
         const String saved = preferences.getString("config", "");
         if (!saved.isEmpty()) {
             JsonDocument record;
-            const auto parsed = deserializeJson(record, saved, DeserializationOption::NestingLimit(3));
-            configValid = !parsed && record["schema_version"] == 1 &&
+            // La lista de redes añade un nivel: objeto raíz, array y objeto.
+            const auto parsed = deserializeJson(record, saved, DeserializationOption::NestingLimit(4));
+            const int schema = record["schema_version"] | 0;
+            configValid = !parsed && (schema == 1 || schema == 2) &&
                 validString(record["device_name"], config_rules::deviceName) &&
                 record["revision"].is<uint32_t>() && record["refresh_ms"].is<uint32_t>() &&
-                config_rules::refresh(record["refresh_ms"].as<uint32_t>()) &&
-                validString(record["wifi_ssid"], config_rules::ssid) &&
-                record["wifi_password"].is<const char*>();
-            if (configValid) {
-                const String ssid = record["wifi_ssid"].as<const char*>();
-                configValid = ssid.isEmpty() || validString(record["wifi_password"], config_rules::password);
+                config_rules::refresh(record["refresh_ms"].as<uint32_t>());
+            SavedNetwork loaded[kMaxNetworks];
+            size_t loadedCount = 0;
+            if (configValid && schema == 1) {
+                // Registro de una sola red: se migra a la lista sin perderla.
+                configValid = validString(record["wifi_ssid"], config_rules::ssid) &&
+                    record["wifi_password"].is<const char*>();
+                if (configValid) {
+                    const String ssid = record["wifi_ssid"].as<const char*>();
+                    if (!ssid.isEmpty()) {
+                        configValid = validString(record["wifi_password"], config_rules::password);
+                        if (configValid) {
+                            loaded[0].ssid = ssid;
+                            loaded[0].password = record["wifi_password"].as<const char*>();
+                            loadedCount = 1;
+                        }
+                    }
+                }
+            } else if (configValid) {
+                configValid = record["networks"].is<JsonArrayConst>();
+                if (configValid) {
+                    for (JsonVariantConst item : record["networks"].as<JsonArrayConst>()) {
+                        if (loadedCount == kMaxNetworks) break;
+                        if (!validString(item["ssid"], config_rules::ssid) ||
+                            !validString(item["password"], config_rules::password)) {
+                            configValid = false;
+                            break;
+                        }
+                        const String ssid = item["ssid"].as<const char*>();
+                        if (ssid.isEmpty()) {
+                            configValid = false;
+                            break;
+                        }
+                        loaded[loadedCount].ssid = ssid;
+                        loaded[loadedCount].password = item["password"].as<const char*>();
+                        ++loadedCount;
+                    }
+                }
             }
             if (configValid) {
                 deviceName = record["device_name"].as<const char*>();
                 revision = record["revision"].as<uint32_t>();
                 refreshMs = record["refresh_ms"].as<uint32_t>();
-                stationSsid = record["wifi_ssid"].as<const char*>();
-                stationPassword = record["wifi_password"].as<const char*>();
+                adoptNetworks(loaded, loadedCount);
             }
         }
     }
-    stationPresent = !stationSsid.isEmpty();
+    stationPresent = networkCount > 0;
     WiFi.persistent(false);
     WiFi.mode(WIFI_AP_STA); // radio activa para la fuente de entropía del RNG
-    if (!config_rules::password(key.c_str())) {
-        key = randomCredential();
-        if (storageReady && preferences.putString("access_key", key) != key.length()) storageReady = false;
+    // Solo se respeta una contraseña guardada si el propietario la fijó a
+    // propósito desde Configuración. Un equipo que venía con la aleatoria de
+    // 0.6.0 vuelve así al valor de fábrica, que sí se puede teclear.
+    apKey = "";
+    if (storageReady && preferences.getBool("ap_custom", false)) {
+        apKey = preferences.getString("ap_password", "");
     }
-    // Credencial del AP separada de la clave de API. Hasta 0.5.0 eran la misma
-    // cadena: quien recibía el Wi-Fi obtenía también control total del equipo,
-    // incluida la carga de firmware sin firma. Un equipo actualizado desde una
-    // versión anterior genera aquí una contraseña Wi-Fi nueva; hay que leerla
-    // por USB con `usb_console.py access`.
-    if (storageReady) apKey = preferences.getString("ap_password", "");
-    if (!config_rules::password(apKey.c_str())) {
-        apKey = randomCredential();
-        if (storageReady && preferences.putString("ap_password", apKey) != apKey.length()) storageReady = false;
-    }
-    char suffix[5];
-    snprintf(suffix, sizeof(suffix), "%04X", static_cast<unsigned int>(ESP.getEfuseMac() >> 32) & 0xffff);
-    networkName = String("TresVizo-") + suffix;
+    if (!config_rules::password(apKey.c_str())) apKey = kDefaultApPassword;
+    // Sin sufijo de MAC: el nombre es del producto, no de la unidad. Si algún día
+    // hay dos equipos encendidos en la misma obra, sus redes se verán iguales.
+    deviceName = kDeviceName;
+    networkName = kDeviceName;
     WiFi.setAutoReconnect(true);
     WiFi.setHostname("tresvizo-rtk");
     WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
     apReady = WiFi.softAP(networkName.c_str(), apKey.c_str(), 1, false, 4);
-    connectStation();
+    // Al encender no se fuerza una red concreta: el primer tick escanea y se
+    // une a la red guardada que esté realmente a la vista.
+    joinRequested = networkCount > 0;
 }
 
 void tick() {
@@ -343,36 +668,35 @@ void tick() {
     if (pendingRestart && config_rules::elapsed(now, restartRequestedAt, 1000)) ESP.restart();
     if (pendingNetwork && config_rules::elapsed(now, networkChangedAt, 1000)) {
         pendingNetwork = false;
-        connectStation();
+        joinRequested = networkCount > 0;
     }
-    if (!pendingNetwork && !stationSsid.isEmpty() && WiFi.status() != WL_CONNECTED &&
-        config_rules::elapsed(now, lastConnectionAttempt, 30000)) connectStation();
+    if (scanState == ScanState::running) {
+        const int16_t found = WiFi.scanComplete();
+        if (found >= 0) {
+            scanFound = found;
+            scanState = ScanState::ready;
+            scanFinishedAt = now;
+            // Los resultados se aprovechan venga el escaneo de donde venga: si
+            // el equipo está suelto, se une sin pedir otro barrido.
+            if (networkCount && WiFi.status() != WL_CONNECTED && !joinBestVisible()) {
+                lastConnectionAttempt = now;
+            }
+        } else if (found == WIFI_SCAN_FAILED || config_rules::elapsed(now, scanStartedAt, 20000)) {
+            scanState = ScanState::failed;
+            scanFinishedAt = now;
+            lastConnectionAttempt = now;
+        }
+    }
+    if (networkCount && scanState != ScanState::running && WiFi.status() != WL_CONNECTED &&
+        (joinRequested || config_rules::elapsed(now, lastConnectionAttempt, 30000))) {
+        joinRequested = false;
+        startScan();
+    }
 }
 
-int changeAccessKey(JsonVariantConst body, JsonDocument& response) {
-    if(sd_recorder::active() || gnss_control::busy() || firmware_update::busy()) {error(response,"busy","Espera al cierre de la operación antes de cambiar la clave y reiniciar.");return 409;}
-    if (pendingRestart) { error(response, "restarting", "Reinicio en curso."); return 409; }
-    if (!body.is<JsonObjectConst>() || body.size() != 1 ||
-        !validString(body["access_key"], config_rules::password)) {
-        error(response, "invalid_key", "La clave debe tener entre 8 y 63 caracteres ASCII imprimibles.");
-        return 400;
-    }
-    const String next = body["access_key"].as<const char*>();
-    if (next == key) { response["changed"] = false; return 200; }
-    if (!storageReady || preferences.putString("access_key", next) != next.length()) {
-        error(response, "storage_failed", "No se pudo guardar la clave."); return 503;
-    }
-    // Mantener la clave activa inmutable hasta reiniciar evita carreras con HTTP.
-    pendingRestart = true;
-    restartRequestedAt = millis();
-    response["changed"] = true;
-    response["restarting"] = true;
-    return 202;
-}
-
-const String& accessKey() { return key; }
 const String& apPassword() { return apKey; }
 bool stationConfigured() { return stationPresent.load(); }
+// Nota: informa de que hay al menos una red guardada, no de que haya enlace.
 const String& apName() { return networkName; }
 
 int previewBase(JsonVariantConst body, JsonDocument& response) {
@@ -434,6 +758,8 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
     if (firmware_update::busy() && method != "GET") { error(response,"updating","Actualización en curso. Espera antes de modificar el equipo."); return 409; }
     if(path=="/api/recording" || path.startsWith("/api/recording/"))return sd_recorder::request(method,path,body,response);
     if(path=="/api/ntrip/input") return ntrip_input::request(method,body,response);
+    if(path=="/api/ntrip/profiles") return ntrip_input::profileRequest(method,body,response);
+    if(path=="/api/ntrip/sourcetable") return ntrip_input::sourcetableRequest(method,body,response);
     if(path=="/api/gnss/control") {
         if(method=="GET"){gnss_control::status(response.to<JsonObject>());return 200;}
         if(method=="POST")return gnss_control::start(body,response);
@@ -479,6 +805,12 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
     if (method == "GET" && path == "/api/status") { status(response); return 200; }
     if (method == "GET" && path == "/api/config") { config(response); return 200; }
     if (method == "PUT" && path == "/api/config") return saveConfig(body, response);
+    if ((method == "GET" || method == "POST") && path == "/api/wifi/networks") {
+        return wifiNetworks(method, body, response);
+    }
+    if ((method == "GET" || method == "POST") && path == "/api/wifi/scan") {
+        return wifiScan(method, response);
+    }
     if (method == "POST" && path == "/api/restart") {
         if(sd_recorder::active()||gnss_control::busy()){error(response,"busy","Cierra grabación y espera al GPS antes de reiniciar.");return 409;}
         pendingRestart = true;

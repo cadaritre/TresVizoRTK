@@ -21,13 +21,11 @@ size_t serialLength = 0;
 bool serialOverflow = false;
 uint32_t serialStartedAt = 0;
 
-bool authenticated(const char* supplied) {
-    const String& expected = instrument::accessKey();
-    if (strlen(supplied) != expected.length()) return false;
-    uint8_t difference = 0;
-    for (size_t i = 0; i < expected.length(); ++i) difference |= supplied[i] ^ expected[i];
-    return difference == 0;
-}
+// El instrumento dejó de pedir clave de panel por decisión del propietario:
+// es un receptor GNSS de campo y la barrera estorbaba más de lo que protegía.
+// La contraseña del Wi-Fi propio es la única puerta que queda. Conviene tenerlo
+// presente: la carga de firmware por OTA no lleva firma.
+bool authenticated(const char*) { return true; }
 
 int dispatch(const String& method, const String& path, JsonVariantConst body, JsonDocument& response) {
     if (xSemaphoreTake(instrumentMutex, pdMS_TO_TICKS(1000)) != pdTRUE) {
@@ -85,16 +83,6 @@ esp_err_t handleHttp(httpd_req_t* request) {
             return httpd_resp_send(request, reinterpret_cast<const char*>(asset.data), asset.size);
         }
     }
-    char suppliedKey[64] = {};
-    if (httpd_req_get_hdr_value_len(request, "X-Device-Key") < 8 ||
-        httpd_req_get_hdr_value_len(request, "X-Device-Key") > 63 ||
-        httpd_req_get_hdr_value_str(request, "X-Device-Key", suppliedKey, sizeof(suppliedKey)) != ESP_OK ||
-        !authenticated(suppliedKey)) {
-        response["error"] = "unauthorized";
-        response["message"] = "Introduce la clave de acceso del instrumento.";
-        reply(request, 401, response);
-        return ESP_FAIL;
-    }
     char payload[config_rules::kMaxRequestBytes + 1];
     size_t received = 0;
     const uint32_t receiveStartedAt = millis();
@@ -142,33 +130,16 @@ void handleSerialLine() {
     if (input["method"] == "GET" && input["path"] == "/api/access") {
         output["status"] = 200;
         output["body"]["ap_ssid"] = instrument::apName();
-        // Dos credenciales distintas desde 0.6.0: la del Wi-Fi solo deja entrar
-        // a la red; la de acceso es la que autoriza la API y el panel.
+        // Única credencial del equipo: la del Wi-Fi propio. El panel y la API no
+        // piden clave. El PIN de BLE es aparte y lo exige el emparejamiento.
         output["body"]["ap_password"] = instrument::apPassword();
-        output["body"]["access_key"] = instrument::accessKey();
         output["body"]["ble_pairing_pin"] = ble_transport::passkey();
         output["body"]["ap_url"] = "http://192.168.4.1";
         serialReply(output);
         return;
     }
-    if (!authenticated(input["key"] | "")) {
-        output["status"] = 401;
-        output["body"]["error"] = "unauthorized";
-        serialReply(output);
-        return;
-    }
     JsonDocument body;
-    if (input["method"] == "PUT" && input["path"] == "/api/access") {
-        if (xSemaphoreTake(instrumentMutex, pdMS_TO_TICKS(1000)) == pdTRUE) {
-            output["status"] = instrument::changeAccessKey(input["body"].as<JsonVariantConst>(), body);
-            xSemaphoreGive(instrumentMutex);
-        } else {
-            output["status"] = 503;
-            body["error"] = "busy";
-        }
-    } else {
     output["status"] = dispatch(input["method"] | "", input["path"] | "", input["body"].as<JsonVariantConst>(), body);
-    }
     output["body"] = body;
     serialReply(output);
 }

@@ -31,25 +31,30 @@
         <button class="nav-item" data-page="base"><span aria-hidden="true">◎</span> Base / rover</button>
         <button class="nav-item" data-page="corrections"><span aria-hidden="true">⇄</span> Correcciones</button>
         <button class="nav-item" data-page="recording"><span aria-hidden="true">◉</span> Registro / PPK</button>
-        <button class="nav-item" data-page="gps"><span aria-hidden="true">⚙</span> GPS avanzado</button>
         <button class="nav-item" data-page="connections"><span aria-hidden="true">⌁</span> Conexiones</button>
         <button class="nav-item" data-page="settings"><span aria-hidden="true">☷</span> Configuración</button>
-        <button class="nav-item" data-page="diagnostics"><span aria-hidden="true">▤</span> Diagnóstico</button>
       </nav>
       <div class="sidebar-bottom">
         <span class="eyebrow">TRESVIZO INGENIERÍA</span>
         <p>Tecnología que<br />conecta con el terreno.</p>
-        <span class="version">PROTOTIPO <b>0.6.0</b></span>
+        <span class="version">PROTOTIPO <b id="sidebar-version">—</b></span>
       </div>
     </aside>
     <div class="workspace">
       <header class="topbar">
         <div>
-          <b>TresVizo RTK</b><span class="slash">/</span
+          <b>MeridianV</b><span class="slash">/</span
           ><span id="page-title">Resumen</span>
         </div>
-        <div class="connection-pill" id="connection-pill">
-          <span class="dot"></span><span id="connection-text">Conectando…</span>
+        <!-- Estado de la solución visible desde cualquier pestaña: en campo hay
+             que saber si se está en fijo sin navegar a otra pantalla. -->
+        <div class="topbar-status">
+          <span id="corrections-state" class="corrections-state none"
+            >Sin correcciones recibidas</span
+          ><span id="fix-badge" class="fix-badge none">SIN FIX</span>
+          <div class="connection-pill" id="connection-pill">
+            <span class="dot"></span><span id="connection-text">Conectando…</span>
+          </div>
         </div>
       </header>
       <main id="main" tabindex="-1">
@@ -97,6 +102,16 @@
               <span class="field-label">HDOP</span>
               <strong id="field-hdop" data-live>—</strong>
               <span class="field-note">Geometría, no metros</span>
+            </article>
+            <article class="field-chip">
+              <span class="field-label">PRECISIÓN H</span>
+              <strong id="field-sigma-h" data-live>—</strong>
+              <span class="field-note">Estimación del receptor</span>
+            </article>
+            <article class="field-chip">
+              <span class="field-label">PRECISIÓN V</span>
+              <strong id="field-sigma-v" data-live>—</strong>
+              <span class="field-note">Estimación del receptor</span>
             </article>
             <article class="field-chip">
               <span class="field-label">EDAD</span>
@@ -338,8 +353,16 @@
           </div>
           <div class="two-columns lower">
             <article class="panel">
-              <h2>Correcciones NTRIP</h2>
-              <span class="badge muted">Cliente directo disponible</span><p>Configura la entrada Wi-Fi en Correcciones. Publicación y caster en el ESP32 siguen pendientes.</p>
+              <h2>Correcciones</h2>
+              <p>
+                La entrada y la salida de correcciones se configuran en su
+                propia pestaña, con su estado real.
+              </p>
+              <div class="button-row">
+                <button class="button secondary" type="button" data-page="corrections">
+                  Ir a Correcciones ↗
+                </button>
+              </div>
             </article>
             <article class="panel">
               <h2>Bluetooth LE</h2>
@@ -392,11 +415,166 @@
         <section class="page" id="page-corrections" aria-labelledby="corrections-title" hidden>
           <div class="page-heading"><div><p class="eyebrow">RTCM Y CONECTIVIDAD</p><h1 id="corrections-title">Correcciones</h1><p class="intro">Recibe correcciones como rover o distribuye las de tu base.</p></div></div>
           <p id="device-memory"></p><div class="notice" id="corrections-availability">Entrada NTRIP directa al ESP32 disponible. Publicador y caster integrados siguen pendientes.</div>
+          <h2 class="flow-heading">Entrada de correcciones</h2>
+          <p class="flow-sub">
+            Lo que el receptor recibe para corregir su posición. Solo una fuente
+            alimenta el GPS a la vez.
+          </p>
           <div class="two-columns lower">
-            <article class="panel"><h2>Entrada NTRIP · ESP32 por Wi-Fi</h2><p>Conecta el equipo a tu hotspot en Configuración y consulta el modo rover en Base / rover.</p><p>Versión inicial: NTRIP v1 por TCP, sin TLS y sin envío GGA para VRS. Usa un caster compatible. Las credenciales quedan solo en memoria hasta reiniciar.</p><form id="device-ntrip-form"><label for="device-host">Caster</label><input id="device-host" maxlength="128" required /><label for="device-port">Puerto</label><input id="device-port" type="number" min="1" max="65535" value="2101" required /><label for="device-mount">Mountpoint</label><input id="device-mount" maxlength="96" required /><label for="device-user">Usuario</label><input id="device-user" maxlength="64" autocomplete="off" /><label for="device-password">Contraseña</label><input id="device-password" type="password" maxlength="128" autocomplete="off" /><div class="button-row"><button class="button primary" type="submit">Conectar NTRIP</button><button class="button secondary" type="button" id="device-ntrip-stop">Detener</button></div></form><p id="device-ntrip-state" role="status"></p></article>
-            <article class="panel"><h2>Publicación NTRIP · base</h2><p>GPS → ESP32 → caster externo → rovers. Las credenciales de publicación pueden ser diferentes de las de recepción.</p><fieldset disabled><legend>Destino de publicación</legend><label for="ntrip-output-host">Caster destino (hostname o IP LAN)</label><input id="ntrip-output-host" /><label for="ntrip-output-port">Puerto</label><input id="ntrip-output-port" type="number" value="2101" /><label for="ntrip-output-mount">Mountpoint de la base</label><input id="ntrip-output-mount" /><label for="ntrip-output-user">Usuario de fuente</label><input id="ntrip-output-user" autocomplete="off" /><label for="ntrip-output-pass">Contraseña de fuente</label><input id="ntrip-output-pass" type="password" autocomplete="new-password" /><label for="ntrip-output-version">Protocolo</label><select id="ntrip-output-version"><option>NTRIP v2</option><option>NTRIP v1</option></select><label class="checkbox-label"><input type="checkbox" /> TLS</label></fieldset><button class="button primary" disabled>Iniciar publicación</button><p>Estado: sin integrar · RTCM enviado: — · Reconexiones: —</p></article>
+            <article class="panel">
+              <h3>NTRIP · por Wi-Fi del equipo</h3>
+              <p>
+                Guarda hasta cinco casters. El equipo se reconecta solo al
+                último que hayas usado, también después de un corte de corriente.
+              </p>
+              <div class="button-row">
+                <span class="hint" id="ntrip-profile-count">—</span>
+              </div>
+              <ul class="wifi-list" id="ntrip-profile-list"></ul>
+              <p id="ntrip-profile-message" role="status"></p>
+              <details id="ntrip-profile-editor">
+                <summary>Añadir o editar un perfil</summary>
+                <form id="device-ntrip-form">
+                  <label for="ntrip-profile-name">Nombre del perfil</label
+                  ><input id="ntrip-profile-name" maxlength="24" required placeholder="Oficina" />
+                  <label for="device-host">Caster</label
+                  ><input id="device-host" maxlength="128" required placeholder="caster.emlid.com" />
+                  <label for="device-port">Puerto</label
+                  ><input id="device-port" type="number" min="1" max="65535" value="2101" required />
+                  <label for="device-mount">Punto de montaje</label>
+                  <div class="inline-pair">
+                    <input id="device-mount" maxlength="96" required />
+                    <button class="button secondary" type="button" id="ntrip-mount-browse">
+                      Ver lista ↗
+                    </button>
+                  </div>
+                  <p class="field-help" id="ntrip-mount-hint">
+                    El equipo pregunta al caster qué puntos publica. Requiere red
+                    y la conexión NTRIP detenida.
+                  </p>
+                  <ul class="wifi-list" id="ntrip-mount-list"></ul>
+                  <label for="device-user">Usuario</label
+                  ><input id="device-user" maxlength="64" autocomplete="off" />
+                  <label for="device-password">Contraseña</label
+                  ><input id="device-password" type="password" maxlength="128" autocomplete="off" />
+                  <p class="field-help">
+                    Al editar un perfil, dejar la contraseña vacía conserva la
+                    guardada.
+                  </p>
+                  <div class="button-row">
+                    <button class="button primary" type="submit">Guardar perfil</button>
+                  </div>
+                </form>
+              </details>
+              <div class="button-row">
+                <button class="button secondary" type="button" id="device-ntrip-stop">
+                  Detener conexión
+                </button>
+                <button class="button secondary" type="button" id="ntrip-select-none">
+                  No usar ningún perfil
+                </button>
+              </div>
+              <p id="device-ntrip-state" role="status"></p>
+              <p class="hint">
+                NTRIP v1 por TCP, sin TLS y sin envío de GGA para VRS. Un punto
+                de montaje que exija GGA puede no llegar a fijar.
+              </p>
+            </article>
+            <article class="panel">
+              <h3>Radio externo · entrada</h3>
+              <span class="badge muted">Sin integrar</span>
+              <p>
+                Entrada de correcciones por radio UHF hacia el receptor. No hay
+                controlador ni pines asignados: el hueco está previsto en el
+                enrutador de correcciones, no implementado.
+              </p>
+            </article>
           </div>
-          <article class="panel lower"><h2>Caster propio · red local</h2><p>Previsto dentro del ESP32, o en una Mac/PC/Raspberry Pi de la misma red. La opción externa usa la publicación NTRIP de arriba hacia la IP LAN del servidor.</p><fieldset disabled><legend>Caster integrado en el ESP32 · pendiente</legend><label for="caster-network">Red de acceso</label><select id="caster-network"><option>Wi-Fi del equipo (AP)</option><option>Red local del sitio (LAN)</option></select><label for="caster-port">Puerto local</label><input id="caster-port" type="number" value="2101" /><label for="caster-mount">Mountpoint local</label><input id="caster-mount" value="TRESVIZO" /><label for="caster-user">Usuario rover</label><input id="caster-user" autocomplete="off" /><label for="caster-pass">Contraseña rover</label><input id="caster-pass" type="password" autocomplete="new-password" /><label for="caster-clients">Límite propuesto de rovers</label><input id="caster-clients" type="number" value="2" /></fieldset><button class="button primary" disabled>Iniciar caster local</button><p>Dirección disponible: — · Clientes conectados: — · Capacidad pendiente de pruebas.</p><p>La distribución local no necesita internet. Los rovers deben alcanzar la IP y puerto del caster; el panel web y el caster son servicios distintos.</p></article>
+          <h2 class="flow-heading">Salida de correcciones</h2>
+          <p class="flow-sub">
+            Lo que el equipo distribuye cuando trabaja como base. Requiere modo
+            base con coordenadas verificadas.
+          </p>
+          <article class="panel" id="rtcm-messages-panel">
+            <h3>Mensajes RTCM que se emiten</h3>
+            <p>
+              Se aplican tanto a la publicación como al caster local. El juego
+              por defecto ya funciona: cámbialo solo si tu red lo exige.
+            </p>
+            <form id="rtcm-output-form">
+              <div class="checkbox-grid" id="rtcm-message-grid"></div>
+              <label for="rtcm-observation-rate">Frecuencia de observaciones</label>
+              <select id="rtcm-observation-rate">
+                <option value="1">1 Hz (por defecto)</option>
+                <option value="2">2 Hz</option>
+                <option value="5">5 Hz</option>
+              </select>
+              <p class="field-help">
+                Las coordenadas de la estación (1005/1006) se emiten a 1 Hz: el
+                receptor no admite intervalos más largos.
+              </p>
+              <div class="button-row">
+                <button class="button primary" type="submit">Aplicar</button>
+                <button class="button secondary" type="button" id="rtcm-defaults">
+                  Volver al juego por defecto
+                </button>
+              </div>
+            </form>
+            <p id="rtcm-output-message" role="status"></p>
+          </article>
+          <div class="two-columns lower">
+            <article class="panel">
+              <h3>NTRIP · publicar a un caster</h3>
+              <p>
+                GPS → ESP32 → caster externo → rovers. Las credenciales de
+                publicación son distintas de las de recepción.
+              </p>
+              <form id="ntrip-server-form">
+                <label for="ntrip-output-host">Caster destino</label
+                ><input id="ntrip-output-host" maxlength="128" required />
+                <label for="ntrip-output-port">Puerto</label
+                ><input id="ntrip-output-port" type="number" min="1" max="65535" value="2101" required />
+                <label for="ntrip-output-mount">Punto de montaje de la base</label
+                ><input id="ntrip-output-mount" maxlength="96" required />
+                <label for="ntrip-output-pass">Contraseña de fuente</label
+                ><input id="ntrip-output-pass" type="password" maxlength="128" autocomplete="new-password" />
+                <div class="button-row">
+                  <button class="button primary" type="submit">Iniciar publicación</button>
+                  <button class="button secondary" type="button" id="ntrip-server-stop">Detener</button>
+                </div>
+              </form>
+              <p id="ntrip-server-state" role="status"></p>
+            </article>
+            <article class="panel">
+              <h3>NTRIP local · caster en el equipo</h3>
+              <p>
+                El propio ESP32 atiende a los rovers en su red. No necesita
+                internet: los rovers deben alcanzar su IP y puerto.
+              </p>
+              <form id="caster-form">
+                <label for="caster-port">Puerto local</label
+                ><input id="caster-port" type="number" min="1" max="65535" value="2101" required />
+                <label for="caster-mount">Punto de montaje local</label
+                ><input id="caster-mount" maxlength="32" value="MERIDIANV" required />
+                <label for="caster-pass">Contraseña para los rovers</label
+                ><input id="caster-pass" type="password" maxlength="63" autocomplete="new-password" />
+                <p class="field-help">Vacío deja el punto de montaje abierto en tu red.</p>
+                <div class="button-row">
+                  <button class="button primary" type="submit">Iniciar caster local</button>
+                  <button class="button secondary" type="button" id="caster-stop">Detener</button>
+                </div>
+              </form>
+              <p id="caster-state" role="status"></p>
+            </article>
+            <article class="panel">
+              <h3>Radio externo · salida</h3>
+              <span class="badge muted">Sin integrar</span>
+              <p>
+                Emisión por radio UHF hacia otros rovers. Sin controlador ni
+                pines asignados.
+              </p>
+            </article>
+          </div>
         <article class="panel bench-panel" id="bench-corrections" hidden>
             <h2>Correcciones de banco · Mac</h2>
             <p>Este transporte se ejecuta en la Mac y es independiente de la entrada directa del ESP32. Perfil inicial NTRIP v1; no envía tu posición GGA al caster.</p>
@@ -446,20 +624,17 @@
               <article class="panel">
                 <h2>General</h2>
                 <p>
-                  Identifica tu equipo y elige la frecuencia de actualización
-                  del panel.
+                  Elige la frecuencia de actualización del panel.
                 </p>
-                <label for="device-name-input">Nombre del instrumento</label
-                ><input
-                  id="device-name-input"
-                  name="device_name"
-                  maxlength="32"
-                  required
-                  autocomplete="off"
-                  placeholder="TresVizo RTK"
-                /><small class="field-help"
-                  >Hasta 32 caracteres: letras sin acentos, números, espacios o
-                  guiones.</small
+                <dl class="detail-list">
+                  <div>
+                    <dt>Nombre del instrumento</dt>
+                    <dd>MeridianV</dd>
+                  </div>
+                </dl>
+                <small class="field-help"
+                  >Fijo. La red Wi-Fi del equipo se llama igual para que sea
+                  reconocible en campo.</small
                 ><label for="refresh-input">Actualización del panel</label
                 ><select id="refresh-input" name="refresh_ms">
                   <option value="1000">Cada segundo</option>
@@ -471,31 +646,23 @@
                 >
               </article>
               <article class="panel">
-                <h2>Conexión a hotspot</h2>
+                <h2>Wi-Fi del instrumento</h2>
                 <p>
-                  Usa una red protegida de 2.4 GHz. El panel funciona también
-                  sin una red externa.
+                  Es la red que emite el propio equipo. Esta contraseña es su
+                  única credencial: el panel no pide clave aparte.
                 </p>
-                <label for="wifi-ssid-input">Nombre de la red (SSID)</label
+                <label for="ap-password-input"
+                  >Contraseña del Wi-Fi del equipo</label
                 ><input
-                  id="wifi-ssid-input"
-                  name="wifi_ssid"
-                  autocomplete="off"
-                  placeholder="Hotspot del teléfono"
-                /><label for="wifi-password-input">Contraseña de la red</label
-                ><input
-                  id="wifi-password-input"
-                  name="wifi_password"
-                  type="password"
+                  id="ap-password-input"
+                  name="ap_password"
+                  type="text"
                   maxlength="63"
-                  autocomplete="new-password"
-                  placeholder="Contraseña del hotspot"
-                /><small class="field-help" id="password-help"
-                  >Entre 8 y 63 caracteres. La contraseña no se devuelve al
-                  navegador.</small
-                ><label class="checkbox-label"
-                  ><input type="checkbox" id="forget-wifi" /> Olvidar la red
-                  externa guardada</label
+                  autocomplete="off"
+                /><small class="field-help" id="ap-password-help"
+                  >Entre 8 y 63 caracteres. Se muestra a propósito: hay que
+                  poder teclearla en un teléfono. Al guardarla se corta a quien
+                  esté conectado a la red del equipo.</small
                 >
               </article>
               <div class="save-bar">
@@ -526,11 +693,71 @@
               </p>
               <hr />
               <p>
-                Actualmente puedes configurar el nombre, el panel y la conexión
-                Wi-Fi del instrumento.
+                Actualmente puedes configurar el nombre, el panel, la
+                contraseña del Wi-Fi propio y las redes a las que el equipo se
+                conecta solo.
               </p>
             </aside>
           </form>
+          <article class="panel" id="settings-more">
+            <h2>Más ajustes</h2>
+            <p>
+              Ajustes que no se tocan en cada salida. Viven aquí para no ocupar
+              una pestaña propia en el menú de campo.
+            </p>
+            <div class="button-row">
+              <button class="button secondary" type="button" data-page="gps">
+                Configuración avanzada del GPS ↗
+              </button>
+              <button class="button secondary" type="button" data-page="diagnostics">
+                Diagnóstico ↗
+              </button>
+            </div>
+          </article>
+          <article class="panel" id="wifi-panel">
+            <h2>Redes Wi-Fi guardadas</h2>
+            <p>
+              El equipo busca estas redes al encender y se conecta solo a la de
+              mejor señal entre las que encuentre. Solo redes protegidas de 2.4
+              GHz.
+            </p>
+            <p class="hint">
+              Buscar redes interrumpe unos segundos la red propia del equipo. Si
+              estás viendo el panel desde ella, se quedará sin datos un momento
+              y volverá.
+            </p>
+            <div class="button-row">
+              <button type="button" class="button secondary" id="wifi-scan">
+                Buscar redes
+              </button>
+              <span class="hint" id="wifi-count">—</span>
+            </div>
+            <p id="wifi-scan-state" role="status"></p>
+            <ul class="wifi-list" id="wifi-scan-list"></ul>
+            <h3>Guardadas</h3>
+            <ul class="wifi-list" id="wifi-saved-list"></ul>
+            <p id="wifi-message" role="status"></p>
+          </article>
+          <dialog id="wifi-password-dialog" aria-labelledby="wifi-password-title">
+            <form id="wifi-password-form">
+              <h2 id="wifi-password-title">Contraseña de la red</h2>
+              <label for="wifi-password-value">Contraseña</label
+              ><input
+                id="wifi-password-value"
+                type="password"
+                maxlength="63"
+                autocomplete="off"
+                required
+              />
+              <p class="field-help">Entre 8 y 63 caracteres.</p>
+              <div class="button-row">
+                <button type="button" class="button secondary" id="wifi-password-cancel">
+                  Cancelar
+                </button>
+                <button class="button primary" type="submit">Guardar red</button>
+              </div>
+            </form>
+          </dialog>
         <article class="panel bench-panel" id="update-panel">
             <h2>Actualizar firmware del ESP32</h2>
             <p>Selecciona firmware.bin y su manifest.json de TresVizo. Se verifica el equipo, el tamaño y SHA-256 antes de activar la imagen nueva. Los ajustes se conservan.</p>
@@ -707,33 +934,19 @@
         </section>
         <footer class="footer">
           <span>3VIZO <b>INGENIERÍA</b> · Control del instrumento</span
-          ><span id="last-updated">Esperando datos del equipo</span>
+          ><span class="footer-right"
+            ><span id="last-updated">Esperando datos del equipo</span
+            ><a
+              class="footer-site"
+              href="https://www.TresVizo.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              >www.TresVizo.com</a
+            ></span
+          >
         </footer>
       </main>
     </div>
-    <dialog id="login-dialog" aria-labelledby="login-title">
-      <form id="login-form">
-        <img
-          src="/assets/tresvizo-logo.png"
-          width="134"
-          height="60"
-          alt="3Vizo"
-        />
-        <p class="eyebrow">ACCESO AL INSTRUMENTO</p>
-        <h2 id="login-title">Conecta con tu equipo.</h2>
-        <p>
-          Introduce la misma clave que utilizas para conectarte a la red Wi-Fi
-          del instrumento.
-        </p>
-        <label for="access-key">Clave del instrumento</label
-        ><input id="access-key" type="password" required autocomplete="off" />
-        <p class="field-help">
-          Puedes consultarla desde la consola USB del equipo.
-        </p>
-        <p id="login-message" role="alert"></p>
-        <button class="button primary" type="submit">Entrar al panel ↗</button>
-      </form>
-    </dialog>
     <dialog id="restart-dialog" aria-labelledby="restart-title">
       <h2 id="restart-title">¿Reiniciar el instrumento?</h2>
       <p>

@@ -3,7 +3,6 @@
 import argparse
 from collections import deque
 import json
-import getpass
 import mimetypes
 import threading
 import time
@@ -39,7 +38,6 @@ class Instrument:
     def __init__(self, port):
         self.port = port
         self.connection = None
-        self.key = None
         self.sequence = 0
         self.lock = threading.Lock()
         self.boot_diagnostics = deque(maxlen=12)
@@ -48,7 +46,6 @@ class Instrument:
         if self.connection:
             self.connection.close()
         self.connection = None
-        self.key = None
 
     def _open(self):
         if self.connection and self.connection.is_open:
@@ -98,14 +95,9 @@ class Instrument:
     def request(self, method, path, body=None):
         with self.lock:
             try:
-                if method == "GET" and path == "/api/access":
-                    return self._exchange(method, path, body)
-                if self.key is None:
-                    access = self._exchange("GET", "/api/access")
-                    if access.get("status") != 200:
-                        return access
-                    self.key = access["body"]["access_key"]
-                return self._exchange(method, path, body, self.key)
+                # El instrumento ya no exige clave de panel: la única credencial
+                # es la del Wi-Fi propio, y por USB no hace falta ni esa.
+                return self._exchange(method, path, body)
             except (serial.SerialException, OSError, TimeoutError):
                 self.close()
                 raise
@@ -202,7 +194,7 @@ def serve(device, port, gps=None):
                 except (serial.SerialException, OSError, TimeoutError) as error:
                     return self.respond(503, {"message": str(error)})
                 return self.respond(404, {"error": "not_found"})
-            if self.path not in {"/api/recording", "/api/recording/start", "/api/recording/stop", "/api/recording/read", "/api/recording/sessions", "/api/gnss/control", "/api/base/apply", "/api/ntrip/input", "/api/status", "/api/config", "/api/restart", "/api/operations", "/api/base/plan", "/api/update", "/api/update/begin", "/api/update/chunk", "/api/update/finish", "/api/update/abort", "/api/update/rollback", "/api/corrections/source"}:
+            if self.path not in {"/api/recording", "/api/recording/start", "/api/recording/stop", "/api/recording/read", "/api/recording/sessions", "/api/gnss/control", "/api/base/apply", "/api/ntrip/input", "/api/status", "/api/config", "/api/restart", "/api/operations", "/api/base/plan", "/api/update", "/api/update/begin", "/api/update/chunk", "/api/update/finish", "/api/update/abort", "/api/update/rollback", "/api/corrections/source", "/api/wifi/networks", "/api/wifi/scan", "/api/gnss/profile", "/api/ntrip/profiles", "/api/ntrip/sourcetable"}:
                 return self.respond(404, {"error": "not_found"})
             if self.headers.get("X-TresVizo-Client") != "portal":
                 return self.respond(403, {"error": "client_header_required"})
@@ -245,7 +237,7 @@ def serve(device, port, gps=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", help="Puerto USB del ESP32; se detecta si hay uno solo.")
-    parser.add_argument("command", choices=["access", "set-access", "status", "config", "serve"])
+    parser.add_argument("command", choices=["access", "status", "config", "serve"])
     parser.add_argument("--http-port", type=int, default=8765)
     parser.add_argument("--gnss-port", help="Activa banco GNSS USB independiente; nunca se presenta como UART del ESP32.")
     args = parser.parse_args()
@@ -254,22 +246,15 @@ def main():
         if args.command == "serve":
             gps = Receiver(args.gnss_port, ROOT / "captures" / "local" / "sessions") if args.gnss_port else None
             serve(device, args.http_port, gps)
-        elif args.command == "set-access":
-            key = getpass.getpass("Nueva clave de acceso al panel/API: ")
-            if key != getpass.getpass("Repite la clave: "):
-                raise ValueError("Las claves no coinciden.")
-            result = device.request("PUT", "/api/access", {"access_key": key})
-            print(json.dumps(result, ensure_ascii=False))
         elif args.command == "access":
             result = device.request("GET", "/api/access")
             body = result.get("body", {})
-            # Desde 0.6.0 son dos credenciales distintas; mostrarlas etiquetadas
-            # evita que se confundan al escribirlas en el teléfono.
-            print(f'Red Wi-Fi          : {body.get("ap_ssid")}')
-            print(f'Contraseña Wi-Fi   : {body.get("ap_password")}')
-            print(f'Clave del panel/API: {body.get("access_key")}')
+            # La contraseña del Wi-Fi propio es la única credencial del
+            # equipo. Se cambia desde Configuración, no desde aquí.
+            print(f'Red Wi-Fi                : {body.get("ap_ssid")}')
+            print(f'Contraseña Wi-Fi         : {body.get("ap_password")}')
             print(f'PIN de emparejamiento BLE: {body.get("ble_pairing_pin")}')
-            print(f'Panel              : {body.get("ap_url")}')
+            print(f'Panel                    : {body.get("ap_url")}')
             print("\nSalida privada: no la subas al repositorio ni la compartas.")
         else:
             result = device.request("GET", f"/api/{args.command}")

@@ -33,8 +33,10 @@ char textBlock[kBlock];
 
 void acquire(void*) {
     gnss::GgaParser parser;
+    gnss::GstParser precisionParser;
     gnss::WireFilter filter;
     gnss::Gga solution;
+    gnss::Gst precision;
     size_t sent = 0;
 #ifdef TRESVIZO_TASK_WDT
     // Desactivado por defecto: cambia el comportamiento ante un bloqueo a reinicio
@@ -60,6 +62,7 @@ void acquire(void*) {
             for (size_t i = 0; i < got; ++i) {
                 filter.feed(rawBlock[i], now, [&](char character) {
                     parser.feed(character, arrival, solution);
+                    precisionParser.feed(character, arrival, precision);
                     textBlock[textLength++] = character;
                 });
             }
@@ -84,6 +87,8 @@ void acquire(void*) {
         }
         portENTER_CRITICAL(&lock);
         state.solution = solution;
+        state.precision = precision;
+        state.precision_accepted = precisionParser.accepted;
         state.accepted = parser.accepted;
         state.rejected = parser.rejected;
         state.overflow = parser.overflow;

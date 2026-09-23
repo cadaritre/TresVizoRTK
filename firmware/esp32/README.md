@@ -196,9 +196,20 @@ node tests/gnss_panel_test.js
 python -m py_compile tests/device_services_smoke.py tools/usb_console.py
 ```
 
-**No ejecutado:** compilación del firmware, carga al ESP32 y
-`tests/device_services_smoke.py`. La máquina de trabajo no tiene compilador C++ ni
-PlatformIO, y el receptor no estaba conectado. Nada de esta versión se ha
+Compilación y carga, ejecutadas en Windows con PlatformIO Core 6.2.0:
+
+```sh
+python -m platformio run -e esp32s3_usb
+python -m platformio run -e esp32s3_usb -t upload --upload-port COM4
+```
+
+La compilación termina en `[SUCCESS]`: 22,6 % de la RAM interna (73.984 de 327.680
+bytes) y 74,3 % de la partición de aplicación (1.461.545 de 1.966.080). La carga
+verifica el hash de los 1.461.904 bytes escritos y, tras el reinicio, el equipo
+imprime `TresVizo RTK 0.6.0. Consola JSON USB disponible.` por la consola USB.
+
+**No ejecutado:** `tests/device_services_smoke.py`. Arrancar no es validar: ninguna
+función de esta versión —panel, NTRIP, configuración del GPS, BLE, microSD— se ha
 comprobado sobre el equipo real.
 
 ### Herramientas en Windows
@@ -207,3 +218,11 @@ comprobado sobre el equipo real.
 modo que no arrancaba en Windows. Ahora esos módulos son opcionales: en Windows el
 puerto ya se abre en exclusiva y pyserial rechaza una segunda apertura, así que no
 hace falta el refuerzo con `TIOCEXCL`.
+
+La distribución de Python de la Microsoft Store trae `install.user = yes` fijado a
+nivel *site*, de modo que PlatformIO falla al instalar las dependencias de
+`tool-esptoolpy` con `Can not combine '--user' and '--target'`. Anteponer
+`PIP_USER=0` al comando lo evita sin tocar configuración global. Si una descarga
+de paquete se interrumpe, el toolchain queda a medio extraer y la compilación
+falla con `fatal error: stdint.h`; se corrige borrando
+`~/.platformio/packages/toolchain-xtensa-esp32s3` para que se reinstale.

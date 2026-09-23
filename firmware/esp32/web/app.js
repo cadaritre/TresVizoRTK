@@ -12,7 +12,6 @@ const pageNames = {
   settings: "Configuración",
   diagnostics: "Diagnóstico",
 };
-let accessKey = "";
 let config = null;
 let latestStatus = null;
 let timer;
@@ -49,7 +48,6 @@ async function api(path, method = "GET", body) {
   const timeout = setTimeout(() => controller.abort(), 7000);
   try {
     const headers = { "X-TresVizo-Client": "portal" };
-    if (accessKey) headers["X-Device-Key"] = accessKey;
     if (body !== undefined) headers["Content-Type"] = "application/json";
     const response = await fetch(path, {
       method,
@@ -63,10 +61,6 @@ async function api(path, method = "GET", body) {
       data = await response.json();
     } catch {
       throw new Error("La respuesta del instrumento no es válida.");
-    }
-    if (response.status === 401) {
-      if (!$("login-dialog").open) $("login-dialog").showModal();
-      throw new Error("La clave del instrumento no es válida.");
     }
     if (!response.ok)
       throw new Error(data.message || "No se pudo completar la operación.");
@@ -104,7 +98,7 @@ function connected(ok) {
         ? "Reiniciando…"
         : "Sin conexión",
   );
-  $("offline-notice").hidden = ok || awaitingRestart || $("login-dialog").open;
+  $("offline-notice").hidden = ok || awaitingRestart;
   $("save-settings").disabled =
     saving || !ok || !config || !config.persistence_ready;
   $("restart-button").disabled = !ok;
@@ -161,10 +155,51 @@ function renderGnss(data) {
     solution.height_reference === "ellipsoidal_user_configured" ? "Elipsoidal configurada" : "Referencia no confirmada");
   text("field-satellites", current && Number.isFinite(solution.satellites_used) ? String(solution.satellites_used) : "—");
   text("field-hdop", current && Number.isFinite(solution.hdop) ? solution.hdop.toFixed(1) : "—");
+  // Sigma declarada por el receptor, no exactitud comprobada. Se muestra en
+  // metros porque es lo que se pregunta en campo; el matiz va en la nota.
+  text("field-sigma-h", current && Number.isFinite(solution.horizontal_sigma_m)
+    ? `${solution.horizontal_sigma_m.toFixed(3)} m` : "—");
+  text("field-sigma-v", current && Number.isFinite(solution.vertical_sigma_m)
+    ? `${solution.vertical_sigma_m.toFixed(3)} m` : "—");
   text("field-age", Number.isFinite(health?.age_ms) ? `${(health.age_ms / 1000).toFixed(1)} s` : "—");
   // Tramas RTCM entregadas al receptor: es el dato que dice si las correcciones
   // llegaron de verdad, no solo si el caster las envió.
   text("field-corrections", Number.isFinite(health?.correction_frames_sent) ? String(health.correction_frames_sent) : "—");
+  renderFixBadge(current ? solution.fix : null, health?.correction_frames_sent);
+}
+
+// Indicador permanente de la cabecera. En campo la pregunta constante es "¿ya
+// fijó?" y "¿me están llegando correcciones?", y no debe costar navegar.
+let lastCorrectionFrames = null;
+let lastCorrectionGrowth = 0;
+function renderFixBadge(fix, frames) {
+  const badge = $("fix-badge");
+  const corrections = $("corrections-state");
+  if (!badge || !corrections) return;
+  // El receptor distingue más estados que los tres del rótulo: diferencial no es
+  // RTK pero tampoco es autónoma, y ocultarlo engañaría.
+  const map = {
+    rtk_fixed: ["FIX", "fix"],
+    rtk_float: ["FLOAT", "float"],
+    differential: ["DGPS", "float"],
+    standalone: ["SINGLE", "single"],
+  };
+  const [label, tone] = map[fix] || ["SIN FIX", "none"];
+  badge.textContent = label;
+  badge.className = `fix-badge ${tone}`;
+  // "Recibiendo" se decide por tramas que de verdad entraron al GPS entre dos
+  // sondeos, no por que el cliente NTRIP diga estar conectado.
+  if (Number.isFinite(frames)) {
+    if (lastCorrectionFrames !== null && frames > lastCorrectionFrames) {
+      lastCorrectionGrowth = Date.now();
+    }
+    lastCorrectionFrames = frames;
+  }
+  const flowing = Date.now() - lastCorrectionGrowth < 8000;
+  corrections.textContent = flowing
+    ? "Recibiendo correcciones"
+    : "Sin correcciones recibidas";
+  corrections.className = `corrections-state ${flowing ? "ok" : "none"}`;
 }
 
 function renderStatus(data) {
@@ -188,6 +223,8 @@ function renderStatus(data) {
   text("uptime", duration(data.uptime_ms));
   text("heap", kib(data.memory?.internal_free_bytes ?? data.free_heap_bytes));
   text("firmware", `v${data.firmware_version}`);
+  // Del equipo, no escrita en el HTML: escribirla a mano ya provocó un desfase.
+  text("sidebar-version", data.firmware_version || "—");
   text("ap-name", data.wifi.ap_ssid);
   text(
     "ap-summary",
@@ -245,7 +282,7 @@ async function poll() {
   clearTimeout(timer);
   try {
     renderStatus(await api("/api/status"));
-    if (!config && !$("login-dialog").open) await loadConfig();
+    if (!config) await loadConfig();
   } catch {
     connected(false);
   } finally {
@@ -255,17 +292,9 @@ async function poll() {
 }
 function fillConfig(value) {
   config = value;
-  $("device-name-input").value = value.device_name;
   $("refresh-input").value = String(value.refresh_ms);
-  $("wifi-ssid-input").value = value.wifi_ssid;
-  $("wifi-password-input").value = "";
-  $("forget-wifi").checked = false;
-  text(
-    "password-help",
-    value.wifi_password_saved
-      ? "Ya hay una contraseña guardada. Deja vacío para conservarla si usas la misma red."
-      : "Entre 8 y 63 caracteres. La contraseña no se devuelve al navegador.",
-  );
+  $("ap-password-input").value = value.ap_password || "";
+  renderSaved(value);
   $("save-settings").disabled =
     saving || !latestStatus || !value.persistence_ready;
   dirty = false;
@@ -297,11 +326,8 @@ $("settings-form").addEventListener("submit", async (event) => {
   message("Guardando en el instrumento…");
   const body = {
     revision: config.revision,
-    device_name: $("device-name-input").value,
     refresh_ms: Number($("refresh-input").value),
-    wifi_ssid: $("wifi-ssid-input").value,
-    wifi_password: $("wifi-password-input").value,
-    forget_wifi: $("forget-wifi").checked,
+    ap_password: $("ap-password-input").value,
   };
   try {
     fillConfig(await api("/api/config", "PUT", body));
@@ -313,23 +339,6 @@ $("settings-form").addEventListener("submit", async (event) => {
     saving = false;
     $("reload-settings").disabled = false;
     $("save-settings").disabled = !latestStatus || !config.persistence_ready;
-  }
-});
-$("login-dialog").addEventListener("cancel", (event) => event.preventDefault());
-$("login-form").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  accessKey = $("access-key").value.trim();
-  text("login-message", "Verificando…");
-  try {
-    const status = await api("/api/status");
-    $("login-dialog").close();
-    $("access-key").value = "";
-    text("login-message", "");
-    renderStatus(status);
-    await loadConfig();
-  } catch (error) {
-    accessKey = "";
-    text("login-message", error.message);
   }
 });
 $("restart-button").addEventListener("click", () =>
@@ -447,4 +456,164 @@ $("correction-source-form").addEventListener("submit", async event => {
     const result = await api("/api/corrections/source","PUT",{source:$("correction-source").value});
     text("correction-source-message", `Fuente seleccionada: ${result.active_source}. ${result.receiver_ready ? "UART disponible." : "GPS–ESP32 sin conectar; aún no se entregan correcciones."}`);
   } catch (error) { text("correction-source-message",error.message); }
+});
+
+// --- Redes Wi-Fi guardadas -------------------------------------------------
+// El equipo se une solo, así que el panel no elige red: solo mantiene la lista
+// y enseña lo que la radio ve de verdad.
+let wifiBusy = false;
+let wifiPending = null;
+let wifiScanTimer = null;
+
+function wifiMessage(value, error = false) {
+  text("wifi-message", value);
+  $("wifi-message").classList.toggle("error", error);
+}
+function signalLabel(rssi) {
+  if (typeof rssi !== "number") return "señal desconocida";
+  if (rssi >= -60) return "señal fuerte";
+  if (rssi >= -70) return "señal media";
+  if (rssi >= -80) return "señal débil";
+  return "señal muy débil";
+}
+function listRow(label, button) {
+  const row = document.createElement("li");
+  const name = document.createElement("span");
+  name.textContent = label;
+  row.append(name, button);
+  return row;
+}
+function renderSaved(value) {
+  const list = $("wifi-saved-list");
+  list.textContent = "";
+  const saved = value && Array.isArray(value.networks) ? value.networks : [];
+  const max = value && value.networks_max ? value.networks_max : 0;
+  text("wifi-count", max ? `${saved.length} de ${max} guardadas` : "—");
+  if (!saved.length) {
+    const empty = document.createElement("li");
+    empty.className = "hint";
+    empty.textContent =
+      "Ninguna guardada. Busca una red y añádela para que el equipo se conecte solo al encender.";
+    list.append(empty);
+    return;
+  }
+  saved.forEach((network) => {
+    const forget = document.createElement("button");
+    forget.type = "button";
+    forget.className = "button secondary";
+    forget.textContent = "Olvidar";
+    forget.addEventListener("click", () => forgetNetwork(network.ssid));
+    list.append(listRow(network.ssid, forget));
+  });
+}
+async function forgetNetwork(ssid) {
+  if (wifiBusy) return;
+  wifiBusy = true;
+  wifiMessage(`Olvidando ${ssid}…`);
+  try {
+    renderSaved(await api("/api/wifi/networks", "POST", { forget: ssid }));
+    wifiMessage(`Se olvidó ${ssid}.`);
+  } catch (error) {
+    wifiMessage(error.message, true);
+  } finally {
+    wifiBusy = false;
+  }
+}
+async function saveNetwork(ssid, password) {
+  if (wifiBusy) return;
+  wifiBusy = true;
+  wifiMessage(`Guardando ${ssid}…`);
+  try {
+    renderSaved(await api("/api/wifi/networks", "POST", { ssid, password }));
+    wifiMessage(`${ssid} guardada. El equipo intentará conectarse en unos segundos.`);
+  } catch (error) {
+    wifiMessage(error.message, true);
+  } finally {
+    wifiBusy = false;
+  }
+}
+function renderScan(value) {
+  const list = $("wifi-scan-list");
+  if (value.state === "scanning") {
+    text("wifi-scan-state", "Buscando redes…");
+    return;
+  }
+  list.textContent = "";
+  if (value.state === "failed") {
+    text("wifi-scan-state", "La búsqueda falló. Vuelve a intentarlo.");
+    return;
+  }
+  if (value.state !== "ready") {
+    text("wifi-scan-state", "");
+    return;
+  }
+  const found = Array.isArray(value.networks) ? value.networks : [];
+  text(
+    "wifi-scan-state",
+    found.length
+      ? `${found.length} a la vista${value.truncated ? ", lista recortada" : ""}.`
+      : "No se vio ninguna red. Acerca el equipo o revisa que el hotspot sea de 2.4 GHz.",
+  );
+  found.forEach((network) => {
+    const action = document.createElement("button");
+    action.type = "button";
+    action.className = "button secondary";
+    if (!network.secure) {
+      action.disabled = true;
+      action.textContent = "Abierta";
+    } else if (network.saved) {
+      action.disabled = true;
+      action.textContent = "Guardada";
+    } else {
+      action.textContent = "Añadir";
+      action.addEventListener("click", () => askPassword(network.ssid));
+    }
+    list.append(listRow(`${network.ssid} · ${signalLabel(network.rssi_dbm)}`, action));
+  });
+}
+async function pollScan() {
+  try {
+    const value = await api("/api/wifi/scan");
+    renderScan(value);
+    if (value.state === "scanning") {
+      wifiScanTimer = setTimeout(pollScan, 1500);
+      return;
+    }
+    $("wifi-scan").disabled = false;
+  } catch (error) {
+    $("wifi-scan").disabled = false;
+    text("wifi-scan-state", error.message);
+  }
+}
+function askPassword(ssid) {
+  wifiPending = ssid;
+  text("wifi-password-title", `Contraseña de ${ssid}`);
+  $("wifi-password-value").value = "";
+  $("wifi-password-dialog").showModal();
+}
+$("wifi-password-cancel").addEventListener("click", () => {
+  wifiPending = null;
+  $("wifi-password-value").value = "";
+  $("wifi-password-dialog").close();
+});
+$("wifi-password-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const ssid = wifiPending;
+  const password = $("wifi-password-value").value;
+  wifiPending = null;
+  $("wifi-password-value").value = "";
+  $("wifi-password-dialog").close();
+  if (ssid) saveNetwork(ssid, password);
+});
+$("wifi-scan").addEventListener("click", async () => {
+  $("wifi-scan").disabled = true;
+  text("wifi-scan-state", "Buscando redes…");
+  clearTimeout(wifiScanTimer);
+  try {
+    renderScan(await api("/api/wifi/scan", "POST"));
+    wifiScanTimer = setTimeout(pollScan, 1500);
+  } catch (error) {
+    $("wifi-scan").disabled = false;
+    text("wifi-scan-state", error.message);
+  }
 });

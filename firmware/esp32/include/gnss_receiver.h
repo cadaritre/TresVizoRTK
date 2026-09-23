@@ -1,8 +1,13 @@
 #pragma once
 #include "nmea_gga.h"
+#include "nmea_gst.h"
 namespace gnss_receiver {
 struct Snapshot {
     gnss::Gga solution;
+    // Estimación de error del propio receptor (GST). Es su desviación típica
+    // declarada, no una exactitud comprobada contra una referencia externa.
+    gnss::Gst precision;
+    uint32_t precision_accepted = 0;
     uint32_t accepted = 0, rejected = 0, overflow = 0, uart_errors = 0;
     // Tramas RTCM entregadas al receptor por la UART y descartadas antes de salir.
     // Sin estas cifras no se puede distinguir "el caster no manda" de "no llega al GPS".

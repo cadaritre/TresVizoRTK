@@ -230,7 +230,10 @@ int start(JsonVariantConst body,JsonDocument& out) {
         if(name=="query") {add("VERSIONA");add("MODE");}
         if(name=="config_query") {maskReadback="";add("MASK");}
         if(name=="rover") {rover=false;mode="";add("MODE ROVER SURVEY");add("CONFIG UNDULATION AUTO");add("MODE");expectedMode="MODE ROVER SURVEY";}
-        if(name=="telemetry") add(String("GPGGA COM2 ")+rateFor(telemetryHz));
+        // GST acompaña siempre a GGA: sin ella el panel no puede decir con qué
+        // precisión estima el receptor. Va a 1 Hz aunque la posición vaya más
+        // rápido; la desviación no cambia a 10 Hz y cargar la UART no ayuda.
+        if(name=="telemetry") {add(String("GPGGA COM2 ")+rateFor(telemetryHz));add("GPGST COM2 1");}
         if(name=="stop_outputs") add("UNLOG COM2");
         if(name=="mask") {
             add("MASK "+String(elevation,2));
