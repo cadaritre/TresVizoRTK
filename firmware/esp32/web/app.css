@@ -1424,3 +1424,76 @@ fieldset:disabled { opacity: .65; }
   .corrections-state { font-size: 11px; }
   .topbar-status { gap: 6px; }
 }
+
+/* Jerarquia Entrada / Salida de correcciones. */
+.flow-heading { font-size: 20px; margin: 26px 0 4px; }
+.flow-sub { margin: 0 0 14px; opacity: 0.75; }
+.inline-pair { align-items: center; display: flex; gap: 8px; }
+.inline-pair input { flex: 1 1 auto; min-width: 0; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.row-actions .button { padding: 5px 10px; }
+#ntrip-profile-editor summary { cursor: pointer; font-weight: 600; margin: 10px 0; }
+
+/* La cabecera tenia altura fija: al envolver, el estado se salia y se montaba
+   sobre la miga de pan. Aqui crece en vez de desbordarse. */
+@media (max-width: 900px) {
+  .topbar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    height: auto;
+    min-height: 78px;
+    padding: 12px 18px;
+  }
+  .topbar-status { flex-wrap: nowrap; justify-content: flex-end; width: 100%; }
+}
+@media (max-width: 560px) {
+  /* Con el ancho de un telefono lo unico que no puede faltar es el estado de la
+     solucion. El texto del enlace se reduce a su punto de color. */
+  .connection-pill span:not(.dot) { display: none; }
+  .connection-pill { padding: 6px; }
+  .corrections-state { font-size: 10px; white-space: normal; text-align: right; }
+  .fix-badge { font-size: 11px; padding: 4px 8px; }
+  .topbar { padding: 10px 14px; }
+}
+
+/* Capsula plegable: lo que el usuario promedio no necesita ver de entrada. */
+.capsule > summary {
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  column-gap: 10px;
+  font-size: 17px;
+  font-weight: 700;
+  list-style: none;
+}
+.capsule > summary > span { grid-column: 1; }
+.capsule > summary small { grid-column: 1; }
+.capsule > summary::-webkit-details-marker { display: none; }
+.capsule > summary::after { content: "▾"; font-size: 13px; grid-column: 2; grid-row: 1 / span 2; opacity: 0.6; }
+.capsule[open] > summary::after { content: " ▴"; }
+.capsule > summary small { font-size: 12px; font-weight: 400; opacity: 0.75; }
+
+/* Progreso del promedio de base: ver como se forma la coordenada. */
+.survey-progress { margin: 12px 0; }
+.survey-bar {
+  background: rgba(128, 128, 128, 0.22);
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+}
+.survey-bar > span {
+  background: #1f8a4c;
+  display: block;
+  height: 100%;
+  transition: width 0.4s ease;
+  width: 0;
+}
+.survey-count { font-size: 13px; font-weight: 600; margin: 8px 0 4px; }
+
+/* Papel del receptor: lo primero que se ve en Base / rover. */
+.role-panel { align-items: center; display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; }
+.role-current { display: flex; flex-direction: column; gap: 2px; }
+.role-current strong { font-size: 24px; }
+.role-panel .button-row { margin: 0; }

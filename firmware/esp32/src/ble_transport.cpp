@@ -3,10 +3,10 @@
 #include "gnss_receiver.h"
 #include "rtcm3.h"
 #include "correction_router.h"
+#include "correction_output.h"
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLE2902.h>
-#include <BLESecurity.h>
 #include <esp_timer.h>
 #include <atomic>
 #include <Preferences.h>
@@ -18,41 +18,37 @@ constexpr char commandId[] = "a04c0002-8f24-4adb-a350-77ef6339c320";
 constexpr char responseId[] = "a04c0003-8f24-4adb-a350-77ef6339c320";
 constexpr char correctionId[] = "a04c0005-8f24-4adb-a350-77ef6339c320";
 constexpr char solutionId[] = "a04c0004-8f24-4adb-a350-77ef6339c320";
+constexpr char healthId[] = "a04c0006-8f24-4adb-a350-77ef6339c320";
 struct Request { uint32_t generation, arrival; char json[1025]; };
 QueueHandle_t requests = nullptr;
 Dispatch dispatchRequest;
 Authenticate authenticateRequest;
-BLECharacteristic *responses = nullptr, *solutions = nullptr;
+BLECharacteristic *responses = nullptr, *solutions = nullptr, *health = nullptr;
 BLEServer* server = nullptr;
-std::atomic<bool> connected{false}, secure{false}, authorized{false}, advertise{false};
+std::atomic<bool> connected{false}, authorized{false}, advertise{false};
+// Interruptor del transporte. Se persiste: apagar la radio debe seguir apagada
+// después de un corte de corriente, no volver sola en la siguiente jornada.
+std::atomic<bool> enabled{true};
 std::atomic<uint32_t> generation{0}, dropped{0}, correctionAccepted{0}, correctionRejected{0}, correctionDropped{0};
-std::atomic<uint8_t> lastAuthReason{0},lastAuthMode{0};
 bool ready = false;
-uint32_t pairingPin = 0;
+Preferences settings;
 String pending;
 size_t offset = 0;
 uint16_t messageId = 0, sampleSequence = 0;
-uint32_t lastSend = 0, lastEpoch = UINT32_MAX, lastSample = 0;
+uint32_t lastSend = 0, lastEpoch = UINT32_MAX, lastSample = 0, lastHealth = 0;
 uint32_t responseGeneration = 0;
 
 class ConnectionCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer*, esp_ble_gatts_cb_param_t* parameters) override {
-        ++generation; connected = true; secure = false; authorized = false;
-        esp_ble_set_encryption(parameters->connect.remote_bda,ESP_BLE_SEC_ENCRYPT_MITM);
+        // Sin emparejamiento: quien se conecta queda autorizado. La única
+        // barrera que queda es el alcance de la radio.
+        (void)parameters;
+        ++generation; connected = true; authorized = true;
     }
     void onDisconnect(BLEServer*) override {
-        ++generation; connected = false; secure = false; authorized = false; advertise = true;
-    }
-};
-class SecurityCallbacks : public BLESecurityCallbacks {
-    uint32_t onPassKeyRequest() override { return pairingPin; }
-    void onPassKeyNotify(uint32_t) override {}
-    bool onSecurityRequest() override { return true; }
-    bool onConfirmPIN(uint32_t) override { return false; }
-    void onAuthenticationComplete(esp_ble_auth_cmpl_t event) override {
-        lastAuthReason=event.fail_reason;lastAuthMode=event.auth_mode;
-        secure = event.success && (event.auth_mode & ESP_LE_AUTH_REQ_MITM);
-        if (!secure && server) server->disconnect(server->getConnId());
+        ++generation; connected = false; authorized = false;
+        // Solo volver a anunciarse si el transporte sigue habilitado.
+        advertise = enabled.load();
     }
 };
 class CommandCallbacks : public BLECharacteristicCallbacks {
@@ -61,7 +57,7 @@ class CommandCallbacks : public BLECharacteristicCallbacks {
     bool overflow = false;
     uint32_t started = 0, seenGeneration = 0;
     void onWrite(BLECharacteristic* characteristic) override {
-        if (!secure) return;
+        if (!enabled) return;
         const uint32_t currentGeneration = generation.load();
         if (seenGeneration != currentGeneration || (length && millis() - started > 5000)) {
             length = 0; overflow = false; seenGeneration = currentGeneration;
@@ -88,7 +84,12 @@ class CorrectionCallbacks : public BLECharacteristicCallbacks {
     gnss::Rtcm3Parser parser;
     uint32_t seenGeneration = 0, lastByte = 0, sourceGeneration = 0;
     void onWrite(BLECharacteristic* characteristic) override {
-        if (!secure || !authorized) return;
+        // El teléfono actúa de puente: recibe RTCM de un caster por datos
+        // móviles y lo escribe aquí cuando el equipo no tiene red propia.
+        // Sin emparejamiento, cualquiera dentro del alcance puede escribir:
+        // al menos no se admite mientras el equipo trabaja como base, donde
+        // recibir correcciones ajenas no tiene ningún sentido legítimo.
+        if (!enabled || !authorized || correction_output::active()) return;
         if (seenGeneration != generation.load() || sourceGeneration != correction_router::generation() || millis() - lastByte > 2000) parser.reset();
         sourceGeneration = correction_router::generation();
         seenGeneration = generation.load(); lastByte = millis();
@@ -108,48 +109,49 @@ void begin(Dispatch dispatch, Authenticate authenticate) {
     dispatchRequest = dispatch; authenticateRequest = authenticate;
     requests = xQueueCreate(2, sizeof(Request));
     if (!requests) return;
-    Preferences pairing;
-    if(!pairing.begin("ble_pairing",false))return;
-    pairingPin=pairing.getUInt("pin",0);
-    if(pairingPin<100000 || pairingPin>999999){
-        pairingPin=100000+esp_random()%900000;
-        if(pairing.putUInt("pin",pairingPin)!=sizeof(uint32_t)){pairing.end();return;}
-    }
-    pairing.end();
+    if (settings.begin("ble", false)) enabled = settings.getBool("enabled", true);
+    // Sin emparejamiento ni PIN, por decisión del propietario: la app de campo
+    // debe conectarse de un toque. La contrapartida es real y conviene tenerla
+    // presente: cualquier equipo dentro del alcance puede escribir en las
+    // características, incluidas las correcciones que van al receptor.
     BLEDevice::init(instrument::apName().c_str());
-    BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT_MITM);
-    BLEDevice::setSecurityCallbacks(new SecurityCallbacks());
-    auto security = new BLESecurity();
-    security->setStaticPIN(pairingPin);
-    security->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM_BOND);
-    security->setCapability(ESP_IO_CAP_OUT);
-    security->setKeySize(16);
-    security->setInitEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
-    security->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
     server = BLEDevice::createServer();
     server->setCallbacks(new ConnectionCallbacks());
     auto service = server->createService(serviceId);
     auto commands = service->createCharacteristic(commandId, BLECharacteristic::PROPERTY_WRITE);
-    commands->setAccessPermissions(ESP_GATT_PERM_WRITE_ENC_MITM);
+    commands->setAccessPermissions(ESP_GATT_PERM_WRITE);
     commands->setCallbacks(new CommandCallbacks());
     responses = service->createCharacteristic(responseId, BLECharacteristic::PROPERTY_NOTIFY);
     responses->addDescriptor(new BLE2902());
     solutions = service->createCharacteristic(solutionId, BLECharacteristic::PROPERTY_NOTIFY);
     solutions->addDescriptor(new BLE2902());
     auto corrections = service->createCharacteristic(correctionId, BLECharacteristic::PROPERTY_WRITE);
-    corrections->setAccessPermissions(ESP_GATT_PERM_WRITE_ENC_MITM);
+    corrections->setAccessPermissions(ESP_GATT_PERM_WRITE);
     corrections->setCallbacks(new CorrectionCallbacks());
+    // Salud del equipo, aparte de la posición: precisión estimada, antigüedad de
+    // las correcciones y presencia de IMU. La app necesita saber con qué calidad
+    // está midiendo, no solo dónde. Va en su propia característica para no
+    // romper el paquete de 20 bytes que cabe en un MTU ATT sin negociar.
+    health = service->createCharacteristic(healthId, BLECharacteristic::PROPERTY_NOTIFY);
+    health->addDescriptor(new BLE2902());
     service->start();
     auto advertising = BLEDevice::getAdvertising();
     advertising->addServiceUUID(serviceId);
     advertising->setScanResponse(true);
-    BLEDevice::startAdvertising();
+    if (enabled) BLEDevice::startAdvertising();
     ready = true;
 }
 void tick() {
     if (!ready) return;
+    // Apagado: dejar de anunciarse y soltar a quien esté conectado. La radio BLE
+    // del SDK no se desinicializa aquí: hacerlo y rehacerlo fragmenta el heap.
+    if (!enabled) {
+        if (connected && server) server->disconnect(server->getConnId());
+        pending = ""; offset = 0;
+        return;
+    }
     if (advertise.exchange(false)) BLEDevice::startAdvertising();
-    if (!connected || !secure) { pending = ""; offset = 0; return; }
+    if (!connected) { pending = ""; offset = 0; return; }
     if (responseGeneration != generation.load()) { pending = ""; offset = 0; }
     if (pending.isEmpty()) {
         Request request;
@@ -207,12 +209,37 @@ void tick() {
     put32(sample + 12, s.has_position ? lround(s.longitude_deg * 1e7) : INT32_MIN);
     put32(sample + 16, s.has_position && std::isfinite(s.altitude_msl_m) && fabs(s.altitude_msl_m) < 2147483.0 ? lround(s.altitude_msl_m * 1000) : INT32_MIN);
     solutions->setValue(sample, sizeof(sample)); solutions->notify();
+    // Salud a 1 Hz: la sigma y la antigüedad de correcciones no cambian a la
+    // velocidad de la posición y mandarlas a 10 Hz solo gastaría radio.
+    if (millis() - lastHealth < 1000) return;
+    lastHealth = millis();
+    uint8_t report[20] = {};
+    report[0] = 1; // versión del paquete de salud
+    // Sigmas en milímetros. 0xFFFF significa "el receptor no la estima".
+    const auto sigma = [](double metres) -> uint16_t {
+        if (!std::isfinite(metres) || metres < 0 || metres > 65.0) return 0xFFFF;
+        return uint16_t(lround(metres * 1000));
+    };
+    const uint16_t h = snapshot.precision_accepted ? sigma(snapshot.precision.horizontal_sigma_m) : 0xFFFF;
+    const uint16_t v = snapshot.precision_accepted ? sigma(snapshot.precision.altitude_sigma_m) : 0xFFFF;
+    report[1] = h; report[2] = h >> 8;
+    report[3] = v; report[4] = v >> 8;
+    const uint32_t age = correction_router::ageMs();
+    // 0xFFFF = sin fuente conectada; el resto, segundos desde la última trama.
+    const uint16_t ageSeconds = age == UINT32_MAX ? 0xFFFF : uint16_t(std::min<uint32_t>(age / 1000, 65534));
+    report[5] = ageSeconds; report[6] = ageSeconds >> 8;
+    report[7] = uint8_t(correction_router::sourceCode());
+    report[8] = s.quality;
+    report[9] = 0; // IMU: sin hardware todavía, reservado para no renumerar después
+    health->setValue(report, sizeof(report)); health->notify();
 }
 void status(JsonObject out) {
-    out["state"] = !ready ? "start_failed" : (connected ? (authorized ? "authorized" : "connected") : "advertising");
-    out["encrypted_authenticated"] = secure.load();
-    out["last_auth_reason"] = lastAuthReason.load();out["last_auth_mode"] = lastAuthMode.load();
-    out["protocol_version"] = 1;
+    out["state"] = !ready ? "start_failed" : (!enabled ? "disabled" : (connected ? "connected" : "advertising"));
+    out["enabled"] = enabled.load();
+    // Sin emparejamiento ni PIN por decisión del propietario: cualquier equipo
+    // dentro del alcance puede escribir, incluidas las correcciones.
+    out["pairing_required"] = false;
+    out["protocol_version"] = 2;
     out["dropped_requests"] = dropped.load();
     out["control_available"] = ready;
     out["rtcm_available"] = gnss_receiver::snapshot().enabled;
@@ -222,5 +249,19 @@ void status(JsonObject out) {
     out["file_download_available"] = false;
     out["telemetry_hardware_validated"] = false;
 }
-uint32_t passkey() { return pairingPin; }
+int request(const String& method, JsonVariantConst body, JsonDocument& out) {
+    if (method == "GET") { status(out.to<JsonObject>()); return 200; }
+    if (method != "POST" || !body.is<JsonObjectConst>() || body.size() != 1) return 400;
+    if (!body["enabled"].is<bool>()) return 400;
+    const bool next = body["enabled"].as<bool>();
+    if (next != enabled) {
+        enabled = next;
+        if (!settings.putBool("enabled", next)) {
+            out["message"] = "No se pudo guardar el ajuste; el cambio se perderá al reiniciar.";
+        }
+        if (next) advertise = true;
+    }
+    status(out.to<JsonObject>());
+    return 200;
+}
 }

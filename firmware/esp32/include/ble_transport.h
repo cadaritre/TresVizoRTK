@@ -7,5 +7,8 @@ using Authenticate = bool (*)(const char*);
 void begin(Dispatch dispatch, Authenticate authenticate);
 void tick();
 void status(JsonObject out);
-uint32_t passkey(); // Solo recuperación física USB; nunca HTTP ni publicidad.
+// Encendido/apagado del transporte, persistido en NVS. El emparejamiento y el
+// PIN se retiraron por decisión del propietario: la app de campo se conecta sin
+// pasos previos y la única barrera es el alcance de la radio.
+int request(const String& method, JsonVariantConst body, JsonDocument& out);
 }

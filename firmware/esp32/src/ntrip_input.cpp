@@ -16,6 +16,8 @@ namespace {
 struct Config {String host,mount,user,password;uint16_t port=2101;};
 Config config;
 SemaphoreHandle_t lock;bool ready=false;
+// Cuanto lleva la tarea esperando enlace de red, para no esperar sin fin.
+uint32_t waitingSince=0;
 
 // Perfiles guardados. Hasta ahora las credenciales vivían solo en memoria y se
 // perdían en cada arranque: en campo eso obliga a teclear un caster completo
@@ -174,7 +176,19 @@ void worker(void*) {
   // La sourcetable solo se pide cuando no hay flujo: comparten socket y radio.
   if(tableWanted && !wanted){fetchSourcetable(client);continue;}
   if(!wanted){state="stopped";vTaskDelay(pdMS_TO_TICKS(100));continue;}
-  if(firmware_update::busy() || WiFi.status()!=WL_CONNECTED){state="waiting_network";vTaskDelay(pdMS_TO_TICKS(100));continue;}
+  if(firmware_update::busy() || WiFi.status()!=WL_CONNECTED){
+   // Esperar red es normal unos segundos tras encender. Un minuto entero ya no
+   // lo es: sin enlace el enrutador queda fijado en "ntrip" y eso bloquea
+   // configurar el GPS. Se suelta solo y se explica por qué.
+   if(!waitingSince)waitingSince=millis();
+   else if(millis()-waitingSince>60000){
+    wanted=false;++generation;correction_router::select("none");
+    failure="no_network_timeout";state="stopped";waitingSince=0;
+    continue;
+   }
+   state="waiting_network";vTaskDelay(pdMS_TO_TICKS(100));continue;
+  }
+  waitingSince=0;
   Config c;xSemaphoreTake(lock,portMAX_DELAY);c=config;xSemaphoreGive(lock);const uint32_t id=generation;
   state="connecting";failure="";client.setTimeout(2000);
   if(client.connect(c.host.c_str(),c.port,2000) && current(id)) {
@@ -235,7 +249,9 @@ void begin(){
  // arranque manual: ese control es una guía para quien configura a mano, y
  // pedirlo aquí obligaría a tocar el panel tras cada corte de corriente, que
  // es justo lo que esta función existe para evitar.
- if(ready && autoConnect && lastUsed>=0){
+ // No reanudar en un equipo que quedó como base: volvería a alimentarse a sí
+ // mismo de correcciones que no necesita y bloquearía configurar el receptor.
+ if(ready && autoConnect && lastUsed>=0 && !gnss_control::isBase()){
   applyProfile(profiles[lastUsed]);
   correction_router::select("ntrip");
   ++generation;wanted=true;state="starting";
@@ -257,6 +273,9 @@ int request(const String& method,JsonVariantConst body,JsonDocument& out){
  // Sin red externa configurada la tarea se quedaría en waiting_network para
  // siempre, que parece un problema pasajero y no lo es.
  if(!instrument::stationConfigured()){out["message"]="No hay red Wi-Fi configurada. Añade tu hotspot de 2.4 GHz en Configuración antes de conectar NTRIP.";return 409;}
+ if(WiFi.status()!=WL_CONNECTED){out["message"]="El equipo no está conectado a ninguna red ahora mismo. Enciende tu hotspot y espera a que aparezca como conectado en Conexiones.";return 409;}
+ // Una base produce correcciones; consumirlas a la vez no significa nada.
+ if(gnss_control::isBase()){out["message"]="El receptor está configurado como base. Una base emite correcciones, no las recibe. Pásalo a rover antes de conectar NTRIP.";return 409;}
  if(active() || strcmp(state.load(),"stopped")!=0){out["message"]="Hay una conexión NTRIP activa. Pulsa «Detener» en este mismo apartado y vuelve a intentarlo.";return 409;}
  if(!gnss_control::roverReady()){out["message"]="Consulta y confirma el modo rover del receptor antes de conectar.";return 409;}
  xSemaphoreTake(lock,portMAX_DELAY);config.host=host;config.mount=mount;config.user=user;config.password=body["password"].as<const char*>();config.port=body["port"];xSemaphoreGive(lock);
@@ -323,11 +342,20 @@ int profileRequest(const String& method,JsonVariantConst body,JsonDocument& out)
   if(index<0){out["message"]="Ese perfil no está guardado.";return 404;}
   if(!ready)return 503;
   if(!instrument::stationConfigured()){out["message"]="No hay red Wi-Fi configurada. Añade tu hotspot de 2.4 GHz en Configuración antes de conectar NTRIP.";return 409;}
+  if(gnss_control::isBase()){out["message"]="El receptor está configurado como base. Pásalo a rover antes de conectar un perfil NTRIP.";return 409;}
+  // Tener una red guardada no es tenerla al alcance. Arrancar sin enlace deja
+  // el enrutador fijado en "ntrip", y eso bloquea configurar el GPS hasta que
+  // alguien pulse Detener: parece que el panel se averió.
+  if(WiFi.status()!=WL_CONNECTED){out["message"]="El equipo no está conectado a ninguna red ahora mismo. Enciende tu hotspot y espera a que aparezca como conectado en Conexiones.";return 409;}
   if(active()||strcmp(state.load(),"stopped")!=0){out["message"]="Hay una conexión NTRIP activa. Pulsa «Detener» antes de cambiar de perfil.";return 409;}
   lastUsed=index;autoConnect=true;persistProfiles();
   applyProfile(profiles[index]);
   correction_router::select("ntrip");++generation;wanted=true;state="starting";
-  status(out.to<JsonObject>());return 202;
+  // Devolver siempre la lista: el panel la repinta con esta respuesta y si solo
+  // recibiera el estado del flujo se quedaría creyendo que no hay perfiles.
+  profilesJson(out.to<JsonObject>());
+  status(out["stream"].to<JsonObject>());
+  return 202;
  }
  return 400;
 }

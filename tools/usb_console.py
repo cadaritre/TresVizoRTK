@@ -194,7 +194,7 @@ def serve(device, port, gps=None):
                 except (serial.SerialException, OSError, TimeoutError) as error:
                     return self.respond(503, {"message": str(error)})
                 return self.respond(404, {"error": "not_found"})
-            if self.path not in {"/api/recording", "/api/recording/start", "/api/recording/stop", "/api/recording/read", "/api/recording/sessions", "/api/gnss/control", "/api/base/apply", "/api/ntrip/input", "/api/status", "/api/config", "/api/restart", "/api/operations", "/api/base/plan", "/api/update", "/api/update/begin", "/api/update/chunk", "/api/update/finish", "/api/update/abort", "/api/update/rollback", "/api/corrections/source", "/api/wifi/networks", "/api/wifi/scan", "/api/gnss/profile", "/api/ntrip/profiles", "/api/ntrip/sourcetable"}:
+            if self.path not in {"/api/recording", "/api/recording/start", "/api/recording/stop", "/api/recording/read", "/api/recording/sessions", "/api/gnss/control", "/api/base/apply", "/api/ntrip/input", "/api/status", "/api/config", "/api/restart", "/api/operations", "/api/base/plan", "/api/update", "/api/update/begin", "/api/update/chunk", "/api/update/finish", "/api/update/abort", "/api/update/rollback", "/api/corrections/source", "/api/wifi/networks", "/api/wifi/scan", "/api/ble", "/api/gnss/profile", "/api/ntrip/profiles", "/api/ntrip/sourcetable", "/api/ntrip/server", "/api/ntrip/caster", "/api/base/survey"}:
                 return self.respond(404, {"error": "not_found"})
             if self.headers.get("X-TresVizo-Client") != "portal":
                 return self.respond(403, {"error": "client_header_required"})
@@ -253,8 +253,13 @@ def main():
             # equipo. Se cambia desde Configuración, no desde aquí.
             print(f'Red Wi-Fi                : {body.get("ap_ssid")}')
             print(f'Contraseña Wi-Fi         : {body.get("ap_password")}')
-            print(f'PIN de emparejamiento BLE: {body.get("ble_pairing_pin")}')
-            print(f'Panel                    : {body.get("ap_url")}')
+            print(f'Panel por su red propia  : {body.get("ap_url")}')
+            station = body.get("station_url")
+            if station:
+                print(f'Panel en {body.get("station_ssid"):<15}: {station}')
+            else:
+                print('Panel en red externa     : sin conexion')
+            print(f'Por nombre               : {body.get("mdns_url")}')
             print("\nSalida privada: no la subas al repositorio ni la compartas.")
         else:
             result = device.request("GET", f"/api/{args.command}")

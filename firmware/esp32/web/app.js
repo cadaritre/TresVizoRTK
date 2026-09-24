@@ -161,18 +161,24 @@ function renderGnss(data) {
     ? `${solution.horizontal_sigma_m.toFixed(3)} m` : "—");
   text("field-sigma-v", current && Number.isFinite(solution.vertical_sigma_m)
     ? `${solution.vertical_sigma_m.toFixed(3)} m` : "—");
-  text("field-age", Number.isFinite(health?.age_ms) ? `${(health.age_ms / 1000).toFixed(1)} s` : "—");
-  // Tramas RTCM entregadas al receptor: es el dato que dice si las correcciones
-  // llegaron de verdad, no solo si el caster las envió.
-  text("field-corrections", Number.isFinite(health?.correction_frames_sent) ? String(health.correction_frames_sent) : "—");
-  renderFixBadge(current ? solution.fix : null, health?.correction_frames_sent);
+  // Antigüedad de la última corrección aceptada, no de la época del GPS. Es lo
+  // que dice si el equipo sigue corregido: contar tramas no distingue entre
+  // "van llegando" y "se cortó hace un minuto".
+  const router = data?.corrections || latestStatus?.corrections;
+  const sources = { ble: "Por Bluetooth", ntrip: "Por NTRIP", radio: "Por radio" };
+  const sourceName = sources[router?.active_source];
+  const age = router?.age_ms;
+  text(
+    "field-correction-age",
+    !sourceName ? "Sin conectar" : Number.isFinite(age) ? `${(age / 1000).toFixed(1)} s` : "Esperando",
+  );
+  text("field-correction-source", sourceName || "Ninguna fuente activa");
+  renderFixBadge(current ? solution.fix : null, sourceName ? age : null);
 }
 
 // Indicador permanente de la cabecera. En campo la pregunta constante es "¿ya
 // fijó?" y "¿me están llegando correcciones?", y no debe costar navegar.
-let lastCorrectionFrames = null;
-let lastCorrectionGrowth = 0;
-function renderFixBadge(fix, frames) {
+function renderFixBadge(fix, correctionAgeMs) {
   const badge = $("fix-badge");
   const corrections = $("corrections-state");
   if (!badge || !corrections) return;
@@ -187,15 +193,9 @@ function renderFixBadge(fix, frames) {
   const [label, tone] = map[fix] || ["SIN FIX", "none"];
   badge.textContent = label;
   badge.className = `fix-badge ${tone}`;
-  // "Recibiendo" se decide por tramas que de verdad entraron al GPS entre dos
-  // sondeos, no por que el cliente NTRIP diga estar conectado.
-  if (Number.isFinite(frames)) {
-    if (lastCorrectionFrames !== null && frames > lastCorrectionFrames) {
-      lastCorrectionGrowth = Date.now();
-    }
-    lastCorrectionFrames = frames;
-  }
-  const flowing = Date.now() - lastCorrectionGrowth < 8000;
+  // "Recibiendo" se decide por la antigüedad de la última corrección aceptada
+  // por el equipo, no por que el cliente NTRIP se declare conectado.
+  const flowing = Number.isFinite(correctionAgeMs) && correctionAgeMs < 8000;
   corrections.textContent = flowing
     ? "Recibiendo correcciones"
     : "Sin correcciones recibidas";
@@ -210,6 +210,9 @@ function renderStatus(data) {
   )
     throw new Error("Versión de protocolo no compatible.");
   latestStatus = data;
+  // Lo consulta device.js para el atajo de "usar coordenada actual".
+  window.latestStatusSnapshot = data;
+  if (window.renderReceiverRole) window.renderReceiverRole(data);
   window.instrumentGnssEnabled = !!data.subsystems?.gnss && data.subsystems.gnss.state !== "not_integrated";
   if (window.instrumentGnssEnabled) window.benchActive = false;
   if (!window.benchActive) renderGnss(data);
@@ -400,8 +403,7 @@ poll();
 let preparedBase = null;
 function invalidateBasePlan() {
   preparedBase = null;
-  $("base-export").disabled = true;
-  text("base-result", "Cambios sin validar. El plan no se guarda ni aplica al equipo.");
+  text("base-result", "Revisa la coordenada y pulsa estacionar cuando esté lista.");
 }
 $("base-plan-form").addEventListener("input", invalidateBasePlan);
 $("base-method").addEventListener("change", () => {
@@ -416,39 +418,37 @@ $("base-plan-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const method = $("base-method").value;
   const plan = { method, station_id: Number($("base-id").value) };
+  // Marco siempre WGS84 y altura siempre elipsoidal: el equipo no transforma
+  // coordenadas, así que declarar un datum distinto solo daría una falsa idea
+  // de que lo hace.
   if (method === "known") Object.assign(plan, {
     latitude_deg: Number($("base-lat").value), longitude_deg: Number($("base-lon").value),
-    datum: $("base-datum").value.trim(), coordinate_epoch: $("base-epoch").value === "" ? null : Number($("base-epoch").value),
-    height_point: $("base-height-point").value, ellipsoid_height_m: Number($("base-height").value),
+    ellipsoid_height_m: Number($("base-height").value),
     antenna_vertical_m: Number($("base-antenna").value),
   });
-  else Object.assign(plan, { average_seconds: Number($("base-seconds").value), reuse_distance_m: Number($("base-reuse").value) });
+  else Object.assign(plan, { average_seconds: Number($("base-seconds").value), reuse_distance_m: 0 });
   const marker = ++basePlanRequest;
   try {
     const result = await api("/api/base/plan", "POST", plan);
     if (marker !== basePlanRequest) return;
     preparedBase = {...result, request: plan};
-    $("base-export").disabled = false;
-    text("base-result", result.message + (result.plan.arp_ellipsoid_height_m !== undefined ?
-      ` Altura elipsoidal ARP: ${result.plan.arp_ellipsoid_height_m.toFixed(4)} m.` :
-      " El promedio no garantiza exactitud absoluta."));
+    // Validar es un paso interno, no una decisión: si la coordenada es buena se
+    // estaciona directo. Antes había tres botones para una sola intención.
+    const height = result.plan.arp_ellipsoid_height_m;
+    text("base-result", height !== undefined
+      ? `Coordenada válida. Altura a declarar ${height.toFixed(4)} m, con los ${(result.plan.case_offset_m ?? 0.1).toFixed(2)} m del case. Enviando al receptor…`
+      : "Plan válido. Enviando al receptor…");
+    const applied = await api("/api/base/apply", "POST", plan);
+    text("base-result", `Base estacionada (operación ${applied.job_id}). Que el receptor acepte el modo no significa que la coordenada sea exacta.`);
   } catch (error) {
     if (marker !== basePlanRequest) return;
     preparedBase = null;
-    $("base-export").disabled = true;
     text("base-result", error.message);
   }
 });
 let basePlanRequest = 0;
 $("base-plan-form").addEventListener("input", () => { ++basePlanRequest; });
 $("base-plan-form").addEventListener("change", () => { ++basePlanRequest; });
-$("base-export").addEventListener("click", () => {
-  if (!preparedBase) return;
-  const url = URL.createObjectURL(new Blob([JSON.stringify(preparedBase, null, 2)], { type: "application/json" }));
-  const link = document.createElement("a");
-  link.href = url; link.download = "tresvizo-base-plan.json"; link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-});
 
 $("correction-source-form").addEventListener("submit", async event => {
   event.preventDefault();
@@ -498,12 +498,22 @@ function renderSaved(value) {
     return;
   }
   saved.forEach((network) => {
+    const actions = document.createElement("span");
+    actions.className = "row-actions";
+    const address = document.createElement("button");
+    address.type = "button";
+    address.className = "button secondary";
+    address.textContent = network.ip ? "Cambiar IP" : "IP fija";
+    address.addEventListener("click", () => askAddress(network));
     const forget = document.createElement("button");
     forget.type = "button";
     forget.className = "button secondary";
     forget.textContent = "Olvidar";
     forget.addEventListener("click", () => forgetNetwork(network.ssid));
-    list.append(listRow(network.ssid, forget));
+    actions.append(address, forget);
+    // Enseñar la dirección en la lista evita tener que ir a buscarla al router.
+    const label = network.ip ? `${network.ssid} · ${network.ip} fija` : `${network.ssid} · automática`;
+    list.append(listRow(label, actions));
   });
 }
 async function forgetNetwork(ssid) {
@@ -585,6 +595,45 @@ async function pollScan() {
     text("wifi-scan-state", error.message);
   }
 }
+// La dirección se guarda junto a la red, no global: con varias redes en
+// subredes distintas una sola IP fija sería correcta en una y errónea en el resto.
+let addressPending = null;
+function askAddress(network) {
+  addressPending = network.ssid;
+  text("wifi-address-title", `Dirección de ${network.ssid}`);
+  $("wifi-address-ip").value = network.ip || "";
+  $("wifi-address-gateway").value = network.gateway || "";
+  $("wifi-address-mask").value = network.mask || "255.255.255.0";
+  $("wifi-address-dialog").showModal();
+}
+$("wifi-address-cancel").addEventListener("click", () => {
+  addressPending = null;
+  $("wifi-address-dialog").close();
+});
+$("wifi-address-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const ssid = addressPending;
+  const ip = $("wifi-address-ip").value.trim();
+  // Sin IP no hay dirección fija: se mandan los tres vacíos para volver a DHCP,
+  // en vez de dejar una máscara suelta que el equipo rechazaría.
+  const gateway = ip ? $("wifi-address-gateway").value.trim() : "";
+  const mask = ip ? $("wifi-address-mask").value.trim() : "";
+  addressPending = null;
+  $("wifi-address-dialog").close();
+  if (!ssid) return;
+  // Vaciar los tres campos vuelve a DHCP; el firmware trata la cadena vacía así.
+  wifiMessage(ip ? `Fijando ${ip} para ${ssid}…` : `Volviendo a dirección automática en ${ssid}…`);
+  try {
+    renderSaved(await api("/api/wifi/networks", "POST", { ssid, ip, gateway, mask }));
+    wifiMessage(
+      ip
+        ? `${ssid} usará ${ip}. Se aplica en la próxima conexión a esa red.`
+        : `${ssid} vuelve a pedir dirección automática.`,
+    );
+  } catch (error) {
+    wifiMessage(error.message, true);
+  }
+});
 function askPassword(ssid) {
   wifiPending = ssid;
   text("wifi-password-title", `Contraseña de ${ssid}`);

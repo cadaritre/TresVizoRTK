@@ -9,6 +9,10 @@ void feed(const char* data, size_t length);
 void tick(HardwareSerial& uart);
 bool busy();
 bool roverReady();
+// El receptor trabaja como base. Un equipo base no consume correcciones: las
+// produce. Sin esta distincion el panel puede decir a la vez que es base y
+// que esta recibiendo correcciones, que no tiene sentido.
+bool isBase();
 const char* heightReference();
 int start(JsonVariantConst body, JsonDocument& out);
 int applyBase(JsonVariantConst plan, JsonDocument& out);

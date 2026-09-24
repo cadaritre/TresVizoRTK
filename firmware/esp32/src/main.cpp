@@ -1,9 +1,12 @@
 #include "sd_recorder.h"
 #include "ntrip_input.h"
+#include "correction_output.h"
+#include "base_survey.h"
 #include "gnss_control.h"
 #include "memory_health.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <WiFi.h>
 #include <esp_http_server.h>
 #include <freertos/semphr.h>
 #include "config_rules.h"
@@ -133,8 +136,13 @@ void handleSerialLine() {
         // Única credencial del equipo: la del Wi-Fi propio. El panel y la API no
         // piden clave. El PIN de BLE es aparte y lo exige el emparejamiento.
         output["body"]["ap_password"] = instrument::apPassword();
-        output["body"]["ble_pairing_pin"] = ble_transport::passkey();
         output["body"]["ap_url"] = "http://192.168.4.1";
+        // Donde vive en la red externa, que es justo lo que cuesta averiguar
+        // cuando un hotspot reparte la direccion por DHCP.
+        output["body"]["station_ssid"] = WiFi.SSID();
+        output["body"]["station_url"] = WiFi.status() == WL_CONNECTED
+            ? String("http://") + WiFi.localIP().toString() : String();
+        output["body"]["mdns_url"] = "http://meridianv.local";
         serialReply(output);
         return;
     }
@@ -185,6 +193,8 @@ void setup() {
     sd_recorder::begin();
     gnss_receiver::begin();
     ntrip_input::begin();
+    correction_output::begin();
+    base_survey::begin();
     ble_transport::begin(dispatch, authenticated);
     httpd_config_t configuration = HTTPD_DEFAULT_CONFIG();
     configuration.uri_match_fn = httpd_uri_match_wildcard;
@@ -211,6 +221,9 @@ void loop() {
         ble_transport::tick();
         if (xSemaphoreTake(instrumentMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
             instrument::tick();
+            // Bajo el mutex: el promedio puede terminar aplicando modo base, y
+            // eso toca el receptor igual que cualquier otra operación.
+            base_survey::tick();
             firmware_update::tick(server != nullptr);
             xSemaphoreGive(instrumentMutex);
         }

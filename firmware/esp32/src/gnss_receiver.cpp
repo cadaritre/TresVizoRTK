@@ -5,6 +5,8 @@
 #include "gnss_control.h"
 #include "sd_recorder.h"
 #include "wire_filter.h"
+#include "rtcm3.h"
+#include "correction_output.h"
 #ifdef TRESVIZO_TASK_WDT
 #include <esp_task_wdt.h>
 #endif
@@ -35,6 +37,9 @@ void acquire(void*) {
     gnss::GgaParser parser;
     gnss::GstParser precisionParser;
     gnss::WireFilter filter;
+    // El receptor emite RTCM por la misma UART cuando trabaja como base. Se
+    // reconstruyen las tramas aquí para poder publicarlas o servirlas.
+    gnss::Rtcm3Parser outgoing;
     gnss::Gga solution;
     gnss::Gst precision;
     size_t sent = 0;
@@ -63,6 +68,9 @@ void acquire(void*) {
                 filter.feed(rawBlock[i], now, [&](char character) {
                     parser.feed(character, arrival, solution);
                     precisionParser.feed(character, arrival, precision);
+                    outgoing.feed(uint8_t(character), [](const uint8_t* p, size_t size) {
+                        correction_output::publish(p, size);
+                    });
                     textBlock[textLength++] = character;
                 });
             }

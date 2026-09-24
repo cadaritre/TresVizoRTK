@@ -98,8 +98,15 @@ int prepare(const String& name, JsonDocument& out) {
     if(!gnss_receiver::snapshot().enabled) {out["message"]="UART no disponible.";return 503;}
     if(sd_recorder::active()){out["message"]="Cierra la grabación antes de configurar el GPS.";return 409;}
     if(running) {out["message"]="Operación GNSS en curso.";return 409;}
-    JsonDocument router;correction_router::status(router.to<JsonObject>());
-    if(router["active_source"]!="none") {out["message"]="Hay correcciones activas. Pulsa «Detener» en el apartado de correcciones y repite; configurar el GPS con una fuente activa mezclaría comandos con RTCM.";return 409;}
+    // Las consultas son de solo lectura y no reconfiguran nada: bloquearlas con
+    // correcciones activas impedia saber en que modo esta el receptor justo
+    // cuando mas falta hace. El entrelazado de bytes ya esta resuelto: el
+    // consumidor de correcciones se detiene mientras este modulo trabaja.
+    const bool readOnly = name=="query" || name=="config_query" || name=="raw_profile";
+    if(!readOnly) {
+        JsonDocument router;correction_router::status(router.to<JsonObject>());
+        if(router["active_source"]!="none") {out["message"]="Hay correcciones activas. Pulsa «Detener» en el apartado de correcciones y repite; configurar el GPS con una fuente activa mezclaría comandos con RTCM.";return 409;}
+    }
     count=index=0;sent=ack=readback=false;overflowed=false;failure="";expectedMode="";action=name;
     return 0;
 }
@@ -113,7 +120,11 @@ int launch(JsonDocument& out) {
 void commitProfile() {
     if(action=="mask"){profileState.elevation_known=true;}
     else if(action=="constellations"){profileState.constellations_known=true;}
-    else if(action=="save"){profileState.saved=true;}
+    // Cualquier acción que modifica configuración termina con SAVECONFIG, así
+    // que al confirmarse queda persistida en el receptor.
+    if(action=="save"||action=="rover"||action=="base"||action=="telemetry"||action=="stop_outputs"||
+       action=="mask"||action=="constellations"||action=="dgps_timeout"||
+       action=="outputs"||action=="rtcm_base"){profileState.saved=true;}
 }
 
 bool boolField(JsonVariantConst body,const char* name,bool& target){
@@ -125,6 +136,7 @@ bool boolField(JsonVariantConst body,const char* name,bool& target){
 void begin(){mutex=xSemaphoreCreateMutex();}
 bool busy(){return running;}
 bool roverReady(){return rover && !running && millis()-modeAt.load()<30000;}
+bool isBase(){return mode.startsWith("MODE BASE");}
 const char* heightReference(){return ellipsoid?"ellipsoidal_user_configured":"receiver_msl";}
 
 void feed(const char* data, size_t size) {
@@ -210,9 +222,15 @@ int start(JsonVariantConst body,JsonDocument& out) {
                 if(messageName!="GPGGA"&&messageName!="GPGSV"&&messageName!="GPGST"&&messageName!="GPRMC"&&
                    messageName!="GPVTG"&&messageName!="GPZDA"&&messageName!="GPGSA")return 400;
             } else {
+                // MSM4 (107x/108x…) y MSM7 (1077/1087/1097/1117/1127). Los MSM7
+                // llevan resolución extendida y Doppler, y son los que permiten
+                // aprovechar de verdad un receptor de triple banda: MSM4 recorta
+                // la resolución de fase que la tercera frecuencia aporta.
                 if(messageName!="RTCM1005"&&messageName!="RTCM1006"&&messageName!="RTCM1033"&&
                    messageName!="RTCM1074"&&messageName!="RTCM1084"&&messageName!="RTCM1094"&&
-                   messageName!="RTCM1114"&&messageName!="RTCM1124")return 400;
+                   messageName!="RTCM1114"&&messageName!="RTCM1124"&&
+                   messageName!="RTCM1077"&&messageName!="RTCM1087"&&messageName!="RTCM1097"&&
+                   messageName!="RTCM1117"&&messageName!="RTCM1127")return 400;
             }
         }
     } else if(name=="save") {
@@ -261,6 +279,19 @@ int start(JsonVariantConst body,JsonDocument& out) {
             }
             if(name=="outputs")profileState.outputs=summary;else profileState.rtcm=summary;
         }
+        // Todo cambio de configuración se graba en la memoria no volátil del
+        // receptor, no solo cuando se pide expresamente. Sin esto, cualquier
+        // corte de corriente devuelve el UM980 a su estado anterior y el equipo
+        // aparenta estar averiado: el enlace responde pero no llega ni una
+        // posición. Ha pasado dos veces. La contrapartida es desgaste de la
+        // flash del receptor, acotado porque son cambios manuales, no un bucle.
+        // "base" incluido a proposito: una base que pierde corriente y vuelve
+        // en el modo anterior seguiria emitiendo correcciones desde una
+        // coordenada equivocada, y los rovers fijarian con buena pinta sobre
+        // un punto que no es. Es el fallo mas caro de los que puede tener.
+        if(name=="rover"||name=="base"||name=="telemetry"||name=="stop_outputs"||name=="mask"||
+           name=="constellations"||name=="dgps_timeout"||name=="outputs"||name=="rtcm_base")
+            add("SAVECONFIG");
         if(name=="save") add("SAVECONFIG");
         code=launch(out);
         if(code!=202)finish("idle","");
@@ -270,10 +301,8 @@ int start(JsonVariantConst body,JsonDocument& out) {
 
 int applyBase(JsonVariantConst plan,JsonDocument& out) {
     if(!mutex)return 503;
-    if(plan["method"]=="known") {
-        String datum=plan["datum"]|"";datum.toUpperCase();datum.replace(" ","");
-        if(datum!="WGS84" && datum!="WGS-84"){out["message"]="Solo WGS84; no se transforman coordenadas.";return 400;}
-    }
+    // El marco es siempre WGS84: no se transforman coordenadas ni se pide al
+    // usuario que declare un datum que no tendría efecto.
     xSemaphoreTake(mutex,portMAX_DELAY);int code=prepare("base",out);
     if(!code){
         rover=false;mode="";

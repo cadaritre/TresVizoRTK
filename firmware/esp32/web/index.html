@@ -74,8 +74,6 @@
             <div class="field-quality-block">
               <span class="field-label">SOLUCIÓN</span>
               <strong id="field-quality" data-live>Sin solución</strong>
-              <span class="field-sub">Estado informado por el receptor. No es una
-                garantía de exactitud.</span>
             </div>
             <dl class="field-coords">
               <div>
@@ -106,22 +104,15 @@
             <article class="field-chip">
               <span class="field-label">PRECISIÓN H</span>
               <strong id="field-sigma-h" data-live>—</strong>
-              <span class="field-note">Estimación del receptor</span>
             </article>
             <article class="field-chip">
               <span class="field-label">PRECISIÓN V</span>
               <strong id="field-sigma-v" data-live>—</strong>
-              <span class="field-note">Estimación del receptor</span>
             </article>
             <article class="field-chip">
-              <span class="field-label">EDAD</span>
-              <strong id="field-age" data-live>—</strong>
-              <span class="field-note">Desde la última época</span>
-            </article>
-            <article class="field-chip">
-              <span class="field-label">RTCM AL GPS</span>
-              <strong id="field-corrections" data-live>—</strong>
-              <span class="field-note">Tramas entregadas</span>
+              <span class="field-label">CORRECCIONES</span>
+              <strong id="field-correction-age" data-live>—</strong>
+              <span class="field-note" id="field-correction-source">—</span>
             </article>
           </div>
           <div class="field-actions">
@@ -367,32 +358,96 @@
             <article class="panel">
               <h2>Bluetooth LE</h2>
               <p id="ble-state">Consultando el estado del ESP32.</p>
-              <p>Control y telemetría para la futura app. Emparejamiento cifrado con PIN consultable por USB y autenticación con la clave del equipo.</p>
-              <p class="hint">El envío de correcciones al GPS requiere UART conectado. Las descargas y el firmware utilizan Wi-Fi o USB.</p>
+              <p>
+                Control, posición y salud del equipo para la app de campo, y
+                entrada de correcciones: el teléfono puede recibir NTRIP por
+                datos móviles y pasárselas al receptor por Bluetooth cuando el
+                equipo no tiene red propia.
+              </p>
+              <div class="button-row">
+                <button class="button secondary" type="button" id="ble-toggle">
+                  Consultando…
+                </button>
+              </div>
+              <p class="hint">
+                Sin emparejamiento ni PIN. Cualquier equipo dentro del alcance
+                puede conectarse y escribir, incluidas las correcciones que van
+                al receptor. Apágalo aquí si no lo estás usando.
+              </p>
             </article>
           </div>
         </section>
         <section class="page" id="page-base" aria-labelledby="base-title" hidden>
-          <div class="page-heading"><div><p class="eyebrow">FUNCIÓN DEL RECEPTOR</p><h1 id="base-title">Base / rover</h1><p class="intro">Prepara la estación y comprueba sus referencias antes de aplicarla.</p></div></div>
-          <div class="notice">Control UART disponible. Preparar un plan no cambia el GPS; usa Aplicar después de revisar las referencias.</div>
+          <div class="page-heading"><div><p class="eyebrow">FUNCIÓN DEL RECEPTOR</p><h1 id="base-title">Base / rover</h1><p class="intro">Estaciona el equipo como base: fija su coordenada y empieza a emitir correcciones.</p></div></div>
+          <!-- El papel actual y como salir de el, arriba del todo: buscar donde
+               se quitaba el modo base obligaba a bajar hasta el panel de UART. -->
+          <article class="panel role-panel">
+            <div class="role-current">
+              <span class="field-label">PAPEL DEL RECEPTOR</span>
+              <strong id="role-state" data-live>Consultando…</strong>
+              <span class="field-note" id="role-detail">—</span>
+            </div>
+            <div class="button-row">
+              <button class="button primary" type="button" id="role-use-rover">Usar como rover</button>
+              <button class="button secondary" type="button" id="role-refresh">Consultar al receptor</button>
+            </div>
+          </article>
+          <div class="notice">«Estacionar la base aquí» envía la coordenada al receptor. Que la acepte no significa que sea exacta.</div>
           <div class="two-columns lower">
             <article class="panel"><h2>Modo del equipo</h2><p>Consulta el modo efectivo y activa rover en el panel GPS conectado al ESP32 de esta página.</p><p>El rover recibirá correcciones desde la app por BLE o desde un caster por Wi-Fi.</p><button class="button secondary" data-page="corrections">Ver correcciones ↗</button></article>
-            <article class="panel"><h2>Base con referencia conocida</h2><p>Conserva el datum, la época y el origen de tus coordenadas. La altura del punto y la altura de antena son valores distintos.</p><p>El promedio autónomo sirve para establecer una referencia local; no garantiza coordenadas centimétricas absolutas.</p></article>
+            <article class="panel"><h2>Cómo se declara la coordenada</h2><p>Marco siempre <b>WGS84</b> y altura siempre <b>elipsoidal</b>: el equipo no transforma coordenadas, así que no se te pide declarar un datum que no tendría efecto.</p><p>La altura que introduces es la del punto en el suelo. El equipo le suma la altura de antena que midas y <b>10 cm del case</b>, todavía sin medir sobre la carcasa real.</p><p>Promediar establece una referencia local repetible; no garantiza exactitud absoluta si la solución de partida no la tiene.</p></article>
           </div>
           <form id="base-plan-form" class="panel lower">
             <h2>Preparar estación base</h2>
+            <div class="button-row">
+              <button class="button secondary" type="button" id="base-use-current">
+                Usar coordenada actual
+              </button>
+              <button class="button secondary" type="button" id="base-use-average">
+                Promediar coordenadas
+              </button>
+            </div>
+            <p class="hint" id="base-shortcut-hint">
+              «Usar coordenada actual» copia la posición que el receptor entrega
+              en este momento. Si esa solución es autónoma, la base queda con
+              varios metros de error absoluto: los rovers serán coherentes entre
+              sí, pero el conjunto estará desplazado respecto al terreno real.
+            </p>
             <label for="base-method">Origen de coordenadas</label><select id="base-method"><option value="known">Coordenadas conocidas</option><option value="average">Promedio del receptor</option></select>
             <label for="base-id">Identificador de estación</label><input id="base-id" type="number" min="0" max="4095" step="1" value="1" required />
-            <fieldset id="base-known"><legend>Coordenadas y antena</legend>
+            <fieldset id="base-known"><legend>Coordenadas del punto</legend>
               <div class="two-columns"><div><label for="base-lat">Latitud (grados decimales)</label><input id="base-lat" type="number" min="-90" max="90" step="any" required /></div><div><label for="base-lon">Longitud (grados decimales)</label><input id="base-lon" type="number" min="-180" max="180" step="any" required /></div></div>
-              <label for="base-datum">Datum / marco de referencia</label><input id="base-datum" maxlength="32" placeholder="Marco de las coordenadas de origen" required /><small class="field-help">Declararlo no transforma las coordenadas. Se comprobará su compatibilidad con el receptor.</small>
-              <label for="base-epoch">Época de coordenadas (año decimal, opcional)</label><input id="base-epoch" type="number" min="1900" max="2200" step="any" />
-              <label for="base-height-point">La altura corresponde a</label><select id="base-height-point"><option value="marker">Punto materializado en el terreno</option><option value="arp">Punto de referencia de antena (ARP)</option></select>
-              <label for="base-height">Altura elipsoidal (m)</label><input id="base-height" type="number" min="-30000" max="30000" step="any" required />
-              <label for="base-antenna">Altura vertical del punto al ARP (m)</label><input id="base-antenna" type="number" min="0" max="100" step="any" required /><small class="field-help">Medición vertical, no inclinada. Si la coordenada ya es del ARP, no se vuelve a sumar. Alturas ortométricas requieren conversión previa.</small>
+              <label for="base-height">Altura elipsoidal del punto (m)</label><input id="base-height" type="number" min="-30000" max="30000" step="any" required /><small class="field-help">Siempre elipsoidal sobre WGS84. No introduzcas altura ortométrica o sobre el nivel del mar.</small>
+              <label for="base-antenna">Altura vertical hacia base de receptor (m)</label><input id="base-antenna" type="number" min="0" max="100" step="any" required /><small class="field-help">Medición vertical, no inclinada, desde el punto del terreno hasta la base del receptor. El equipo suma por su cuenta los 10 cm del case.</small>
             </fieldset>
-            <fieldset id="base-average" hidden disabled><legend>Promedio autónomo</legend><label for="base-seconds">Tiempo máximo (s)</label><input id="base-seconds" type="number" min="1" max="3600" step="1" value="300" required /><label for="base-reuse">Distancia de reutilización de coordenada guardada (m)</label><input id="base-reuse" type="number" min="0" max="10" step="any" value="0" required /><small class="field-help">Cero solicita una nueva solución promedio. Este parámetro no es una tolerancia de precisión garantizada.</small></fieldset>
-            <div class="save-bar"><button class="button primary" type="submit">Validar y preparar plan</button><button id="base-export" class="button secondary" type="button" disabled>Exportar plan JSON</button></div>
+            <fieldset id="base-average" hidden disabled><legend>Promediar en el sitio</legend>
+              <label for="base-seconds">Tiempo de promedio (s)</label><input id="base-seconds" type="number" min="5" max="900" step="1" value="60" required />
+              <label for="base-quality">Promediar solo con</label>
+              <select id="base-quality">
+                <option value="rtk_fixed">Solución fija</option>
+                <option value="rtk_float">Solución flotante</option>
+                <option value="standalone">Solución autónoma</option>
+                <option value="any">Cualquier solución</option>
+              </select>
+              <small class="field-help">Si la calidad elegida se pierde durante el promedio, se cancela y se te dice por qué: una media contaminada no se distingue a simple vista de una buena.</small>
+              <label for="base-antenna-avg">Altura vertical hacia base de receptor (m)</label><input id="base-antenna-avg" type="number" min="0" max="100" step="any" value="0" />
+              <div class="button-row">
+                <button class="button primary" type="button" id="base-average-start">Iniciar promedio</button>
+                <button class="button secondary" type="button" id="base-average-cancel">Cancelar</button>
+              </div>
+              <div class="survey-progress" id="base-average-progress" hidden>
+                <div class="survey-bar"><span id="base-average-fill"></span></div>
+                <p class="survey-count" id="base-average-count">—</p>
+                <dl class="detail-list">
+                  <div><dt>Latitud media</dt><dd id="base-average-lat">—</dd></div>
+                  <div><dt>Longitud media</dt><dd id="base-average-lon">—</dd></div>
+                  <div><dt>Altura que se fijará</dt><dd id="base-average-height">—</dd></div>
+                </dl>
+              </div>
+              <p id="base-average-state" role="status"></p>
+              <input id="base-reuse" type="hidden" value="0" />
+            </fieldset>
+            <div class="save-bar"><button class="button primary" type="submit">Estacionar la base aquí ↗</button></div>
             <p id="base-result" role="status">Prepara y revisa el plan; después puedes aplicarlo desde el control UART de esta página.</p>
           </form>
         <article class="panel lower"><h2>GPS conectado al ESP32</h2><p>Comandos por UART. La adquisición continúa durante las consultas. Cambios temporales: no se envía SAVECONFIG.</p><div class="button-row"><button class="button secondary" id="device-query">Consultar versión y modo</button><button class="button secondary" id="device-rover">Configurar rover</button></div><label for="device-hz">Frecuencia GGA</label><select id="device-hz"><option value="1">1 Hz</option><option value="2">2 Hz</option><option value="5">5 Hz</option><option value="10" selected>10 Hz</option><option value="20">20 Hz</option></select><button class="button secondary" id="device-rate">Aplicar frecuencia</button><p id="device-control-state"></p><p id="device-version"></p><p id="device-control-error" role="status"></p><p id="device-control-message" role="status"></p><button class="button primary" id="device-base-apply">Aplicar plan de base al ESP32</button><p id="device-base-message" role="status"></p><p>La lectura de modo base no verifica las coordenadas. No publicar correcciones hasta comprobar coordenadas, referencia de altura y convergencia.</p></article><article class="panel bench-panel" id="bench-base" hidden><h2>Aplicar al GPS por USB de la Mac</h2><p>La base conocida requiere WGS84 y altura elipsoidal. El promedio puede guardar coordenadas en la memoria del GPS y no garantiza precisión absoluta.</p><button class="button primary" type="button" id="bench-base-apply">Aplicar el plan validado al GPS USB</button><p id="bench-base-message" role="status"></p></article></section>
@@ -414,7 +469,7 @@
           </section>
         <section class="page" id="page-corrections" aria-labelledby="corrections-title" hidden>
           <div class="page-heading"><div><p class="eyebrow">RTCM Y CONECTIVIDAD</p><h1 id="corrections-title">Correcciones</h1><p class="intro">Recibe correcciones como rover o distribuye las de tu base.</p></div></div>
-          <p id="device-memory"></p><div class="notice" id="corrections-availability">Entrada NTRIP directa al ESP32 disponible. Publicador y caster integrados siguen pendientes.</div>
+          <p id="device-memory"></p><div class="notice" id="corrections-availability">Entrada NTRIP, publicación y caster local funcionan desde el propio ESP32. La publicación y el caster no se han probado todavía contra un caster real. Radio sigue sin integrar.</div>
           <h2 class="flow-heading">Entrada de correcciones</h2>
           <p class="flow-sub">
             Lo que el receptor recibe para corregir su posición. Solo una fuente
@@ -495,12 +550,11 @@
             Lo que el equipo distribuye cuando trabaja como base. Requiere modo
             base con coordenadas verificadas.
           </p>
-          <article class="panel" id="rtcm-messages-panel">
-            <h3>Mensajes RTCM que se emiten</h3>
-            <p>
-              Se aplican tanto a la publicación como al caster local. El juego
-              por defecto ya funciona: cámbialo solo si tu red lo exige.
-            </p>
+          <details class="panel capsule" id="rtcm-messages-panel">
+            <summary>
+              <span>Mensajes RTCM que se emiten</span>
+              <small>Ya vienen configurados para triple banda. Ábrelo solo si tu red exige otros.</small>
+            </summary>
             <form id="rtcm-output-form">
               <div class="checkbox-grid" id="rtcm-message-grid"></div>
               <label for="rtcm-observation-rate">Frecuencia de observaciones</label>
@@ -521,7 +575,7 @@
               </div>
             </form>
             <p id="rtcm-output-message" role="status"></p>
-          </article>
+          </details>
           <div class="two-columns lower">
             <article class="panel">
               <h3>NTRIP · publicar a un caster</h3>
@@ -738,6 +792,29 @@
             <ul class="wifi-list" id="wifi-saved-list"></ul>
             <p id="wifi-message" role="status"></p>
           </article>
+          <dialog id="wifi-address-dialog" aria-labelledby="wifi-address-title">
+            <form id="wifi-address-form">
+              <h2 id="wifi-address-title">Dirección fija</h2>
+              <p class="field-help">
+                Sin dirección fija el router reparte una distinta cada vez y hay
+                que averiguarla. Con una fija el equipo siempre vive en la misma.
+              </p>
+              <label for="wifi-address-ip">Dirección IP</label
+              ><input id="wifi-address-ip" placeholder="192.168.1.50" maxlength="15" />
+              <label for="wifi-address-gateway">Puerta de enlace</label
+              ><input id="wifi-address-gateway" placeholder="192.168.1.1" maxlength="15" />
+              <label for="wifi-address-mask">Máscara de subred</label
+              ><input id="wifi-address-mask" placeholder="255.255.255.0" maxlength="15" />
+              <p class="field-help">
+                Elige una dirección fuera del rango que reparte el router, o
+                chocará con otro equipo. Vaciar los tres campos vuelve a DHCP.
+              </p>
+              <div class="button-row">
+                <button type="button" class="button secondary" id="wifi-address-cancel">Cancelar</button>
+                <button class="button primary" type="submit">Guardar dirección</button>
+              </div>
+            </form>
+          </dialog>
           <dialog id="wifi-password-dialog" aria-labelledby="wifi-password-title">
             <form id="wifi-password-form">
               <h2 id="wifi-password-title">Contraseña de la red</h2>

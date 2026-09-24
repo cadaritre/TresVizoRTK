@@ -1,6 +1,7 @@
 #include "correction_output.h"
 #include "instrument.h"
 #include "firmware_update.h"
+#include <Preferences.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WiFiServer.h>
@@ -16,6 +17,10 @@ struct Frame {uint16_t length;uint8_t bytes[1029];};
 QueueHandle_t queue=nullptr;
 SemaphoreHandle_t lock=nullptr;
 bool ready=false;
+// La entrada NTRIP se reconecta sola tras un corte; la salida no lo hacia y
+// era justo la que vive fija en el tripode. Se guarda y se reanuda igual.
+Preferences store;
+bool storeReady=false;
 
 // --- publicación hacia un caster externo ---------------------------------
 struct ServerConfig {String host,mount,password;uint16_t port=2101;};
@@ -185,10 +190,42 @@ void worker(void*){
 }
 }
 
+namespace {
+void persist(){
+ if(!storeReady)return;
+ JsonDocument doc;
+ doc["srv"]=serverWanted.load();
+ doc["host"]=serverConfig.host;doc["mount"]=serverConfig.mount;
+ doc["pass"]=serverConfig.password;doc["port"]=serverConfig.port;
+ doc["cast"]=casterWanted.load();
+ doc["cmount"]=casterConfig.mount;doc["cpass"]=casterConfig.password;doc["cport"]=casterConfig.port;
+ String encoded;serializeJson(doc,encoded);
+ store.putString("out",encoded);
+}
+void restore(){
+ if(!storeReady)return;
+ const String saved=store.getString("out","");
+ if(saved.isEmpty())return;
+ JsonDocument doc;
+ if(deserializeJson(doc,saved,DeserializationOption::NestingLimit(3)))return;
+ serverConfig.host=doc["host"]|"";serverConfig.mount=doc["mount"]|"";
+ serverConfig.password=doc["pass"]|"";serverConfig.port=uint16_t(doc["port"]|2101);
+ casterConfig.mount=doc["cmount"]|"MERIDIANV";casterConfig.password=doc["cpass"]|"";
+ casterConfig.port=uint16_t(doc["cport"]|2101);
+ // Solo se reanuda lo que estaba activo y tiene destino completo.
+ if((doc["srv"]|false)&&serverConfig.host.length()&&serverConfig.mount.length()){
+  serverWanted=true;serverState="starting";
+ }
+ if(doc["cast"]|false){casterWanted=true;casterState="starting";}
+}
+}
+
 void begin(){
  lock=xSemaphoreCreateMutex();
  queue=xQueueCreate(6,sizeof(Frame));
  if(lock&&queue)ready=xTaskCreate(worker,"rtcm_out",4096,nullptr,1,nullptr)==pdPASS;
+ storeReady=store.begin("rtcmout",false);
+ if(ready)restore();
 }
 
 void publish(const uint8_t* frame,size_t length){
@@ -229,6 +266,7 @@ int serverRequest(const String& method,JsonVariantConst body,JsonDocument& out){
  if(body["action"]=="stop"&&body.size()==1){
   serverWanted=false;
   xSemaphoreTake(lock,portMAX_DELAY);serverConfig.password="";xSemaphoreGive(lock);
+  persist();
   status(out.to<JsonObject>());return 200;
  }
  if(body["action"]!="start"||body.size()!=5||!valid(body["host"],128)||
@@ -246,6 +284,7 @@ int serverRequest(const String& method,JsonVariantConst body,JsonDocument& out){
  xSemaphoreGive(lock);
  serverFrames=serverDropped=serverReconnects=0;
  serverError="";serverState="starting";serverWanted=true;
+ persist();
  status(out.to<JsonObject>());return 202;
 }
 
@@ -255,6 +294,7 @@ int casterRequest(const String& method,JsonVariantConst body,JsonDocument& out){
  if(!ready)return 503;
  if(body["action"]=="stop"&&body.size()==1){
   casterWanted=false;casterState="stopping";
+  persist();
   status(out.to<JsonObject>());return 200;
  }
  if(body["action"]!="start"||body.size()!=4||!valid(body["mountpoint"],32)||
@@ -271,6 +311,7 @@ int casterRequest(const String& method,JsonVariantConst body,JsonDocument& out){
  casterConfig.port=uint16_t(body["port"].as<unsigned>());
  xSemaphoreGive(lock);
  casterFrames=0;casterState="starting";casterWanted=true;
+ persist();
  status(out.to<JsonObject>());return 202;
 }
 }

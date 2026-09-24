@@ -7,11 +7,14 @@
 #include "ble_transport.h"
 #include "firmware_update.h"
 #include "correction_router.h"
+#include "correction_output.h"
 #include "config_rules.h"
 #include "base_plan.h"
+#include "base_survey.h"
 
 #include <Preferences.h>
 #include <WiFi.h>
+#include <ESPmDNS.h>
 #include <atomic>
 #include <esp_system.h>
 #include <esp_timer.h>
@@ -55,6 +58,12 @@ constexpr size_t kMaxNetworks = 5;
 struct SavedNetwork {
     String ssid;
     String password;
+    // Dirección fija opcional, por red y no global: con varias redes guardadas
+    // en subredes distintas, una sola IP fija sería correcta en una y estaría
+    // equivocada en el resto. Vacío significa DHCP.
+    String ip;
+    String gateway;
+    String mask;
 };
 SavedNetwork networks[kMaxNetworks];
 size_t networkCount = 0;
@@ -89,6 +98,9 @@ void config(JsonDocument& response) {
         JsonObject item = saved.add<JsonObject>();
         item["ssid"] = networks[i].ssid;
         item["has_password"] = !networks[i].password.isEmpty();
+        item["ip"] = networks[i].ip;
+        item["gateway"] = networks[i].gateway;
+        item["mask"] = networks[i].mask;
     }
     response["networks_max"] = kMaxNetworks;
     response["ap_ssid"] = networkName;
@@ -120,6 +132,17 @@ void connectTo(const SavedNetwork& network) {
     lastConnectionAttempt = millis();
     stationSsid = network.ssid;
     stationPassword = network.password;
+    IPAddress ip, gateway, mask;
+    // Si la red trae dirección fija se aplica; si no, se devuelve el interfaz a
+    // DHCP explícitamente, porque una configuración estática anterior seguiría
+    // vigente y dejaría el equipo inalcanzable en la red siguiente.
+    if (!network.ip.isEmpty() && ip.fromString(network.ip) &&
+        gateway.fromString(network.gateway) && mask.fromString(network.mask)) {
+        // El gateway hace también de DNS: en una red de obra no hay otro.
+        WiFi.config(ip, gateway, mask, gateway);
+    } else {
+        WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
+    }
     WiFi.begin(network.ssid.c_str(), network.password.c_str());
 }
 
@@ -158,6 +181,11 @@ bool persistConfig(uint32_t nextRevision, const String& name, uint32_t refresh,
         JsonObject item = saved.add<JsonObject>();
         item["ssid"] = list[i].ssid;
         item["password"] = list[i].password;
+        if (!list[i].ip.isEmpty()) {
+            item["ip"] = list[i].ip;
+            item["gateway"] = list[i].gateway;
+            item["mask"] = list[i].mask;
+        }
     }
     String encoded;
     serializeJson(record, encoded);
@@ -169,6 +197,9 @@ void adoptNetworks(const SavedNetwork* list, size_t count) {
     for (size_t i = 0; i < kMaxNetworks; ++i) {
         networks[i].ssid = i < count ? list[i].ssid : String();
         networks[i].password = i < count ? list[i].password : String();
+        networks[i].ip = i < count ? list[i].ip : String();
+        networks[i].gateway = i < count ? list[i].gateway : String();
+        networks[i].mask = i < count ? list[i].mask : String();
     }
     networkCount = count;
     stationPresent = count > 0;
@@ -357,7 +388,8 @@ int wifiNetworks(const String& method, JsonVariantConst body, JsonDocument& resp
     }
     for (JsonPairConst pair : body.as<JsonObjectConst>()) {
         const String name = pair.key().c_str();
-        if (name != "ssid" && name != "password" && name != "forget") {
+        if (name != "ssid" && name != "password" && name != "forget" &&
+            name != "ip" && name != "gateway" && name != "mask") {
             error(response, "unknown_setting", "La solicitud contiene un campo no admitido.");
             return 400;
         }
@@ -409,14 +441,44 @@ int wifiNetworks(const String& method, JsonVariantConst body, JsonDocument& resp
             }
             password = candidate[index].password;
         }
+        // Dirección fija opcional. Las tres van juntas o ninguna: una IP sin
+        // máscara ni puerta de enlace deja el equipo incomunicado.
+        String fixedIp, fixedGateway, fixedMask;
+        // Mencionar los campos vacíos es la forma de volver a dirección
+        // automática: exigir que fueran válidos impediría desactivarla.
+        const bool mentionsAddress = !body["ip"].isNull() || !body["gateway"].isNull() || !body["mask"].isNull();
+        const char* rawIp = body["ip"].is<const char*>() ? body["ip"].as<const char*>() : "";
+        const char* rawGateway = body["gateway"].is<const char*>() ? body["gateway"].as<const char*>() : "";
+        const char* rawMask = body["mask"].is<const char*>() ? body["mask"].as<const char*>() : "";
+        const bool wantsFixed = *rawIp || *rawGateway || *rawMask;
+        if (wantsFixed) {
+            IPAddress probe;
+            if (!probe.fromString(rawIp) || !probe.fromString(rawGateway) || !probe.fromString(rawMask)) {
+                error(response, "invalid_address", "Para una dirección fija hacen falta IP, puerta de enlace y máscara, las tres válidas. Déjalas vacías para volver a dirección automática.");
+                return 400;
+            }
+            fixedIp = rawIp;
+            fixedGateway = rawGateway;
+            fixedMask = rawMask;
+        }
         if (index >= 0) {
             candidate[index].password = password;
+            // Si la petición menciona la dirección, se adopta tal cual: con
+            // valores, la fija; vacía, vuelve a automática.
+            if (mentionsAddress) {
+                candidate[index].ip = fixedIp;
+                candidate[index].gateway = fixedGateway;
+                candidate[index].mask = fixedMask;
+            }
         } else if (count == kMaxNetworks) {
             error(response, "networks_full", "Se alcanzó el máximo de redes guardadas de este equipo. Olvida una antes de añadir otra.");
             return 409;
         } else {
             candidate[count].ssid = ssid;
             candidate[count].password = password;
+            candidate[count].ip = fixedIp;
+            candidate[count].gateway = fixedGateway;
+            candidate[count].mask = fixedMask;
             ++count;
         }
     }
@@ -515,6 +577,61 @@ void status(JsonDocument& response) {
     }
     ble_transport::status(response["subsystems"]["ble"].as<JsonObject>());
     ntrip_input::status(response["subsystems"]["ntrip"].as<JsonObject>());
+    // Fuente y antigüedad de correcciones en el estado general: la vista de
+    // campo las necesita en cada refresco y no debe pedir una segunda ruta.
+    // Papel del receptor: sin esto el panel puede afirmar a la vez que el
+    // equipo es base y que está recibiendo correcciones.
+    response["receiver_role"] = gnss_control::isBase() ? "base"
+        : (gnss_control::roverReady() ? "rover" : "unknown");
+    correction_router::status(response["corrections"].to<JsonObject>());
+    // Alarmas: lo que hay que mirar, no números que haya que interpretar. Los
+    // dos fallos que más costaron en banco (receptor mudo y NTRIP esperando red
+    // para siempre) no los delataba ningún contador a simple vista.
+    JsonArray alerts = response["alerts"].to<JsonArray>();
+    const auto raise = [&alerts](const char* code, const char* level, const char* text) {
+        JsonObject item = alerts.add<JsonObject>();
+        item["code"] = code; item["level"] = level; item["message"] = text;
+    };
+    const auto receiver = gnss_receiver::snapshot();
+    if (receiver.enabled && !receiver.accepted) {
+        raise("receiver_silent", "error",
+              "El enlace con el receptor funciona pero no emite posiciones. Suele ser que perdió sus salidas: aplica una frecuencia en GPS avanzado.");
+    }
+    if (receiver.start_failed) {
+        raise("uart_failed", "error", "La UART del receptor no arrancó.");
+    }
+    {
+        const uint32_t age = correction_router::ageMs();
+        if (correction_router::sourceCode() && age != UINT32_MAX && age > 30000) {
+            raise("corrections_stale", "warning",
+                  "Hay una fuente de correcciones activa pero no llega ninguna desde hace más de 30 s.");
+        }
+    }
+    if (gnss_control::isBase() && correction_router::sourceCode()) {
+        raise("base_consuming_corrections", "warning",
+              "El receptor es base y además tiene una entrada de correcciones activa. Una base emite correcciones, no las consume: detén la entrada.");
+    }
+    if (correction_output::active() && !gnss_control::isBase()) {
+        raise("publishing_without_base", "warning",
+              "Se está publicando correcciones pero el receptor no está en modo base: no hay RTCM que enviar.");
+    }
+    if (!networkCount) {
+        raise("no_network", "info", "No hay redes Wi-Fi guardadas: el equipo no puede salir a internet.");
+    }
+    if (esp_reset_reason() == ESP_RST_PANIC) {
+        raise("last_reset_panic", "warning", "El último reinicio fue por un fallo del firmware, no por corte de corriente.");
+    }
+    if (esp_reset_reason() == ESP_RST_BROWNOUT) {
+        raise("last_reset_brownout", "warning", "El último reinicio fue por caída de tensión. Revisa cable y alimentación.");
+    }
+    // Que el watchdog actúe es una buena noticia (el equipo se recuperó solo)
+    // pero significa que una tarea se quedó bloqueada: hay que saberlo.
+    if (esp_reset_reason() == ESP_RST_TASK_WDT || esp_reset_reason() == ESP_RST_INT_WDT ||
+        esp_reset_reason() == ESP_RST_WDT) {
+        raise("last_reset_watchdog", "warning",
+              "El último reinicio lo provocó el watchdog: una tarea dejó de responder y el equipo se reinició solo. Anota qué estabas haciendo.");
+    }
+    correction_output::status(response["corrections_out"].to<JsonObject>());
     sd_recorder::status(response["subsystems"]["microsd"].as<JsonObject>());
     response["solution"]["fix"] = nullptr;
     response["solution"]["latitude_deg"] = nullptr;
@@ -627,6 +744,9 @@ void begin() {
                         }
                         loaded[loadedCount].ssid = ssid;
                         loaded[loadedCount].password = item["password"].as<const char*>();
+                        loaded[loadedCount].ip = item["ip"].is<const char*>() ? item["ip"].as<const char*>() : "";
+                        loaded[loadedCount].gateway = item["gateway"].is<const char*>() ? item["gateway"].as<const char*>() : "";
+                        loaded[loadedCount].mask = item["mask"].is<const char*>() ? item["mask"].as<const char*>() : "";
                         ++loadedCount;
                     }
                 }
@@ -655,7 +775,11 @@ void begin() {
     deviceName = kDeviceName;
     networkName = kDeviceName;
     WiFi.setAutoReconnect(true);
-    WiFi.setHostname("tresvizo-rtk");
+    WiFi.setHostname("meridianv");
+    // Nombre en la red local: "meridianv.local" sigue funcionando aunque el
+    // DHCP reparta otra dirección en la siguiente conexión.
+    MDNS.begin("meridianv");
+    MDNS.addService("http", "tcp", 80);
     WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
     apReady = WiFi.softAP(networkName.c_str(), apKey.c_str(), 1, false, 4);
     // Al encender no se fuerza una red concreta: el primer tick escanea y se
@@ -703,9 +827,11 @@ int previewBase(JsonVariantConst body, JsonDocument& response) {
     if (!body.is<JsonObjectConst>()) { error(response, "invalid_plan", "Se esperaba un plan de base."); return 400; }
     for (JsonPairConst field : body.as<JsonObjectConst>()) {
         const String name = field.key().c_str();
-        if (name != "method" && name != "station_id" && name != "datum" && name != "coordinate_epoch" &&
+        // Marco siempre WGS84 y altura siempre elipsoidal: pedir datum, época o
+        // a qué punto corresponde la altura era ceremonia sin efecto.
+        if (name != "method" && name != "station_id" &&
             name != "latitude_deg" && name != "longitude_deg" && name != "ellipsoid_height_m" &&
-            name != "antenna_vertical_m" && name != "height_point" && name != "average_seconds" && name != "reuse_distance_m") {
+            name != "antenna_vertical_m" && name != "average_seconds" && name != "reuse_distance_m") {
             error(response, "invalid_plan", "Campo de plan desconocido."); return 400;
         }
     }
@@ -717,23 +843,23 @@ int previewBase(JsonVariantConst body, JsonDocument& response) {
     plan["station_id"] = body["station_id"];
     plan["method"] = method;
     if (method == "known") {
-        if (!validString(body["datum"], config_rules::deviceName) ||
-            !body["latitude_deg"].is<double>() || !body["longitude_deg"].is<double>() ||
-            !body["ellipsoid_height_m"].is<double>() || !body["antenna_vertical_m"].is<double>() ||
-            (!body["coordinate_epoch"].isNull() && (!body["coordinate_epoch"].is<double>() ||
-                body["coordinate_epoch"].as<double>() < 1900 || body["coordinate_epoch"].as<double>() > 2200))) {
-            error(response, "invalid_coordinates", "Revisa coordenadas numéricas, datum y época decimal opcional."); return 400;
+        if (!body["latitude_deg"].is<double>() || !body["longitude_deg"].is<double>() ||
+            !body["ellipsoid_height_m"].is<double>() || !body["antenna_vertical_m"].is<double>()) {
+            error(response, "invalid_coordinates", "Revisa que latitud, longitud, altura y antena sean números."); return 400;
         }
-        const String point = body["height_point"] | "";
         double arp;
-        if ((point != "marker" && point != "arp") || !base_plan::known(body["latitude_deg"], body["longitude_deg"],
-            body["ellipsoid_height_m"], body["antenna_vertical_m"], point == "marker", arp)) {
-            error(response, "invalid_height", "Coordenadas o alturas fuera de rango; usa altura elipsoidal y medida vertical."); return 400;
+        // La altura introducida es siempre la del punto en el suelo: se le suma
+        // la antena y la constante del case.
+        if (!base_plan::known(body["latitude_deg"], body["longitude_deg"],
+            body["ellipsoid_height_m"], body["antenna_vertical_m"], true, arp)) {
+            error(response, "invalid_height", "Coordenadas o alturas fuera de rango. La altura es elipsoidal y la medida de antena, vertical."); return 400;
         }
-        for (const char* field : {"datum", "coordinate_epoch", "latitude_deg", "longitude_deg", "ellipsoid_height_m", "antenna_vertical_m", "height_point"}) plan[field] = body[field];
+        arp += base_plan::kCaseOffsetM;
+        for (const char* field : {"latitude_deg", "longitude_deg", "ellipsoid_height_m", "antenna_vertical_m"}) plan[field] = body[field];
         plan["arp_ellipsoid_height_m"] = arp;
+        plan["case_offset_m"] = base_plan::kCaseOffsetM;
         plan["height_reference"] = "ellipsoidal";
-        plan["datum_transformed"] = false;
+        plan["datum"] = "WGS84";
     } else if (method == "average") {
         if (!body["average_seconds"].is<unsigned>() || !body["reuse_distance_m"].is<double>() ||
             !base_plan::average(body["average_seconds"], body["reuse_distance_m"])) {
@@ -746,7 +872,7 @@ int previewBase(JsonVariantConst body, JsonDocument& response) {
     response["applied"] = false;
     response["persisted"] = false;
     response["plan"] = plan.as<JsonVariant>();
-    response["message"] = "Plan preparado. No enviado al GPS ni guardado en el equipo. Datum, antena y aplicación física pendientes de verificación.";
+    response["message"] = "Plan validado. Pulsa aplicar para enviarlo al receptor; aceptar el modo no verifica la exactitud de la coordenada.";
     return 200;
 }
 
@@ -759,6 +885,10 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
     if(path=="/api/recording" || path.startsWith("/api/recording/"))return sd_recorder::request(method,path,body,response);
     if(path=="/api/ntrip/input") return ntrip_input::request(method,body,response);
     if(path=="/api/ntrip/profiles") return ntrip_input::profileRequest(method,body,response);
+    if(path=="/api/ble") return ble_transport::request(method,body,response);
+    if(path=="/api/base/survey") return base_survey::request(method,body,response);
+    if(path=="/api/ntrip/server") return correction_output::serverRequest(method,body,response);
+    if(path=="/api/ntrip/caster") return correction_output::casterRequest(method,body,response);
     if(path=="/api/ntrip/sourcetable") return ntrip_input::sourcetableRequest(method,body,response);
     if(path=="/api/gnss/control") {
         if(method=="GET"){gnss_control::status(response.to<JsonObject>());return 200;}
