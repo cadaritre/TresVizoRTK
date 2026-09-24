@@ -209,6 +209,13 @@
     if(!select)return;
     select.value=method;
     select.dispatchEvent(new Event('change',{bubbles:true}));
+    // Un solo boton de accion visible a la vez: con coordenada conocida se
+    // estaciona; promediando, la accion es iniciar el promedio.
+    const known=method==='known';
+    $('base-use-current')?.classList.toggle('active',known);
+    $('base-use-average')?.classList.toggle('active',!known);
+    const bar=$('base-station-bar');
+    if(bar)bar.hidden=!known;
   }
   $('base-use-current')?.addEventListener('click',()=>{
     const solution=(window.latestStatusSnapshot||{}).solution;
@@ -261,11 +268,11 @@
   function renderAverage(d){
     const labels={idle:'Sin promediar',averaging:'Promediando',applied:'Promedio aplicado a la base',
                   cancelled:'Cancelado',failed:'Falló'};
-    const running=d.state==='averaging';
+    const running=d.state==='averaging'||d.state==='applying';
     // Barra de progreso y coordenada en formación: promediar a ciegas durante
     // un minuto sin ver nada es lo que hacía sentir el proceso interminable.
     const box=$('base-average-progress');
-    if(box)box.hidden=!running&&d.state!=='applied';
+    if(box)box.hidden=d.state==='idle';
     const pct=d.seconds_requested?Math.min(100,Math.round(100*(d.seconds_elapsed||0)/d.seconds_requested)):0;
     const fill=$('base-average-fill');
     if(fill)fill.style.width=`${pct}%`;
@@ -291,6 +298,14 @@
     catch(error){text('base-average-state',error.message);}
   }
   $('base-average-start')?.addEventListener('click',async()=>{
+    // Realimentación inmediata: el usuario pulsa y ve que algo arrancó, sin
+    // esperar al primer sondeo. Antes no pasaba nada visible y parecía muerto.
+    const box=$('base-average-progress');
+    if(box)box.hidden=false;
+    const fill=$('base-average-fill');
+    if(fill)fill.style.width='0%';
+    text('base-average-count','Iniciando…');
+    text('base-average-state','Pidiendo el promedio al equipo…');
     try{
       renderAverage(await api('/api/base/survey','POST',{
         action:'start',
@@ -326,7 +341,17 @@
     text('role-detail','Cambiando a rover…');
     run({action:'rover'});
   });
-  $('role-refresh')?.addEventListener('click',()=>run({action:'query'}));
+  // Consultar el modo al abrir la pestaña: tener que pulsar un botón para saber
+  // en qué modo está el equipo no es informar, es delegar el trabajo.
+  let roleAsked=false;
+  document.querySelectorAll('[data-page="base"]').forEach((el)=>{
+    el.addEventListener('click',()=>{
+      if(roleAsked)return;
+      roleAsked=true;
+      run({action:'query'});
+    });
+  });
+  if(location.hash==='#base')setTimeout(()=>{roleAsked=true;run({action:'query'});},1200);
 
   buildRtcmGrid();
   loadProfiles();

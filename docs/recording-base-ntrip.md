@@ -16,7 +16,9 @@ Esta entrega agrega los apartados del panel, preparación y exportación de un p
 
 ## Alturas y coordenadas de base
 
-Guardar latitud/longitud en grados decimales, hemisferio por signo, sistema de referencia/datum y época de coordenadas cuando aplique, origen de las coordenadas y calidad estimada. No confundir época de coordenadas con hora UTC de una medición. Una transformación entre marcos de referencia necesita parámetros verificados; cambiar la etiqueta no transforma coordenadas.
+**Desde 0.6.2 la interfaz no pide datum ni época de coordenadas.** El marco es siempre WGS84 y la altura siempre elipsoidal, porque el equipo no transforma coordenadas: declarar otro marco no habría tenido efecto y sugería una conversión inexistente. Se guardan latitud y longitud en grados decimales con hemisferio por signo, altura elipsoidal del punto, altura vertical hasta la base del receptor y la calidad de la solución con que se obtuvo.
+
+El razonamiento original sigue siendo válido para cuando haya transformaciones: una conversión entre marcos necesita parámetros verificados, y cambiar la etiqueta no transforma coordenadas. No confundir época de coordenadas con hora UTC de una medición.
 
 La interfaz debe distinguir:
 

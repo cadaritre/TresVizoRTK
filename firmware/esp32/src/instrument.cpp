@@ -892,7 +892,20 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
     if(path=="/api/ntrip/sourcetable") return ntrip_input::sourcetableRequest(method,body,response);
     if(path=="/api/gnss/control") {
         if(method=="GET"){gnss_control::status(response.to<JsonObject>());return 200;}
-        if(method=="POST")return gnss_control::start(body,response);
+        if(method=="POST"){
+            // Cambiar de papel cierra la entrada de correcciones por su cuenta:
+            // pedirle al usuario que vaya a otra pestaña a detener algo que él
+            // no inició, para poder hacer lo que acaba de pedir, es trasladarle
+            // nuestro problema de orden interno.
+            const String action = body["action"] | "";
+            if(action=="rover" || action=="base"){
+                JsonDocument stopBody, ignored;
+                stopBody["action"] = "stop";
+                ntrip_input::request("POST", stopBody.as<JsonVariantConst>(), ignored);
+                correction_router::select("none");
+            }
+            return gnss_control::start(body,response);
+        }
         return 400;
     }
     // Configuración avanzada conocida del receptor: máscara, constelaciones,

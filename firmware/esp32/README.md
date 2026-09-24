@@ -1,6 +1,6 @@
 # Firmware inicial del instrumento
 
-Versión 0.6.0 para el ESP32-S3 conectado por USB. El perfil usa 4 MB de flash comprobados por esptool. La placa de referencia de PlatformIO aporta la configuración de CPU/USB; no identifica la carrier como DevKitC ni autoriza sus pines externos. PSRAM Quad de 2 MB habilitada, con prueba de integridad y métricas separadas de RAM interna.
+Versión 0.6.2 para el ESP32-S3 conectado por USB. El perfil usa 4 MB de flash comprobados por esptool. La placa de referencia de PlatformIO aporta la configuración de CPU/USB; no identifica la carrier como DevKitC ni autoriza sus pines externos. PSRAM Quad de 2 MB habilitada, con prueba de integridad y métricas separadas de RAM interna.
 
 ## Funciones del primer firmware
 
@@ -94,7 +94,11 @@ Desde la raíz, con el puente detenido:
 La prueba de hardware guarda ajustes temporales, reinicia el equipo y restaura los ajustes originales. No ejecutarla durante una operación de campo. Consultar los resultados y pendientes en `docs/firmware-validation.md`.
 
 
-## Cambio de clave del equipo (0.2.0)
+## Cambio de clave del equipo (0.2.0, retirado en 0.6.2)
+
+> **Esta sección es histórica.** Desde 0.6.2 no hay clave de panel y el
+> subcomando `set-access` se eliminó de `usb_console.py`. La contraseña del
+> Wi-Fi propio es la única credencial y se cambia desde Configuración.
 
 Con el puente detenido, ejecutar `python tools/usb_console.py set-access` e introducir dos veces la nueva clave en el prompt oculto. La operación solo existe por USB, requiere la clave actual (la consola la recupera por acceso físico), valida 8–63 caracteres ASCII imprimibles y reinicia después de guardar en NVS. Una solicitud inválida no cambia la clave. La clave anterior permanece activa hasta el reinicio; la nueva no se incluye en la respuesta ni en estado/configuración. No pasar credenciales como argumentos del shell ni guardarlas en el repositorio.
 
@@ -226,3 +230,155 @@ nivel *site*, de modo que PlatformIO falla al instalar las dependencias de
 de paquete se interrumpe, el toolchain queda a medio extraer y la compilación
 falla con `fatal error: stdint.h`; se corrige borrando
 `~/.platformio/packages/toolchain-xtensa-esp32s3` para que se reinstale.
+
+
+## Versión 0.6.2
+
+### El equipo se llama MeridianV
+
+Nombre y SSID fijos, no editables desde el panel: la red que emite tiene que ser
+reconocible en campo sin consultar a nadie. 3Vizo sigue siendo la marca del
+panel. **Sin sufijo de MAC**: dos equipos encendidos en la misma obra emitirán
+redes con nombre idéntico.
+
+### Se retiró la clave del panel
+
+El panel y la API **ya no piden clave**. `X-Device-Key`, el cambio de clave por
+USB y el diálogo de acceso desaparecieron. La contraseña del Wi-Fi propio es la
+única credencial del equipo, sale de fábrica como `TresVIzoRTK` y se cambia desde
+Configuración.
+
+Consecuencia que conviene tener presente: **la carga de firmware por OTA no lleva
+firma**, así que quien alcance la red del equipo puede sustituir su firmware.
+Decisión explícita del propietario para un instrumento de campo.
+
+### Bluetooth sin emparejamiento, con interruptor
+
+Se retiraron el PIN y el cifrado MITM. Cualquier equipo dentro del alcance puede
+conectarse y escribir en las características. A cambio, BLE se enciende y apaga
+desde Conexiones y ese ajuste se guarda en NVS.
+
+Se añadió una característica de salud (`a04c0006-…`) a 1 Hz con sigma horizontal
+y vertical en milímetros, antigüedad de correcciones, fuente activa y calidad de
+solución. El byte de IMU está reservado y vale siempre 0: **no hay IMU**.
+
+Las correcciones por BLE se rechazan mientras el receptor trabaja como base.
+
+### Redes Wi-Fi: hasta cinco, con autoconexión
+
+El equipo guarda cinco redes, escanea al encender y se une a la de mejor señal
+entre las que estén realmente a la vista. Cada red admite **dirección fija
+opcional** (IP, puerta de enlace y máscara) o DHCP; la dirección es por red y no
+global, porque con varias subredes una sola IP fija sería correcta en una y
+errónea en el resto. El equipo responde además a `meridianv.local`.
+
+| Ruta | Comportamiento |
+| --- | --- |
+| `GET /api/wifi/networks` | Redes guardadas, tope y dirección de cada una. |
+| `POST /api/wifi/networks` | `ssid`, `password`, `ip`, `gateway`, `mask` añade o edita; `forget` elimina. |
+| `POST /api/wifi/scan` | Inicia un escaneo asíncrono. **Interrumpe el AP propio** unos segundos. |
+| `GET /api/wifi/scan` | Estado y redes vistas, con señal y si ya están guardadas. |
+
+### Perfiles NTRIP y lista de puntos de montaje
+
+Cinco perfiles persistentes con contraseña. El equipo se reconecta solo al último
+usado, también tras un corte de corriente. «Ningún perfil» es una elección que
+también se guarda. La autoconexión no exige confirmar modo rover, al contrario
+que el arranque manual: pedirlo obligaría a tocar el panel tras cada reinicio.
+
+| Ruta | Comportamiento |
+| --- | --- |
+| `GET /api/ntrip/profiles` | Perfiles, tope, seleccionado y si hay autoconexión. |
+| `POST /api/ntrip/profiles` | `save`, `delete`, `select` (nombre nulo = ninguno) y `connect`. |
+| `POST /api/ntrip/sourcetable` | Pide al caster su lista de puntos. Requiere el flujo detenido. |
+| `GET /api/ntrip/sourcetable` | Puntos publicados, formato y si exigen GGA. |
+
+### Salida de correcciones
+
+Entrada y salida quedan separadas en el panel, con hueco previsto para radio en
+ambos sentidos. El RTCM que emite el receptor se reconstruye desde la UART y
+alimenta dos destinos simultáneos:
+
+| Ruta | Comportamiento |
+| --- | --- |
+| `GET/POST /api/ntrip/server` | Publicación hacia un caster externo (NTRIP v1, `SOURCE`). |
+| `GET/POST /api/ntrip/caster` | Caster propio del equipo, hasta dos rovers. |
+
+Ambos se guardan en NVS y **se reanudan tras un reinicio**. El juego de mensajes
+por defecto usa MSM7 (1005, 1033, 1077, 1087, 1097, 1127) para aprovechar la
+triple banda; MSM4 queda disponible por compatibilidad. Los mnemónicos MSM7 se
+añadieron por numeración estándar RTCM y **no se contrastaron con el manual
+Unicore**.
+
+**Sin verificar:** ni la publicación ni el caster se han probado contra un caster
+real o un rover. Solo consta que el caster abre el puerto y escucha.
+
+### Modo base reescrito
+
+- Marco **siempre WGS84** y altura **siempre elipsoidal**. Se retiraron los
+  campos de datum, época de coordenadas y «la altura corresponde a»: el equipo no
+  transforma coordenadas, así que declararlo no tenía efecto.
+- La altura introducida es la del punto en el suelo. Se le suma la altura de
+  antena medida y **10 cm de case**, constante declarada en `base_plan.h` que
+  **todavía no se ha medido sobre la carcasa real**.
+- Un solo botón: «Estacionar la base aquí» valida y envía. Antes había tres, y
+  uno exportaba un JSON que no salía del navegador.
+- El papel del receptor y el botón «Usar como rover» están arriba del todo.
+
+### Promedio de coordenadas en el ESP32
+
+`POST /api/base/survey` promedia en el controlador, no en el receptor. El UM980
+sabe promediar solo, pero no distingue con qué calidad lo hace ni avisa si la
+pierde: promediar cien épocas autónomas da una coordenada muy repetible y
+exactamente igual de equivocada.
+
+Se elige la calidad exigida (`rtk_fixed`, `rtk_float`, `standalone` o `any`) y el
+tiempo, de 5 a 900 s. **Si la calidad se pierde a mitad, el promedio se cancela y
+se explica por qué.** El panel muestra barra de progreso, épocas usadas y la
+coordenada que se va formando.
+
+### Precisión estimada
+
+Parser NMEA **GST** nuevo (`lib/gnss/src/nmea_gst.h`). `GET /api/status` añade
+`solution.horizontal_sigma_m` y `vertical_sigma_m`. Es la desviación típica que
+declara el receptor, no una exactitud comprobada contra una referencia externa.
+`telemetry` activa `GPGST COM2 1` junto a GGA: la sigma no cambia a 10 Hz.
+
+### Endurecimiento
+
+- **`SAVECONFIG` automático** tras cualquier cambio de configuración del receptor,
+  incluido el modo base. Sin esto, una base que perdía corriente volvía en el modo
+  anterior y seguía emitiendo correcciones desde una coordenada equivocada: los
+  rovers fijaban con buena pinta sobre un punto que no era.
+- **Watchdog activo** (`-DTRESVIZO_TASK_WDT`). Vigila la tarea de adquisición del
+  GPS; un bloqueo pasa de dejar el equipo sordo a reiniciarlo en segundos. **No
+  vigila** las tareas de NTRIP, de salida ni el bucle principal.
+- **Alarmas** en `GET /api/status` (`alerts`): receptor mudo, UART caída,
+  correcciones detenidas, sin redes guardadas, reinicio por pánico, por caída de
+  tensión o por watchdog, y las dos contradictorias —base con entrada de
+  correcciones activa, y publicación sin modo base—.
+- **La entrada NTRIP no arranca en un equipo configurado como base**, ni se
+  reanuda al encender si quedó así.
+- **Las consultas de solo lectura funcionan con correcciones activas.** Antes el
+  guardia bloqueaba también las lecturas, y no se podía saber en qué modo estaba
+  el receptor justo cuando más falta hacía.
+- La entrada NTRIP se suelta sola si pasa más de un minuto esperando red: dejarla
+  esperando fijaba el enrutador y bloqueaba configurar el GPS.
+
+### Verificación de esta entrega
+
+Comprobado sobre el equipo:
+
+- Compilación y carga; el panel reporta la versión que corre.
+- Escaneo Wi-Fi con 13 redes reales; guardar, olvidar y fijar o liberar dirección.
+- Reconexión completa tras reinicio: red guardada, perfil NTRIP, correcciones y
+  RTK flotante, sin intervención.
+- Precisión GST con valores reales; interruptor BLE encendiendo y apagando.
+- Caster local abriendo puerto y escuchando.
+- Watchdog sin reinicios espurios durante la prueba (minutos, no días).
+
+**No ejecutado:** estacionar una base, una pasada de promedio, publicación NTRIP,
+el caster sirviendo a un rover, lectura de sourcetable, resolución de
+`meridianv.local`, conexión con dirección fija aplicada, y los paquetes BLE, que
+necesitan una app que todavía no existe. `tests/hardware_smoke.py` **está roto**:
+usa la clave de acceso y el nombre editable, que ya no existen.

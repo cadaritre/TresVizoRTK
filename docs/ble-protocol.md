@@ -4,7 +4,7 @@
 
 Firmware 0.4.0 incorpora servicio GATT de control, respuestas fragmentadas, solución compacta y entrada RTCM3. La app de topografía no está implementada. Compilar o anunciar el servicio no demuestra entrega a 10 Hz por radio: falta prueba con cliente BLE y UART real. Las características no usan el protocolo propietario de Emlid.
 
-Emparejamiento LE Secure Connections, MITM, PIN de seis dígitos y bonding. Desde 0.5.0 el PIN se genera una vez, se conserva en NVS y se consulta con `GET /api/access` por USB físico (`ble_pairing_pin`), nunca por HTTP/BLE. Una conexión además necesita la clave del instrumento en solicitudes JSON. No publicar el PIN ni la clave en diagnósticos. La recuperación/cambio de clave sigue exclusivamente por USB.
+**Desde 0.6.2 no hay emparejamiento, PIN ni cifrado**: la app de campo se conecta de un toque y cualquier equipo dentro del alcance puede escribir en las características, incluidas las correcciones que van al receptor. Decisión explícita del propietario. Mitigaciones vigentes: el transporte se apaga desde Conexiones y el ajuste se persiste, y las correcciones por BLE se rechazan mientras el receptor trabaja como base. Hasta 0.6.1 existieron LE Secure Connections con MITM, PIN de seis dígitos en NVS y autenticación por clave del instrumento.
 
 ## UUID
 

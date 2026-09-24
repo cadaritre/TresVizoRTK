@@ -8,15 +8,28 @@ El objetivo de desarrollo es alcanzar aproximadamente 2 cm de precisión en cond
 
 ## Estado actual
 
-Ya existe una primera versión de firmware, compilada y cargada al ESP32-S3 conectado por USB. Incluye un panel web con la identidad de TresVizo, diagnóstico real y ajustes persistentes. En 0.5.0 se probaron el enlace UART con UM980, control BLE cifrado y 2 MB de PSRAM. La salida GGA por UART se comprobó a 10 Hz; la precisión y la telemetría de posición en exterior siguen pendientes. La entrada NTRIP está implementada, pendiente de prueba con caster real. IMU sigue sin integrar y microSD está preparada en código, deshabilitada hasta conectar y validar el hardware.
+El firmware **0.6.2** corre sobre el ESP32-S3 y el equipo se llama **MeridianV**.
+Panel web propio, sin clave de acceso: la contraseña del Wi-Fi del instrumento es
+su única credencial. Enlace UART con el UM980 verificado en ambos sentidos, GGA y
+GST a 10 Hz, precisión estimada en metros y solución RTK alcanzada con
+correcciones NTRIP reales.
 
-**0.6.0** añade una [auditoría del firmware con sus correcciones](docs/project-status.md), un [panel reorganizado para uso en campo](docs/panel-campo.md) y [configuración avanzada del receptor](docs/gps-advanced.md) con sintaxis verificada contra el manual Unicore N4. También separa la contraseña del Wi-Fi propio de la clave de la API: **al actualizar, el equipo genera una contraseña Wi-Fi nueva que debe leerse por USB**. Esta versión **no se ha compilado ni cargado al equipo**, y ninguno de sus comandos nuevos se ha ejecutado contra el UM980 real. No hay aplicación móvil ni diseño electrónico fabricable. La carcasa vigente es la [V2 mecánica](mechanical/v2/README.md), con módulos comerciales y una reserva de batería; todavía no se ha impreso ni ensayado físicamente.
+Funciona sin intervención tras un corte de corriente: el equipo recupera su red
+Wi-Fi guardada, reconecta el perfil NTRIP y vuelve a corregir solo. La
+configuración del receptor se graba en su memoria no volátil en cada cambio.
 
-Consulta las [instrucciones del firmware](firmware/esp32/README.md) y la [evidencia de validación](docs/firmware-validation.md).
+**Implementado pero sin probar contra hardware o servicio real:** publicación
+NTRIP hacia un caster, caster propio sirviendo a un rover, lectura de sourcetable,
+estacionamiento de base, promedio de coordenadas y los paquetes BLE de
+telemetría. Compilan y están cargados; nadie los ha ejecutado de principio a fin.
 
-Consulta [el estado detallado](docs/project-status.md) antes de interpretar cualquier elemento como funcional.
+**Sin integrar:** IMU (no hay hardware), radio UHF, firma de firmware y la
+aplicación móvil. La microSD está preparada en código y deshabilitada hasta
+validar el cableado. La carcasa vigente es la [V2 mecánica](mechanical/v2/README.md),
+todavía sin imprimir ni ensayar.
 
-**V2 mecánica, 22/09/2026:** [modelo, STEP/STL y montaje](mechanical/v2/README.md). Rediseño desde cero tras [auditar V1](mechanical/AUDITORIA-V1.md): pasa de Ø74 × 164 mm a **Ø54 × 107 mm**, de 231 a 101 cm³ de material, de 10 piezas impresas a 6 y de 19 tornillos con 13 tuercas a 11 tornillos con 2. El interior deja de tener alojamientos a la medida de cada componente y pasa a una rejilla de anclaje universal. **Nada se ha impreso ni ensayado**, y el montaje del inserto del jalón sigue sin resolver. Alimentación por [módulos comerciales](hardware/power-modules/README.md). Las referencias anteriores a una PCB personalizada son antecedentes.
+Detalle de cada entrega en el [README del firmware](firmware/esp32/README.md) y
+en el [estado del proyecto](docs/project-status.md).
 
 ## Alcance previsto
 

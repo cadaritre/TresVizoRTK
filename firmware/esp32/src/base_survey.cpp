@@ -1,6 +1,8 @@
 #include "base_survey.h"
 #include "gnss_receiver.h"
 #include "gnss_control.h"
+#include "ntrip_input.h"
+#include "correction_router.h"
 #include "config_rules.h"
 #include <Arduino.h>
 #include <atomic>
@@ -22,6 +24,14 @@ double antennaVertical = 0;
 // Sumas en doble precisión. A un metro de escala y unas miles de épocas no hay
 // pérdida apreciable, y evita el coste de un acumulador compensado.
 double sumLat = 0, sumLon = 0, sumHeight = 0;
+// El motivo del fallo vive fuera del atomic: este guarda el puntero y necesita
+// que la cadena siga existiendo.
+String failureText;
+JsonDocument stopRequest() {
+    JsonDocument body;
+    body["action"] = "stop";
+    return body;
+}
 uint32_t lastEpoch = UINT32_MAX;
 
 // La altura del case todavía no está medida. Hasta entonces se suma una
@@ -55,6 +65,13 @@ void begin() { state = "idle"; }
 bool active() { return !strcmp(state.load(), "averaging"); }
 
 void tick() {
+    // Esperando la confirmación del receptor tras enviar la coordenada.
+    if (!strcmp(state.load(), "applying")) {
+        if (gnss_control::busy()) return;
+        if (gnss_control::isBase()) stop("applied", "");
+        else stop("failed", "El receptor no confirmó el modo base. Consulta su estado en GPS avanzado.");
+        return;
+    }
     if (!active()) return;
     const auto snapshot = gnss_receiver::snapshot();
     const auto& s = snapshot.solution;
@@ -80,10 +97,26 @@ void tick() {
             // La coordenada promediada es la del receptor; lo que se declara a
             // la base es la altura del punto más la antena y el case.
             plan["arp_ellipsoid_height_m"] = sumHeight / samples + antennaVertical + kCaseOffsetM;
+            // Una base no consume correcciones, y tenerlas activas bloquea la
+            // aplicación del modo. Se cierran aquí en vez de fallar al final de
+            // un promedio de varios minutos por algo que sabíamos de antemano.
+            JsonDocument ignored;
+            ntrip_input::request("POST", stopRequest().as<JsonVariantConst>(), ignored);
+            correction_router::select("none");
             JsonDocument out;
             const int code = gnss_control::applyBase(plan.as<JsonVariantConst>(), out);
-            if (code == 202) stop("applied", "");
-            else stop("failed", "El receptor rechazó la coordenada promediada.");
+            if (code == 202) {
+                // Lanzado no es aplicado: el receptor todavía no ha contestado.
+                // Decir "applied" aquí era la misma mentira de siempre.
+                stop("applying", "Enviando la coordenada al receptor…");
+            } else {
+                // El motivo real, no uno inventado: antes decía que lo rechazaba
+                // el receptor cuando el receptor no había llegado a verlo.
+                failureText = out["message"].is<const char*>()
+                    ? String(out["message"].as<const char*>())
+                    : String("No se pudo aplicar la coordenada promediada.");
+                stop("failed", failureText.c_str());
+            }
         }
         return;
     }
@@ -141,9 +174,11 @@ int request(const String& method, JsonVariantConst body, JsonDocument& out) {
     if (action != "start") return 400;
     if (active()) { out["message"] = "Ya hay un promedio en curso."; return 409; }
     if (gnss_control::busy()) { out["message"] = "Espera a que termine la operación del GPS."; return 409; }
-    if (!body["seconds"].is<unsigned>() || body["seconds"].as<unsigned>() < 5 ||
+    // Dos segundos son 20 épocas a 10 Hz: con solución fija es un promedio
+    // legítimo, y exigir más era una regla inventada.
+    if (!body["seconds"].is<unsigned>() || body["seconds"].as<unsigned>() < 2 ||
         body["seconds"].as<unsigned>() > 900) {
-        out["message"] = "El tiempo de promedio va de 5 a 900 segundos."; return 400;
+        out["message"] = "El tiempo de promedio va de 2 a 900 segundos."; return 400;
     }
     if (!body["station_id"].is<unsigned>() || body["station_id"].as<unsigned>() > 4095) {
         out["message"] = "Identificador de estación: 0 a 4095."; return 400;

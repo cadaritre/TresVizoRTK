@@ -27,7 +27,7 @@ Desde la raíz:
 
 Salida local ignorada por Git: `data/local/releases/<versión>/firmware.bin` y `manifest.json`. Se conserva esquema de configuración NVS v1. Las futuras migraciones deben leer la versión anterior, validar en memoria, escribir atómicamente y mantener compatibilidad con rollback; no borrar ajustes para resolver una migración.
 
-Rutas: GET `/api/update`; POST `/api/update/begin` con `hardware_id,size,sha256`; `/chunk` con `session,offset,data` base64 (hasta 576 bytes decodificados); `/finish`, `/abort` con `session`; `/rollback`. El token de sesión no sustituye la clave de acceso. Firmware y API muestran versión y capacidades, no solo un número comercial.
+Rutas: GET `/api/update`; POST `/api/update/begin` con `hardware_id,size,sha256`; `/chunk` con `session,offset,data` base64 (hasta 576 bytes decodificados); `/finish`, `/abort` con `session`; `/rollback`. Desde 0.6.2 no existe clave de acceso: el token de sesión es lo único que ata los bloques a una carga concreta, y **la imagen no se verifica contra ninguna firma**. Quien alcance la red del equipo puede sustituir su firmware. Firmware y API muestran versión y capacidades, no solo un número comercial.
 
 ## Módulos y radios
 

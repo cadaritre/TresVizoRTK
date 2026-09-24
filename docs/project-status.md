@@ -97,6 +97,42 @@ El panel prioriza UART del ESP32 sobre el banco USB de la Mac. Pasaron las prueb
 - Pruebas: 24 comprobaciones API de servicios; 27 de operaciones; 29 de hardware; 14 Python GNSS y 3 NTRIP de banco. Parser de binario con sanitizadores y render GNSS JS superados. Primera prueba corta de frecuencia capturó transición; se añadió estabilización y cálculo por tiempo real del ESP32: 4.96 y 10.12 Hz en ventanas de unos 5 s. Pruebas históricas se actualizaron para UART activo y respuesta 503 de SD ausente.
 - Firmware instalado por OTA, arranque confirmado y ajustes conservados. Detalles y límites: [servicios del ESP32](esp32-services.md).
 
+## 0.6.2 — 2026-09-23: identidad, credenciales, salida de correcciones y endurecimiento
+
+Entrega larga con cambios de fondo. El equipo pasa a llamarse **MeridianV** y el
+nombre deja de ser editable.
+
+**Credenciales.** Se retira la clave del panel y el PIN de BLE por decisión
+expresa del propietario. Queda una sola credencial, la contraseña del Wi-Fi
+propio, con valor de fábrica conocido y editable desde Configuración. La firma de
+firmware se descartó para esta entrega al constatar que el repositorio es público
+y una clave privada dentro de él no protegería nada.
+
+**Conectividad.** Cinco redes Wi-Fi guardadas con autoconexión por mejor señal y
+dirección fija opcional por red; nombre mDNS `meridianv.local`. Cinco perfiles
+NTRIP persistentes con reconexión automática al último usado y lectura de la
+sourcetable del caster.
+
+**Salida de correcciones.** Publicación NTRIP hacia un caster externo y caster
+propio en el equipo, ambos persistentes y con reanudación tras reinicio.
+Selección de mensajes RTCM con juego por defecto MSM7 para triple banda.
+
+**Modo base.** Reescrito: marco WGS84 y altura elipsoidal fijos, sin datum ni
+época; promedio de coordenadas ejecutado en el ESP32 con filtro por calidad de
+solución y cancelación explicada si esa calidad se pierde. Constante de case de
+10 cm **declarada y sin medir**.
+
+**Endurecimiento.** `SAVECONFIG` automático en todo cambio del receptor, modo base
+incluido; watchdog de tarea activo; alarmas en `GET /api/status`, entre ellas las
+dos contradictorias (base consumiendo correcciones y publicación sin modo base).
+
+**Estado real:** verificado sobre el equipo el ciclo completo red → NTRIP →
+correcciones → RTK flotante tras reinicio, la precisión GST, el escaneo Wi-Fi, el
+interruptor BLE y que el caster local abre puerto. **Sin ejecutar ni una vez:**
+estacionar una base, una pasada de promedio, publicación NTRIP, el caster
+sirviendo a un rover, sourcetable, `meridianv.local` y los paquetes BLE.
+`tests/hardware_smoke.py` quedó roto al retirar la clave de acceso.
+
 ## 0.6.0 — 2026-09-20: auditoría del firmware, panel de campo y GPS avanzado
 
 Esta sección sustituye los estados anteriores de los componentes que menciona.

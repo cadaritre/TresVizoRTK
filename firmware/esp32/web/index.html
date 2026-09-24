@@ -389,7 +389,6 @@
             </div>
             <div class="button-row">
               <button class="button primary" type="button" id="role-use-rover">Usar como rover</button>
-              <button class="button secondary" type="button" id="role-refresh">Consultar al receptor</button>
             </div>
           </article>
           <div class="notice">«Estacionar la base aquí» envía la coordenada al receptor. Que la acepte no significa que sea exacta.</div>
@@ -399,12 +398,12 @@
           </div>
           <form id="base-plan-form" class="panel lower">
             <h2>Preparar estación base</h2>
-            <div class="button-row">
-              <button class="button secondary" type="button" id="base-use-current">
+            <div class="segmented" role="group" aria-label="Origen de la coordenada">
+              <button class="segment active" type="button" id="base-use-current">
                 Usar coordenada actual
               </button>
-              <button class="button secondary" type="button" id="base-use-average">
-                Promediar coordenadas
+              <button class="segment" type="button" id="base-use-average">
+                Promediar en el sitio
               </button>
             </div>
             <p class="hint" id="base-shortcut-hint">
@@ -413,7 +412,7 @@
               varios metros de error absoluto: los rovers serán coherentes entre
               sí, pero el conjunto estará desplazado respecto al terreno real.
             </p>
-            <label for="base-method">Origen de coordenadas</label><select id="base-method"><option value="known">Coordenadas conocidas</option><option value="average">Promedio del receptor</option></select>
+            <select id="base-method" hidden><option value="known">known</option><option value="average">average</option></select>
             <label for="base-id">Identificador de estación</label><input id="base-id" type="number" min="0" max="4095" step="1" value="1" required />
             <fieldset id="base-known"><legend>Coordenadas del punto</legend>
               <div class="two-columns"><div><label for="base-lat">Latitud (grados decimales)</label><input id="base-lat" type="number" min="-90" max="90" step="any" required /></div><div><label for="base-lon">Longitud (grados decimales)</label><input id="base-lon" type="number" min="-180" max="180" step="any" required /></div></div>
@@ -421,7 +420,7 @@
               <label for="base-antenna">Altura vertical hacia base de receptor (m)</label><input id="base-antenna" type="number" min="0" max="100" step="any" required /><small class="field-help">Medición vertical, no inclinada, desde el punto del terreno hasta la base del receptor. El equipo suma por su cuenta los 10 cm del case.</small>
             </fieldset>
             <fieldset id="base-average" hidden disabled><legend>Promediar en el sitio</legend>
-              <label for="base-seconds">Tiempo de promedio (s)</label><input id="base-seconds" type="number" min="5" max="900" step="1" value="60" required />
+              <label for="base-seconds">Tiempo de promedio (s)</label><input id="base-seconds" type="number" min="2" max="900" step="1" value="30" required />
               <label for="base-quality">Promediar solo con</label>
               <select id="base-quality">
                 <option value="rtk_fixed">Solución fija</option>
@@ -447,7 +446,7 @@
               <p id="base-average-state" role="status"></p>
               <input id="base-reuse" type="hidden" value="0" />
             </fieldset>
-            <div class="save-bar"><button class="button primary" type="submit">Estacionar la base aquí ↗</button></div>
+            <div class="save-bar" id="base-station-bar"><button class="button primary" type="submit">Estacionar la base aquí ↗</button></div>
             <p id="base-result" role="status">Prepara y revisa el plan; después puedes aplicarlo desde el control UART de esta página.</p>
           </form>
         <article class="panel lower"><h2>GPS conectado al ESP32</h2><p>Comandos por UART. La adquisición continúa durante las consultas. Cambios temporales: no se envía SAVECONFIG.</p><div class="button-row"><button class="button secondary" id="device-query">Consultar versión y modo</button><button class="button secondary" id="device-rover">Configurar rover</button></div><label for="device-hz">Frecuencia GGA</label><select id="device-hz"><option value="1">1 Hz</option><option value="2">2 Hz</option><option value="5">5 Hz</option><option value="10" selected>10 Hz</option><option value="20">20 Hz</option></select><button class="button secondary" id="device-rate">Aplicar frecuencia</button><p id="device-control-state"></p><p id="device-version"></p><p id="device-control-error" role="status"></p><p id="device-control-message" role="status"></p><button class="button primary" id="device-base-apply">Aplicar plan de base al ESP32</button><p id="device-base-message" role="status"></p><p>La lectura de modo base no verifica las coordenadas. No publicar correcciones hasta comprobar coordenadas, referencia de altura y convergencia.</p></article><article class="panel bench-panel" id="bench-base" hidden><h2>Aplicar al GPS por USB de la Mac</h2><p>La base conocida requiere WGS84 y altura elipsoidal. El promedio puede guardar coordenadas en la memoria del GPS y no garantiza precisión absoluta.</p><button class="button primary" type="button" id="bench-base-apply">Aplicar el plan validado al GPS USB</button><p id="bench-base-message" role="status"></p></article></section>

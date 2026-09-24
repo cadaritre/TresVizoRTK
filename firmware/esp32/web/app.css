@@ -1497,3 +1497,18 @@ fieldset:disabled { opacity: .65; }
 .role-current { display: flex; flex-direction: column; gap: 2px; }
 .role-current strong { font-size: 24px; }
 .role-panel .button-row { margin: 0; }
+
+/* Eleccion de origen de coordenada: es una opcion, no tres acciones sueltas. */
+.segmented { display: flex; flex-wrap: wrap; gap: 0; margin: 4px 0 14px; }
+.segmented .segment {
+  background: transparent;
+  border: 1px solid var(--line, #d8dde5);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  padding: 10px 16px;
+}
+.segmented .segment:first-child { border-radius: 10px 0 0 10px; }
+.segmented .segment:last-child { border-radius: 0 10px 10px 0; border-left-width: 0; }
+.segmented .segment.active { background: #281a39; border-color: #281a39; color: #fff; }

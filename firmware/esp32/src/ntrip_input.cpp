@@ -175,6 +175,14 @@ void worker(void*) {
  for(;;){
   // La sourcetable solo se pide cuando no hay flujo: comparten socket y radio.
   if(tableWanted && !wanted){fetchSourcetable(client);continue;}
+  // La autoconexion se decide al arrancar, cuando el modo del receptor todavia
+  // no se conoce. En cuanto se sabe que es base, se suelta: una base produce
+  // correcciones, no las consume, y ademas tenerlas activas bloquea configurarla.
+  if(wanted && gnss_control::isBase()){
+   wanted=false;++generation;correction_router::select("none");
+   failure="receiver_is_base";state="stopped";
+   continue;
+  }
   if(!wanted){state="stopped";vTaskDelay(pdMS_TO_TICKS(100));continue;}
   if(firmware_update::busy() || WiFi.status()!=WL_CONNECTED){
    // Esperar red es normal unos segundos tras encender. Un minuto entero ya no

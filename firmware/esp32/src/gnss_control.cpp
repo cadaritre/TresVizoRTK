@@ -21,6 +21,7 @@ bool sent=false, ack=false, readback=false, overflowed=false;
 uint32_t started=0, launched=0, job=0;
 std::atomic<uint32_t> modeAt{0};
 std::atomic<bool> running{false}, rover{false}, ellipsoid{false};
+bool bootQueried=false;
 const char* phase="idle";
 char line[1024]; size_t length=0;
 
@@ -152,6 +153,15 @@ void feed(const char* data, size_t size) {
 
 void tick(HardwareSerial& uart) {
     if(!mutex || xSemaphoreTake(mutex,portMAX_DELAY)!=pdTRUE)return;
+    // Preguntar el modo al arrancar, sin que nadie pulse nada. Sin esto el
+    // equipo no sabe si es base hasta que alguien lo consulta, y mientras tanto
+    // el cliente NTRIP se reconecta a una base que no necesita correcciones.
+    if(!bootQueried && !running && millis()>5000 && gnss_receiver::snapshot().enabled) {
+        bootQueried=true;
+        count=index=0;sent=ack=readback=false;overflowed=false;failure="";expectedMode="";action="query";
+        add("VERSIONA");add("MODE");
+        phase="running";running=true;++job;launched=millis();
+    }
     if(running) {
         if(millis()-launched>kJobBudgetMs) {
             finish("partial_or_unknown","Se agotó el tiempo del trabajo; consulta el estado antes de repetir.");
