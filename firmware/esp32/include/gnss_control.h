@@ -13,6 +13,9 @@ bool roverReady();
 // produce. Sin esta distincion el panel puede decir a la vez que es base y
 // que esta recibiendo correcciones, que no tiene sentido.
 bool isBase();
+// El modo leido, sin ventana de caducidad. roverReady() caduca a los 30 s
+// porque sirve para autorizar una conexion, no para informar del papel.
+bool isRover();
 const char* heightReference();
 int start(JsonVariantConst body, JsonDocument& out);
 int applyBase(JsonVariantConst plan, JsonDocument& out);

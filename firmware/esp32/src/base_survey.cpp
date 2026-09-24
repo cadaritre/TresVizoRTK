@@ -100,8 +100,7 @@ void tick() {
             // Una base no consume correcciones, y tenerlas activas bloquea la
             // aplicación del modo. Se cierran aquí en vez de fallar al final de
             // un promedio de varios minutos por algo que sabíamos de antemano.
-            JsonDocument ignored;
-            ntrip_input::request("POST", stopRequest().as<JsonVariantConst>(), ignored);
+            ntrip_input::releaseForBase();
             correction_router::select("none");
             JsonDocument out;
             const int code = gnss_control::applyBase(plan.as<JsonVariantConst>(), out);

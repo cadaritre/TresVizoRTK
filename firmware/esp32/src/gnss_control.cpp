@@ -138,6 +138,7 @@ void begin(){mutex=xSemaphoreCreateMutex();}
 bool busy(){return running;}
 bool roverReady(){return rover && !running && millis()-modeAt.load()<30000;}
 bool isBase(){return mode.startsWith("MODE BASE");}
+bool isRover(){return mode=="MODE ROVER SURVEY";}
 const char* heightReference(){return ellipsoid?"ellipsoidal_user_configured":"receiver_msl";}
 
 void feed(const char* data, size_t size) {

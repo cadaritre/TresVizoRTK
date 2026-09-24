@@ -30,6 +30,8 @@ size_t profileCount=0;
 // es una elección que se guarda: no es lo mismo que no haber elegido nunca.
 int lastUsed=-1;
 bool autoConnect=false;
+// El usuario pulso "Detener": no volver a conectar por nuestra cuenta.
+std::atomic<bool> userStopped{false};
 Preferences store;
 bool storeReady=false;
 
@@ -179,8 +181,16 @@ void worker(void*) {
   // no se conoce. En cuanto se sabe que es base, se suelta: una base produce
   // correcciones, no las consume, y ademas tenerlas activas bloquea configurarla.
   if(wanted && gnss_control::isBase()){
-   wanted=false;++generation;correction_router::select("none");
-   failure="receiver_is_base";state="stopped";
+   releaseForBase();
+   continue;
+  }
+  // Volver a rover devuelve las correcciones sin que nadie las pida otra vez:
+  // el perfil sigue elegido y el equipo ya no es base. Solo se respeta el
+  // silencio si fue el usuario quien detuvo la conexion.
+  if(!wanted && autoConnect && !userStopped && lastUsed>=0 && ready &&
+     !gnss_control::isBase() && gnss_control::isRover()){
+   applyProfile(profiles[lastUsed]);
+   correction_router::select("ntrip");++generation;wanted=true;state="starting";
    continue;
   }
   if(!wanted){state="stopped";vTaskDelay(pdMS_TO_TICKS(100));continue;}
@@ -248,6 +258,11 @@ void worker(void*) {
  }
 }
 }
+void releaseForBase(){
+ if(!wanted)return;
+ wanted=false;++generation;correction_router::select("none");
+ failure="receiver_is_base";state="stopped";
+}
 void begin(){
  lock=xSemaphoreCreateMutex();
  if(lock)ready=xTaskCreate(worker,"ntrip_rx",6144,nullptr,1,nullptr)==pdPASS;
@@ -270,7 +285,7 @@ void status(JsonObject out){out["state"]=state.load();out["error"]=failure.load(
 int request(const String& method,JsonVariantConst body,JsonDocument& out){
  if(method=="GET"){status(out.to<JsonObject>());return 200;}
  if(method!="POST"||!body.is<JsonObjectConst>())return 400;
- if(body["action"]=="stop" && body.size()==1){wanted=false;++generation;correction_router::select("none");xSemaphoreTake(lock,portMAX_DELAY);config.password="";xSemaphoreGive(lock);state="stopping";status(out.to<JsonObject>());return 200;}
+ if(body["action"]=="stop" && body.size()==1){userStopped=true;wanted=false;++generation;correction_router::select("none");xSemaphoreTake(lock,portMAX_DELAY);config.password="";xSemaphoreGive(lock);state="stopping";status(out.to<JsonObject>());return 200;}
  if(body["action"]!="start"||body.size()!=6||!valid(body["host"],128)||!valid(body["mountpoint"],96)||!valid(body["username"],64,true)||!valid(body["password"],128,true)||!body["port"].is<unsigned>()||body["port"].as<unsigned>()<1||body["port"].as<unsigned>()>65535)return 400;
  String host=body["host"].as<const char*>(),mount=body["mountpoint"].as<const char*>(),user=body["username"].as<const char*>();
  // Cast explicito: isalnum() con char con signo es comportamiento indefinido.
@@ -356,7 +371,7 @@ int profileRequest(const String& method,JsonVariantConst body,JsonDocument& out)
   // alguien pulse Detener: parece que el panel se averió.
   if(WiFi.status()!=WL_CONNECTED){out["message"]="El equipo no está conectado a ninguna red ahora mismo. Enciende tu hotspot y espera a que aparezca como conectado en Conexiones.";return 409;}
   if(active()||strcmp(state.load(),"stopped")!=0){out["message"]="Hay una conexión NTRIP activa. Pulsa «Detener» antes de cambiar de perfil.";return 409;}
-  lastUsed=index;autoConnect=true;persistProfiles();
+  lastUsed=index;autoConnect=true;userStopped=false;persistProfiles();
   applyProfile(profiles[index]);
   correction_router::select("ntrip");++generation;wanted=true;state="starting";
   // Devolver siempre la lista: el panel la repinta con esta respuesta y si solo

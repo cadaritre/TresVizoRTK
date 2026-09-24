@@ -582,7 +582,7 @@ void status(JsonDocument& response) {
     // Papel del receptor: sin esto el panel puede afirmar a la vez que el
     // equipo es base y que está recibiendo correcciones.
     response["receiver_role"] = gnss_control::isBase() ? "base"
-        : (gnss_control::roverReady() ? "rover" : "unknown");
+        : (gnss_control::isRover() ? "rover" : "unknown");
     correction_router::status(response["corrections"].to<JsonObject>());
     // Alarmas: lo que hay que mirar, no números que haya que interpretar. Los
     // dos fallos que más costaron en banco (receptor mudo y NTRIP esperando red
@@ -899,9 +899,7 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
             // nuestro problema de orden interno.
             const String action = body["action"] | "";
             if(action=="rover" || action=="base"){
-                JsonDocument stopBody, ignored;
-                stopBody["action"] = "stop";
-                ntrip_input::request("POST", stopBody.as<JsonVariantConst>(), ignored);
+                ntrip_input::releaseForBase();
                 correction_router::select("none");
             }
             return gnss_control::start(body,response);
@@ -915,6 +913,12 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
     if(path=="/api/base/apply" && method=="POST") {
         JsonDocument preview;int code=previewBase(body,preview);
         if(code!=200){response=preview;return code;}
+        // Misma razón que al cambiar de papel: estacionar una base con una
+        // entrada de correcciones abierta es contradictorio, y hacer que el
+        // usuario vaya a cerrarla a otra pestaña es trasladarle nuestro orden
+        // interno. Se cierra aquí.
+        ntrip_input::releaseForBase();
+        correction_router::select("none");
         return gnss_control::applyBase(preview["plan"],response);
     }
     if (path == "/api/corrections/source") {

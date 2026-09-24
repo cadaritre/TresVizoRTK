@@ -36,6 +36,10 @@ CasterConfig casterConfig;
 std::atomic<bool> casterWanted{false};
 std::atomic<const char*> casterState{"stopped"};
 std::atomic<uint32_t> casterClients{0},casterFrames{0};
+// Tramas RTCM capturadas del receptor. Sin este contador no habia forma de
+// distinguir "la base no emite" de "nadie se ha conectado a recogerlo".
+std::atomic<uint32_t> captured{0};
+std::atomic<uint32_t> lastCapture{0};
 WiFiServer* listener=nullptr;
 WiFiClient clients[kMaxClients];
 uint16_t listeningPort=0;
@@ -230,6 +234,7 @@ void begin(){
 
 void publish(const uint8_t* frame,size_t length){
  if(!ready||!length||length>sizeof(Frame::bytes))return;
+ captured.fetch_add(1);lastCapture=millis();
  if(!serverWanted&&!casterWanted)return; // nadie escucha: no llenar la cola
  Frame item;item.length=uint16_t(length);
  memcpy(item.bytes,frame,length);
@@ -240,6 +245,10 @@ bool active(){return serverWanted||casterWanted;}
 
 void status(JsonObject out){
  out["available"]=ready;
+ // Lo que el receptor produce, independientemente de si alguien lo consume.
+ out["frames_from_receiver"]=captured.load();
+ const uint32_t mark=lastCapture.load();
+ if(mark) out["last_frame_age_ms"]=millis()-mark; else out["last_frame_age_ms"]=nullptr;
  JsonObject server=out["ntrip_server"].to<JsonObject>();
  server["enabled"]=serverWanted.load();
  server["state"]=serverState.load();
