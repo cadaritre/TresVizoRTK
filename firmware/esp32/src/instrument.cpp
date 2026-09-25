@@ -11,6 +11,7 @@
 #include "config_rules.h"
 #include "base_plan.h"
 #include "base_survey.h"
+#include "telemetry_ws.h"
 
 #include <Preferences.h>
 #include <WiFi.h>
@@ -583,6 +584,11 @@ void status(JsonDocument& response) {
     // equipo es base y que está recibiendo correcciones.
     response["receiver_role"] = gnss_control::isBase() ? "base"
         : (gnss_control::isRover() ? "rover" : "unknown");
+    // Telemetría empujada por Wi-Fi. Va anunciada en el estado para que la app
+    // **no tenga que adivinar** si este firmware la trae: un cliente que abre
+    // un WebSocket a ciegas contra una versión antigua se queda esperando sin
+    // saber por qué, y acaba enseñando una posición congelada.
+    telemetry_ws::status(response["telemetry_stream"].to<JsonObject>());
     correction_router::status(response["corrections"].to<JsonObject>());
     // Alarmas: lo que hay que mirar, no números que haya que interpretar. Los
     // dos fallos que más costaron en banco (receptor mudo y NTRIP esperando red

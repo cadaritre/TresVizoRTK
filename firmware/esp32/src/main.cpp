@@ -8,6 +8,7 @@
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include <esp_http_server.h>
+#include "telemetry_ws.h"
 #include <freertos/semphr.h>
 #include "config_rules.h"
 #include "instrument.h"
@@ -199,11 +200,21 @@ void setup() {
     httpd_config_t configuration = HTTPD_DEFAULT_CONFIG();
     configuration.uri_match_fn = httpd_uri_match_wildcard;
     configuration.stack_size = 8192;
-    configuration.max_open_sockets = 4;
+    // Siete y no cuatro: el WebSocket de telemetría ocupa uno **de forma
+    // permanente**, y con cuatro en total una descarga de grabación y el panel
+    // abierto bastaban para que el purgado LRU echara al teléfono que estaba
+    // midiendo. Cada socket cuesta memoria, pero echar al que mide no es un
+    // compromiso aceptable.
+    configuration.max_open_sockets = 7;
     configuration.lru_purge_enable = true;
     configuration.recv_wait_timeout = 2;
     configuration.send_wait_timeout = 2;
     if (httpd_start(&server, &configuration) == ESP_OK) {
+        // **Antes del comodín, y no es un detalle de estilo.** El servidor
+        // compara las rutas en el orden en que se registran, y "/*" engancha
+        // todo: registrada después, la ruta del WebSocket no se alcanzaría
+        // nunca y el apretón de manos se contestaría con un 404 en JSON.
+        telemetry_ws::begin(server);
         for (const httpd_method_t method : {HTTP_GET, HTTP_PUT, HTTP_POST}) {
             httpd_uri_t route = {};
             route.uri = "/*";
@@ -219,6 +230,7 @@ void loop() {
     if (instrumentMutex) {
         pollSerial();
         ble_transport::tick();
+        telemetry_ws::tick();
         if (xSemaphoreTake(instrumentMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
             instrument::tick();
             // Bajo el mutex: el promedio puede terminar aplicando modo base, y
