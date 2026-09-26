@@ -483,16 +483,18 @@ class CablePath:
 
         def pt(th):
             return c - n * (r * math.cos(th)) + self.t * (r * math.sin(th))
-        self.edges.append(Part.Arc(self.p, pt(a / 2), pt(a)).toShape())
+        end = pt(a)
+        self.edges.append(Part.Arc(self.p, pt(a / 2), end).toShape())
         self.t = (n * math.sin(a) + self.t * math.cos(a)).normalize()
-        self.p, self.length = pt(a), self.length + r * a
+        self.p, self.length = end, self.length + r * a
         return self
 
-    def pipe(self, radius):
-        e0 = self.edges[0]
+    def pipe(self, radius, skip=0):
+        edges = self.edges[skip:]
+        e0 = edges[0]
         circ = Part.Wire(Part.makeCircle(radius, e0.valueAt(e0.FirstParameter),
                                          e0.tangentAt(e0.FirstParameter)))
-        return Part.Wire(self.edges).makePipeShell([circ], True, True)
+        return Part.Wire(edges).makePipeShell([circ], True, True)
 
 
 def rot(v):
@@ -504,7 +506,8 @@ def rot(v):
 sx, sy, sz = A['salida_cable']
 R_B = CB['radio_curvatura']
 tilt = math.radians(CB['inclinacion_curva'])
-path = CablePath(rot(V(sx, sy, Z_SEAT + sz)), rot(V(0, -1, 0)))
+exit_point = rot(V(sx, sy, Z_SEAT + sz))
+path = CablePath(exit_point, rot(V(0, -1, 0)))
 path.arc(R_B, 180, rot(V(-math.sin(tilt), 0, -math.cos(tilt))))
 # Cruza bajo la caja hacia +Y y baja por la muesca de la repisa del IMU.
 path.line(max(0.0, (CB['y_bajada'] - R_B) - path.p.y))
@@ -512,7 +515,9 @@ path.arc(R_B, 90, V(0, 0, -1)).line(CB['tramo_final'])
 cable = path.pipe(CB['diametro'] / 2)
 cable_hits = {
     'tapa_plato': vol(cable, lid),
-    'antena': vol(cable, ant_rigid),
+    # Junto a la salida el STEP ya dibuja el arranque del cable: se excluye
+    # una esfera de 1.6 mm alrededor de ese punto.
+    'antena': vol(cable, ant_rigid.cut(Part.makeSphere(1.6, exit_point))),
     'tubo': vol(cable, v21_parts['02-logo-tube']),
     'trineo': vol(cable, v21_parts['04-universal-sled']),
 }
@@ -610,10 +615,13 @@ doc.saveAs(str(OUT / 'TresVizo-DomeOption.FCStd'))
 
 exports = []
 for fname, shape in (('07-oem-antenna-lid', lid), ('08-oem-dome', dome)):
-    mesh = MeshPart.meshFromShape(Shape=shape, LinearDeflection=0.05,
-                                  AngularDeflection=0.25, Relative=False)
-    mesh.write(str(OUT / 'stl' / f'{fname}.stl'))
     shape.exportStep(str(OUT / 'step' / f'{fname}.step'))
+    # Malla desde el STEP releido: la teselacion del solido en memoria dejaba
+    # triangulos degenerados en los chaflanes pequenos del domo.
+    mesh = MeshPart.meshFromShape(Shape=Part.read(str(OUT / 'step' / f'{fname}.step')),
+                                  LinearDeflection=0.05, AngularDeflection=0.25,
+                                  Relative=False)
+    mesh.write(str(OUT / 'stl' / f'{fname}.stl'))
     closed = mesh.isSolid() and not mesh.hasNonManifolds() and not mesh.hasSelfIntersections()
     exports.append({'pieza': fname, 'triangulos': mesh.CountFacets, 'cerrada': bool(closed)})
     if not closed:

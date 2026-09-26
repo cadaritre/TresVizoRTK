@@ -11,8 +11,10 @@ eso no es validación.
 
 ## Por qué
 
-La HA-901A es una copia de una hélice de dron: su centro de fase, según el
-fabricante del original, solo es repetible «a nivel de centímetro». La
+La hélice actual lleva en la etiqueta «HA-901A» (foto del propietario del
+24-09-2026) y se vende como reemplazo de la Harxon HX-CH7609A, de dron. Para
+esa antena, [Harxon declara](https://en.harxon.com/product/detail/d-helix-antenna-hx-ch7609a.html)
+una repetibilidad del centro de fase «a nivel de centímetro». La
 [ArduSimple OEM Survey Tripleband](https://www.ardusimple.com/product/oem-survey-tripleband-gnss-antenna/)
 (AS-ANT3B-OEMSUR-L1L2L5-02SMA-00, 99 €) es una antena de topografía de
 triple banda pensada para integrarse dentro de una carcasa: declara ±3 mm de
@@ -31,10 +33,13 @@ Resto de piezas: las de [V2.1](../v2.1/generated/stl/), menos `03-tapa-antena`.
 color claro, sin cargas de carbono ni metálicas y sin pintura metálica.
 
 Los soportes se aceptan donde lo justifica la estética. El domo curvo escurre el
-agua y el cuenco a 35° deja la cabeza unos 12 mm más baja que a 45°. Ninguna cara
-exterior lleva soportes; la comprobación lo mide en el domo. El escalón donde
-apoya el domo cuelga 2.8 mm en la impresión boca abajo, pero queda tapado por la
-falda.
+agua y el cuenco a 35° deja la cabeza unos 11 mm más baja que a 45°.
+
+- **Domo:** por fuera no pide ningún soporte; la comprobación lo mide.
+- **Tapa-plato:** por fuera quedan tres voladizos cortos que se imprimen **sin
+  soporte**: el escalón donde apoya el domo (2.8 mm), un flanco de la ranura de la
+  junta (1.25 mm) y la cara de los tres dientes (2.5 mm). Los tres quedan tapados
+  al montar.
 
 ## Medidas
 
@@ -61,16 +66,21 @@ El STEP no se incluye en el repositorio porque es de ArduSimple.
    entradas, girar hasta el tope y el M3 del seguro (mismo tornillo, mismo
    ángulo).
 2. Pasar el SMA del coaxial por el cuenco hasta el tubo. Sale del costado de la
-   caja hacia −Y. Bajarlo por el cuenco dejando una curva amplia, sin doblarlo
-   en seco, y dentro del tubo **por el lado +Y**, por fuera de la repisa del
-   IMU, hasta el UM980. Son 20 cm de cable.
+   caja hacia −Y: hacer la curva en U inclinada hacia −X, cruzar bajo la caja
+   hacia +Y y bajar por la **muesca +Y de la repisa del IMU** hasta el UM980.
+   Con radio de curvatura de **13 mm** no toca nada (comprobado, 145 mm de
+   recorrido de los 200); con 14 ya roza.
 3. Antena sobre el aro: seis **M3×8 cabeza botón** desde arriba, que roscan en
    las torres.
-4. Junta tórica en su ranura: **sección 2 mm, diámetro interior de 130 a 133 mm**
-   (NBR).
-5. Domo: bajarlo sobre la junta hasta que la falda apoye en el escalón. Tres
-   **M3×10 cabeza botón** radiales. Van por debajo de la junta y en pilotos
-   ciegos, así que el agua no encuentra camino al interior.
+4. Junta tórica **130 × 2 mm NBR**, engrasada, en su ranura. Se estira un 2.7 %
+   y no se sale al bajar el domo.
+5. Domo: bajarlo sobre la junta hasta que la falda apoye en el escalón; la
+   falda tiene entrada suave y los pasos de tornillo el canto matado para no
+   pellizcarla. Tres **M3×10 cabeza botón** radiales. Van por debajo de la junta
+   y en pilotos ciegos, así que el agua no encuentra camino al interior.
+
+**Tornillería:** 6 × M3×8 cabeza botón (antena), 3 × M3×10 cabeza botón (domo),
+1 × M3×12 cabeza botón (seguro, el mismo de V2.1), junta 130 × 2 NBR.
 
 ## Lo que se comprueba al generar
 
@@ -80,7 +90,10 @@ de la antena:
 - las dos piezas son sólidos únicos y válidos, con mallas cerradas;
 - **cero interferencias**: tapa-plato con tubo y trineo, domo con tapa-plato y
   tubo, antena con tapa-plato y domo;
-- el elemento radiante queda al menos a 6 mm del domo;
+- el elemento radiante queda al menos a 6 mm del domo, y la caja del LNA a más de
+  1.5 mm de la tapa-plato (2.8);
+- un coaxial de 2.2 mm con radio de curvatura de 13 mm llega de la antena al tubo
+  sin tocar tapa-plato, antena, tubo ni trineo;
 - el tornillo del seguro atraviesa el tubo y entra en el piloto de la tapa-plato
   sin tocar pared, con plástico para la rosca;
 - el domo no pide soportes por fuera.
@@ -91,13 +104,14 @@ El resultado queda en [`generated/checks.json`](generated/checks.json).
 
 - **Sin imprimir ni ensayar.** Ajuste de la junta, estanqueidad, resistencia a
   caídas y temperatura: sin datos.
-- **Alimentación de la antena:** la ArduSimple admite **3 a 5.5 V**; la HA-901A
-  admitía 3–16 V. Comprobar la tensión que da la carrier del UM980 en su SMA.
+- **Alimentación de la antena:** la ArduSimple admite **3 a 5.5 V**; la etiqueta
+  de la HA-901A dice 3–16 V. Comprobar la tensión que da la carrier del UM980 en
+  su SMA.
 - **La junta depende de la impresora:** con ±0.2 mm en diámetros, el prensado va
   del 12 al 32 %. Probar con una junta antes de fiarse.
-- **El recorrido del cable no está modelado:** el STEP lo dibuja recto y fuera
-  del equipo. El cuenco deja espacio de sobra, pero hay que comprobarlo con el
-  cable real.
+- **El recorrido del cable es un modelo:** se comprueba un camino concreto con
+  radio de 13 mm. El cable real puede ir por otro; si su radio mínimo es mayor de
+  13 mm, no cabe.
 - **Centro de fase:** la antena no trae calibración NGS. El PCO se mide con el
   **domo puesto**, porque el domo también lo mueve.
 - Sigue vigente el pendiente del inserto del jalón de V2.1.
@@ -114,4 +128,5 @@ export PYTHONPATH=/Applications/FreeCAD.app/Contents/Resources/lib
 Sin `--antena-step`, las comprobaciones usan la envolvente medida de la antena.
 En Windows o Linux, basta el Python de FreeCAD sin `PYTHONPATH`.
 
-Para verlo con colores: abrir `view_dome.py` desde FreeCAD.
+Para verlo con colores: abrir `view_dome.py` desde FreeCAD. El ensamble es
+`generated/TresVizo-DomeOption.FCStd`.

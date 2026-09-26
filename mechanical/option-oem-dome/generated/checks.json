@@ -2,12 +2,12 @@
  "tapa_plato": {
   "solidos": 1,
   "valido": true,
-  "volumen_cm3": 103.01
+  "volumen_cm3": 109.43
  },
  "domo": {
   "solidos": 1,
   "valido": true,
-  "volumen_cm3": 59.51
+  "volumen_cm3": 59.16
  },
  "interferencias_mm3": {
   "tapa_plato-tubo": 0.0,
@@ -20,12 +20,25 @@
  "holguras_mm": {
   "elemento_a_domo": 6.12,
   "antena_completa_a_domo": 3.24,
-  "antena_a_tapa_plato": 0.0
+  "caja_lna_a_tapa_plato": 2.82
+ },
+ "cable": {
+  "diametro_mm": 2.2,
+  "radio_curvatura_mm": 13.0,
+  "largo_recorrido_mm": 144.9,
+  "largo_cable_mm": 200.0,
+  "choques_mm3": {
+   "tapa_plato": 0.0,
+   "antena": 0.0,
+   "tubo": 0.0,
+   "trineo": 0.0
+  },
+  "pasa": true
  },
  "seguro": {
   "angulo": 193.0,
   "choque_del_nucleo_mm3": 0.0,
-  "plastico_para_la_rosca_mm3": 11.7,
+  "plastico_para_la_rosca_mm3": 16.1,
   "alineado": true
  },
  "voladizos": {
@@ -99,7 +112,8 @@
     }
    ]
   },
-  "domo_exterior_con_soporte_mm2": 0.0
+  "domo_exterior_con_soporte_mm2": 0.0,
+  "tapa_plato_exteriores": "escalon del domo (2.8 mm), flanco de la ranura de la junta (1.25 mm) y cara superior de los tres dientes (2.5 mm): voladizos cortos, sin soporte; quedan tapados por el domo o dentro del tubo"
  },
  "junta": {
   "fondo_ranura_diametro_mm": 133.5,
@@ -122,12 +136,12 @@
  "exportes": [
   {
    "pieza": "07-oem-antenna-lid",
-   "triangulos": 8766,
+   "triangulos": 8768,
    "cerrada": true
   },
   {
    "pieza": "08-oem-dome",
-   "triangulos": 46058,
+   "triangulos": 47040,
    "cerrada": true
   }
  ]
