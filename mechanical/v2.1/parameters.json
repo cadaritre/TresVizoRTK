@@ -1,0 +1,319 @@
+{
+ "units": "mm",
+ "criterio": [
+  "V2.1 = V2 con 15 mm mas de diametro, 30 mm mas de altura y un trineo rigido y",
+  "centrado: pie atornillado a la base, cuatro pestanas, placa de 4 mm con alas y",
+  "una repisa en disco que el cuello de la tapa centra al cerrar.",
+  "El interior sigue SIN alojamientos con forma de componente: rejilla de anclaje",
+  "universal. Solo tres cosas tienen posicion definida: antena, rosca 5/8 e IMU.",
+  "Los tornillos de la carcasa roscan en el plastico. Excepciones: el IMU lleva",
+  "tuercas y los de la antena roscan en la propia antena."
+ ],
+ "tubo": {
+  "diametro_exterior": 69.0,
+  "pared": 2.5,
+  "_nota_diametro": "V2.1: 54 -> 69 mm por peticion del propietario (15 mm mas ancho). El paso libre de montaje lo fija el collar de bayoneta (radio interior 28.5): todo lo que va en el trineo debe caber en r <= 27.9. La bateria 955565 nominal (55 x 9.5) centrada deja 0.6 mm en las esquinas; la del peor caso documentado (55.5 x 10), 0.3 mm. Ver capacity_check.py.",
+  "chaflan_inferior": 2.0,
+  "ranuras_decorativas_z": [
+   18.0,
+   20.5,
+   23.0,
+   116.0,
+   118.5,
+   121.0,
+   123.5
+  ],
+  "ranura_decorativa_ancho": 1.4,
+  "ranura_decorativa_profundidad": 0.5,
+  "_nota_ranuras": "Grupos de lineas circunferenciales arriba y abajo, fuera del panel y del logo. El grupo superior sube 30 mm con el cuerpo.",
+  "lineas_verticales": {
+   "angulos": [
+    126.0,
+    135.0,
+    144.0,
+    153.0,
+    162.0,
+    171.0,
+    180.0,
+    205.0,
+    214.0,
+    223.0,
+    232.0,
+    241.0
+   ],
+   "z": [
+    30.0,
+    110.0
+   ],
+   "ancho": 1.3,
+   "profundidad": 0.5,
+   "_nota": "Sectores libres entre el panel principal (57-123), el seguro (193) y el logo."
+  },
+  "chaflan_voladizos": true,
+  "_nota_chaflan": "Chaflan a 45 grados en la cara inferior de los salientes interiores: collar superior de bayoneta y engrosamiento de los paneles. Imprimiendo el tubo de pie esas caras cuelgan. No se aplica a las ranuras de bayoneta: ahi apoya el diente y un chaflan le quitaria agarre."
+ },
+ "rejilla_anclaje": {
+  "_que_es": "Ranuras pasantes repetidas en el trineo. Una brida entra por cualquier par y sujeta lo que sea contra el plano de apoyo.",
+  "paso_longitudinal": 10.0,
+  "ranura_ancho": 4.5,
+  "ranura_alto": 2.6,
+  "separacion_transversal": [
+   12.0,
+   26.0
+  ],
+  "borde_minimo": 3.0,
+  "inicio": 6.0,
+  "fila_superior": 2.5,
+  "_nota": "Columnas a +-6 y +-13: 2.5 mm de pared entre ranuras (con [12, 22] quedaban 0.5 mm). Primera fila a 6 mm sobre el pie, debajo de la bateria, y una fila extra a 2.5 mm del borde superior de la placa, encima de ella: la bateria se amarra A LO LARGO por esas dos filas, nunca rodeando su ancho, porque en los cantos solo le quedan 0.3-0.6 mm hasta el collar."
+ },
+ "trineo": {
+  "ancho": 56.0,
+  "espesor": 4.0,
+  "desplazamiento_y": 7.0,
+  "zona_bateria": 87.0,
+  "zona_imu": 27.0,
+  "holgura_lateral": 0.6,
+  "_nota": "Placa DESPLAZADA del eje a proposito: la bateria (9.5 de espesor nominal) se amarra contra la cara -Y y queda centrada en el eje, que es lo unico que cabe por el collar. Cara -Y de la placa en y=5.0; la placa llega a y=9.0.",
+  "_nota_espesor": "4 mm en vez de 3: la placa de V2 se doblaba con la mano.",
+  "alas": {
+   "_que_es": "Dos alas longitudinales en la cara +Y, de pie a repisa. Convierten la placa en un perfil en U: es lo que de verdad quita la flexion.",
+   "profundidad": 6.0,
+   "espesor": 2.5,
+   "x_exterior": 23.4,
+   "_nota": "x_exterior sale de que la esquina exterior del ala (x, 9+6) quede dentro de r=27.9, el paso libre del collar. Entre alas quedan 41.8 mm libres para placas."
+  },
+  "pie": {
+   "_que_es": "Pie horizontal que apoya plano sobre el piso de la base y se atornilla a ella. Sustituye a las dos pestanas sueltas de V2: el trineo queda rigido y perpendicular.",
+   "espesor": 3.0,
+   "vuelo": 10.0,
+   "radio_libre_centro": 10.5,
+   "_nota_centro": "Hueco central libre: el esparrago del jalon puede asomar por encima del inserto; ni el pie ni la placa deben estorbarle.",
+   "_nota_tornillos": "Dos M3 de cabeza boton bajan por el pie, por la cara +Y entre las alas, y roscan en el piso de la base. Ahi quedan a 1.7 mm (cresta de rosca) del alojamiento de la brida del inserto y lejos del seguro de 193 grados. En la primera version de V2.1 estaban en (+-20, -1): 0.4 mm de pared contra ese alojamiento y 0.5 mm contra el seguro. Se ponen antes que las placas.",
+   "tornillo_paso": 3.3,
+   "tornillo_piloto": 2.5,
+   "tornillo_profundidad": 9.0,
+   "tornillos": [
+    [
+     -16.0,
+     14.5
+    ],
+    [
+     16.0,
+     14.5
+    ]
+   ]
+  },
+  "pestanas": {
+   "_que_es": "Cuatro pestanas bajo la placa entran en sus ranuras del piso de la base. Ubican; el apriete lo dan los tornillos del pie.",
+   "x": [
+    -22.5,
+    -12.5,
+    12.5,
+    22.5
+   ],
+   "ancho": 5.0,
+   "alto": 2.5,
+   "holgura": 0.3,
+   "_nota": "Simetricas en X: la posicion la fija el desplazamiento de la placa. Girado 180 grados el trineo cae en y=-7 y no entra. Altas 2.5: bajo las dos centrales solo hay 3.9 mm de base hasta el alojamiento de la brida del inserto."
+  },
+  "cartelas": {
+   "_que_es": "Cartelas triangulares entre pie y placa por la cara -Y. Por la +Y ya trabajan las alas.",
+   "x": [
+    -18.0,
+    18.0
+   ],
+   "alto": 10.0,
+   "fondo": 8.0,
+   "espesor": 2.5,
+   "_nota": "A 18 del centro: fuera de las ranuras de +-13 de la rejilla y dentro del ancho de la bateria, que apoya encima."
+  },
+  "_nota_zonas": "87 + 27 en vez de 102 + 12: misma altura total, pero el IMU baja 15 mm. Sobre el IMU quedan unos 18 mm hasta la tapa, sitio para el conector SMA acodado del coaxial de la antena, que baja por el eje. Con 12 mm (V2) el conector caia encima del IMU. La placa mas corta ademas flexa menos."
+ },
+ "imu": {
+  "ajuste_lateral": 1.5,
+  "agujeros_separacion": 18.5,
+  "agujeros_diametro": 3.0,
+  "espesor_repisa": 3.0,
+  "tornillo": "M2 con arandela y tuerca",
+  "_nota": "PCB ACOSTADO sobre repisa horizontal, centrado en el eje, con ajuste en X y en Y. De canto pedia 29 mm de altura.",
+  "marca_eje_diametro": 3.0,
+  "pcb_separadores": 2.5,
+  "_nota_marca": "Agujero pasante de 3 mm en el eje exacto del cuerpo. Quita material en vez de anadirlo: un resalte estorbaria al PCB y quedaria tapado por el. Con el PCB elevado sobre los dos separadores se puede mirar a traves del agujero y comprobar el centrado con el sensor ya montado.",
+  "marca_eje_pasante": true,
+  "metrica": "M2",
+  "tornillo_paso": 2.4,
+  "_nota_metrica": "M2 en vez de M2.5: los agujeros del BMI088 son de 3.0 y admiten M2 de sobra con arandela, y el M2 se consigue en cualquier kit de hobby. El M3 no pasa: 3.0 contra 3.0 no deja holgura.",
+  "holgura_cuello": 0.3,
+  "chaflan_repisa": 1.0,
+  "_nota_centrado": "La repisa es un disco recortado al taladro del cuello de la tapa con 0.3 de holgura radial, con chaflan en su canto superior, y una muesca en el sector +Y (60-120 grados, desde r=18) para el coaxial y los cables del IMU. El cuello de la tapa se alarga hacia abajo (bayoneta.cuello_extra) hasta rodear la repisa. Al bajar la tapa, el chaflan de entrada del cuello empuja el disco al centro; es un cono y no depende del angulo, porque la tapa todavia gira 28.7 grados al cerrar. En la primera version de V2.1 la repisa era un rectangulo heredado de V2 que no llegaba al cuello: 4.5 mm de juego.",
+  "repisa": "disco",
+  "muesca_cables": {
+   "angulos": [
+    60.0,
+    120.0
+   ],
+   "radio_interior": 18.0
+  }
+ },
+ "antena": {
+  "diametro_asiento": 47.0,
+  "circulo_pernos": 26.6,
+  "numero_pernos": 3,
+  "angulo_inicial": 90.0,
+  "_nota": "Parametrico a proposito. La HA-901A no esta confirmada: si llega otra se cambian estos numeros y se reimprime SOLO la tapa.",
+  "_nota_piloto": "2.1 de piloto para que el M2.5 rosque en el plastico. Sin tuercas.",
+  "montaje": "exterior",
+  "paso_coaxial": 12.0,
+  "espesor_tapa": 5.0,
+  "_nota_montaje": "La antena se atornilla SOBRE la cara superior de la tapa, no dentro. La tapa no necesita cavidad: solo los tres pilotos y un paso central para el coaxial. Esto quita 42 mm de altura al equipo.",
+  "metrica": "M2.5",
+  "perno_paso": 2.9,
+  "_nota_metrica": "M2.5 lo impone la ANTENA, no el diseno: la HA-901A trae tres roscas M2.5 en su base. El tornillo sube desde dentro de la tapa y rosca en la antena, asi que aqui solo hay paso libre de 2.9. Si la antena que llega usa otra metrica, se cambian perno_paso y circulo_pernos y se reimprime SOLO la tapa.",
+  "rosca_profundidad": 6.0,
+  "_nota_rosca": "Profundidad supuesta de las roscas M2.5 de la antena, de la referencia '3-M2.5x6'. Medirla antes de comprar."
+ },
+ "inserto_jalon": {
+  "brida_diametro": 36.5125,
+  "brida_espesor": 2.38125,
+  "barril_diametro": 18.25625,
+  "barril_altura": 9.525,
+  "holgura": 0.2,
+  "radio_pilotos": 13.5,
+  "paso_libre_macho_radio": 9.0,
+  "_nota": "Con capturar_sin_tornillos=false vuelve a tres M3. La captura por brida NO esta validada: el par de un jalon es real.",
+  "capturar_sin_tornillos": true,
+  "piloto_diametro": 3.4,
+  "_nota_pilotos": "Tres pilotos impresos entran en los agujeros de montaje del propio inserto. Diametro reducido frente al agujero de 3.97 porque su radio NO es cota publicada por McMaster.",
+  "_PENDIENTE_montaje": "SIN RESOLVER: la brida de 36.5 no pasa por el barreno del barril (18.46) ni por el paso del jalon (18.0), y no hay entrada lateral. Tal como esta, el inserto no se puede introducir en su alojamiento. V1 lo resolvia con una ventana posterior."
+ },
+ "bayoneta": {
+  "numero_dientes": 3,
+  "diente_alto": 2.5,
+  "diente_largo_grados": 22.0,
+  "tope_grados": 30.0,
+  "holgura": 0.35,
+  "collar_espesor": 3.5,
+  "collar_altura": 13.0,
+  "_nota_collar": "Collar interior en los extremos del tubo: la ranura vive dentro del collar y no toca la pared.",
+  "chaflan_entrada_cuello": 1.5,
+  "_nota_chaflan_entrada": "Chaflan interior al pie del cuello de la tapa: embudo que recoge la repisa del IMU. 1.5 de 2.5 de pared.",
+  "_nota_cierre": "El modelo se dibuja CERRADO. El giro real de cierre es 28.7 grados, no tope_grados: la entrada de la ranura tiene 2 grados de mas y la holgura suma 0.7. V2 dibujaba base y tapa abiertas y sus seguros quedaban desalineados con los del tubo al cerrar.",
+  "cuello_extra": 15.0,
+  "_nota_cuello_extra": "El cuello de la tapa baja 15 mm por debajo del collar del tubo para rodear la repisa del IMU, que bajo 15 mm. Su diametro (56.3) libra los engrosamientos de los paneles (57.4) y gira libre.",
+  "tapa_cierra_horario": true,
+  "_nota_sentido": "La ranura superior es la simetrica de la inferior: base y tapa cierran las dos girando la pieza de arriba en sentido horario visto desde arriba, el mismo sentido en que el equipo se enrosca al jalon. Asi, enroscarlo sujetandolo por la tapa aprieta la bayoneta en vez de abrirla. En la primera version de V2.1 la tapa cerraba al reves."
+ },
+ "seguro": {
+  "_que_es": "Un M3 radial por union que bloquea la bayoneta. Rosca en el propio plastico del cuello; sin tuerca.",
+  "paso_libre": 3.3,
+  "piloto": 2.5,
+  "cabeza_diametro": 6.0,
+  "cabeza_profundidad": 1.8,
+  "angulo": 193.0,
+  "_nota_angulo": "Sector libre. Las ranuras de bayoneta barren 347-40, 107-160 y 227-280 grados abajo, y sus simetricas 320-13, 80-133 y 200-253 arriba; el panel principal ocupa 57-123. A 193 no hay nada.",
+  "profundidad_base": 17.0,
+  "_nota_piloto": "Piloto de 2.5 para un M3 que forma su propia rosca en el plastico. Un piloto 0.1 mm menor que el tornillo (2.9) no deja material que roscar y el tornillo giraria en falso; 2.5 da flanco completo. Es un parametro: subelo si tu impresora saca los agujeros estrechos.",
+  "_nota_alineacion": "Tubo, base y tapa llevan el seguro en este mismo angulo en posicion cerrada. capacity_check.py comprueba que un tornillo recto pase por los tres.",
+  "profundidad_tapa": 16.3,
+  "_nota_profundidad": "Medidas desde 2 mm fuera de la pared. El piloto llega mas alla de la punta del tornillo comercial. En la base, 17: entra un M3x12 con 7.4 mm de rosca y su cresta queda a mas de 2 mm del alojamiento de la brida del inserto (con 18.3 y un M3x14 quedaban 0.4). En la tapa, el refuerzo interior mide 7.5 mm (5 en V2) para que el piloto sea ciego y el M3x12 muerda 7.4 mm. El seguro de la base sube a 1.8 mm sobre la brida para no asomar a su alojamiento.",
+  "altura_sobre_brida": 1.8,
+  "boss_largo": 7.5
+ },
+ "panel": {
+  "_que_es": "Quinta pieza: tapa del panel. Cierra la abertura en vez de dejar un hueco.",
+  "arco_grados": 66.0,
+  "z_centro": 69.0,
+  "alto": 58.0,
+  "espesor": 2.5,
+  "holgura": 0.3,
+  "tornillo_separacion_z": 48.0,
+  "_nota_tornillos": "Material alrededor del barreno en la tapa: 4.3 mm. Antes eran 0.85 porque el tornillo caia casi en el filo. El tornillo tiene que seguir cayendo en el reborde, que es donde hay pared detras.",
+  "tornillo_paso_libre": 3.3,
+  "tornillo_piloto": 2.5,
+  "tornillo_cabeza": 6.0,
+  "angulo": 90.0,
+  "usb_ancho": 9.6,
+  "usb_alto": 4.0,
+  "usb_z": 81.0,
+  "_nota_usb": "USB-C. Hueco obround de 9.6 x 4.0 para el receptaculo, no para el sobremolde del cable. Referencia: Adafruit TS3USB30 del BOM de alimentacion.",
+  "boton_diametro": 10.4,
+  "boton_z": 57.0,
+  "led_diametro": 3.2,
+  "led_z": 71.0,
+  "led_separacion": 9.0,
+  "_nota_z": "V2.1: todo el panel sube 15 mm para seguir centrado en el cuerpo, que crecio 30.",
+  "engrosamiento": 3.3,
+  "postes": false,
+  "_nota_postes": "Sin postes interiores: la rosca sale del engrosamiento de 4 mm. Si no agarra, el barreno admite tuerca por dentro.",
+  "_nota_reparto": "El USB estaba a 72 y el tornillo superior a 75: sus huecos se tocaban. Ahora hay separacion entre los tres elementos y los dos tornillos.",
+  "reborde_arco": 3.5,
+  "reborde_z": 9.0,
+  "_nota_reborde": "Reborde en arco minimo, solo apoyo; el vertical aloja los tornillos. Un unico valor para ambos estrangulaba la ventana.",
+  "_nota_engrosamiento": "Engrosamiento 3.3 hacia dentro: su cara interior queda en r=28.7, fuera del paso libre del collar (28.5), asi que no estorba al bajar el tubo sobre el trineo.",
+  "cabeza_profundidad": 1.6,
+  "_nota_cabeza": "Avellanado de 1.6 para la cabeza. En V2 el corte no llegaba a la tapa y la cabeza apoyaba en la superficie."
+ },
+ "logo": {
+  "ancho_mm": 35.5,
+  "profundidad_grabado": 0.8,
+  "z_centro": 69.5,
+  "angulo": 276.5,
+  "_nota": "GRABADO, no en relieve: no se raya con el roce y sale sin soportes. Reconstruido del DXF del propietario con dxf_logo.py.",
+  "_nota_espejo": "El generador niega X. Mirando la cara +Y con Z arriba, el eje X apunta a la izquierda; sin negarlo el logo sale espejeado.",
+  "_nota_posicion": "Colocado por layout_check.py en el mayor hueco libre: 242 a 311 grados y 24 a 115 mm, con 3.0 mm de margen por lado.",
+  "_nota_margen": "layout_check.py calcula el margen como arco, pero el logo es una proyeccion plana: el margen real al grupo de lineas verticales ronda 2 mm, no 3."
+ },
+ "impresion": {
+  "holgura_general": 0.35,
+  "pared_minima": 2.0,
+  "chaflan": 0.6
+ },
+ "panel_aux": {
+  "_que_es": "Panel auxiliar para aditamentos futuros. Misma logica que el principal: ventana pasante, pared engrosada por dentro y tapa a ras.",
+  "angulo": 0.0,
+  "_nota_angulo": "Lateral libre: el panel principal esta en 90, el seguro en 193 y el logo en 270.",
+  "arco_grados": 50.0,
+  "z_centro": 69.0,
+  "alto": 40.0,
+  "espesor": 2.5,
+  "holgura": 0.3,
+  "tornillo_separacion_z": 30.0,
+  "tornillo_paso_libre": 3.3,
+  "tornillo_piloto": 2.5,
+  "tornillo_cabeza": 6.0,
+  "usbc_ancho": 9.4,
+  "usbc_alto": 3.4,
+  "usbc_z": 69.0,
+  "_nota_usbc": "USB-C hembra pasante, hueco obround de 9.4 x 3.4. Sin funcion asignada todavia: queda previsto para lo que se monte despues.",
+  "engrosamiento": 3.3,
+  "postes": false,
+  "_nota_tornillos": "Material alrededor del barreno en la tapa: 4.3 mm. Antes eran 0.85 porque el tornillo caia casi en el filo. El tornillo tiene que seguir cayendo en el reborde, que es donde hay pared detras.",
+  "_nota_postes": "Sin postes interiores: la rosca sale del engrosamiento de 4 mm. Si no agarra, el barreno admite tuerca por dentro.",
+  "reborde_arco": 3.5,
+  "reborde_z": 8.0,
+  "_nota_reborde": "Reborde en arco minimo, solo apoyo; el vertical aloja los tornillos. Un unico valor para ambos estrangulaba la ventana.",
+  "_nota_engrosamiento": "Engrosamiento 3.3 hacia dentro: su cara interior queda en r=28.7, fuera del paso libre del collar (28.5), asi que no estorba al bajar el tubo sobre el trineo.",
+  "cabeza_profundidad": 1.6,
+  "_nota_cabeza": "Avellanado de 1.6 para la cabeza. En V2 el corte no llegaba a la tapa y la cabeza apoyaba en la superficie.",
+  "_nota_obstaculo": "Detras del panel auxiliar (0 grados) esta el canto de la bateria, a menos de 1 mm del engrosamiento: su tornillo nunca puede ser mas largo que el que da bom.py."
+ },
+ "accesorios": {
+  "_que_es": "Dos barrenos pasantes en la pared, junto al panel auxiliar, para montar accesorios externos.",
+  "angulo": 0.0,
+  "z": [
+   47.0,
+   91.0
+  ],
+  "separacion_angular": 82.0,
+  "_nota_separacion": "A 41 grados: encajan entre el panel auxiliar y el principal, y su refuerzo sigue librando la placa del trineo.",
+  "piloto": 3.3,
+  "refuerzo_diametro": 9.0,
+  "refuerzo_profundidad": 7.0,
+  "metrica": "M4 formando rosca en el plastico",
+  "_nota_piloto": "Barreno de 3.3 pasante, para M4 con tuerca o para M3 holgado.",
+  "refuerzo": false,
+  "_nota_refuerzo": "Sin refuerzo interior: estorbaba dentro del cuerpo. La pared son 2.5 mm, asi que para colgar peso conviene tuerca o arandela por dentro. Con refuerzo=true vuelven los resaltes.",
+  "_nota_z": "V2.1: misma separacion que en V2 (44 mm), centrada en el cuerpo nuevo."
+ },
+ "_version": "2.1"
+}

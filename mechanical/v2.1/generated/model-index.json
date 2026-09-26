@@ -1,0 +1,117 @@
+{
+ "posicion": "cerrada: dientes de base y tapa contra el fondo de su ranura",
+ "giro_cierre_grados": 28.7,
+ "tapa_cierra_horario": true,
+ "altura_total_mm": 136.91,
+ "diametro_exterior_mm": 69.0,
+ "plano_alturas": {
+  "piso_interior": 15.91,
+  "techo_interior": 129.91,
+  "largo_util_mm": 114.0,
+  "cara_montaje_antena": 136.91,
+  "borde_superior_tubo": 131.91,
+  "fondo_cuello_tapa": 103.91,
+  "repisa_imu": 104.91,
+  "seguro_base": 13.71,
+  "seguro_tapa": 126.91
+ },
+ "piezas": [
+  {
+   "pieza": "01-threaded-base",
+   "etiqueta": "Base con rosca 5/8",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 42.9,
+   "caja": [
+    69.0,
+    69.0,
+    15.91
+   ],
+   "z": [
+    0.0,
+    15.91
+   ]
+  },
+  {
+   "pieza": "02-logo-tube",
+   "etiqueta": "Tubo con logo grabado",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 78.68,
+   "caja": [
+    69.0,
+    69.0,
+    123.91
+   ],
+   "z": [
+    8.0,
+    131.91
+   ]
+  },
+  {
+   "pieza": "03-antenna-cap",
+   "etiqueta": "Tapa de antena",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 29.77,
+   "caja": [
+    69.0,
+    69.0,
+    33.0
+   ],
+   "z": [
+    103.91,
+    136.91
+   ]
+  },
+  {
+   "pieza": "04-universal-sled",
+   "etiqueta": "Trineo universal",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 28.12,
+   "caja": [
+    55.8,
+    47.3,
+    97.0
+   ],
+   "z": [
+    13.41,
+    110.41
+   ]
+  },
+  {
+   "pieza": "05-panel-cover",
+   "etiqueta": "Tapa del panel principal",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 4.97,
+   "caja": [
+    37.08,
+    7.52,
+    57.4
+   ],
+   "z": [
+    40.3,
+    97.7
+   ]
+  },
+  {
+   "pieza": "06-aux-panel-cover",
+   "etiqueta": "Tapa del panel auxiliar",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 2.62,
+   "caja": [
+    5.38,
+    28.62,
+    39.4
+   ],
+   "z": [
+    49.3,
+    88.7
+   ]
+  }
+ ],
+ "volumen_total_cm3": 187.06
+}

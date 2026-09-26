@@ -1,0 +1,106 @@
+{
+ "units": "mm",
+ "_que_es": [
+  "Otra posibilidad de diseno, no una V3: sustituye SOLO la tapa de antena de V2.1",
+  "por una tapa-plato que lleva dentro una antena de topografia ArduSimple OEM, y",
+  "anade un domo que la cubre. Base, tubo, trineo y paneles son los de V2.1 sin",
+  "cambios: este modelo lee ../v2.1/parameters.json y ../v2.1/generated."
+ ],
+ "antena": {
+  "modelo": "ArduSimple OEM Survey Tripleband AS-ANT3B-OEMSUR-L1L2L5-02SMA-00",
+  "fuente_cotas": "Medidas del STEP oficial AS-ANT3B-OEM-L125-02SMA-00-R01 (ArduSimple, 29-10-2025), leido con FreeCAD el 25-09-2026.",
+  "plato_diametro": 130.0,
+  "plato_espesor": 1.0,
+  "barrenos_diametro": 3.2,
+  "barrenos_circulo": 120.0,
+  "barrenos_numero": 6,
+  "elemento": [
+   [
+    95.0,
+    1.0,
+    11.0
+   ],
+   [
+    85.0,
+    11.0,
+    12.0
+   ],
+   [
+    75.0,
+    12.0,
+    17.1
+   ]
+  ],
+  "_nota_elemento": "Escalones del elemento radiante: [diametro, z desde, z hasta], con z=0 en la cara inferior del plato.",
+  "elemento_cima": 18.55,
+  "caja_inferior_ancho": 89.2,
+  "caja_inferior_chaflan": 12.6,
+  "caja_inferior_profundidad": 7.2,
+  "_nota_caja": "Bajo el plato hay una caja octogonal (cuadrado de 89.2 con esquinas a 45 de 12.6) de 7.2 de profundidad: LNA y salida del cable.",
+  "salida_cable": [
+   17.7,
+   -44.6,
+   -1.5
+  ],
+  "_nota_cable": "El coaxial de 20 cm y 2.2 mm sale por el costado de la caja en este punto, hacia -Y. El STEP lo dibuja recto con el SMA a 86 mm del eje (y = -84.5), fuera del equipo: en la realidad es flexible. build_dome.py comprueba su recorrido (ver 'cable').",
+  "rotacion": 0.0,
+  "_nota_rotacion": "Giro de la antena sobre el eje, en el marco cerrado de V2.1. Con 0 los barrenos caen a 0, 60, ... grados y el cable sale hacia -68 grados.",
+  "tension": "3 a 5.5 V",
+  "_nota_tension": "La ArduSimple admite 3-5.5 V. La etiqueta de la HA-901A dice DC 3-16 V. Comprobar que la alimentacion de antena de la carrier del UM980 no pasa de 5.5 V."
+ },
+ "tapa": {
+  "_que_es": "Tapa-plato: cuello y bayoneta de V2.1 abajo, cuenco a 35 grados y aro donde se atornilla la antena.",
+  "collar_inicial": 2.0,
+  "aro_radio_exterior": 68.0,
+  "aro_radio_interior": 62.0,
+  "aro_alto": 12.0,
+  "_nota_cuenco": "Cuenco a 35 grados sobre la horizontal: unos 11 mm (10.9) mas bajo que a 45. Se imprime boca abajo, con el asiento de la antena en la cama; el cono interior cuelga 55 grados y lleva soportes, pero quedan dentro del cuenco, donde no se ven. Por fuera quedan tres voladizos cortos sin soporte: el escalon del domo, un flanco de la ranura de la junta y la cara de los dientes.",
+  "torres_diametro": 8.0,
+  "torres_piloto": 2.5,
+  "torres_profundidad": 8.0,
+  "_nota_torres": "Seis torres bajo los barrenos del plato. M3 cabeza boton desde arriba, rosca en el plastico.",
+  "pendiente_cuenco": 35.0,
+  "pared_cuenco": 4.0,
+  "escalon_recto": 1.5,
+  "_nota_escalon": "Bajo el aro hay un escalon plano del ancho de la falda del domo: es el tope axial. Debajo, 1.5 mm rectos al mismo diametro que el domo, para que la junta entre las dos piezas quede a ras."
+ },
+ "domo": {
+  "pared": 2.5,
+  "holgura_radial": 0.3,
+  "holgura_sobre_antena": 7.0,
+  "entrada_falda": 0.8,
+  "_nota": "Casquete eliptico sobre falda recta. Se imprime de pie, sobre el canto plano de la falda, con soportes solo por dentro: la cara exterior no los toca. Imprimir macizo (100 %) en ASA o PC, color claro. Nada metalico por encima del plano de la antena.",
+  "perfil": "eliptico",
+  "holgura_lateral_minima": 6.0,
+  "_nota_altura": "La altura interior sale de la antena: la mayor entre cima del elemento + holgura_sobre_antena y lo que pide cada escalon del elemento para quedar a holgura_lateral_minima del casquete.",
+  "entrada_alto": 2.8,
+  "_nota_entrada": "Entrada de la falda: 0.8 mm radiales en 2.8 de altura (unos 16 grados), para no pellizcar la junta."
+ },
+ "junta": {
+  "seccion": 2.0,
+  "ranura_ancho": 2.7,
+  "prensado": 0.45,
+  "z_desde_asiento": -3.5,
+  "_nota": "Junta torica radial en el aro. Fondo de ranura = radio interior de la falda - (seccion - prensado). Con seccion 2 queda un 22.5 % de prensado nominal y la ranura llena al 75 %. Comprar 130 x 2 NBR: se estira un 2.7 % sobre el fondo de 133.5 y no se sale de la ranura al bajar el domo. Engrasarla."
+ },
+ "tornillos_domo": {
+  "numero": 3,
+  "angulo_inicial": 30.0,
+  "z_desde_asiento": -8.0,
+  "paso": 3.3,
+  "piloto": 2.5,
+  "profundidad": 9.0,
+  "torre_ancho": 8.0,
+  "_nota": "Radiales, por DEBAJO de la junta: el agujero de la falda queda fuera de la zona sellada. Piloto ciego en una torre interior del aro, para que el agua no tenga camino al interior. A 30 grados de las torres de la antena.",
+  "chaflan_interior": 0.4
+ },
+ "cable": {
+  "diametro": 2.2,
+  "largo": 200.0,
+  "radio_curvatura": 13.0,
+  "inclinacion_curva": 40.0,
+  "y_bajada": 22.0,
+  "tramo_final": 30.0,
+  "_nota": "Coaxial del STEP: 2.2 mm. Se comprueba un radio de curvatura de 13 mm (6 veces el diametro) con la curva en U inclinada 40 grados hacia -X, cruzando bajo la caja hacia +Y y bajando por la muesca de la repisa del IMU. Con 14 ya choca."
+ }
+}

@@ -1,0 +1,68 @@
+{
+ "piezas": [
+  {
+   "pieza": "01-threaded-base",
+   "etiqueta": "Base con rosca 5/8",
+   "triangulos": 2920,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 42.9,
+   "stl": "01-threaded-base.stl"
+  },
+  {
+   "pieza": "02-logo-tube",
+   "etiqueta": "Tubo con logo grabado",
+   "triangulos": 12986,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 78.68,
+   "stl": "02-logo-tube.stl"
+  },
+  {
+   "pieza": "03-antenna-cap",
+   "etiqueta": "Tapa de antena",
+   "triangulos": 2838,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 29.77,
+   "stl": "03-antenna-cap.stl"
+  },
+  {
+   "pieza": "04-universal-sled",
+   "etiqueta": "Trineo universal",
+   "triangulos": 2556,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 28.12,
+   "stl": "04-universal-sled.stl"
+  },
+  {
+   "pieza": "05-panel-cover",
+   "etiqueta": "Tapa del panel principal",
+   "triangulos": 2052,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 4.97,
+   "stl": "05-panel-cover.stl"
+  },
+  {
+   "pieza": "06-aux-panel-cover",
+   "etiqueta": "Tapa del panel auxiliar",
+   "triangulos": 1272,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 2.62,
+   "stl": "06-aux-panel-cover.stl"
+  }
+ ],
+ "todas_cerradas": true,
+ "interferencias": [],
+ "sin_interferencias": true,
+ "deflexion_lineal": 0.05
+}

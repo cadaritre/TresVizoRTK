@@ -404,7 +404,19 @@ int start(JsonVariantConst body,JsonDocument& out) {
         // GST acompaña siempre a GGA: sin ella el panel no puede decir con qué
         // precisión estima el receptor. Va a 1 Hz aunque la posición vaya más
         // rápido; la desviación no cambia a 10 Hz y cargar la UART no ayuda.
-        if(name=="telemetry") {add(String("GPGGA COM2 ")+rateFor(telemetryHz));add("GPGST COM2 1");}
+        // GSV y GSA acompanan a GGA por el mismo motivo que GST: sin ellas la
+        // pantalla de satelites no puede decir nada del cielo, y "diez
+        // satelites" sin saber cuantos hay a la vista no distingue una antena
+        // mala de un cielo tapado. Van a 1 Hz aunque la posicion vaya a diez:
+        // el cielo no cambia en cien milisegundos, y a 10 Hz cargarian la UART
+        // de verdad. Con GGA a 10 Hz, GST, GSV y GSA a 1 Hz la estimacion del
+        // enlace ronda el 20 % de los 115200 baudios.
+        if(name=="telemetry") {
+            add(String("GPGGA COM2 ")+rateFor(telemetryHz));
+            add("GPGST COM2 1");
+            add("GPGSV COM2 1");
+            add("GPGSA COM2 1");
+        }
         if(name=="stop_outputs") add("UNLOG COM2");
         if(name=="mask") {
             add("MASK "+String(elevation,2));

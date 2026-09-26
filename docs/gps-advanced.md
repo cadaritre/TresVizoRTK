@@ -78,6 +78,104 @@ explícitamente lo aplicado por este firmware de lo que solo se asume por defect
 Cuando `*_applied` es `false`, el valor mostrado es el de fábrica según el manual,
 no una lectura del receptor. El panel lo dice con esas palabras.
 
+## Los satélites uno a uno · `GET /api/gnss/sky`
+
+Hasta ahora el firmware solo publicaba **cuántos** satélites entraron en la
+solución, que es lo que trae GGA. Con eso no se puede dibujar un cielo ni se
+puede distinguir el problema más común del campo: un equipo que **ve** veinte y
+**usa** ocho tiene una máscara de elevación o una constelación apagada; uno que
+ve ocho tiene una antena, un cable o un cielo tapado. El número solo no separa
+los dos casos, y llevan a arreglos distintos.
+
+Se añadieron dos analizadores —`lib/gnss/src/nmea_gsv.h` y `nmea_gsa.h`— y la
+tabla que los junta, `lib/gnss/src/sky_table.h`. Los tres se prueban en el Mac
+con `test/nmea_gsv_test.cpp`, `test/nmea_gsa_test.cpp` y `test/sky_table_test.cpp`.
+
+### Lo que hay que respetar de NMEA 4.10, o los números salen mal
+
+El firmware configura `CONFIG NMEAVERSION V410`, y esa versión cambia tres cosas:
+
+1. **Cada trama GSV lleva identificador de señal al final.** El mismo satélite
+   aparece una vez por señal —L1 y L5 del mismo GPS son dos tramas— con C/N0
+   distinto. Guardar por PRN a secas hace que una tape a la otra y la pantalla
+   enseñe una relación señal-ruido que no es la que cree.
+2. **Cada GSA lleva identificador de sistema**, y sin él dos GSA seguidas son
+   indistinguibles: el PRN 12 de GLONASS no es el 12 de GPS. Cuando el
+   identificador falta y el emisor es el genérico `GN`, **no se marca nada**:
+   encender el 12 en todas las constelaciones diría que la solución usó
+   satélites que no usó.
+3. **C/N0 vacío no es cero.** Vacío es «a la vista y sin rastrear»; cero sería
+   una señal medida de potencia nula, que no existe.
+
+### Cómo se mantiene la tabla
+
+Cada entrada lleva su marca de tiempo y **caduca**: diez segundos sin aparecer y
+se va, cinco para la marca de «usado». La alternativa era vaciar la tabla al
+empezar cada ciclo de GSV; se descartó porque un ciclo se reparte en varias
+tramas y el vaciado deja la tabla a medias justo cuando alguien la lee, con el
+cielo parpadeando. Con caducidad la tabla nunca está incompleta, solo un poco
+vieja, **y la edad se publica** para poder decidir con ella.
+
+Un satélite que deja de aparecer no se extrapola: se deja de decir que está.
+
+### La respuesta
+
+```json
+{
+  "satellites": [
+    {"sys":"GP","prn":7,"el":67,"az":300,"cno":45,"use":true,"sig":[[1,45],[6,31]]},
+    {"sys":"GL","prn":68,"el":21,"az":95,"cno":null,"use":false,"sig":[[1,null]]}
+  ],
+  "in_view": 28, "used": 18, "published": 28, "omitted": 0, "dropped": 0,
+  "age_ms": 380,
+  "fix_type": 3, "pdop": 1.8, "hdop": 0.9, "vdop": 1.5, "dop_age_ms": 420
+}
+```
+
+- `sys` es el emisor de la trama —`GP`, `GL`, `GA`, `GB`, `GQ`—, no una
+  deducción a partir del rango del PRN. Los rangos no coinciden entre
+  fabricantes.
+- **Agrupado por satélite, no por observación.** `cno` es la mejor de sus
+  señales y `sig` las trae todas, `[identificador, C/N0]`. Una gráfica de barras
+  que no agrupe pinta el mismo PRN dos veces.
+- `el`, `az` y `cno` van **nulos** cuando no se saben. Cero es el horizonte,
+  cero es el norte y cero no es una señal.
+- `fix_type` y los tres DOP salen de GSA. **`pdop` y `vdop` no estaban
+  disponibles antes**: GGA solo trae HDOP.
+- `omitted` es cuántos satélites no se publicaron y `dropped` cuántas
+  observaciones no cupieron en la tabla. Los dos deberían ser cero.
+
+### Por qué hay un límite de cuarenta
+
+No es de memoria, es del transporte: una respuesta por BLE se corta en 4096
+bytes y devuelve `413` (`ble_transport.cpp:181`). Con cuarenta satélites y sus
+señales la respuesta ronda los 2.5 KB. **Si hay que recortar se recortan los más
+bajos, nunca los que entraron en la solución**: un cielo recortado al azar es
+peor que uno corto, porque el operador busca justo el satélite que le falta.
+
+Va en su propia ruta y no en `/api/status` porque son varios kilobytes que solo
+hacen falta con la pantalla de satélites abierta, y el estado se consulta una vez
+por segundo desde todas partes.
+
+### El coste en la UART
+
+La acción `telemetry` añade ahora `GPGSV COM2 1` y `GPGSA COM2 1` junto a
+`GPGGA` y `GPGST`, por el mismo motivo por el que GST ya iba ahí: sin ellas la
+pantalla no puede decir nada del cielo.
+
+Van a **1 Hz aunque la posición vaya a diez**. El cielo no cambia en cien
+milisegundos, y a 10 Hz cargarían el enlace de verdad. Con GGA a 10 Hz y las
+otras tres a 1 Hz, la estimación con el tamaño máximo de sentencia ronda el 20 %
+de los 115200 baudios. **Es una estimación, no una medida.**
+
+### Lo que falta comprobar
+
+Todo lo anterior está probado en el Mac con tramas construidas a mano y el
+firmware compila. **No se ha comprobado contra el UM980 real**: el equipo no
+estaba conectado. Queda pendiente verificar contra tramas de verdad que el
+UM980 con `V410` emite el identificador de señal y el de sistema, y con qué
+emisores anuncia BeiDou y QZSS.
+
 ## Persistencia
 
 Hasta 0.5.0 el firmware nunca enviaba `SAVECONFIG`, por diseño. La consecuencia

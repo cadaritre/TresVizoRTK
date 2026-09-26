@@ -3,6 +3,7 @@
 #include "gnss_receiver.h"
 #include "correction_router.h"
 #include "gnss_control.h"
+#include "gnss_sky.h"
 #include "sd_recorder.h"
 #include "wire_filter.h"
 #include "rtcm3.h"
@@ -36,12 +37,19 @@ char textBlock[kBlock];
 void acquire(void*) {
     gnss::GgaParser parser;
     gnss::GstParser precisionParser;
+    // Los satelites uno a uno. GSV trae donde esta cada uno y con cuanta senal;
+    // GSA, cuales entraron en la solucion y los tres DOP. Ninguna de las dos
+    // cosas esta en GGA, que solo dice cuantos se usaron.
+    gnss::GsvParser skyParser;
+    gnss::GsaParser usedParser;
     gnss::WireFilter filter;
     // El receptor emite RTCM por la misma UART cuando trabaja como base. Se
     // reconstruyen las tramas aquí para poder publicarlas o servirlas.
     gnss::Rtcm3Parser outgoing;
     gnss::Gga solution;
     gnss::Gst precision;
+    gnss::GsvMessage sky;
+    gnss::Gsa used;
     size_t sent = 0;
 #ifdef TRESVIZO_TASK_WDT
     // Desactivado por defecto: cambia el comportamiento ante un bloqueo a reinicio
@@ -68,6 +76,10 @@ void acquire(void*) {
                 filter.feed(rawBlock[i], now, [&](char character) {
                     parser.feed(character, arrival, solution);
                     precisionParser.feed(character, arrival, precision);
+                    // El cielo se guarda en su propio modulo: la instantanea de
+                    // aqui se copia en media docena de sitios que no lo usan.
+                    if (skyParser.feed(character, arrival, sky)) gnss_sky::feed(sky, now);
+                    if (usedParser.feed(character, arrival, used)) gnss_sky::feed(used, now);
                     outgoing.feed(uint8_t(character), [](const uint8_t* p, size_t size) {
                         correction_output::publish(p, size);
                     });

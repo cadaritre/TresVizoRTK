@@ -1,0 +1,142 @@
+{
+ "radio_collar_mm": 28.5,
+ "trineo_radio_max_mm": 27.9,
+ "trineo_holgura_collar_mm": 0.6,
+ "bateria": {
+  "nominal": {
+   "cota_mm": [
+    9.5,
+    55.0,
+    65.0
+   ],
+   "radio_esquina_mm": 27.94,
+   "holgura_collar_mm": 0.56,
+   "choque_con_trineo_mm3": 0.0,
+   "z_mm": [
+    29.4,
+    94.4
+   ],
+   "cabe": true
+  },
+  "peor_caso": {
+   "cota_mm": [
+    10.0,
+    55.5,
+    68.0
+   ],
+   "radio_esquina_mm": 28.21,
+   "holgura_collar_mm": 0.29,
+   "choque_con_trineo_mm3": 0.0,
+   "z_mm": [
+    29.4,
+    97.4
+   ],
+   "cabe": true
+  },
+  "envolvente_diseno": {
+   "cota_mm": [
+    13.0,
+    58.0,
+    72.0
+   ],
+   "radio_esquina_si_centrada_mm": 29.72,
+   "nota": "Informativa: la envolvente con margen de hinchazon no pasa por el collar."
+  }
+ },
+ "carrier_um980": {
+  "cota_mm": [
+   11.0,
+   32.0,
+   52.0
+  ],
+  "hueco_entre_alas_mm": 41.8,
+  "radio_esquina_mm": 25.65,
+  "holgura_collar_mm": 2.85,
+  "choque_con_trineo_mm3": 0.0,
+  "cabe": true
+ },
+ "centrado": {
+  "radio_repisa_mm": 25.35,
+  "radio_taladro_cuello_mm": 25.65,
+  "holgura_radial_mm": 0.3,
+  "arco_en_contacto_grados": 300,
+  "mayor_hueco_grados": 62,
+  "cuello_baja_hasta_la_repisa": true,
+  "centra": true
+ },
+ "rigidez": {
+  "v2_1": {
+   "largo_placa_mm": 87.0,
+   "inercia_entre_filas_mm4": 1039,
+   "inercia_en_fila_mm4": 907,
+   "z_mm": [
+    54.9,
+    59.9
+   ]
+  },
+  "v2": {
+   "largo_placa_mm": 72.0,
+   "inercia_entre_filas_mm4": 88,
+   "inercia_en_fila_mm4": 27
+  },
+  "factor_seccion": [
+   11.8,
+   33.0
+  ],
+  "factor_punta_en_voladizo": [
+   6.7,
+   18.7
+  ],
+  "nota": "Flexion fuera del plano de la placa. factor_punta compara la placa como voladizo libre (I/L^3, mismo material). En V2.1, con la tapa puesta, el cuello sujeta ademas el extremo superior."
+ },
+ "seguros": {
+  "base": {
+   "angulo": 193.0,
+   "z_mm": 13.71,
+   "choque_del_nucleo_mm3": 0.0,
+   "plastico_para_la_rosca_mm3": 17.6,
+   "alineado": true
+  },
+  "tapa": {
+   "angulo": 193.0,
+   "z_mm": 126.91,
+   "choque_del_nucleo_mm3": 0.0,
+   "plastico_para_la_rosca_mm3": 16.1,
+   "alineado": true
+  }
+ },
+ "paredes_mm": {
+  "pie_0-pie_1": 29.0,
+  "pie_0-seguro_base": 16.76,
+  "pie_0-alojamiento_brida": 1.74,
+  "pie_0-barril": 10.86,
+  "pie_0-paso_esparrago": 11.09,
+  "pie_1-seguro_base": 39.07,
+  "pie_1-alojamiento_brida": 1.74,
+  "pie_1-barril": 10.86,
+  "pie_1-paso_esparrago": 11.09,
+  "seguro_base-alojamiento_brida": 2.35,
+  "seguro_base-barril": 11.76,
+  "seguro_base-paso_esparrago": 11.7
+ },
+ "tornillos_panel": {
+  "panel_aux": {
+   "largo_mm": 4,
+   "obstaculo": "bateria",
+   "distancia_punta_mm": 1.15
+  },
+  "panel": {
+   "largo_mm": 6,
+   "obstaculo": "carrier UM980",
+   "distancia_punta_mm": 6.85
+  }
+ },
+ "sobre_imu": {
+  "cara_inferior_tapa_mm": 131.91,
+  "cima_imu_estimada_mm": 113.5,
+  "libre_mm": 18.4,
+  "pide_sma_acodado_mm": 15.0
+ },
+ "cabe_todo": true,
+ "fallos": []
+}

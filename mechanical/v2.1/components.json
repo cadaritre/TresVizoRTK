@@ -1,0 +1,215 @@
+{
+  "units": "mm",
+  "criterio": [
+    "IMPORTANTE: esta tabla NO genera geometria. El interior es una rejilla de",
+    "anclaje universal (ver parameters.json); ningun componente tiene alojamiento",
+    "propio salvo el IMU, la antena y el inserto del jalon.",
+    "Esta tabla sirve solo para COMPROBAR CAPACIDAD: que lo que hoy se piensa",
+    "meter quepa con holgura en el volumen disponible. Si manana llega otro",
+    "modulo, se anade una fila y se vuelve a comprobar; el modelo no cambia.",
+    "'confianza' dice de donde sale el dato y nunca autoriza agujeros a patron",
+    "de PCB salvo que sea 'medido' o exista plano publicado."
+  ],
+  "sujecion": {
+    "brida": "apoyo plano, tope lateral y ranuras pasantes; admite variacion libre",
+    "correa": "banda elastica sobre apoyo plano; maxima tolerancia",
+    "tornillo": "solo cuando el propio componente impone su patron y esta verificado",
+    "ajuste": "asiento con plantilla de centrado y bloqueo rigido final"
+  },
+  "bateria": {
+    "descripcion": "LiPo 1S 955565, 3.7 V 5000 mAh",
+    "publicado": [
+      9.5,
+      55.0,
+      65.0
+    ],
+    "peor_caso_documentado": [
+      10.0,
+      55.5,
+      68.0
+    ],
+    "fuente_peor_caso": "hoja Dazheng/Ciel Light del mismo codigo 955565",
+    "envolvente_diseno": [
+      13.0,
+      58.0,
+      72.0
+    ],
+    "confianza": "publicado",
+    "sujecion": "bridas a lo largo",
+    "nota": "Bolsa blanda: no comprimir. Se amarra A LO LARGO con bridas por las ranuras de +-6 o +-13 de la fila bajo la bateria y la fila superior, nunca rodeando su ancho: en los cantos solo quedan 0.3-0.6 mm hasta el collar del tubo. La envolvente con margen de hinchazon (13 x 58) no pasa por el collar."
+  },
+  "carrier_um980": {
+    "descripcion": "BDLX RTK_UM98_V1.0.1",
+    "publicado": [
+      11.0,
+      32.0,
+      52.0
+    ],
+    "envolvente_diseno": [
+      15.0,
+      37.0,
+      58.0
+    ],
+    "confianza": "publicado",
+    "sujecion": "brida",
+    "nota": "Sin plano de agujeros publicado. Prohibido fijar a patron supuesto. El margen en espesor cubre conectores SMA/USB enchufados, que la ficha no acota."
+  },
+  "esp32_tiny": {
+    "descripcion": "Waveshare ESP32-S3-Tiny",
+    "publicado": [
+      2.45,
+      18.0,
+      23.5
+    ],
+    "envolvente_diseno": [
+      7.0,
+      22.0,
+      28.0
+    ],
+    "confianza": "publicado",
+    "sujecion": "brida",
+    "nota": "Los pads de conexion no son agujeros de montaje. El margen cubre el FPC y su conector."
+  },
+  "tiny_adapter": {
+    "descripcion": "Adaptador USB Waveshare",
+    "publicado": [
+      2.45,
+      18.0,
+      18.0
+    ],
+    "envolvente_diseno": [
+      7.0,
+      22.0,
+      22.0
+    ],
+    "confianza": "publicado",
+    "sujecion": "brida"
+  },
+  "microsd": {
+    "descripcion": "Lector microSD azul con regulador",
+    "publicado": [
+      7.0,
+      24.0,
+      42.0
+    ],
+    "envolvente_diseno": [
+      11.0,
+      28.0,
+      47.0
+    ],
+    "confianza": "familia",
+    "sujecion": "brida",
+    "nota": "Patron 38x20 es de la familia, no del lote. El largo incluye margen para el recorrido de insercion de la tarjeta, que no esta acotado."
+  },
+  "powerboost": {
+    "descripcion": "Adafruit PowerBoost 1000C sin USB-A",
+    "publicado": [
+      10.0,
+      23.0,
+      45.0
+    ],
+    "alternativa_documentada": [
+      8.0,
+      26.0,
+      47.0
+    ],
+    "envolvente_diseno": [
+      13.0,
+      29.0,
+      51.0
+    ],
+    "confianza": "publicado",
+    "sujecion": "brida",
+    "nota": "V1 daba 0.4 mm de holgura cuando el propio documento registra 3 mm de diferencia entre versiones."
+  },
+  "soft_switch": {
+    "descripcion": "SparkFun Soft Power Switch Mk2",
+    "publicado": [
+      10.0,
+      25.4,
+      25.4
+    ],
+    "alternativa_documentada": [
+      8.0,
+      27.0,
+      27.0
+    ],
+    "envolvente_diseno": [
+      13.0,
+      30.0,
+      30.0
+    ],
+    "confianza": "publicado",
+    "sujecion": "brida"
+  },
+  "bmi088": {
+    "descripcion": "Breakout BMI088 V1.0 azul",
+    "publicado_pcb": [
+      1.6,
+      18.0,
+      23.5
+    ],
+    "agujeros": {
+      "diametro": 3.0,
+      "separacion": 18.5,
+      "centros_desde_borde": 2.5
+    },
+    "envolvente_diseno": [
+      9.0,
+      22.0,
+      28.0
+    ],
+    "confianza": "publicado",
+    "sujecion": "ajuste",
+    "ajuste_lateral": 1.5,
+    "nota": "Posicion del encapsulado dentro del PCB desconocida. Se centra con plantilla y se bloquea rigido. Los dos M2.5 se conservan: aqui el patron SI esta publicado con plano."
+  },
+  "antena": {
+    "descripcion": "Helix externa HA-901A (etiqueta confirmada por foto del propietario, 24-09-2026)",
+    "publicado": {
+      "diametro": 43.5,
+      "altura": 40.8,
+      "tornillos": 3,
+      "metrica": "M2.5",
+      "circulo_pernos": 26.6
+    },
+    "envolvente_diseno": {
+      "diametro": 47.0,
+      "altura": 44.0
+    },
+    "confianza": "etiqueta",
+    "sujecion": "tornillo",
+    "nota": "La etiqueta dice HA-901A, 43.5 x 40.8, DC 3-16 V. El patron de tornillos es parametrico: si llega otra antena se cambia un numero y se reimprime solo la tapa."
+  },
+  "inserto_jalon": {
+    "descripcion": "McMaster 90611A121, 5/8-11 UNC hembra",
+    "brida_diametro": 36.5125,
+    "brida_espesor": 2.38125,
+    "barril_diametro": 18.25625,
+    "barril_altura": 9.525,
+    "confianza": "catalogo",
+    "sujecion": "captura entre base y tubo",
+    "nota": "La captura por brida sustituye a los tres M3 de V1. NO VALIDADA: el par de apriete de un jalon es real. Si el ensayo falla, el modelo conserva el parametro para reactivar los tres tornillos."
+  },
+  "usb_c_exterior": {
+    "descripcion": "Adafruit TS3USB30 5871 en el panel",
+    "publicado_pcb": [
+      1.6,
+      18.0,
+      18.0
+    ],
+    "sobremolde_cable_comprobado": [
+      5.5,
+      13.0,
+      25.0
+    ],
+    "envolvente_diseno_sobremolde": [
+      9.0,
+      17.0,
+      28.0
+    ],
+    "confianza": "publicado",
+    "sujecion": "brida",
+    "nota": "V1 solo admitia el sobremolde compacto comprobado. El margen busca aceptar cables comunes de mercado."
+  }
+}

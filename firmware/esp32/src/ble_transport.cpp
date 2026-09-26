@@ -4,10 +4,12 @@
 #include "rtcm3.h"
 #include "correction_router.h"
 #include "correction_output.h"
+#include "ble_frames.h"
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLE2902.h>
 #include <esp_timer.h>
+#include <esp_gatt_common_api.h>
 #include <atomic>
 #include <Preferences.h>
 
@@ -30,6 +32,18 @@ std::atomic<bool> connected{false}, authorized{false}, advertise{false};
 // después de un corte de corriente, no volver sola en la siguiente jornada.
 std::atomic<bool> enabled{true};
 std::atomic<uint32_t> generation{0}, dropped{0}, correctionAccepted{0}, correctionRejected{0}, correctionDropped{0};
+// MTU ATT negociado con el telefono y la conexion a la que se refiere. Hasta
+// que el telefono lo negocia rige el minimo, 23.
+std::atomic<uint16_t> attMtu{protocol::kMinimumAttMtu}, connectionId{0};
+// Si la controladora dice que no hay hueco, se espera; pero no mas de esto. Si
+// la consulta fallara por algo que no se ha visto en el equipo, el canal de
+// ordenes seguiria vivo, a una trama cada 50 ms, en vez de quedarse mudo.
+constexpr uint32_t kFlowControlMaxWaitMs = 50;
+// Tramas de respuesta mandadas **sin hueco** en la controladora, al vencer la
+// espera. Lo que se arriesga a perderse se cuenta: si en campo vencen
+// peticiones y este numero sube, la causa es esta y no la antena ni la
+// distancia. Si se queda en cero, los 50 ms bastan.
+std::atomic<uint32_t> forcedFrames{0};
 bool ready = false;
 Preferences settings;
 String pending;
@@ -42,10 +56,16 @@ class ConnectionCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer*, esp_ble_gatts_cb_param_t* parameters) override {
         // Sin emparejamiento: quien se conecta queda autorizado. La única
         // barrera que queda es el alcance de la radio.
-        (void)parameters;
+        connectionId = parameters->connect.conn_id;
+        attMtu = protocol::kMinimumAttMtu;
         ++generation; connected = true; authorized = true;
     }
+    // El telefono negocia el MTU nada mas conectarse; iPhone pide 185 o mas.
+    void onMtuChanged(BLEServer*, esp_ble_gatts_cb_param_t* parameters) override {
+        attMtu = parameters->mtu.mtu;
+    }
     void onDisconnect(BLEServer*) override {
+        attMtu = protocol::kMinimumAttMtu;
         ++generation; connected = false; authorized = false;
         // Solo volver a anunciarse si el transporte sigue habilitado.
         advertise = enabled.load();
@@ -115,6 +135,9 @@ void begin(Dispatch dispatch, Authenticate authenticate) {
     // presente: cualquier equipo dentro del alcance puede escribir en las
     // características, incluidas las correcciones que van al receptor.
     BLEDevice::init(instrument::apName().c_str());
+    // Ofrecer un MTU mayor (hueco G5): el telefono elige el menor de los dos.
+    // Un cliente que no negocia sigue en 23 y recibe tramas de 20 bytes.
+    BLEDevice::setMTU(protocol::kPreferredAttMtu);
     server = BLEDevice::createServer();
     server->setCallbacks(new ConnectionCallbacks());
     auto service = server->createService(serviceId);
@@ -182,16 +205,23 @@ void tick() {
             responseGeneration = request.generation; offset = 0; ++messageId;
         }
     }
-    // Tramas de 20 bytes: funcionan incluso con MTU ATT de 23.
-    if (!pending.isEmpty() && millis() - lastSend >= 5) {
-        uint8_t frame[20] = {};
-        const size_t count = std::min<size_t>(15, pending.length() - offset);
-        frame[0] = messageId; frame[1] = messageId >> 8;
-        frame[2] = offset; frame[3] = offset >> 8;
-        frame[4] = (offset == 0 ? 1 : 0) | (offset + count == pending.length() ? 2 : 0);
-        memcpy(frame + 5, pending.c_str() + offset, count);
-        responses->setValue(frame, count + 5); responses->notify();
-        offset += count; lastSend = millis();
+    // Tramas del tamano del MTU negociado: con 247, una respuesta de 2 kB son 9
+    // tramas en vez de 134. Con 23 siguen siendo de 20 bytes.
+    //
+    // Y solo si la controladora tiene hueco para esta conexion, como hace el
+    // ejemplo de caudal de ESP-IDF: una notificacion que no cabe se pierde en
+    // silencio, y la app descarta la respuesta entera por el hueco en los
+    // desplazamientos. Con tramas de 244 el riesgo de llenarla es mucho mayor
+    // que con las de 20.
+    const bool due = !pending.isEmpty() && millis() - lastSend >= 5;
+    const bool room = due && esp_ble_get_cur_sendable_packets_num(connectionId.load()) > 0;
+    if (due && (room || millis() - lastSend >= kFlowControlMaxWaitMs)) {
+        if (!room) ++forcedFrames;
+        uint8_t frame[protocol::kMaxNotificationBytes];
+        const size_t length = protocol::encodeResponseFrame(frame, messageId, offset, pending.c_str(), pending.length(),
+                                                            protocol::responsePayloadBytes(attMtu.load()));
+        responses->setValue(frame, length); responses->notify();
+        offset += length - protocol::kResponseHeaderBytes; lastSend = millis();
         if (offset == pending.length()) pending = "";
     }
     if (!authorized || millis() - lastSample < 20) return;
@@ -241,6 +271,10 @@ void status(JsonObject out) {
     out["pairing_required"] = false;
     out["protocol_version"] = 2;
     out["dropped_requests"] = dropped.load();
+    // MTU negociado con el telefono conectado (23 = sin negociar) y tramas de
+    // respuesta mandadas sin hueco en la controladora (hueco G5).
+    out["att_mtu"] = attMtu.load();
+    out["response_frames_forced"] = forcedFrames.load();
     out["control_available"] = ready;
     out["rtcm_available"] = gnss_receiver::snapshot().enabled;
     out["rtcm_valid_frames"] = correctionAccepted.load();

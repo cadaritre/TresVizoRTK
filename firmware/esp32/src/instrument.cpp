@@ -1,6 +1,7 @@
 #include "sd_recorder.h"
 #include "ntrip_input.h"
 #include "gnss_control.h"
+#include "gnss_sky.h"
 #include "memory_health.h"
 #include "instrument.h"
 #include "gnss_receiver.h"
@@ -916,6 +917,10 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
     // salidas, perfil RTCM y persistencia. Refleja lo aplicado o leído por este
     // firmware, no una consulta continua al UM980.
     if(path=="/api/gnss/profile" && method=="GET"){gnss_control::profile(response.to<JsonObject>());return 200;}
+    // El cielo va en su propia ruta y no en /api/status: son varios kilobytes
+    // que solo hacen falta con la pantalla de satelites abierta, y el estado se
+    // consulta una vez por segundo desde todas partes.
+    if(path=="/api/gnss/sky" && method=="GET"){gnss_sky::publish(response.to<JsonObject>());return 200;}
     if(path=="/api/base/apply" && method=="POST") {
         JsonDocument preview;int code=previewBase(body,preview);
         if(code!=200){response=preview;return code;}

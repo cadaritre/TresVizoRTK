@@ -1,0 +1,134 @@
+{
+ "tapa_plato": {
+  "solidos": 1,
+  "valido": true,
+  "volumen_cm3": 103.01
+ },
+ "domo": {
+  "solidos": 1,
+  "valido": true,
+  "volumen_cm3": 59.51
+ },
+ "interferencias_mm3": {
+  "tapa_plato-tubo": 0.0,
+  "tapa_plato-trineo": 0.0,
+  "domo-tapa_plato": 0.0,
+  "domo-tubo": 0.0,
+  "antena-tapa_plato": 0.0,
+  "antena-domo": 0.0
+ },
+ "holguras_mm": {
+  "elemento_a_domo": 6.12,
+  "antena_completa_a_domo": 3.24,
+  "antena_a_tapa_plato": 0.0
+ },
+ "seguro": {
+  "angulo": 193.0,
+  "choque_del_nucleo_mm3": 0.0,
+  "plastico_para_la_rosca_mm3": 11.7,
+  "alineado": true
+ },
+ "voladizos": {
+  "tapa_plato_boca_abajo": {
+   "area_con_soporte_mm2": 13648.0,
+   "caras": [
+    {
+     "area_mm2": 11784.1,
+     "altura_mm": 26.1,
+     "tipo": "Cone"
+    },
+    {
+     "area_mm2": 1220.9,
+     "altura_mm": 12.0,
+     "tipo": "Plane"
+    },
+    {
+     "area_mm2": 529.2,
+     "altura_mm": 4.8,
+     "tipo": "Plane"
+    },
+    {
+     "area_mm2": 28.2,
+     "altura_mm": 46.4,
+     "tipo": "Plane"
+    },
+    {
+     "area_mm2": 28.2,
+     "altura_mm": 46.4,
+     "tipo": "Plane"
+    },
+    {
+     "area_mm2": 28.2,
+     "altura_mm": 46.4,
+     "tipo": "Plane"
+    }
+   ]
+  },
+  "domo_de_pie": {
+   "area_con_soporte_mm2": 13704.0,
+   "caras": [
+    {
+     "area_mm2": 210.2,
+     "altura_mm": 29.4,
+     "tipo": "Cone"
+    },
+    {
+     "area_mm2": 210.2,
+     "altura_mm": 29.7,
+     "tipo": "Cone"
+    },
+    {
+     "area_mm2": 210.2,
+     "altura_mm": 30.0,
+     "tipo": "Cone"
+    },
+    {
+     "area_mm2": 210.1,
+     "altura_mm": 29.2,
+     "tipo": "Cone"
+    },
+    {
+     "area_mm2": 210.0,
+     "altura_mm": 30.3,
+     "tipo": "Cone"
+    },
+    {
+     "area_mm2": 209.9,
+     "altura_mm": 28.9,
+     "tipo": "Cone"
+    }
+   ]
+  },
+  "domo_exterior_con_soporte_mm2": 0.0
+ },
+ "junta": {
+  "fondo_ranura_diametro_mm": 133.5,
+  "falda_interior_diametro_mm": 136.6,
+  "prensado_nominal_pct": 22.5
+ },
+ "cotas": {
+  "asiento_antena_z_mm": 172.83,
+  "cima_domo_z_mm": 203.28,
+  "altura_interior_casquete_mm": 27.95,
+  "cabeza_sobre_el_tubo_mm": 71.4,
+  "diametro_exterior_mm": 141.6,
+  "sobre_la_tapa_de_v2_1_mm": 66.4,
+  "altura_total_mm": 203.3
+ },
+ "antena_comprobada_con": "STEP oficial",
+ "cable_del_step_fuera_de_la_caja_mm3": 640.8,
+ "fallos": [],
+ "geometria_coherente": true,
+ "exportes": [
+  {
+   "pieza": "07-oem-antenna-lid",
+   "triangulos": 8766,
+   "cerrada": true
+  },
+  {
+   "pieza": "08-oem-dome",
+   "triangulos": 46058,
+   "cerrada": true
+  }
+ ]
+}
