@@ -40,6 +40,11 @@ Hasta 0.5.0 el firmware solo ofrecía 1, 5 y 10 Hz, y formateaba el parámetro c
 un decimal, de modo que 20 Hz era inexpresable. Las 50 Hz que menciona el manual
 dependen del producto y del firmware del receptor y no se ofrecen.
 
+**Desde 0.7.6 el firmware solo acepta 1, 2 y 5 Hz**, aunque el UM980 admita 10 y
+20: `telemetry`, `outputs` y `rtcm_base` con más de 5 Hz devuelven `400` con el
+motivo. A 10 Hz el teléfono medía unos 8 por Bluetooth, y el propietario fijó
+5 Hz para todo el camino. La tabla de arriba sigue siendo la del manual.
+
 Las sentencias NMEA deben pedirse con prefijo `GP`, según indica el manual, aunque
 la respuesta llegue como `GN`. El firmware admite `GPGGA`, `GPGST`, `GPRMC`,
 `GPGSV`, `GPGSA`, `GPVTG` y `GPZDA`.
@@ -189,7 +194,8 @@ pantalla no puede decir nada del cielo.
 Van a **1 Hz aunque la posición vaya a diez**. El cielo no cambia en cien
 milisegundos, y a 10 Hz cargarían el enlace de verdad. Con GGA a 10 Hz y las
 otras tres a 1 Hz, la estimación con el tamaño máximo de sentencia ronda el 20 %
-de los 115200 baudios. **Es una estimación, no una medida.**
+de los 115200 baudios. **Es una estimación, no una medida.** Desde 0.7.6 la posición
+va a 5 Hz, así que la carga es menor.
 
 ### Comprobado contra el UM980 real, 26-09-2026
 

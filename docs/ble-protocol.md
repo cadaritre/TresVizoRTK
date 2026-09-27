@@ -37,7 +37,7 @@ Respuestas de hasta 4096 bytes en paquetes del tamaño del MTU negociado: uint16
 | 12 | int32 | Longitud × 10⁷ grados; INT32_MIN inválido |
 | 16 | int32 | Altura MSL del receptor en mm; INT32_MIN inválido |
 
-Se notifica únicamente una época nueva con llegada menor a 500 ms. La app vence datos si dejan de llegar y distingue secuencia de época. No extrapolar ni repetir una posición para aparentar 10 Hz. No hay reloj UTC absoluto ni sincronización PPS validada. Extensiones de mensaje y otras referencias de altura requieren versión nueva; no reinterpretar campos silenciosamente.
+Se notifica únicamente una época nueva con llegada menor a 500 ms, y **como máximo a 5 Hz** desde 0.7.6: al menos 190 ms entre envíos, por Bluetooth y por WebSocket (`protocol::kMinSolutionIntervalMs`); hasta 0.7.5 bastaban 20 ms. La app vence datos si dejan de llegar y distingue secuencia de época. No extrapolar ni repetir una posición para aparentar 10 Hz. No hay reloj UTC absoluto ni sincronización PPS validada. Extensiones de mensaje y otras referencias de altura requieren versión nueva; no reinterpretar campos silenciosamente.
 
 ## Salud (20 bytes, little-endian, 1 Hz)
 

@@ -454,3 +454,35 @@ añade `chosen_source`, la que se restaurará.
 
 **Sin probar:** los paquetes por BLE (mismo código que el WebSocket, sin cliente
 en la PC para leerlos) y la app del propietario leyéndolos.
+
+## Versión 0.7.6
+
+### La posición, a 5 Hz como máximo en todo el camino
+
+A 10 Hz el teléfono medía unos 8 posiciones por segundo por Bluetooth. Por
+decisión del propietario, todo queda en 5 Hz como máximo:
+
+- **Del UM980 al ESP32:** `telemetry`, `outputs` y `rtcm_base` solo aceptan 1, 2
+  o 5 Hz. Con 10 o 20 responden `400` con el motivo y no envían nada al receptor.
+  El receptor quedó con GGA a 5 Hz, guardado con `SAVECONFIG`.
+- **Del ESP32 al teléfono:** la solución por BLE y por WebSocket sale con al menos
+  190 ms entre envíos (`protocol::kMinSolutionIntervalMs`). A 5 Hz pasa cada
+  época; si el receptor mandara 10 Hz, saldría una de cada dos. La salud sigue a
+  1 Hz.
+- El panel ya no ofrece 10 ni 20 Hz. El botón «Activar telemetría 10 Hz» del
+  banco USB de la Mac no se tocó: configura el GPS por su USB, sin pasar por el
+  ESP32.
+
+### Verificación de esta entrega
+
+- `test/ble_frames_test.cpp` y `sky_table_test.cpp` con MSVC `/W4`: correctos.
+  `tests/gnss_panel_test.js` pasa. Compilación sin avisos nuevos; carga OTA
+  verificada y ajustes conservados.
+- En el equipo: `telemetry` y `outputs` a 10 Hz → `400` con el mensaje; a 5 Hz,
+  5/5 comandos confirmados. Del UM980 al ESP32, **4.99 GGA/s** medidos en 20 s.
+  Por WebSocket, **4.96 tramas de solución por segundo** en 12 s y la salud a
+  1 Hz. Tras la carga, la fuente de correcciones volvió sola a BLE, la elegida.
+
+**Sin probar:** la frecuencia por Bluetooth medida en el teléfono (mismo código
+que el WebSocket).
+
