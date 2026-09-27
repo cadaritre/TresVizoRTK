@@ -5,10 +5,12 @@ namespace base_plan {
 // ha medido la carcasa: hasta entonces es una constante declarada, no un dato
 // verificado. Cambiarla aquí la cambia en todo el firmware.
 constexpr double kCaseOffsetM = 0.10;
-inline bool known(double lat, double lon, double height, double antenna, bool marker, double& arp) {
+// La altura que se recibe es siempre la del punto en el suelo: desde 0.6.2 no
+// se pregunta a que punto corresponde, asi que la antena siempre se suma.
+inline bool known(double lat, double lon, double height, double antenna, double& arp) {
     if (!std::isfinite(lat) || !std::isfinite(lon) || !std::isfinite(height) || !std::isfinite(antenna) ||
         lat < -90 || lat > 90 || lon < -180 || lon > 180 || antenna < 0 || antenna > 100) return false;
-    arp = height + (marker ? antenna : 0);
+    arp = height + antenna;
     return height >= -30000 && height <= 30000 && arp >= -30000 && arp <= 30000;
 }
 inline bool average(unsigned seconds, double reuse) {

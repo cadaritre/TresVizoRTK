@@ -870,7 +870,7 @@ int previewBase(JsonVariantConst body, JsonDocument& response) {
         // La altura introducida es siempre la del punto en el suelo: se le suma
         // la antena y la constante del case.
         if (!base_plan::known(body["latitude_deg"], body["longitude_deg"],
-            body["ellipsoid_height_m"], body["antenna_vertical_m"], true, arp)) {
+            body["ellipsoid_height_m"], body["antenna_vertical_m"], arp)) {
             error(response, "invalid_height", "Coordenadas o alturas fuera de rango. La altura es elipsoidal y la medida de antena, vertical."); return 400;
         }
         arp += base_plan::kCaseOffsetM;

@@ -126,12 +126,23 @@ solución y cancelación explicada si esa calidad se pierde. Constante de case d
 incluido; watchdog de tarea activo; alarmas en `GET /api/status`, entre ellas las
 dos contradictorias (base consumiendo correcciones y publicación sin modo base).
 
-**Estado real:** verificado sobre el equipo el ciclo completo red → NTRIP →
-correcciones → RTK flotante tras reinicio, la precisión GST, el escaneo Wi-Fi, el
-interruptor BLE y que el caster local abre puerto. **Sin ejecutar ni una vez:**
-estacionar una base, una pasada de promedio, publicación NTRIP, el caster
-sirviendo a un rover, sourcetable, `meridianv.local` y los paquetes BLE.
-`tests/hardware_smoke.py` quedó roto al retirar la clave de acceso.
+**Estado real.** Verificado sobre el equipo: el ciclo completo red → NTRIP →
+correcciones → RTK flotante tras reinicio; la precisión GST; el escaneo Wi-Fi; el
+interruptor BLE; el **ciclo rover → base → rover** con cierre y reanudación
+automáticos de la entrada de correcciones; que **la base produce RTCM de verdad**
+(1482 tramas capturadas); que el **modo base sobrevive a un reinicio**; y que el
+caster local abre puerto y **se reanuda solo** tras reiniciar.
+
+Hallazgo de la prueba: **estacionar una base no la hace emitir**. Hay que
+aplicarle aparte el juego de mensajes RTCM, y hasta ahora no existía forma de
+distinguir «la base no emite» de «nadie recoge lo que emite»; se añadió el
+contador `frames_from_receiver` para eso.
+
+**Sin ejecutar ni una vez:** publicación NTRIP contra un caster externo, el caster
+sirviendo a un rover real, lectura de sourcetable, `meridianv.local`, conexión con
+dirección fija aplicada y los paquetes BLE. `tests/hardware_smoke.py`,
+`tests/operations_smoke.py` y `tools/ble_probe.py` se pusieron al día con 0.6.2
+—sin clave de acceso ni PIN, con el nombre fijo— pero no se han vuelto a ejecutar.
 
 ## 0.6.0 — 2026-09-20: auditoría del firmware, panel de campo y GPS avanzado
 

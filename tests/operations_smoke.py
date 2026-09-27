@@ -22,24 +22,27 @@ def run():
         check(body["base"]["can_preview"] and body["base"]["can_apply"])
         check(body["recording"]["sessions"] is None and not body["recording"]["can_start"])
         check(body["corrections"]["input"]["can_start"] and all(not body["corrections"][role]["can_start"] for role in ("publisher","local_caster")))
-        plan = dict(method="known",station_id=1,datum="Test frame",coordinate_epoch=None,
-                    latitude_deg=0,longitude_deg=0,ellipsoid_height_m=100,antenna_vertical_m=2,height_point="marker")
+        plan = dict(method="known",station_id=1,
+                    latitude_deg=0,longitude_deg=0,ellipsoid_height_m=100,antenna_vertical_m=2)
         r = preview(plan)
         check(r["status"] == 200 and not r["body"]["applied"] and not r["body"]["persisted"])
-        check(r["body"]["plan"]["arp_ellipsoid_height_m"] == 102)
-        r = preview({**plan,"height_point":"arp"})
-        check(r["body"]["plan"]["arp_ellipsoid_height_m"] == 100)
+        # Altura declarada = punto + antena + los 10 cm de case que suma el equipo.
+        check(abs(r["body"]["plan"]["arp_ellipsoid_height_m"] - 102.10) < 1e-6)
+        check(abs(r["body"]["plan"]["case_offset_m"] - 0.10) < 1e-9)
+        check(r["body"]["plan"]["datum"] == "WGS84")
         for patch in [dict(station_id=-1),dict(station_id=4096),dict(station_id=1.5),
                       dict(latitude_deg=91),dict(longitude_deg=-181),dict(latitude_deg="0"),
                       dict(latitude_deg=None),dict(antenna_vertical_m=-1),dict(ellipsoid_height_m=30000),
-                      dict(height_point="inclined"),dict(datum=""),dict(datum="a\0b"),
-                      dict(coordinate_epoch=3000),dict(command="MODE BASE")]:
+                      dict(command="MODE BASE"),
+                      # Retirados en 0.6.2: enviarlos ahora debe rechazarse.
+                      dict(datum="Test frame"),dict(coordinate_epoch=2020.5),
+                      dict(height_point="marker")]:
             check(preview({**plan,**patch})["status"]==400)
         average=dict(method="average",station_id=4095,average_seconds=300,reuse_distance_m=0)
         check(preview(average)["status"]==200)
         check(preview({**average,"average_seconds":3601})["status"]==400)
         check(preview({**average,"reuse_distance_m":11})["status"]==400)
-        check(device._exchange("POST","/api/base/plan",plan,key="wrong")["status"]==401)
+        # La clave de panel se retiró en 0.6.2: ya no hay respuesta 401 que probar.
         check(device.request("POST","/api/recording/start",{})["status"]==503)
         check(device.request("GET","/api/config")["body"]==before["body"])
         print(f"Operaciones: {count} comprobaciones; sin cambios persistentes ni comandos GNSS.")

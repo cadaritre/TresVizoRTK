@@ -321,9 +321,24 @@ real o un rover. Solo consta que el caster abre el puerto y escucha.
 - La altura introducida es la del punto en el suelo. Se le suma la altura de
   antena medida y **10 cm de case**, constante declarada en `base_plan.h` que
   **todavía no se ha medido sobre la carcasa real**.
-- Un solo botón: «Estacionar la base aquí» valida y envía. Antes había tres, y
-  uno exportaba un JSON que no salía del navegador.
-- El papel del receptor y el botón «Usar como rover» están arriba del todo.
+- **Un solo botón de acción visible.** El origen de la coordenada es un selector
+  segmentado —usar la actual o promediar— y según lo elegido aparece «Estacionar
+  la base aquí» o «Iniciar promedio», nunca ambos. Se retiraron el paso de
+  validación por separado, la exportación a JSON, que no salía del navegador, y
+  el desplegable «Origen de coordenadas», que duplicaba exactamente el selector.
+- El papel del receptor y el botón «Usar como rover» están arriba del todo. **El
+  modo se consulta solo**; no hay botón de consultar porque el equipo ya sabe
+  preguntárselo al receptor.
+
+**Estacionar una base no la hace emitir correcciones.** Hay que aplicarle además
+el juego de mensajes RTCM desde Correcciones. `GET /api/status` expone
+`corrections_out.frames_from_receiver` justamente para distinguir «la base no
+emite» de «nadie se ha conectado a recoger lo que emite».
+
+**Estacionar cierra la entrada de correcciones por su cuenta**, igual que cambiar
+de papel. Pedirle al usuario que vaya a otra pestaña a detener algo que él no
+inició, para poder hacer lo que acaba de pedir, era trasladarle nuestro orden
+interno.
 
 ### Promedio de coordenadas en el ESP32
 
@@ -333,9 +348,18 @@ pierde: promediar cien épocas autónomas da una coordenada muy repetible y
 exactamente igual de equivocada.
 
 Se elige la calidad exigida (`rtk_fixed`, `rtk_float`, `standalone` o `any`) y el
-tiempo, de 5 a 900 s. **Si la calidad se pierde a mitad, el promedio se cancela y
-se explica por qué.** El panel muestra barra de progreso, épocas usadas y la
-coordenada que se va formando.
+tiempo, **de 2 a 900 s**, con 30 s por defecto. Dos segundos son veinte épocas a
+10 Hz: con solución fija es un promedio legítimo, y exigir más era una regla
+inventada. **Si la calidad se pierde a mitad, el promedio se cancela y se explica
+por qué.**
+
+El panel muestra barra de progreso, épocas usadas y la coordenada que se va
+formando, desde el instante del clic y no desde la primera respuesta del equipo.
+
+Estados: `averaging` mientras acumula, **`applying` mientras el receptor decide**
+y `applied` solo cuando el receptor **confirma** el modo base. Antes decía
+`applied` en cuanto se lanzaba el trabajo, que no es lo mismo: el receptor podía
+seguir en rover y el panel lo daba por hecho.
 
 ### Precisión estimada
 
@@ -352,13 +376,25 @@ declara el receptor, no una exactitud comprobada contra una referencia externa.
   rovers fijaban con buena pinta sobre un punto que no era.
 - **Watchdog activo** (`-DTRESVIZO_TASK_WDT`). Vigila la tarea de adquisición del
   GPS; un bloqueo pasa de dejar el equipo sordo a reiniciarlo en segundos. **No
-  vigila** las tareas de NTRIP, de salida ni el bucle principal.
+  vigila** las tareas de NTRIP, de salida ni el bucle principal. Si llega a
+  actuar, el panel lo dice: un reinicio silencioso que «se arregló solo» es justo
+  el dato que hace falta para encontrar el bloqueo de fondo.
+- **El modo del receptor se consulta solo** cinco segundos después de arrancar.
+  Sin ese dato, el guardia que impide que una base consuma correcciones no puede
+  decidir, y el panel tendría que pedirle al usuario que pulse un botón para
+  saber algo que el equipo puede averiguar por su cuenta. El papel informado **no
+  caduca**: antes usaba la ventana de 30 s de `roverReady()`, que existe para
+  autorizar conexiones y no para informar, y el panel volvía a «sin confirmar».
 - **Alarmas** en `GET /api/status` (`alerts`): receptor mudo, UART caída,
   correcciones detenidas, sin redes guardadas, reinicio por pánico, por caída de
   tensión o por watchdog, y las dos contradictorias —base con entrada de
   correcciones activa, y publicación sin modo base—.
-- **La entrada NTRIP no arranca en un equipo configurado como base**, ni se
-  reanuda al encender si quedó así.
+- **La entrada NTRIP no convive con el modo base.** No arranca en un equipo que ya
+  es base, y si se encuentra conectada en uno que lo es, se suelta sola.
+- **Al volver a rover, las correcciones vuelven sin que nadie las pida.** El
+  firmware distingue «lo detuvo el usuario» de «lo soltó el equipo para
+  estacionar»: lo primero se respeta, lo segundo se deshace. Respetar una decisión
+  del usuario y deshacer un apaño nuestro no son lo mismo.
 - **Las consultas de solo lectura funcionan con correcciones activas.** Antes el
   guardia bloqueaba también las lecturas, y no se podía saber en qué modo estaba
   el receptor justo cuando más falta hacía.
@@ -367,21 +403,34 @@ declara el receptor, no una exactitud comprobada contra una referencia externa.
 
 ### Verificación de esta entrega
 
-Comprobado sobre el equipo:
+Comprobado sobre el equipo, no deducido del código:
 
 - Compilación y carga; el panel reporta la versión que corre.
 - Escaneo Wi-Fi con 13 redes reales; guardar, olvidar y fijar o liberar dirección.
 - Reconexión completa tras reinicio: red guardada, perfil NTRIP, correcciones y
   RTK flotante, sin intervención.
 - Precisión GST con valores reales; interruptor BLE encendiendo y apagando.
-- Caster local abriendo puerto y escuchando.
+- **Ciclo completo rover → base → rover**: la base queda confirmada, la entrada
+  NTRIP se cierra sola, y al volver a rover se reanuda sola y recupera RTK.
+- **La base produce RTCM de verdad**: 1482 tramas capturadas del receptor tras
+  aplicarle el juego de mensajes.
+- **El modo base sobrevive a un reinicio**, gracias al `SAVECONFIG` automático.
+- **El caster local se reanuda solo** tras un reinicio y queda escuchando.
+- La alarma `publishing_without_base` salta cuando el caster queda encendido con
+  el receptor en rover.
 - Watchdog sin reinicios espurios durante la prueba (minutos, no días).
 
-**No ejecutado:** estacionar una base, una pasada de promedio, publicación NTRIP,
-el caster sirviendo a un rover, lectura de sourcetable, resolución de
-`meridianv.local`, conexión con dirección fija aplicada, y los paquetes BLE, que
-necesitan una app que todavía no existe. `tests/hardware_smoke.py` **está roto**:
-usa la clave de acceso y el nombre editable, que ya no existen.
+**No ejecutado ni una vez:** publicación NTRIP contra un caster externo, el caster
+local **sirviendo a un rover real** —solo consta que abre el puerto y escucha—,
+lectura de sourcetable, resolución de `meridianv.local`, conexión con dirección
+fija aplicada, y los paquetes BLE, que necesitan una app que todavía no existe.
+`tests/hardware_smoke.py`, `tests/operations_smoke.py` y `tools/ble_probe.py` se
+pusieron al día con 0.6.2 —sin clave de acceso, sin PIN y con el nombre fijo—,
+pero no se han vuelto a ejecutar contra el equipo.
+
+Los mnemónicos MSM7 se añadieron por numeración estándar RTCM y **no se
+contrastaron con el manual Unicore**; el receptor aceptó el juego por defecto en
+banco, que no es lo mismo que haberlo verificado contra la documentación.
 
 ## Versión 0.7.5
 

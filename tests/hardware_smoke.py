@@ -50,14 +50,13 @@ def run(port):
         check(status["subsystems"]["imu"]["state"] == "not_integrated" and status["subsystems"]["microsd"]["state"] == "not_configured" and status["subsystems"]["gnss"]["state"] in ("waiting_data","receiving","stale") and status["subsystems"]["ntrip"]["available"], "UART/NTRIP disponibles, IMU y microSD pendientes explícitos")
         check(status["subsystems"]["ble"]["control_available"], "Servicio de control BLE iniciado")
         original = get("/api/config")
-        check("wifi_password" not in original and "access_key" not in status, "Secretos ausentes de estado y configuración")
-        invalid = device._exchange("GET", "/api/status", key="incorrecta")
-        check(invalid["status"] == 401, "Acceso sin clave válida rechazado")
+        check("wifi_password" not in original, "Contraseña de red externa ausente de la configuración")
+        # Desde 0.6.2 el panel no pide clave: no hay 401 que comprobar. La del
+        # Wi-Fi propio sí se expone a propósito, para poder teclearla en un teléfono.
+        check(bool(original.get("ap_password")), "Contraseña del Wi-Fi propio visible para el operador")
+        check(original.get("device_name") == "MeridianV", "Nombre fijo del equipo")
         for body, label in [
-            ({"device_name": "<script>"}, "Nombre con contenido HTML rechazado"),
-            ({"device_name": "x" * 33}, "Nombre mayor a 32 bytes rechazado"),
-            ({"device_name": None}, "Valor nulo rechazado"),
-            ({"device_name": "prueba\u0000oculta"}, "NUL incrustado rechazado"),
+            ({"ap_password": "corta"}, "Contraseña de AP demasiado corta rechazada"),
             ({"refresh_ms": 0}, "Intervalo cero rechazado"),
             ({"refresh_ms": "1000"}, "Tipo de intervalo inválido rechazado"),
             ({"wifi_ssid": "é" * 17}, "Límite SSID aplicado en bytes UTF-8"),
@@ -69,15 +68,15 @@ def run(port):
             result = update({"revision": original["revision"], **body})
             check(result["status"] == 400, label)
         check(get("/api/config") == original, "Solicitudes inválidas no alteran la configuración")
-        changed = update({"revision": original["revision"], "device_name": "TresVizo prueba USB", "refresh_ms": 5000})
+        changed = update({"revision": original["revision"], "refresh_ms": 5000})
         check(changed["status"] == 200 and changed["body"]["changed"], "Ajustes válidos guardados")
         new_config = get("/api/config")
-        unchanged = update({"revision": new_config["revision"], "device_name": new_config["device_name"]})
+        unchanged = update({"revision": new_config["revision"], "refresh_ms": 5000})
         check(unchanged["status"] == 200 and not unchanged["body"]["changed"], "Guardado sin cambios evita escribir de nuevo")
-        conflict = update({"revision": original["revision"], "device_name": "Conflicto"})
+        conflict = update({"revision": original["revision"], "refresh_ms": 1000})
         check(conflict["status"] == 409, "Revisión obsoleta rechazada")
         after_restart = reboot()
-        check(after_restart["device_name"] == "TresVizo prueba USB" and after_restart["uptime_ms"] < 20000, "Reinicio y persistencia comprobados")
+        check(after_restart["device_name"] == "MeridianV" and after_restart["uptime_ms"] < 20000, "Reinicio y persistencia comprobados")
         check(get("/api/config")["refresh_ms"] == 5000, "Intervalo persiste tras reiniciar")
         # El parser debe recuperarse tras una línea más grande que su buffer.
         device.connection.write(b"x" * 1200 + b"\n")
@@ -92,10 +91,10 @@ def run(port):
     finally:
         if original is not None:
             current = get("/api/config")
-            result = update({"revision": current["revision"], "device_name": original["device_name"], "refresh_ms": original["refresh_ms"]})
+            result = update({"revision": current["revision"], "refresh_ms": original["refresh_ms"]})
             assert result["status"] == 200, "No se pudo restaurar la configuración original"
             restored = reboot()
-            check(restored["device_name"] == original["device_name"], "Ajustes originales restaurados y reiniciados")
+            check(restored["refresh_ms"] == original["refresh_ms"], "Ajustes originales restaurados y reiniciados")
         device.close()
     print(f"Completadas {len(checks)} comprobaciones de hardware.")
 
