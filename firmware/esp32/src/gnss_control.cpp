@@ -50,6 +50,10 @@ struct Profile {
 struct Reconciliation {
     bool ran = false;
     bool reading = false;            // fase de lectura en curso
+    // La del arranque no toca las preferencias del usuario. Ver
+    // `applyReconciliation`: forzar la mascara al arrancar le borraria al
+    // operador la que acaba de poner, y sin decirselo.
+    bool atBoot = false;
     uint32_t readStartedAt = 0;
     String readback;                 // líneas $CONFIG,... tal como llegaron
     String differences;              // clave: leído -> esperado, separadas por " | "
@@ -145,15 +149,24 @@ int prepare(const String& name, JsonDocument& out) {
     if(!gnss_receiver::snapshot().enabled) {out["message"]="UART no disponible.";return 503;}
     if(sd_recorder::active()){out["message"]="Cierra la grabación antes de configurar el GPS.";return 409;}
     if(running) {out["message"]="Operación GNSS en curso.";return 409;}
-    // Las consultas son de solo lectura y no reconfiguran nada: bloquearlas con
-    // correcciones activas impedia saber en que modo esta el receptor justo
-    // cuando mas falta hace. El entrelazado de bytes ya esta resuelto: el
-    // consumidor de correcciones se detiene mientras este modulo trabaja.
-    const bool readOnly = name=="query" || name=="config_query" || name=="raw_profile";
-    if(!readOnly) {
-        JsonDocument router;correction_router::status(router.to<JsonObject>());
-        if(router["active_source"]!="none") {out["message"]="Hay correcciones activas. Pulsa «Detener» en el apartado de correcciones y repite; configurar el GPS con una fuente activa mezclaría comandos con RTCM.";return 409;}
-    }
+    // **Configurar el GPS con las correcciones encendidas esta permitido.**
+    //
+    // Aqui habia un 409 que lo prohibia, con este motivo: «configurar el GPS con
+    // una fuente activa mezclaria comandos con RTCM». Ese motivo era falso, y el
+    // comentario de al lado ya lo decia para las consultas: **el entrelazado de
+    // bytes esta resuelto en el planificador de escritura de la UART**
+    // (`gnss_receiver.cpp`), que solo llama a `tick` cuando no hay trama RTCM a
+    // medio enviar, y solo saca una trama nueva de la cola cuando este modulo no
+    // esta trabajando. Comandos y RTCM no pueden cruzarse, ni leyendo ni
+    // escribiendo.
+    //
+    // El coste real de permitirlo es otro y es pequeno: mientras el comando
+    // viaja, las tramas RTCM esperan en la cola y las que pasen de dos segundos
+    // se descartan, asi que la solucion puede degradarse un instante. Eso lo
+    // decide el operador, no el firmware. Lo que el firmware hacia era mandarle
+    // a apagar las correcciones para cambiar una mascara de elevacion, y volver
+    // a encenderlas despues: obligarle a perder el fijo entero para evitar
+    // perder dos tramas.
     count=index=0;sent=ack=readback=false;overflowed=false;failure="";expectedMode="";action=name;
     return 0;
 }
@@ -203,7 +216,19 @@ void feed(const char* data, size_t size) {
 /// Se llama cuando la fase de lectura termina. Los comandos correctores entran
 /// en la **misma** cola, así que el trabajo sigue sin que el cliente tenga que
 /// pedir nada más: para quien monta un receptor nuevo es una sola operación.
-void applyReconciliation() {
+/// Compara lo leido con la linea base y encola lo que falte.
+///
+/// `userPreferences` decide si tambien se tocan **la mascara de elevacion y las
+/// constelaciones**, que no son invariantes de correccion sino decisiones del
+/// operador: las cambia por trabajo desde la app.
+///
+/// La reconciliacion **automatica del arranque no las toca**. Forzarlas ahi
+/// significaria que apagar y encender el equipo le devuelve la mascara a 5
+/// grados despues de que el operador la puso en 15, sin avisarle. La
+/// reconciliacion **que pide el usuario** si las pone: ahi lo que ha pedido es
+/// justo devolver el receptor a la linea base, que es el caso del equipo recien
+/// montado.
+void applyReconciliation(bool userPreferences) {
     reconciliation.reading = false;
     reconciliation.ran = true;
     reconciliation.checked = 0;
@@ -230,34 +255,51 @@ void applyReconciliation() {
         }
     }
 
-    // La máscara va aparte: se lee con MASK y no con CONFIG.
-    ++reconciliation.checked;
+    // La mascara se lee con MASK y no con CONFIG. **Se lee siempre**, aunque no
+    // se corrija: asi la app puede ensenar la que el receptor tiene de verdad
+    // en vez de suponer la de fabrica.
     String mascara = maskReadback;
     mascara.trim();
-    const String esperadaMascara = "MASK " + String(receiver_baseline::kElevationMaskDegrees, 1);
-    if(!mascara.startsWith(esperadaMascara.substring(0, esperadaMascara.length()-2))) {
-        anotar("MASK", mascara, receiver_baseline::kElevationMaskCommand);
-        if(add(String(receiver_baseline::kElevationMaskCommand))) ++reconciliation.fixed;
+    if(mascara.startsWith("MASK ")) {
+        profileState.elevation_deg = mascara.substring(5).toDouble();
+        profileState.elevation_known = true;
     }
 
-    // Las constelaciones no salen en CONFIG, así que no se pueden comparar: se
-    // habilitan siempre. Es el único punto donde se escribe sin haber leído, y
-    // se dice en el informe en vez de dejarlo como si se hubiera comprobado.
-    for(size_t i = 0; i < receiver_baseline::kConstellationCount; ++i) {
-        add(String("UNMASK ") + receiver_baseline::kConstellations[i]);
-    }
-    profileState.gps=profileState.bds=profileState.glo=profileState.gal=profileState.qzss=true;
-    profileState.constellations_known = true;
-    profileState.elevation_deg = receiver_baseline::kElevationMaskDegrees;
-    profileState.elevation_known = true;
+    if(userPreferences) {
+        ++reconciliation.checked;
+        const String esperadaMascara = "MASK " + String(receiver_baseline::kElevationMaskDegrees, 1);
+        if(!mascara.startsWith(esperadaMascara.substring(0, esperadaMascara.length()-2))) {
+            anotar("MASK", mascara, receiver_baseline::kElevationMaskCommand);
+            if(add(String(receiver_baseline::kElevationMaskCommand))) ++reconciliation.fixed;
+        }
 
+        // Las constelaciones no salen en CONFIG, asi que no se pueden comparar:
+        // se habilitan siempre. Es el unico punto donde se escribe sin haber
+        // leido, y se dice en el informe en vez de dejarlo como si se hubiera
+        // comprobado.
+        for(size_t i = 0; i < receiver_baseline::kConstellationCount; ++i) {
+            add(String("UNMASK ") + receiver_baseline::kConstellations[i]);
+        }
+        profileState.gps=profileState.bds=profileState.glo=profileState.gal=profileState.qzss=true;
+        profileState.constellations_known = true;
+        profileState.elevation_deg = receiver_baseline::kElevationMaskDegrees;
+        profileState.elevation_known = true;
+    }
+
+    const String cola = userPreferences
+        ? String(" Las constelaciones se habilitaron sin poder comprobarlas antes: "
+                 "CONFIG no las devuelve.")
+        : String(" La mascara de elevacion y las constelaciones no se tocaron: "
+                 "son del operador, no de la linea base.");
     if(reconciliation.fixed == 0) {
-        reconciliation.summary = "El receptor ya tenía la configuración correcta. "
-            "Las constelaciones se habilitaron igualmente: CONFIG no las devuelve y no se pueden comprobar.";
+        reconciliation.summary = (reconciliation.atBoot
+            ? String("Al arrancar, el receptor ya tenia la configuracion correcta.")
+            : String("El receptor ya tenia la configuracion correcta.")) + cola;
     } else {
-        reconciliation.summary = "Se corrigieron " + String(reconciliation.fixed) + " de "
-            + String(reconciliation.checked) + " ajustes. Las constelaciones se habilitaron "
-            "sin poder comprobarlas antes: CONFIG no las devuelve.";
+        reconciliation.summary = (reconciliation.atBoot ? String("Al arrancar se corrigieron ")
+                                                        : String("Se corrigieron "))
+            + String(reconciliation.fixed) + " de " + String(reconciliation.checked)
+            + " ajustes." + cola;
     }
 }
 
@@ -268,8 +310,25 @@ void tick(HardwareSerial& uart) {
     // el cliente NTRIP se reconecta a una base que no necesita correcciones.
     if(!bootQueried && !running && millis()>5000 && gnss_receiver::snapshot().enabled) {
         bootQueried=true;
-        count=index=0;sent=ack=readback=false;overflowed=false;failure="";expectedMode="";action="query";
-        add("VERSIONA");add("MODE");
+        count=index=0;sent=ack=readback=false;overflowed=false;failure="";expectedMode="";
+        // **Al arrancar se reconcilia, no solo se pregunta.**
+        //
+        // Antes esto solo leia VERSIONA y MODE, y la comparacion con la linea
+        // base habia que pedirla a mano. La consecuencia se vio en el equipo el
+        // 25-09-2026: `CONFIG UNDULATION AUTO` habia vuelto. La correccion que
+        // se aplico dias antes no se guardo en la NVM del receptor —a proposito,
+        // porque SAVECONFIG persiste tambien lo que este mal—, asi que al
+        // apagarlo volvio a su valor guardado y nadie se enteraba.
+        //
+        // No se persiste, se vuelve a asegurar en cada arranque. Es idempotente,
+        // no escribe la NVM, y arregla de paso el caso que pidio el propietario:
+        // un receptor recien montado queda bien la primera vez que se enciende.
+        action="reconcile";
+        reconciliation = Reconciliation();
+        reconciliation.reading = true;
+        reconciliation.atBoot = true;
+        maskReadback="";
+        add("VERSIONA");add("MODE");add("CONFIG");add("MASK");
         phase="running";running=true;++job;launched=millis();
     }
     if(running) {
@@ -291,7 +350,7 @@ void tick(HardwareSerial& uart) {
                 // Fin de la fase de lectura de una reconciliacion: se compara y
                 // se encolan las correcciones en esta misma cola.
                 if(reconciliation.reading) {
-                    applyReconciliation();
+                    applyReconciliation(!reconciliation.atBoot);
                     if(index < count) { sent=false; xSemaphoreGive(mutex); return; }
                 }
                 if(expectedMode.length() && !mode.startsWith(expectedMode))finish("partial_or_unknown","Modo leído distinto del solicitado.");
@@ -400,7 +459,22 @@ int start(JsonVariantConst body,JsonDocument& out) {
         //
         // La app aplica su propio geoide, declarado y versionado, sobre la
         // altura elipsoidal. Es lo que exige `geoid-models.md`.
-        if(name=="rover") {rover=false;mode="";add("MODE ROVER SURVEY");add("CONFIG UNDULATION 0.0000");add("MODE");expectedMode="MODE ROVER SURVEY";}
+        // **Pasar a movil limpia primero las salidas de COM2.**
+        //
+        // Sin esto, los mensajes RTCM que se configuraron cuando el equipo fue
+        // base **siguen saliendo** despues de volver a movil: `MODE ROVER SURVEY`
+        // cambia el modo, no los registros. Visto en el equipo el 25-09-2026 con
+        // el receptor en `MODE ROVER SURVEY` y `LOGLIST` devolviendo 1005, 1033,
+        // 1077, 1087, 1097 y 1127 a 1 Hz.
+        //
+        // Cuesta la cuarta parte de la UART en tramas que no sirven para nada, y
+        // las mete **entrelazadas con el NMEA de la posicion**, que es la
+        // sospecha mas firme de por que se descartaba el 13 % de las tramas GGA.
+        //
+        // Se puede limpiar sin miedo porque todos los perfiles de la app ponen
+        // `rover` y `telemetry` juntos: la salida de posicion se vuelve a
+        // configurar acto seguido.
+        if(name=="rover") {rover=false;mode="";add("UNLOG COM2");add("MODE ROVER SURVEY");add("CONFIG UNDULATION 0.0000");add("MODE");expectedMode="MODE ROVER SURVEY";}
         // GST acompaña siempre a GGA: sin ella el panel no puede decir con qué
         // precisión estima el receptor. Va a 1 Hz aunque la posición vaya más
         // rápido; la desviación no cambia a 10 Hz y cargar la UART no ayuda.
