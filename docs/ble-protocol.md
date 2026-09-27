@@ -31,7 +31,7 @@ Respuestas de hasta 4096 bytes en paquetes del tamaño del MTU negociado: uint16
 | --- | --- | --- |
 | 0 | uint16 | Secuencia; vuelve a 0 después de 65535 |
 | 2 | uint8 | Calidad GGA 0–8 |
-| 3 | uint8 | Satélites usados; 255 desconocido |
+| 3 | uint8 | Satélites **rastreados** (GSV); 255 desconocido. Hasta 0.7.4, usados (GGA) |
 | 4 | uint32 | Hora UTC del día en ms; **sin fecha** |
 | 8 | int32 | Latitud × 10⁷ grados; INT32_MIN inválido |
 | 12 | int32 | Longitud × 10⁷ grados; INT32_MIN inválido |
@@ -46,20 +46,24 @@ La misma carga va por el WebSocket `/ws/telemetry` como trama de tipo `0x02`.
 | Offset | Tipo | Significado |
 | --- | --- | --- |
 | 0 | uint8 | Versión del paquete: `1` |
-| 1 | uint16 | Sigma horizontal de GST en mm; 0xFFFF sin estimación |
+| 1 | uint16 | Sigma horizontal de GST en mm, **del peor eje** (N/E); 0xFFFF sin estimación. Hasta 0.7.4, combinada |
 | 3 | uint16 | Sigma vertical de GST en mm; 0xFFFF sin estimación |
 | 5 | uint16 | Edad de la última corrección en s; 0xFFFF sin fuente |
 | 7 | uint8 | Fuente activa: 0 ninguna, 1 BLE, 2 NTRIP, 3 radio |
 | 8 | uint8 | Calidad GGA, espejo del paquete de solución |
 | 9 | uint8 | IMU: reservado, siempre 0 |
-| 10 | uint8 | Satélites rastreados, de GSV; 255 desconocido. **Desde 0.7.1** |
+| 10 | uint8 | Satélites usados (GGA); 255 desconocido. **Desde 0.7.5**; antes, 0 |
 | 11–19 | — | Sin usar |
 
-**El byte 10 no sube la versión, a propósito.** Estaba sin usar, así que un
-cliente de la versión 1 no lo lee; subir a 2 podía dejar sin sigmas ni edad de
-correcciones a una app que exija `1`. La contrapartida: hasta 0.7.0 el byte iba
-a cero, y cero también es un número de satélites. Leerlo solo si
-`firmware_version` de `/api/status` es 0.7.1 o posterior.
+**Desde 0.7.5 la telemetría enseña lo mismo que el panel**, por decisión del
+propietario: rastreados en el byte 3 de la solución y el peor eje en la sigma
+horizontal de la salud. Es un cambio de significado de dos campos existentes, y
+**no sube la versión, a propósito**: la app del propietario ya los lee y así
+enseña lo mismo sin tocarla, mientras que una versión nueva podía dejarla sin
+sigmas ni edad de correcciones si exige `1`. Quien necesite el significado
+anterior lo distingue por `firmware_version` de `/api/status`: hasta 0.7.4, byte
+3 = usados y sigma horizontal = combinada. Los usados siguen en el byte 10 y en
+`solution.satellites_used`.
 
 ## Correcciones
 

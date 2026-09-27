@@ -383,32 +383,58 @@ el caster sirviendo a un rover, lectura de sourcetable, resolución de
 necesitan una app que todavía no existe. `tests/hardware_smoke.py` **está roto**:
 usa la clave de acceso y el nombre editable, que ya no existen.
 
-## Versión 0.7.1
+## Versión 0.7.5
 
-**No usar 0.7.1.** Con GSV y GSA activas por COM2 se reinicia por panic cada
-pocos minutos: la pila de la tarea UART se desborda. Lo corrige 0.7.2.
+Entrega del 26-09-2026. Durante las pruebas se cargaron 0.7.1 a 0.7.4 como pasos
+intermedios; **no usar 0.7.1**, que se reinicia por panic con GSV y GSA activas.
 
-### Satélites rastreados, además de los usados
+### Satélites rastreados y precisión por eje, en el panel y en la telemetría
 
-Hasta aquí el panel y la telemetría solo daban los satélites **usados**, la
-cifra de GGA. Con ella no se distingue un cielo tapado de señales débiles que la
-solución descarta. El 26-09-2026, con la antena afuera de una ventana, el UM980
-rastreaba unos 30 satélites y usaba de 16 a 21; el panel solo enseñaba la
-segunda cifra.
+Hasta 0.7.0 el panel y la telemetría daban los satélites **usados**, la cifra de
+GGA, y una precisión horizontal combinada. Con la antena afuera de una ventana el
+UM980 rastreaba unos 30 satélites y usaba de 16 a 21, y la combinada salía √2
+mayor que el RMS por eje con el que otros equipos dan su precisión. Por decisión
+del propietario, Campo y la telemetría enseñan ahora lo mismo:
 
-- `GET /api/status` trae `solution.satellites_tracked`, de GSV. Se omite sin GSV
-  reciente.
-- Byte 10 del paquete de salud, por BLE (`a04c0006`) y por WebSocket; `255` =
-  desconocido. La versión del paquete sigue en `1`: el motivo está en
+- **Satélites rastreados**, de GSV. `GET /api/status` → `solution.satellites_tracked`
+  (se omite sin GSV reciente); `satellites_used` sigue en la API.
+- **Precisión horizontal del peor eje**, la mayor de `solution.north_sigma_m` y
+  `solution.east_sigma_m`. `horizontal_sigma_m` sigue siendo la combinada.
+- BLE y WebSocket **cambian el significado de dos campos**: byte 3 de la solución
+  = rastreados, y sigma horizontal de la salud = peor eje. El byte 10 de la salud
+  lleva los usados. Detalle y compatibilidad en
   [el protocolo BLE](../../docs/ble-protocol.md#salud-20-bytes-little-endian-1-hz).
 - `GET /api/gnss/sky` añade `tracked`.
-- Campo muestra «usados / rastreados».
-- La tabla del cielo pasa de 72 a 192 observaciones: con triple banda y máscara
-  de 5° ya llegaban 75 desde una ventana. Cuesta unos 7 KB de RAM interna.
 
 El receptor tiene que mandar GSV y GSA por COM2, que es lo que hace la acción
 `telemetry`. Un equipo configurado antes de que esa acción las incluyera no las
 manda hasta que se vuelve a aplicar.
+
+La tabla del cielo pasa de 72 a 192 observaciones: con triple banda y máscara de
+5° ya llegaban 75 desde una ventana. Cuesta unos 7 KB de RAM interna.
+
+### La tarea UART pasa de 4 a 8 KiB de pila
+
+Con 0.7.1 y GSV/GSA activas por COM2, el equipo se reinició por panic tres veces
+en unos doce minutos (`reset_reason_code` 4, alerta `last_reset_panic`). La
+consola USB solo alcanzó a mostrar `Backtrace: 0xfffffffe:0x80381d74 |<-CORRUPTED`,
+la traza de una pila pisada. `-fstack-usage` dio el camino más hondo de
+`gnss_rx`: `acquire` 2112 bytes, su lambda 192 y `correction_output::publish`
+1072. Con 8 KiB, la tarea llegó a usar **4092 bytes**: con la pila de 4096 no
+quedaba nada. El fallo venía de antes; lo destapó activar GSV y GSA.
+
+`/api/status` publica `memory.stack_free_min_bytes`: lo menos que ha tenido libre
+cada pila desde el arranque, para `gnss_rx`, `ntrip_rx`, `rtcm_out`, `httpd` y
+`loopTask`.
+
+### La fuente de correcciones elegida sobrevive a un reinicio
+
+Quien elegía BLE desde la app y reiniciaba volvía a NTRIP: la elección vivía en
+RAM y la autoconexión del perfil la pisaba al arrancar. Ahora la elección
+explícita —`PUT /api/corrections/source`, arrancar NTRIP a mano o conectar un
+perfil— se guarda en NVS. Si fue BLE, al encender se restaura BLE y NTRIP no se
+autoconecta; pasar a móvil también la devuelve. `GET /api/corrections/source`
+añade `chosen_source`, la que se restaurará.
 
 ### Verificación de esta entrega
 
@@ -417,30 +443,14 @@ manda hasta que se vuelve a aplicar.
 - `tests/gnss_panel_test.js` pasa. **Estaba roto desde antes**: el contexto de
   la prueba no tenía `latestStatus` ni `$`, que `renderGnss` usa desde que pinta
   el indicador de fix. Se añadieron.
-- Compilación con `-Wall -Wextra` sin avisos en lo tocado; carga OTA verificada
-  por `tools/firmware_upload.py`, ajustes conservados.
-- En el equipo: `satellites_tracked` 29, igual que la lectura directa del UM980
-  por su USB; `dropped` 0; el WebSocket trae 29 en el byte 10; el panel lo
-  enseña a 375 px sin desbordar.
+- Compilación con `-Wall -Wextra` sin avisos nuevos; cada carga OTA verificada
+  por `tools/firmware_upload.py`, con ajustes conservados.
+- En el equipo: `satellites_tracked` igual a la lectura directa del UM980 por su
+  USB; `dropped` 0; diez minutos con 0.7.2 sin reinicios; el WebSocket manda
+  rastreados en el byte 3, el peor eje en la salud y los usados en el byte 10,
+  igual que `/api/status`; el panel se ve bien a 375 px.
+- Fuente de correcciones: BLE elegido, reinicio → sigue en BLE sin NTRIP;
+  conectar el perfil → NTRIP; reinicio → NTRIP se autoconecta como antes.
 
-**Sin probar:** el byte 10 por BLE, y cualquier app que lo lea.
-
-## Versión 0.7.2
-
-### La tarea UART pasa de 4 a 8 KiB de pila
-
-Con 0.7.1 cargada y GSV/GSA activas por COM2, el equipo se reinició por panic
-tres veces en unos doce minutos (`reset_reason_code` 4, alerta
-`last_reset_panic`). La consola USB solo alcanzó a mostrar
-`Backtrace: 0xfffffffe:0x80381d74 |<-CORRUPTED`: una traza así es la de una pila
-pisada.
-
-`-fstack-usage` dio el camino más hondo de `gnss_rx`: `acquire` 2112 bytes, su
-lambda 192 y `correction_output::publish` 1072, unos 3.4 KiB antes de contar
-interrupciones, en una pila de 4096. Con 8 KiB y GSV/GSA activas, la tarea llegó
-a usar **4092 bytes** en los primeros cinco minutos: con la pila anterior no
-quedaba nada. El fallo venía de antes de 0.7.1; lo destapó activar GSV y GSA.
-
-`/api/status` publica ahora `memory.stack_free_min_bytes`: lo menos que ha tenido
-libre cada pila desde el arranque, para `gnss_rx`, `ntrip_rx`, `rtcm_out`,
-`httpd` y `loopTask`.
+**Sin probar:** los paquetes por BLE (mismo código que el WebSocket, sin cliente
+en la PC para leerlos) y la app del propietario leyéndolos.

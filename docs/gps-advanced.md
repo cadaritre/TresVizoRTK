@@ -157,16 +157,16 @@ crecía con el cuadrado del tope y corre dentro de una sección crítica.
 
 ### Rastreados en el estado y en la telemetría
 
-Desde 0.7.1 la cifra de rastreados sale también fuera de esta ruta, porque es
-la que falta junto a los usados de GGA: pocos rastreados es cielo tapado; muchos
+Desde 0.7.5 la cifra de rastreados sale también fuera de esta ruta, porque es la
+que falta junto a los usados de GGA: pocos rastreados es cielo tapado; muchos
 rastreados y pocos usados son señales débiles que la solución descarta.
 
 - `GET /api/status` → `solution.satellites_tracked`, junto a `satellites_used`.
   **Se omite si no hay GSV reciente** (diez segundos): un cero diría que el
   receptor no oye nada cuando lo que pasa es que no se le pidió GSV.
-- Paquete de salud, byte 10: BLE `a04c0006` y WebSocket tipo `0x02`. `255` =
-  desconocido. Ver [protocolo BLE](ble-protocol.md#salud-20-bytes-little-endian-1-hz).
-- El panel lo muestra en Campo como «usados / rastreados».
+- Telemetría BLE y WebSocket: byte 3 de la solución = rastreados; los usados, en
+  el byte 10 de la salud. Ver [protocolo BLE](ble-protocol.md#salud-20-bytes-little-endian-1-hz).
+- Campo enseña solo los rastreados, por decisión del propietario.
 
 ### Por qué hay un límite de cuarenta
 
@@ -207,10 +207,11 @@ banda afuera de una ventana:
   `dropped` y `omitted` en cero; la respuesta pesa 2.6 KB. Los primeros 42 s
   llegaron 9.7 GGA por segundo, sin desbordes ni errores de UART; no es una
   medida de carga.
-- WebSocket: el byte 10 del paquete de salud trae los mismos 29.
+- WebSocket: los rastreados llegan en el byte 3 de la solución y coinciden
+  con `/api/status`.
 
-**Falta:** el byte 10 por BLE (mismo código que el WebSocket, sin cliente para
-probarlo), un cielo abierto con más de cien observaciones y el emisor de QZSS,
+**Falta:** la telemetría por BLE (mismo código que el WebSocket, sin cliente
+para probarlo), un cielo abierto con más de cien observaciones y el emisor de QZSS,
 que no se ve desde donde se probó.
 
 ## Persistencia

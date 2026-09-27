@@ -3,15 +3,36 @@
 #include "gnss_receiver.h"
 #include "firmware_update.h"
 #include "rtcm3.h"
+#include <Preferences.h>
 #include <atomic>
 #include <cstring>
 namespace correction_router {
 namespace {
 std::atomic<Source> selected{Source::None};
+// Lo que eligio el usuario, no lo que esta seleccionado ahora.
+std::atomic<Source> chosen{Source::None};
+Preferences store;
+bool storeReady = false;
 std::atomic<uint32_t> revision{0}, accepted{0}, rejected{0};
 // Instante de la ultima trama aceptada. 0 = todavia no ha llegado ninguna.
 std::atomic<uint32_t> lastAccepted{0};
 }
+void begin() {
+    storeReady = store.begin("corrections", false);
+    if (!storeReady) return;
+    const uint8_t saved = store.getUChar("chosen", uint8_t(Source::None));
+    // Solo BLE se aplica aqui. NTRIP lo arranca su propio modulo con el perfil
+    // guardado, y "ninguna" es el estado de partida.
+    if (saved == uint8_t(Source::Ble)) { chosen = Source::Ble; select("ble"); }
+    else if (saved == uint8_t(Source::Ntrip)) chosen = Source::Ntrip;
+}
+bool choose(const char* name) {
+    if (!select(name)) return false;
+    const Source next = selected.load();
+    if (chosen.exchange(next) != next && storeReady) store.putUChar("chosen", uint8_t(next));
+    return true;
+}
+bool bleChosen() { return chosen == Source::Ble; }
 bool select(const char* name) {
     Source next;
     if (!strcmp(name,"none")) next = Source::None;
@@ -46,6 +67,9 @@ uint8_t sourceCode() {
 }
 void status(JsonObject out) {
     out["active_source"] = selected == Source::Ble ? "ble" : selected == Source::Ntrip ? "ntrip" : "none";
+    // La que se restaura al encender. Puede diferir de la activa: una base, por
+    // ejemplo, deja la activa en "none" sin cambiar lo que eligio el usuario.
+    out["chosen_source"] = chosen == Source::Ble ? "ble" : chosen == Source::Ntrip ? "ntrip" : "none";
     out["format"] = "rtcm3"; out["generation"] = revision.load();
     out["accepted_frames"] = accepted.load(); out["rejected_frames"] = rejected.load();
     out["drivers"]["ble"] = true; out["drivers"]["ntrip"] = true; out["drivers"]["radio"] = false;

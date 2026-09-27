@@ -5,6 +5,15 @@
 namespace correction_router {
 enum class Source : uint8_t { None, Ble, Ntrip, Radio };
 bool select(const char* source);
+// La fuente que **eligió el usuario**, guardada en NVS para que sobreviva a un
+// reinicio. `select` cambia la selección del momento, y la cambian también el
+// modo base, una red caída o detener NTRIP; eso no es cambiar de elección.
+//
+// Hasta 0.7.3 no se guardaba nada: quien elegía BLE y reiniciaba volvía a NTRIP,
+// porque la autoconexión del perfil lo seleccionaba al arrancar.
+void begin();                      // lee la elección y, si era BLE, la aplica
+bool choose(const char* source);   // elección explícita: selecciona y guarda
+bool bleChosen();                  // la última elección explícita fue BLE
 bool submit(Source source, const uint8_t* frame, size_t length);
 void status(JsonObject out);
 uint32_t generation();

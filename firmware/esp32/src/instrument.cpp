@@ -688,6 +688,13 @@ void status(JsonDocument& response) {
             if (gnss.precision_accepted && now - gnss.precision.arrival_us <= 2000000) {
                 if (std::isfinite(gnss.precision.horizontal_sigma_m))
                     out["horizontal_sigma_m"] = gnss.precision.horizontal_sigma_m;
+                // Por eje, además de la combinada: es como la dan otros equipos
+                // (Emlid: RMS de Este y de Norte), y la combinada sale √2 mayor
+                // que cada eje sin que la solución sea peor.
+                if (std::isfinite(gnss.precision.latitude_sigma_m))
+                    out["north_sigma_m"] = gnss.precision.latitude_sigma_m;
+                if (std::isfinite(gnss.precision.longitude_sigma_m))
+                    out["east_sigma_m"] = gnss.precision.longitude_sigma_m;
                 if (std::isfinite(gnss.precision.altitude_sigma_m))
                     out["vertical_sigma_m"] = gnss.precision.altitude_sigma_m;
             }
@@ -912,7 +919,11 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
             const String action = body["action"] | "";
             if(action=="rover" || action=="base"){
                 ntrip_input::releaseForBase();
-                correction_router::select("none");
+                // Una base no consume correcciones. Un móvil que eligió BLE las
+                // recupera aquí, igual que NTRIP se reconecta solo después: sin
+                // esto, pasar a móvil dejaba BLE sin fuente hasta repetir la
+                // elección desde la app.
+                correction_router::select(action=="rover" && correction_router::bleChosen() ? "ble" : "none");
             }
             return gnss_control::start(body,response);
         }
@@ -940,7 +951,7 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
     if (path == "/api/corrections/source") {
         if(method=="PUT" && (ntrip_input::active() || gnss_control::busy())) {error(response,"busy","Detén NTRIP y espera al GPS antes de cambiar fuente.");return 409;}
         if (method == "PUT") {
-            if (!body.is<JsonObjectConst>() || body.size() != 1 || !validString(body["source"], config_rules::deviceName) || !correction_router::select(body["source"])) {
+            if (!body.is<JsonObjectConst>() || body.size() != 1 || !validString(body["source"], config_rules::deviceName) || !correction_router::choose(body["source"])) {
                 error(response,"unsupported_source","Fuente no instalada. Disponibles: none, ble, ntrip."); return 400;
             }
         } else if (method != "GET") { error(response,"invalid_method","Usa GET o PUT."); return 400; }

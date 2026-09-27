@@ -13,6 +13,7 @@
 #include "config_rules.h"
 #include "instrument.h"
 #include "gnss_receiver.h"
+#include "correction_router.h"
 #include "ble_transport.h"
 #include "firmware_update.h"
 #include "web_assets.h"
@@ -193,6 +194,9 @@ void setup() {
     instrument::begin();
     sd_recorder::begin();
     gnss_receiver::begin();
+    // Antes que NTRIP: si el usuario eligió BLE, la autoconexión del perfil no
+    // debe quitárselo al arrancar.
+    correction_router::begin();
     ntrip_input::begin();
     correction_output::begin();
     base_survey::begin();

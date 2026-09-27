@@ -153,18 +153,24 @@ function renderGnss(data) {
   text("field-height-reference", !position ? "—" :
     solution.height_reference === "receiver_msl" ? "MSL del receptor" :
     solution.height_reference === "ellipsoidal_user_configured" ? "Elipsoidal configurada" : "Referencia no confirmada");
-  // Usados, de GGA, y rastreados, de GSV. Juntos separan un cielo tapado
-  // (pocos rastreados) de señales débiles que la solución descarta (muchos
-  // rastreados, pocos usados). Sin GSV solo se sabe la primera cifra.
-  const used = current && Number.isFinite(solution.satellites_used) ? solution.satellites_used : null;
+  // Satélites **rastreados**, de GSV: los que el receptor oye. Los usados de
+  // GGA dependen de cuánto descarta la solución y se leían como "agarra pocos";
+  // el propietario pidió quitarlos de Campo. Siguen en la API. Sin GSV reciente
+  // no se sabe, y se dice en la nota en vez de enseñar otra cifra.
   const tracked = current && Number.isFinite(solution.satellites_tracked) ? solution.satellites_tracked : null;
-  text("field-satellites", used === null ? "—" : tracked === null ? String(used) : `${used} / ${tracked}`);
-  text("field-satellites-note", used === null ? "—" : tracked === null ? "Usados" : "Usados / rastreados");
+  text("field-satellites", tracked === null ? "—" : String(tracked));
+  text("field-satellites-note", !current ? "—" : tracked === null ? "Sin GSV del receptor" : "Rastreados");
   text("field-hdop", current && Number.isFinite(solution.hdop) ? solution.hdop.toFixed(1) : "—");
   // Sigma declarada por el receptor, no exactitud comprobada. Se muestra en
   // metros porque es lo que se pregunta en campo; el matiz va en la nota.
-  text("field-sigma-h", current && Number.isFinite(solution.horizontal_sigma_m)
-    ? `${solution.horizontal_sigma_m.toFixed(3)} m` : "—");
+  //
+  // **Horizontal por eje**, la peor de norte y este: es la escala en la que
+  // otros equipos dan su RMS. La combinada, √(σN² + σE²), sale √2 mayor con la
+  // misma solución y hacía parecer peor al receptor. Sin ejes, la combinada.
+  // Es la misma cifra que va por BLE y WebSocket: la app y el panel coinciden.
+  const axes = [solution.north_sigma_m, solution.east_sigma_m].filter(Number.isFinite);
+  const sigmaH = axes.length === 2 ? Math.max(...axes) : solution.horizontal_sigma_m;
+  text("field-sigma-h", current && Number.isFinite(sigmaH) ? `${sigmaH.toFixed(3)} m` : "—");
   text("field-sigma-v", current && Number.isFinite(solution.vertical_sigma_m)
     ? `${solution.vertical_sigma_m.toFixed(3)} m` : "—");
   // Antigüedad de la última corrección aceptada, no de la época del GPS. Es lo

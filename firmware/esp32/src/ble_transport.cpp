@@ -234,7 +234,11 @@ void tick() {
     uint8_t sample[20] = {};
     ++sampleSequence;
     sample[0] = sampleSequence; sample[1] = sampleSequence >> 8;
-    sample[2] = s.quality; sample[3] = s.has_satellites ? s.satellites : 255;
+    sample[2] = s.quality;
+    // Satélites **rastreados** (GSV), lo mismo que enseña el panel. Hasta 0.7.4
+    // eran los usados de GGA, que pasaron al byte 10 de la salud. 255 = sin GSV.
+    unsigned tracked = 0;
+    sample[3] = gnss_sky::tracked(tracked) ? uint8_t(std::min(tracked, 254u)) : 255;
     put32(sample + 4, s.utc_ms);
     put32(sample + 8, s.has_position ? lround(s.latitude_deg * 1e7) : INT32_MIN);
     put32(sample + 12, s.has_position ? lround(s.longitude_deg * 1e7) : INT32_MIN);
@@ -251,7 +255,12 @@ void tick() {
         if (!std::isfinite(metres) || metres < 0 || metres > 65.0) return 0xFFFF;
         return uint16_t(lround(metres * 1000));
     };
-    const uint16_t h = snapshot.precision_accepted ? sigma(snapshot.precision.horizontal_sigma_m) : 0xFFFF;
+    // Horizontal por eje, la peor de norte y este, igual que el panel. Hasta
+    // 0.7.4 era la combinada √(σN² + σE²), √2 mayor con la misma solución.
+    const auto& p = snapshot.precision;
+    const double horizontal = std::isfinite(p.latitude_sigma_m) && std::isfinite(p.longitude_sigma_m)
+        ? std::max(p.latitude_sigma_m, p.longitude_sigma_m) : p.horizontal_sigma_m;
+    const uint16_t h = snapshot.precision_accepted ? sigma(horizontal) : 0xFFFF;
     const uint16_t v = snapshot.precision_accepted ? sigma(snapshot.precision.altitude_sigma_m) : 0xFFFF;
     report[1] = h; report[2] = h >> 8;
     report[3] = v; report[4] = v >> 8;
@@ -262,10 +271,9 @@ void tick() {
     report[7] = uint8_t(correction_router::sourceCode());
     report[8] = s.quality;
     report[9] = 0; // IMU: sin hardware todavía, reservado para no renumerar después
-    // Satélites rastreados, de GSV; los usados van en el paquete de solución.
-    // 255 = no se sabe (sin GSV reciente). Hasta 0.7.0 este byte iba a cero.
-    unsigned tracked = 0;
-    report[10] = gnss_sky::tracked(tracked) ? uint8_t(std::min(tracked, 254u)) : 255;
+    // Satélites usados en la solución, de GGA: ya no van en el paquete de
+    // solución, pero sirven para diagnosticar. 255 = desconocido.
+    report[10] = s.has_satellites ? uint8_t(std::min(s.satellites, 254u)) : 255;
     health->setValue(report, sizeof(report)); health->notify();
 }
 void status(JsonObject out) {

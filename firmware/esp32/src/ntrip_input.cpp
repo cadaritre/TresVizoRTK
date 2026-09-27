@@ -188,7 +188,7 @@ void worker(void*) {
   // el perfil sigue elegido y el equipo ya no es base. Solo se respeta el
   // silencio si fue el usuario quien detuvo la conexion.
   if(!wanted && autoConnect && !userStopped && lastUsed>=0 && ready &&
-     !gnss_control::isBase() && gnss_control::isRover()){
+     !gnss_control::isBase() && gnss_control::isRover() && !correction_router::bleChosen()){
    applyProfile(profiles[lastUsed]);
    correction_router::select("ntrip");++generation;wanted=true;state="starting";
    continue;
@@ -274,7 +274,9 @@ void begin(){
  // es justo lo que esta función existe para evitar.
  // No reanudar en un equipo que quedó como base: volvería a alimentarse a sí
  // mismo de correcciones que no necesita y bloquearía configurar el receptor.
- if(ready && autoConnect && lastUsed>=0 && !gnss_control::isBase()){
+ // Tampoco si la última elección del usuario fue BLE: el perfil sigue guardado,
+ // pero reconectarlo le quitaría la fuente que eligió.
+ if(ready && autoConnect && lastUsed>=0 && !gnss_control::isBase() && !correction_router::bleChosen()){
   applyProfile(profiles[lastUsed]);
   correction_router::select("ntrip");
   ++generation;wanted=true;state="starting";
@@ -302,7 +304,9 @@ int request(const String& method,JsonVariantConst body,JsonDocument& out){
  if(active() || strcmp(state.load(),"stopped")!=0){out["message"]="Hay una conexión NTRIP activa. Pulsa «Detener» en este mismo apartado y vuelve a intentarlo.";return 409;}
  if(!gnss_control::roverReady()){out["message"]="Consulta y confirma el modo rover del receptor antes de conectar.";return 409;}
  xSemaphoreTake(lock,portMAX_DELAY);config.host=host;config.mount=mount;config.user=user;config.password=body["password"].as<const char*>();config.port=body["port"];xSemaphoreGive(lock);
- correction_router::select("ntrip");++generation;wanted=true;state="starting";status(out.to<JsonObject>());return 202;
+ // Arrancar NTRIP a mano es elegirlo: queda guardado frente a una elección
+ // anterior de BLE.
+ correction_router::choose("ntrip");++generation;wanted=true;state="starting";status(out.to<JsonObject>());return 202;
 }
 
 int profileRequest(const String& method,JsonVariantConst body,JsonDocument& out){
@@ -373,7 +377,7 @@ int profileRequest(const String& method,JsonVariantConst body,JsonDocument& out)
   if(active()||strcmp(state.load(),"stopped")!=0){out["message"]="Hay una conexión NTRIP activa. Pulsa «Detener» antes de cambiar de perfil.";return 409;}
   lastUsed=index;autoConnect=true;userStopped=false;persistProfiles();
   applyProfile(profiles[index]);
-  correction_router::select("ntrip");++generation;wanted=true;state="starting";
+  correction_router::choose("ntrip");++generation;wanted=true;state="starting";
   // Devolver siempre la lista: el panel la repinta con esta respuesta y si solo
   // recibiera el estado del flujo se quedaría creyendo que no hay perfiles.
   profilesJson(out.to<JsonObject>());
