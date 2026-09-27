@@ -151,6 +151,53 @@ int main() {
         assert(n == 1 && !vista[0].used);   // la GSV sigue llegando, la GSA no
     }
 
+    // --- **Un satelite que sale de la solucion deja de estar marcado**, aunque
+    // sigan llegando GSA. Visto en el equipo el 27-09-2026: BDS 12 salia como
+    // usado en 139 de 146 ciclos sin figurar en ninguna GSA, y el cielo daba 29
+    // usados contra 27 de GSA y de GGA. Tramas copiadas de esa captura.
+    {
+        gnss::SkyTable tabla;
+        tabla.feed(gsv("GBGSV,1,1,02,11,24,143,21,12,15,171,18,1"), 1000);
+        tabla.feed(gsa("GNGSA,M,3,04,07,,,,,,,,,,,1.1,0.6,0.9,1"), 1000);
+        tabla.feed(gsa("GNGSA,M,3,11,12,,,,,,,,,,,1.1,0.6,0.9,4"), 1000);
+        tabla.feed(gsv("GBGSV,1,1,02,11,24,143,21,12,15,171,18,1"), 2000);
+        tabla.feed(gsa("GNGSA,M,3,04,07,,,,,,,,,,,1.1,0.6,0.9,1"), 2000);
+        tabla.feed(gsa("GNGSA,M,3,11,,,,,,,,,,,,1.1,0.6,0.9,4"), 2000);
+        const unsigned n = tabla.view(vista, gnss::SkyTable::kCapacity, 2000);
+        assert(find(vista, n, "GB", 1, 11)->used);
+        assert(!find(vista, n, "GB", 1, 12)->used);
+    }
+
+    // --- Lo mismo cuando una constelacion entera deja de usarse: su GSA ya no
+    // llega en la epoca siguiente y sus satelites no pueden seguir marcados.
+    {
+        gnss::SkyTable tabla;
+        tabla.feed(gsv("GPGSV,1,1,01,07,60,200,45,1"), 1000);
+        tabla.feed(gsv("GLGSV,1,1,01,67,30,100,40,1"), 1000);
+        tabla.feed(gsa("GNGSA,M,3,07,,,,,,,,,,,,1.1,0.6,0.9,1"), 1000);
+        tabla.feed(gsa("GNGSA,M,3,67,,,,,,,,,,,,1.1,0.6,0.9,2"), 1000);
+        tabla.feed(gsv("GPGSV,1,1,01,07,60,200,45,1"), 2000);
+        tabla.feed(gsv("GLGSV,1,1,01,67,30,100,40,1"), 2000);
+        tabla.feed(gsa("GNGSA,M,3,07,,,,,,,,,,,,1.1,0.6,0.9,1"), 2000);
+        const unsigned n = tabla.view(vista, gnss::SkyTable::kCapacity, 2000);
+        assert(find(vista, n, "GP", 1, 7)->used);
+        assert(!find(vista, n, "GL", 1, 67)->used);
+    }
+
+    // --- Un sistema con mas de doce usados manda dos GSA seguidas en la misma
+    // epoca: la segunda **no** borra lo que marco la primera.
+    {
+        gnss::SkyTable tabla;
+        tabla.feed(gsv("GBGSV,4,1,14,01,40,010,40,02,40,020,40,03,40,030,40,04,40,040,40,1"), 1000);
+        tabla.feed(gsv("GBGSV,4,2,14,05,40,050,40,06,40,060,40,07,40,070,40,08,40,080,40,1"), 1000);
+        tabla.feed(gsv("GBGSV,4,3,14,09,40,090,40,10,40,100,40,11,40,110,40,12,40,120,40,1"), 1000);
+        tabla.feed(gsv("GBGSV,4,4,14,13,40,130,40,14,40,140,40,1"), 1000);
+        tabla.feed(gsa("GNGSA,M,3,01,02,03,04,05,06,07,08,09,10,11,12,1.1,0.6,0.9,4"), 1000);
+        tabla.feed(gsa("GNGSA,M,3,13,14,,,,,,,,,,,1.1,0.6,0.9,4"), 1000);
+        const unsigned n = tabla.view(vista, gnss::SkyTable::kCapacity, 1000);
+        for (uint8_t prn = 1; prn <= 14; ++prn) assert(find(vista, n, "GB", 1, prn)->used);
+    }
+
     // --- Un satelite a la vista sin rastrear se guarda como tal.
     {
         gnss::SkyTable tabla;

@@ -81,6 +81,24 @@ public:
     }
 
     void feed(const Gsa& message, uint32_t now_ms) {
+        // **Cada epoca de GSA dice quien se usa ahora y borra lo de la
+        // anterior.** Sin borrar, un satelite que salia de la solucion seguia
+        // marcado mientras llegaran GSA de otros: el 27-09-2026 BDS 12 salia
+        // como usado en 139 de 146 ciclos sin estar en ninguna GSA.
+        //
+        // Una epoca son todas sus GSA, que el UM980 manda juntas y por orden de
+        // sistema (1 GPS, 2 GLONASS, 3 Galileo, 4 BeiDou), y dos seguidas del
+        // mismo sistema si usa mas de doce. Empieza otra cuando el sistema
+        // retrocede o cuando pasa un rato sin GSA.
+        const bool nuevaEpoca = !gsa_seen_ || message.system_id < last_system_id_
+            || now_ms - last_gsa_ms_ > kGsaEpochGapMs;
+        if (nuevaEpoca) {
+            for (unsigned e = 0; e < count_; ++e) entries_[e].used = false;
+        }
+        gsa_seen_ = true;
+        last_gsa_ms_ = now_ms;
+        last_system_id_ = message.system_id;
+
         fix_type = message.fix_type;
         pdop = message.pdop;
         hdop = message.hdop;
@@ -140,6 +158,13 @@ public:
 private:
     Satellite entries_[kCapacity];
     unsigned count_ = 0;
+
+    // Hueco que separa dos epocas de GSA. Las de una misma epoca llegan en
+    // unos 25 ms; a 5 Hz la siguiente llega unos 175 ms despues.
+    static constexpr uint32_t kGsaEpochGapMs = 150;
+    bool gsa_seen_ = false;
+    uint32_t last_gsa_ms_ = 0;
+    uint8_t last_system_id_ = 0;
 
     // Emisores distintos que caben en la cuenta. GP, GL, GA, GB, GQ y GI son
     // seis: sobra margen.
