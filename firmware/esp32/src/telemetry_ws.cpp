@@ -2,6 +2,7 @@
 #include "correction_router.h"
 #include "gnss_receiver.h"
 #include "gnss_sky.h"
+#include "ble_frames.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -19,7 +20,7 @@ constexpr size_t kMaxClients = 2;
 int clients[kMaxClients];
 size_t clientCount = 0;
 
-uint32_t lastSample = 0, lastHealth = 0, lastEpoch = 0;
+uint32_t lastSample = 0, lastHealth = 0, lastEpoch = 0, lastSolution = 0;
 uint16_t sampleSequence = 0;
 uint32_t framesSent = 0, dropped = 0;
 
@@ -131,8 +132,8 @@ void stop() {
 
 void tick() {
     if (!server || !clientCount) return;
-    // 20 ms entre muestras: el tope es la cadencia del receptor, no esta
-    // espera. Es el mismo número que usa el transporte Bluetooth.
+    // Se mira cada 20 ms, como en Bluetooth; el tope de envío lo pone
+    // `protocol::kMinSolutionIntervalMs`, más abajo.
     if (millis() - lastSample < 20) return;
     lastSample = millis();
 
@@ -142,6 +143,9 @@ void tick() {
     // anterior inflaría la frecuencia medida sin añadir una sola medición.
     if (!snapshot.enabled || !snapshot.accepted || !s.has_utc
         || esp_timer_get_time() - s.arrival_us > 500000 || s.utc_ms == lastEpoch) return;
+    // Máximo 5 Hz, el mismo tope que el Bluetooth (`protocol::kMinSolutionIntervalMs`).
+    if (millis() - lastSolution < protocol::kMinSolutionIntervalMs) return;
+    lastSolution = millis();
     lastEpoch = s.utc_ms;
 
     uint8_t sample[20] = {};

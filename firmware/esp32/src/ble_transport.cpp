@@ -50,7 +50,7 @@ Preferences settings;
 String pending;
 size_t offset = 0;
 uint16_t messageId = 0, sampleSequence = 0;
-uint32_t lastSend = 0, lastEpoch = UINT32_MAX, lastSample = 0, lastHealth = 0;
+uint32_t lastSend = 0, lastEpoch = UINT32_MAX, lastSample = 0, lastHealth = 0, lastSolution = 0;
 uint32_t responseGeneration = 0;
 
 class ConnectionCallbacks : public BLEServerCallbacks {
@@ -230,6 +230,10 @@ void tick() {
     const auto snapshot = gnss_receiver::snapshot();
     const auto& s = snapshot.solution;
     if (!snapshot.enabled || !snapshot.accepted || !s.has_utc || esp_timer_get_time() - s.arrival_us > 500000 || s.utc_ms == lastEpoch) return;
+    // Máximo 5 Hz (`protocol::kMinSolutionIntervalMs`). Se sigue mirando cada
+    // 20 ms para mandar cada época en cuanto se puede, no con retraso.
+    if (millis() - lastSolution < protocol::kMinSolutionIntervalMs) return;
+    lastSolution = millis();
     lastEpoch = s.utc_ms;
     uint8_t sample[20] = {};
     ++sampleSequence;

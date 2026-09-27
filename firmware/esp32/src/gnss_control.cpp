@@ -98,7 +98,13 @@ const char* rateFor(unsigned hz) {
         default: return nullptr;
     }
 }
-bool validRate(unsigned hz) { return rateFor(hz) != nullptr; }
+// **Nada por encima de 5 Hz** hacia el ESP32, aunque el UM980 admita 10 y 20.
+// Es el mismo tope que la telemetria hacia el telefono
+// (`protocol::kMaxSolutionRateHz`): a 10 Hz el Bluetooth se quedaba en unos 8,
+// y el propietario fijo 5 Hz para todo el camino (27-09-2026).
+constexpr unsigned kMaxOutputRateHz = 5;
+constexpr const char* kRateCapMessage = "La frecuencia maxima es 5 Hz: el enlace con el telefono no sostiene mas.";
+bool validRate(unsigned hz) { return rateFor(hz) != nullptr && hz <= kMaxOutputRateHz; }
 
 void acceptLine() {
     line[length]=0; char* star=strrchr(line,'*');
@@ -376,7 +382,8 @@ int start(JsonVariantConst body,JsonDocument& out) {
        name=="stop_outputs"||name=="reconcile") {
         if(body.size()!=1)return 400;
     } else if(name=="telemetry") {
-        if(body.size()!=2||!body["hz"].is<unsigned>()||!validRate(body["hz"].as<unsigned>()))return 400;
+        if(body.size()!=2||!body["hz"].is<unsigned>())return 400;
+        if(!validRate(body["hz"].as<unsigned>())){if(rateFor(body["hz"].as<unsigned>()))out["message"]=kRateCapMessage;return 400;}
         telemetryHz=body["hz"];
     } else if(name=="mask") {
         if(body.size()!=2||!body["elevation_deg"].is<double>())return 400;
@@ -406,7 +413,8 @@ int start(JsonVariantConst body,JsonDocument& out) {
         if(!list.size()||list.size()>8)return 400;
         for(JsonVariantConst entry:list){
             if(!entry.is<JsonObjectConst>()||entry.size()!=2)return 400;
-            if(!entry["name"].is<const char*>()||!entry["hz"].is<unsigned>()||!validRate(entry["hz"].as<unsigned>()))return 400;
+            if(!entry["name"].is<const char*>()||!entry["hz"].is<unsigned>())return 400;
+            if(!validRate(entry["hz"].as<unsigned>())){if(rateFor(entry["hz"].as<unsigned>()))out["message"]=kRateCapMessage;return 400;}
             const String messageName=entry["name"].as<const char*>();
             if(name=="outputs"){
                 // Solo sentencias NMEA con prefijo GP, como exige el manual N4.

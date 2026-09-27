@@ -29,6 +29,17 @@ constexpr uint16_t kPreferredAttMtu = 247;
 constexpr size_t kMaxNotificationBytes = kPreferredAttMtu - kAttHeaderBytes;
 constexpr size_t kMaxResponsePayloadBytes = kMaxNotificationBytes - kResponseHeaderBytes;
 
+// Telemetria de solucion, por BLE y por WebSocket: **5 Hz como maximo**.
+//
+// A 10 Hz el telefono media unos 8 por Bluetooth: el enlace no los sostenia con
+// la salud y las respuestas encima. El propietario fijo 5 Hz para todo, lo que
+// el receptor manda al ESP32 y lo que el ESP32 manda al telefono (27-09-2026).
+//
+// 190 ms entre envios y no 200: a 5 Hz las epocas llegan con algo de
+// fluctuacion y con 200 justos se saltaria alguna. A 10 Hz sale una de cada dos.
+constexpr unsigned kMaxSolutionRateHz = 5;
+constexpr uint32_t kMinSolutionIntervalMs = 190;
+
 // Bytes de JSON por trama con el MTU negociado. Nunca menos que sin negociar
 // ni mas de lo que ofrece el equipo. C++11: el firmware compila con gnu++11.
 constexpr size_t responsePayloadBytes(uint16_t negotiatedMtu) {
