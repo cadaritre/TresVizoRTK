@@ -1,6 +1,7 @@
 #include "telemetry_ws.h"
 #include "correction_router.h"
 #include "gnss_receiver.h"
+#include "gnss_sky.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -175,6 +176,9 @@ void tick() {
     report[7] = uint8_t(correction_router::sourceCode());
     report[8] = s.quality;
     report[9] = 0;  // IMU: sin hardware todavía, reservado para no renumerar después
+    // Rastreados, igual que por Bluetooth: 255 = sin GSV reciente.
+    unsigned tracked = 0;
+    report[10] = gnss_sky::tracked(tracked) ? uint8_t(std::min(tracked, 254u)) : 255;
     broadcast(kHealth, report);
 }
 

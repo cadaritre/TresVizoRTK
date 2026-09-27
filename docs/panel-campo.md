@@ -45,7 +45,9 @@ textual del enlace GNSS se conservó íntegro en Diagnóstico.
 - **Latitud, longitud, altura:** con cifras tabulares para que no bailen al
   refrescar. La altura lleva su referencia debajo, sin abreviar: «MSL del
   receptor», «Elipsoidal configurada» o «Referencia no confirmada».
-- **Satélites y HDOP:** con la aclaración de que HDOP es geometría, no metros.
+- **Satélites y HDOP:** satélites como «usados / rastreados» desde 0.7.1 —usados
+  de GGA, rastreados de GSV; sin GSV reciente solo los usados—, y HDOP con la
+  aclaración de que es geometría, no metros.
 - **Edad:** segundos desde la última época aceptada.
 - **RTCM al GPS:** tramas de corrección efectivamente entregadas al receptor por la
   UART. Es el último salto de la cadena RTK y hasta 0.6.0 no se publicaba en

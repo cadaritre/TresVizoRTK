@@ -20,7 +20,7 @@ bool haveSky = false;
 constexpr unsigned kPublished = 40;
 
 // Copia de trabajo fuera de la pila: la tarea del servidor no tiene sitio para
-// un kilobyte y medio de satelites. Solo la toca `publish`, y al servidor HTTP
+// tres kilobytes de satelites. Solo la toca `publish`, y al servidor HTTP
 // lo atiende una sola tarea.
 gnss::SkyTable::Satellite scratch[gnss::SkyTable::kCapacity];
 
@@ -62,6 +62,7 @@ void publish(JsonObject out) {
     portENTER_CRITICAL(&lock);
     count = table.view(scratch, gnss::SkyTable::kCapacity, now);
     summary.in_view = table.distinctInView(now);
+    summary.tracked = table.distinctTracked(now);
     summary.dropped = table.dropped;
     summary.fix_type = table.fix_type;
     summary.pdop = table.pdop;
@@ -140,6 +141,7 @@ void publish(JsonObject out) {
     }
 
     out["in_view"] = summary.in_view;
+    out["tracked"] = summary.tracked;
     out["used"] = summary.used;
     out["published"] = published;
     // Cuantos no se publicaron por el limite del transporte, y cuantas
@@ -154,5 +156,16 @@ void publish(JsonObject out) {
         else out[dop.first] = nullptr;
     }
     if (summary.has_dop) out["dop_age_ms"] = summary.dop_age_ms; else out["dop_age_ms"] = nullptr;
+}
+
+bool tracked(unsigned& count) {
+    const uint32_t now = millis();
+    portENTER_CRITICAL(&lock);
+    // Con la GSV parada, las entradas caducan a los diez segundos y la cuenta
+    // bajaria a cero sola. Se corta en el mismo plazo para decir "no se sabe".
+    const bool fresh = haveSky && now - lastSkyMs <= gnss::SkyTable::kExpiryMs;
+    count = fresh ? table.distinctTracked(now) : 0;
+    portEXIT_CRITICAL(&lock);
+    return fresh;
 }
 }

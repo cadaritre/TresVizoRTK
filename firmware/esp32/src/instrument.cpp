@@ -677,6 +677,11 @@ void status(JsonDocument& response) {
                 "pps", "rtk_fixed", "rtk_float", "dead_reckoning", "manual", "simulated"};
             out["fix"] = qualities[gnss.solution.quality];
             if (gnss.solution.has_satellites) out["satellites_used"] = gnss.solution.satellites;
+            // Rastreados sale de GSV: GGA solo dice cuántos entraron en la
+            // solución, y con eso no se distingue un cielo tapado de señales
+            // débiles descartadas. Sin GSV reciente no se publica.
+            unsigned tracked = 0;
+            if (gnss_sky::tracked(tracked)) out["satellites_tracked"] = tracked;
             if (std::isfinite(gnss.solution.hdop)) out["hdop"] = gnss.solution.hdop;
             // GST llega en su propia trama: solo se publica si es tan reciente
             // como la posición, para no mezclar una sigma vieja con un fix nuevo.

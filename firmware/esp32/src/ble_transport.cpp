@@ -1,6 +1,7 @@
 #include "ble_transport.h"
 #include "instrument.h"
 #include "gnss_receiver.h"
+#include "gnss_sky.h"
 #include "rtcm3.h"
 #include "correction_router.h"
 #include "correction_output.h"
@@ -261,6 +262,10 @@ void tick() {
     report[7] = uint8_t(correction_router::sourceCode());
     report[8] = s.quality;
     report[9] = 0; // IMU: sin hardware todavía, reservado para no renumerar después
+    // Satélites rastreados, de GSV; los usados van en el paquete de solución.
+    // 255 = no se sabe (sin GSV reciente). Hasta 0.7.0 este byte iba a cero.
+    unsigned tracked = 0;
+    report[10] = gnss_sky::tracked(tracked) ? uint8_t(std::min(tracked, 254u)) : 255;
     health->setValue(report, sizeof(report)); health->notify();
 }
 void status(JsonObject out) {

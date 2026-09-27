@@ -7,14 +7,16 @@
 //
 // Vive aparte de `gnss_receiver` a proposito: su `snapshot()` se llama en media
 // docena de sitios, a veces solo para leer un booleano, y copia la estructura
-// entera dentro de una seccion critica. Meterle la tabla del cielo —cerca de un
-// kilobyte— haria caro cada uno de esos usos sin que ninguno la necesite.
+// entera dentro de una seccion critica. Meterle la tabla del cielo —unos tres
+// kilobytes— haria caro cada uno de esos usos sin que ninguno la necesite.
 namespace gnss_sky {
 
 struct Summary {
     // Satelites distintos a la vista, contando una vez cada uno aunque llegue
     // por varias senales. Es la cifra que se compara con la de GGA.
     unsigned in_view = 0;
+    // Los que ademas se oyen: con C/N0 en al menos una senal.
+    unsigned tracked = 0;
     unsigned used = 0;
     // Observaciones que no cupieron en la tabla. Deberia ser cero.
     uint32_t dropped = 0;
@@ -33,4 +35,12 @@ void feed(const gnss::Gsa& message, uint32_t now_ms);
 // porque el mismo satelite llega una vez por senal y una grafica de barras que
 // no agrupe pinta el mismo PRN dos veces.
 void publish(JsonObject out);
+
+// Cuantos satelites distintos se rastrean ahora. Es la cifra que falta junto a
+// los usados de GGA: pocos rastreados es cielo tapado; muchos rastreados y
+// pocos usados es senal debil que la solucion descarta.
+//
+// Devuelve false si no hay GSV reciente. Sin GSV no se sabe, y un cero diria
+// que el receptor no oye nada cuando lo que pasa es que nadie se lo pidio.
+bool tracked(unsigned& count);
 }

@@ -22,5 +22,13 @@ void status(JsonObject out){
  out["internal_min_free_bytes"]=heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL|MALLOC_CAP_8BIT);
  out["internal_largest_block_bytes"]=heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL|MALLOC_CAP_8BIT);
  out["psram_total_bytes"]=ESP.getPsramSize();out["psram_free_bytes"]=ESP.getFreePsram();
+ // Lo menos que ha tenido libre cada pila desde el arranque, en bytes. Una pila
+ // desbordada no avisa: pisa memoria ajena y el equipo se reinicia con la traza
+ // corrupta. Esta cifra dice cuanto falta para eso antes de que pase.
+ JsonObject stacks=out["stack_free_min_bytes"].to<JsonObject>();
+ for(const char* name:{"gnss_rx","ntrip_rx","rtcm_out","httpd","loopTask"}){
+  TaskHandle_t task=xTaskGetHandle(name);
+  if(task)stacks[name]=uxTaskGetStackHighWaterMark(task);
+ }
 }
 }

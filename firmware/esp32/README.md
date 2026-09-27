@@ -382,3 +382,65 @@ el caster sirviendo a un rover, lectura de sourcetable, resolución de
 `meridianv.local`, conexión con dirección fija aplicada, y los paquetes BLE, que
 necesitan una app que todavía no existe. `tests/hardware_smoke.py` **está roto**:
 usa la clave de acceso y el nombre editable, que ya no existen.
+
+## Versión 0.7.1
+
+**No usar 0.7.1.** Con GSV y GSA activas por COM2 se reinicia por panic cada
+pocos minutos: la pila de la tarea UART se desborda. Lo corrige 0.7.2.
+
+### Satélites rastreados, además de los usados
+
+Hasta aquí el panel y la telemetría solo daban los satélites **usados**, la
+cifra de GGA. Con ella no se distingue un cielo tapado de señales débiles que la
+solución descarta. El 26-09-2026, con la antena afuera de una ventana, el UM980
+rastreaba unos 30 satélites y usaba de 16 a 21; el panel solo enseñaba la
+segunda cifra.
+
+- `GET /api/status` trae `solution.satellites_tracked`, de GSV. Se omite sin GSV
+  reciente.
+- Byte 10 del paquete de salud, por BLE (`a04c0006`) y por WebSocket; `255` =
+  desconocido. La versión del paquete sigue en `1`: el motivo está en
+  [el protocolo BLE](../../docs/ble-protocol.md#salud-20-bytes-little-endian-1-hz).
+- `GET /api/gnss/sky` añade `tracked`.
+- Campo muestra «usados / rastreados».
+- La tabla del cielo pasa de 72 a 192 observaciones: con triple banda y máscara
+  de 5° ya llegaban 75 desde una ventana. Cuesta unos 7 KB de RAM interna.
+
+El receptor tiene que mandar GSV y GSA por COM2, que es lo que hace la acción
+`telemetry`. Un equipo configurado antes de que esa acción las incluyera no las
+manda hasta que se vuelve a aplicar.
+
+### Verificación de esta entrega
+
+- `test/sky_table_test.cpp`, `nmea_gsv_test.cpp` y `nmea_gsa_test.cpp`
+  compilados con MSVC `/W4` y ejecutados: correctos y sin avisos.
+- `tests/gnss_panel_test.js` pasa. **Estaba roto desde antes**: el contexto de
+  la prueba no tenía `latestStatus` ni `$`, que `renderGnss` usa desde que pinta
+  el indicador de fix. Se añadieron.
+- Compilación con `-Wall -Wextra` sin avisos en lo tocado; carga OTA verificada
+  por `tools/firmware_upload.py`, ajustes conservados.
+- En el equipo: `satellites_tracked` 29, igual que la lectura directa del UM980
+  por su USB; `dropped` 0; el WebSocket trae 29 en el byte 10; el panel lo
+  enseña a 375 px sin desbordar.
+
+**Sin probar:** el byte 10 por BLE, y cualquier app que lo lea.
+
+## Versión 0.7.2
+
+### La tarea UART pasa de 4 a 8 KiB de pila
+
+Con 0.7.1 cargada y GSV/GSA activas por COM2, el equipo se reinició por panic
+tres veces en unos doce minutos (`reset_reason_code` 4, alerta
+`last_reset_panic`). La consola USB solo alcanzó a mostrar
+`Backtrace: 0xfffffffe:0x80381d74 |<-CORRUPTED`: una traza así es la de una pila
+pisada.
+
+`-fstack-usage` dio el camino más hondo de `gnss_rx`: `acquire` 2112 bytes, su
+lambda 192 y `correction_output::publish` 1072, unos 3.4 KiB antes de contar
+interrupciones, en una pila de 4096. Con 8 KiB y GSV/GSA activas, la tarea llegó
+a usar **4092 bytes** en los primeros cinco minutos: con la pila anterior no
+quedaba nada. El fallo venía de antes de 0.7.1; lo destapó activar GSV y GSA.
+
+`/api/status` publica ahora `memory.stack_free_min_bytes`: lo menos que ha tenido
+libre cada pila desde el arranque, para `gnss_rx`, `ntrip_rx`, `rtcm_out`,
+`httpd` y `loopTask`.

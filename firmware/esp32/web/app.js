@@ -153,7 +153,13 @@ function renderGnss(data) {
   text("field-height-reference", !position ? "—" :
     solution.height_reference === "receiver_msl" ? "MSL del receptor" :
     solution.height_reference === "ellipsoidal_user_configured" ? "Elipsoidal configurada" : "Referencia no confirmada");
-  text("field-satellites", current && Number.isFinite(solution.satellites_used) ? String(solution.satellites_used) : "—");
+  // Usados, de GGA, y rastreados, de GSV. Juntos separan un cielo tapado
+  // (pocos rastreados) de señales débiles que la solución descarta (muchos
+  // rastreados, pocos usados). Sin GSV solo se sabe la primera cifra.
+  const used = current && Number.isFinite(solution.satellites_used) ? solution.satellites_used : null;
+  const tracked = current && Number.isFinite(solution.satellites_tracked) ? solution.satellites_tracked : null;
+  text("field-satellites", used === null ? "—" : tracked === null ? String(used) : `${used} / ${tracked}`);
+  text("field-satellites-note", used === null ? "—" : tracked === null ? "Usados" : "Usados / rastreados");
   text("field-hdop", current && Number.isFinite(solution.hdop) ? solution.hdop.toFixed(1) : "—");
   // Sigma declarada por el receptor, no exactitud comprobada. Se muestra en
   // metros porque es lo que se pregunta en campo; el matiz va en la nota.

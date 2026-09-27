@@ -161,11 +161,12 @@ int main() {
     }
 
     // --- La tabla se llena: se cuenta lo que no cupo, **no se tira callando**.
+    // 32 PRN por 8 senales son 256 observaciones: pasan del tope.
     {
         gnss::SkyTable tabla;
         unsigned metidos = 0;
-        for (unsigned senal = 1; senal <= 8 && metidos < 200; ++senal) {
-            for (unsigned prn = 1; prn <= 20; ++prn) {
+        for (unsigned senal = 1; senal <= 8; ++senal) {
+            for (unsigned prn = 1; prn <= 32; ++prn) {
                 char body[64];
                 std::snprintf(body, sizeof(body), "GPGSV,1,1,20,%02u,45,123,42,%u", prn, senal);
                 tabla.feed(gsv(body), 1000);
@@ -173,8 +174,41 @@ int main() {
             }
         }
         const unsigned n = tabla.view(vista, gnss::SkyTable::kCapacity, 1000);
+        assert(metidos > gnss::SkyTable::kCapacity);
         assert(n == gnss::SkyTable::kCapacity);
         assert(tabla.dropped == metidos - gnss::SkyTable::kCapacity);
+        // Llena y con cada PRN repetido en seis senales, siguen siendo 32
+        // satelites: la cuenta no se deja llevar por el numero de entradas.
+        assert(tabla.distinctInView(1000) == 32);
+    }
+
+    // --- **Rastreado no es lo mismo que a la vista.** Un satelite que GSV
+    // anuncia sin C/N0 esta sobre el horizonte, pero el receptor no lo oye.
+    {
+        gnss::SkyTable tabla;
+        tabla.feed(gsv("GPGSV,1,1,03,02,45,123,42,05,12,045,,09,30,200,,1"), 1000);
+        // El 09 no se oye en L1 pero si en L5: con una senal basta.
+        tabla.feed(gsv("GPGSV,1,1,01,09,30,200,33,7"), 1000);
+        assert(tabla.distinctInView(1000) == 3);
+        assert(tabla.distinctTracked(1000) == 2);
+        // Lo caducado no cuenta en ninguna de las dos.
+        assert(tabla.distinctInView(1000 + 20000) == 0);
+        assert(tabla.distinctTracked(1000 + 20000) == 0);
+    }
+
+    // --- El mismo PRN en cuatro constelaciones, con varias senales: cuatro
+    // satelites, ni uno ni doce.
+    {
+        gnss::SkyTable tabla;
+        for (const char* emisor : {"GP", "GL", "GA", "GB"}) {
+            for (unsigned senal = 1; senal <= 3; ++senal) {
+                char body[64];
+                std::snprintf(body, sizeof(body), "%sGSV,1,1,01,07,40,100,40,%u", emisor, senal);
+                tabla.feed(gsv(body), 1000);
+            }
+        }
+        assert(tabla.distinctInView(1000) == 4);
+        assert(tabla.distinctTracked(1000) == 4);
     }
 
     // --- Al llenarse, lo caducado se reutiliza: una constelacion que se anuncia

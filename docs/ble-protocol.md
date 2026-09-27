@@ -17,6 +17,7 @@ Todos comparten sufijo `-8f24-4adb-a350-77ef6339c320`:
 | a04c0003 | Notificaciones: respuestas JSON fragmentadas |
 | a04c0004 | Notificaciones: solución GNSS compacta |
 | a04c0005 | Escritura con respuesta ATT: fragmentos RTCM3 |
+| a04c0006 | Notificaciones: salud a 1 Hz |
 
 ## Control
 
@@ -37,6 +38,28 @@ Respuestas de hasta 4096 bytes en paquetes del tamaño del MTU negociado: uint16
 | 16 | int32 | Altura MSL del receptor en mm; INT32_MIN inválido |
 
 Se notifica únicamente una época nueva con llegada menor a 500 ms. La app vence datos si dejan de llegar y distingue secuencia de época. No extrapolar ni repetir una posición para aparentar 10 Hz. No hay reloj UTC absoluto ni sincronización PPS validada. Extensiones de mensaje y otras referencias de altura requieren versión nueva; no reinterpretar campos silenciosamente.
+
+## Salud (20 bytes, little-endian, 1 Hz)
+
+La misma carga va por el WebSocket `/ws/telemetry` como trama de tipo `0x02`.
+
+| Offset | Tipo | Significado |
+| --- | --- | --- |
+| 0 | uint8 | Versión del paquete: `1` |
+| 1 | uint16 | Sigma horizontal de GST en mm; 0xFFFF sin estimación |
+| 3 | uint16 | Sigma vertical de GST en mm; 0xFFFF sin estimación |
+| 5 | uint16 | Edad de la última corrección en s; 0xFFFF sin fuente |
+| 7 | uint8 | Fuente activa: 0 ninguna, 1 BLE, 2 NTRIP, 3 radio |
+| 8 | uint8 | Calidad GGA, espejo del paquete de solución |
+| 9 | uint8 | IMU: reservado, siempre 0 |
+| 10 | uint8 | Satélites rastreados, de GSV; 255 desconocido. **Desde 0.7.1** |
+| 11–19 | — | Sin usar |
+
+**El byte 10 no sube la versión, a propósito.** Estaba sin usar, así que un
+cliente de la versión 1 no lo lee; subir a 2 podía dejar sin sigmas ni edad de
+correcciones a una app que exija `1`. La contrapartida: hasta 0.7.0 el byte iba
+a cero, y cero también es un número de satélites. Leerlo solo si
+`firmware_version` de `/api/status` es 0.7.1 o posterior.
 
 ## Correcciones
 

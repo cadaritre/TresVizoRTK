@@ -143,7 +143,14 @@ void begin() {
     }
     uart.begin(TRESVIZO_GNSS_BAUD, SERIAL_8N1, TRESVIZO_GNSS_RX, TRESVIZO_GNSS_TX);
     // La tarea UART no depende del temporizador HTTP ni del mutex de configuración.
-    const bool started = uart && xTaskCreate(acquire, "gnss_rx", 4096, nullptr, 2, nullptr) == pdPASS;
+    //
+    // **8 KiB de pila, no 4.** Con 4 KiB el camino más hondo dejaba unos 600
+    // bytes antes de contar interrupciones: `acquire` ocupa 2112, su lambda 192
+    // y `correction_output::publish` 1072 (medido con -fstack-usage). El
+    // 26-09-2026, al activar GSV y GSA por COM2, el equipo empezó a reiniciarse
+    // por panic cada pocos minutos con la pila corrupta. El mínimo de pila libre
+    // de esta tarea se publica en `/api/status` → `memory.stack_free_min_bytes`.
+    const bool started = uart && xTaskCreate(acquire, "gnss_rx", 8192, nullptr, 2, nullptr) == pdPASS;
     portENTER_CRITICAL(&lock);
     state.enabled = started;
     state.start_failed = !started;

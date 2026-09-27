@@ -118,6 +118,14 @@ vieja, **y la edad se publica** para poder decidir con ella.
 
 Un satélite que deja de aparecer no se extrapola: se deja de decir que está.
 
+**Caben 192 observaciones** (satélite por señal). El tope era 72, pensado para
+dos señales por satélite; con triple banda el UM980 manda hasta cinco por
+satélite de BeiDou y tres de GPS y Galileo. El 26-09-2026, desde una ventana con
+medio cielo tapado y máscara de 5°, ya llegaban de 75 a 78. A cielo abierto se
+esperan más de cien. Los satélites distintos se cuentan en una sola pasada, con
+un mapa de bits por emisor: la comparación de todos contra todos que había antes
+crecía con el cuadrado del tope y corre dentro de una sección crítica.
+
 ### La respuesta
 
 ```json
@@ -126,7 +134,7 @@ Un satélite que deja de aparecer no se extrapola: se deja de decir que está.
     {"sys":"GP","prn":7,"el":67,"az":300,"cno":45,"use":true,"sig":[[1,45],[6,31]]},
     {"sys":"GL","prn":68,"el":21,"az":95,"cno":null,"use":false,"sig":[[1,null]]}
   ],
-  "in_view": 28, "used": 18, "published": 28, "omitted": 0, "dropped": 0,
+  "in_view": 28, "tracked": 27, "used": 18, "published": 28, "omitted": 0, "dropped": 0,
   "age_ms": 380,
   "fix_type": 3, "pdop": 1.8, "hdop": 0.9, "vdop": 1.5, "dop_age_ms": 420
 }
@@ -142,8 +150,23 @@ Un satélite que deja de aparecer no se extrapola: se deja de decir que está.
   cero es el norte y cero no es una señal.
 - `fix_type` y los tres DOP salen de GSA. **`pdop` y `vdop` no estaban
   disponibles antes**: GGA solo trae HDOP.
+- `in_view` cuenta todo lo que anuncia GSV; `tracked`, solo los satélites con
+  C/N0 en al menos una señal. `used` sale de GSA.
 - `omitted` es cuántos satélites no se publicaron y `dropped` cuántas
   observaciones no cupieron en la tabla. Los dos deberían ser cero.
+
+### Rastreados en el estado y en la telemetría
+
+Desde 0.7.1 la cifra de rastreados sale también fuera de esta ruta, porque es
+la que falta junto a los usados de GGA: pocos rastreados es cielo tapado; muchos
+rastreados y pocos usados son señales débiles que la solución descarta.
+
+- `GET /api/status` → `solution.satellites_tracked`, junto a `satellites_used`.
+  **Se omite si no hay GSV reciente** (diez segundos): un cero diría que el
+  receptor no oye nada cuando lo que pasa es que no se le pidió GSV.
+- Paquete de salud, byte 10: BLE `a04c0006` y WebSocket tipo `0x02`. `255` =
+  desconocido. Ver [protocolo BLE](ble-protocol.md#salud-20-bytes-little-endian-1-hz).
+- El panel lo muestra en Campo como «usados / rastreados».
 
 ### Por qué hay un límite de cuarenta
 
@@ -168,13 +191,27 @@ milisegundos, y a 10 Hz cargarían el enlace de verdad. Con GGA a 10 Hz y las
 otras tres a 1 Hz, la estimación con el tamaño máximo de sentencia ronda el 20 %
 de los 115200 baudios. **Es una estimación, no una medida.**
 
-### Lo que falta comprobar
+### Comprobado contra el UM980 real, 26-09-2026
 
-Todo lo anterior está probado en el Mac con tramas construidas a mano y el
-firmware compila. **No se ha comprobado contra el UM980 real**: el equipo no
-estaba conectado. Queda pendiente verificar contra tramas de verdad que el
-UM980 con `V410` emite el identificador de señal y el de sistema, y con qué
-emisores anuncia BeiDou y QZSS.
+UM980 `R4.10Build13504`, `SIGNALGROUP 1`, `NMEAVERSION V410`, antena de triple
+banda afuera de una ventana:
+
+- Leyendo el USB del receptor con GSV y GSA pedidas una sola vez: **GSV trae
+  identificador de señal** (GPS 1, 4 y 8; GLONASS 1 y 3; Galileo 1, 2 y 7;
+  BeiDou 1, 3, 5, 6 y 8) y **GSA trae identificador de sistema** (1 a 4). Los
+  emisores son `GP`, `GL`, `GA` y `GB`. Algunos satélites aparecen con C/N0 pero
+  sin elevación ni azimut, y el receptor no los usa; lo más probable es que no
+  tenga su órbita, no se comprobó.
+- Por la UART del ESP32, con firmware 0.7.1: `in_view` y `tracked` en 29, igual
+  que la lectura directa del receptor en ese momento; `used` coincide con GGA;
+  `dropped` y `omitted` en cero; la respuesta pesa 2.6 KB. Los primeros 42 s
+  llegaron 9.7 GGA por segundo, sin desbordes ni errores de UART; no es una
+  medida de carga.
+- WebSocket: el byte 10 del paquete de salud trae los mismos 29.
+
+**Falta:** el byte 10 por BLE (mismo código que el WebSocket, sin cliente para
+probarlo), un cielo abierto con más de cien observaciones y el emisor de QZSS,
+que no se ve desde donde se probó.
 
 ## Persistencia
 

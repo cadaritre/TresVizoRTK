@@ -23,10 +23,14 @@ namespace gnss {
 // caduca; no se le extrapola posicion ni se le mantiene la senal.
 class SkyTable {
 public:
-    // Cabe un cielo lleno de verdad: cuatro constelaciones a la vista con dos
-    // senales cada una pasan de sesenta observaciones. Al llegar al tope se
-    // cuentan las que no caben en vez de tirarlas en silencio.
-    static constexpr unsigned kCapacity = 72;
+    // Cabe un cielo lleno de verdad **con triple banda**. El tope estaba en 72,
+    // pensado para dos senales por satelite, y el UM980 manda hasta cinco por
+    // satelite de BeiDou y tres de GPS y Galileo: el 26-09-2026, desde una
+    // ventana con medio cielo tapado y mascara de 5 grados, ya llegaban de 75 a
+    // 78 observaciones de 32 satelites. A cielo abierto se esperan mas de cien.
+    // Al llegar al tope se cuentan las que no caben en vez de tirarlas en
+    // silencio.
+    static constexpr unsigned kCapacity = 192;
 
     // Diez segundos con GSV a 1 Hz: aguanta que se pierdan varias tramas
     // seguidas sin que el cielo parpadee, y no tanto como para ensenar un
@@ -126,26 +130,50 @@ public:
     /// aunque llegue por varias senales. Es la cifra que se compara con la de
     /// GGA: si GGA dice 10 usados y esto dice 30 a la vista, el problema no es
     /// el cielo.
-    unsigned distinctInView(uint32_t now_ms) const {
-        unsigned total = 0;
-        for (unsigned i = 0; i < count_; ++i) {
-            if (!entries_[i].prn) continue;
-            if (now_ms - entries_[i].updated_ms > kExpiryMs) continue;
-            bool repetido = false;
-            for (unsigned j = 0; j < i && !repetido; ++j) {
-                if (!entries_[j].prn) continue;
-                if (now_ms - entries_[j].updated_ms > kExpiryMs) continue;
-                repetido = entries_[j].prn == entries_[i].prn
-                    && std::strncmp(entries_[j].talker, entries_[i].talker, 2) == 0;
-            }
-            if (!repetido) ++total;
-        }
-        return total;
-    }
+    unsigned distinctInView(uint32_t now_ms) const { return distinct(now_ms, false); }
+
+    /// Lo mismo, pero solo los que se **rastrean**: con C/N0 en al menos una
+    /// senal. GSV puede anunciar un satelite sobre el horizonte que el receptor
+    /// no oye, y contarlo diria que agarra algo que no agarra.
+    unsigned distinctTracked(uint32_t now_ms) const { return distinct(now_ms, true); }
 
 private:
     Satellite entries_[kCapacity];
     unsigned count_ = 0;
+
+    // Emisores distintos que caben en la cuenta. GP, GL, GA, GB, GQ y GI son
+    // seis: sobra margen.
+    static constexpr unsigned kMaxTalkers = 8;
+
+    /// Satelites distintos en una sola pasada, con un mapa de bits de 256 PRN
+    /// por emisor. Antes se comparaba cada entrada con todas las anteriores:
+    /// con la tabla llena son decenas de miles de vueltas, y esto se llama
+    /// **dentro de una seccion critica**, con las interrupciones paradas.
+    unsigned distinct(uint32_t now_ms, bool trackedOnly) const {
+        struct Seen { char talker[2]; uint32_t bits[8]; };
+        Seen seen[kMaxTalkers] = {};
+        unsigned talkers = 0, total = 0;
+        for (unsigned i = 0; i < count_; ++i) {
+            const Satellite& e = entries_[i];
+            if (!e.prn || now_ms - e.updated_ms > kExpiryMs) continue;
+            if (trackedOnly && !e.tracked) continue;
+            Seen* s = nullptr;
+            for (unsigned t = 0; t < talkers && !s; ++t) {
+                if (std::strncmp(seen[t].talker, e.talker, 2) == 0) s = &seen[t];
+            }
+            if (!s) {
+                // Un emisor de mas se queda sin contar: quedarse corto es
+                // mejor que contar dos veces el mismo satelite.
+                if (talkers == kMaxTalkers) continue;
+                s = &seen[talkers++];
+                std::memcpy(s->talker, e.talker, 2);
+            }
+            uint32_t& word = s->bits[e.prn >> 5];
+            const uint32_t bit = uint32_t(1) << (e.prn & 31);
+            if (!(word & bit)) { word |= bit; ++total; }
+        }
+        return total;
+    }
 
     static const char* talkerFor(const Gsa& message) {
         switch (message.system_id) {
