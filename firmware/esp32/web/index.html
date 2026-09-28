@@ -838,8 +838,8 @@
           </dialog>
         <article class="panel bench-panel" id="update-panel">
             <h2>Actualizar firmware del ESP32</h2>
-            <p>Selecciona firmware.bin y su manifest.json de TresVizo. Se verifica el equipo, el tamaño y SHA-256 antes de activar la imagen nueva. Los ajustes se conservan.</p>
-            <p class="hint">Actualiza con alimentación estable y el equipo fuera de una medición. El paquete actual lo proporciona el propietario; todavía no lleva firma digital de distribución.</p>
+            <p>Selecciona firmware-signed.bin y su manifest.json de TresVizo. Se verifica el equipo, el tamaño, el SHA-256 y la firma del propietario antes de activar la imagen nueva. Los ajustes se conservan.</p>
+            <p class="hint">Actualiza con alimentación estable y el equipo fuera de una medición. Desde 0.7.13 el equipo solo instala firmware con la firma del propietario (ECDSA P-256).</p>
             <dl class="detail-list"><div><dt>Versión / partición</dt><dd id="update-version">Consultando</dd></div><div><dt>Recuperación de arranque</dt><dd id="update-recovery">Consultando</dd></div></dl>
             <form id="update-form">
               <label for="update-image">Imagen de aplicación (.bin)</label><input id="update-image" type="file" accept=".bin" required />

@@ -698,6 +698,40 @@ distinto.
 - **Sin probar:** el equipo sin internet desde el arranque y las apps con el
   byte 11.
 
+## Versión 0.7.13
+
+Entrega del 28-09-2026: arreglos de la auditoría externa de 0.7.12 (siete hallazgos P1 y dos
+P2, verificados uno a uno contra el código y reproducidos en la Mac antes de corregirlos).
+
+- **Modo base.**
+  - El promedio declara la posición de la antena tal cual: ya no le suma la antena y el case
+    otra vez. Antes, con un jalón de 1.8 m, la base quedaba 1.90 m alta y los rovers heredaban
+    el error. Nuevo `mark_ellipsoid_height_m` en `/api/base/survey` con la cota de la marca.
+    «Usar coordenada actual» del panel rellena la altura del suelo, no la de la antena.
+  - El promedio se cancela si llega una época sin posición, si la última buena tiene más de
+    2.5 s o si hay demasiado pocas épocas válidas.
+  - Aplicar una base la guarda en el receptor (`SAVECONFIG`), solo si el modo leído es base.
+    `saved` y `persisted_to_receiver` solo dicen «guardado» con el OK de ese `SAVECONFIG`.
+  - «Pasar a rover» repone GGA, GST, GSV y GSA antes de guardar. Antes el receptor quedaba mudo,
+    también tras apagarlo. `receiver_silent` salta a los 5 s sin GGA, en la misma sesión.
+  - El RTCM que produce la base (caster local y publicación) ya no pierde las tramas que llevan
+    un byte `0xAA`: se perdían del 45 % de las MSM de 150 B al 90 % de las de 600 B.
+- **Salud y WebSocket.**
+  - La salud (BLE y WebSocket) dice calidad 0 y precisión desconocida (`0xFFFF`) cuando la
+    última GGA o GST tiene más de 2 s. El formato de 20 bytes no cambia.
+  - El WebSocket manda la salud a 1 Hz aunque no haya solución, y el envío pasa a la tarea
+    `httpd` (`httpd_queue_work`, sin esperar): un cliente lento ya no para el bucle principal.
+- **Seguridad.**
+  - Por Bluetooth ninguna respuesta lleva contraseñas (`ap_password` sale por HTTP y USB).
+  - **La OTA solo instala firmware firmado por el propietario** (ECDSA P-256). Se sube
+    `firmware-signed.bin` (imagen + 72 bytes `TVZSIG01` + firma); `pio run` lo genera si está
+    la clave en `~/.tresvizo/firmware-signing/` (ver `tools/firmware_signing/README.md`).
+    «Restaurar firmware anterior» solo vuelve a una imagen que también exija firma.
+- Probado: 20 pruebas de host y los arneses de la auditoría. Lo que se probó en el equipo se
+  anota abajo. Sin probar con el UM980 en campo: base con RTCM real, persistencia de la base
+  tras un corte de corriente, qué emite el UM980 al perder seguimiento y el case real (0.10 m,
+  sin medir).
+
 ## Versión 0.7.12
 
 Entrega del 28-09-2026: **una dirección Bluetooth por tabla GATT**, para que ningún teléfono

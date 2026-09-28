@@ -9,7 +9,7 @@ el lado del equipo, con archivo y línea.
 
 | Pieza | Dónde | Tarea / contexto | Prioridad |
 | --- | --- | --- | --- |
-| Bucle principal: consola USB, **BLE (órdenes, respuestas, telemetría)**, WebSocket, `instrument::tick` | `src/main.cpp:235-250` | `loopTask` (Arduino) | 1 |
+| Bucle principal: consola USB, **BLE (órdenes, respuestas, telemetría)**, armado de la telemetría WebSocket (desde 0.7.13 el envío lo hace la tarea `httpd` con `httpd_queue_work`), `instrument::tick` | `src/main.cpp:235-250` | `loopTask` (Arduino) | 1 |
 | Callbacks de escritura BLE (órdenes y RTCM) | `src/ble_transport.cpp` `CommandCallbacks`, `CorrectionCallbacks` | tarea de Bluedroid (BTC) | la de la pila |
 | Lectura de la UART del UM980, parsers NMEA, **escritura de RTCM a la UART**, órdenes de configuración al UM980 | `src/gnss_receiver.cpp` `acquire` | `gnss_rx`, 8 KiB de pila | 2 |
 | Cliente NTRIP del propio equipo (Wi-Fi) | `src/ntrip_input.cpp` | `ntrip_rx` | 1 |
