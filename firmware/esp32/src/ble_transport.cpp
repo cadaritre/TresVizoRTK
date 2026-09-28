@@ -6,12 +6,14 @@
 #include "correction_router.h"
 #include "correction_output.h"
 #include "ble_frames.h"
+#include "ble_address.h"
 #include "health_report.h"
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLE2902.h>
 #include <esp_timer.h>
 #include <esp_gatt_common_api.h>
+#include <esp_mac.h>
 #include <atomic>
 #include <Preferences.h>
 
@@ -159,16 +161,26 @@ class CorrectionCallbacks : public BLECharacteristicCallbacks {
     }
 };
 // El intervalo que de verdad quedo tras negociar (el telefono decide).
+// La direccion con la que se anuncia el equipo (lib/protocol/src/ble_address.h)
+// y si la pila la acepto: el aviso de la pila llega despues, por onGapEvent.
+uint8_t advertisedAddress[protocol::kBleAddressBytes] = {};
+std::atomic<bool> advertisedAddressIsRandom{false};
+std::atomic<int> randomAddressStatus{-1};  // -1: la pila aun no contesto
 void onGapEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t* parameters) {
     if (event == ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT && parameters->update_conn_params.status == ESP_BT_STATUS_SUCCESS)
         connIntervalUnits = parameters->update_conn_params.conn_int;
+    if (event == ESP_GAP_BLE_SET_STATIC_RAND_ADDR_EVT)
+        randomAddressStatus = int(parameters->set_rand_addr_cmpl.status);
 }
 // **La tabla GATT que guarda el cliente puede ser de otro firmware.** Medido
 // el 27-09-2026: una Mac que se conecto a un firmware antiguo seguia viendo,
 // con 0.7.11 cargado, cuatro caracteristicas (sin la de salud) y la de RTCM sin
 // escritura sin respuesta. Sin emparejamiento la pila no avisa de «servicios
-// cambiados» a nadie. Mandarlo al conectar no basta: el cliente aun no se ha
-// suscrito a ese aviso. Se manda una vez, un rato despues de conectar.
+// cambiados» a nadie. Desde 0.7.12 lo resuelve la direccion atada a la tabla
+// (ble_address.h). Lo de abajo queda como sonda.
+//
+// Mandarlo al conectar no basta: el cliente aun no se ha suscrito a ese aviso.
+// Se manda una vez, un rato despues de conectar.
 //
 // **Apagado por defecto** (`-DTRESVIZO_BLE_SERVICE_CHANGED` lo enciende). Con la
 // Mac, el aviso sale (ESP_OK) pero macOS no redescubre; en un iPhone no se ha
@@ -334,6 +346,18 @@ void begin(Dispatch dispatch, Authenticate authenticate) {
     health->addDescriptor(new BLE2902());
     service->start();
     auto advertising = BLEDevice::getAdvertising();
+    // Una direccion por tabla GATT (ble_address.h): un telefono que guardo la
+    // tabla de otro firmware ve un equipo nuevo y la lee entera. Si algo falla
+    // se queda la publica del chip, como hasta 0.7.11: el enlace sigue, solo
+    // vuelve el riesgo de la tabla vieja.
+    uint8_t chip[protocol::kBleAddressBytes];
+    if (esp_read_mac(chip, ESP_MAC_BT) == ESP_OK) {
+        protocol::advertisedAddress(chip, protocol::kGattTableGeneration, advertisedAddress);
+        if (esp_ble_gap_set_rand_addr(advertisedAddress) == ESP_OK) {
+            advertising->setDeviceAddress(advertisedAddress, BLE_ADDR_TYPE_RANDOM);
+            advertisedAddressIsRandom = true;
+        }
+    }
     advertising->addServiceUUID(serviceId);
     advertising->setScanResponse(true);
     if (enabled) BLEDevice::startAdvertising();
@@ -381,6 +405,21 @@ void status(JsonObject out) {
     // contadores de RTCM en sus bytes 17-19. Todo aditivo: una app de la
     // version 2 sigue funcionando igual.
     out["protocol_version"] = 3;
+    // Desde 0.7.12: la direccion anunciada y la generacion de la tabla GATT que
+    // la produce (ble_address.h). Si la pila rechazo la aleatoria, lo dice.
+    out["gatt_table_generation"] = protocol::kGattTableGeneration;
+    if (advertisedAddressIsRandom.load()) {
+        char text[18];
+        snprintf(text, sizeof text, "%02X:%02X:%02X:%02X:%02X:%02X", advertisedAddress[0], advertisedAddress[1],
+                 advertisedAddress[2], advertisedAddress[3], advertisedAddress[4], advertisedAddress[5]);
+        out["address"] = text;
+        out["address_type"] = "random_static";
+        const int stackStatus = randomAddressStatus.load();
+        if (stackStatus >= 0 && stackStatus != ESP_BT_STATUS_SUCCESS) out["address_error"] = stackStatus;
+    } else {
+        out["address"] = nullptr;
+        out["address_type"] = "public";
+    }
     out["rtcm_write_without_response"] = true;
     out["health_period_ms"] = kHealthPeriodMs;
     const uint16_t interval = connIntervalUnits.load();
