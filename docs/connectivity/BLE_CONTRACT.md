@@ -75,6 +75,26 @@ Apple). El teléfono decide; el estado BLE dice el que quedó (`conn_interval_ms
 Sin el bit 2, los bytes 17–19 no significan nada. Código: `lib/protocol/src/health_packet.h`,
 pruebas en `test/health_packet_test.cpp`.
 
+## Salud: calidad y precisión caducan en el equipo
+
+La salud sigue saliendo a 1 Hz como latido aunque no haya solución (regla 3). Que llegue no
+quiere decir que lo que lleva sea de ahora; por eso, con el reloj monotónico del ESP32 desde la
+llegada de cada sentencia:
+
+- **Byte 8 (calidad)**: la de la última GGA si llegó hace ≤ 2 s; si no, `0` = sin solución
+  vigente.
+- **Bytes 1–4 (precisión mostrada) y 12–15 (sigma cruda)**: las de la última GST si llegó hace
+  ≤ 2 s **y** hay solución vigente; si no, `0xFFFF` en los cuatro = sin estimación.
+- 2 s porque la GGA puede ir a 1 Hz, la GST va a 1 Hz y la salud sale con fase cualquiera; con
+  500 ms casi la mitad de los paquetes de un equipo sano saldrían vencidos.
+- El resto no cambia: edad de correcciones, fuente, rastreados, visibles y contadores RTCM.
+
+El cliente **no** necesita versión nueva: `0` y `0xFFFF` ya se leían como «sin solución» y
+«sin estimación». Lo que no debe hacer es guardar la última precisión buena y seguir
+enseñándola cuando llega `0xFFFF`. Hasta 0.7.12 el equipo copiaba la última GGA y GST sin mirar
+su edad. Código: `lib/protocol/src/health_timing.h`, `include/health_solution.h`; pruebas en
+`test/health_solution_test.cpp`.
+
 ## Estado (`GET /api/ble` = `subsystems.ble` de `/api/status`)
 
 Nuevos en v3: `protocol_version: 3`, `rtcm_write_without_response: true`,
@@ -92,7 +112,8 @@ desalojadas + caducadas + las que queden en cola.
 - Ni emparejamiento ni cifrado (decisión del propietario desde 0.6.2): ver SECURITY en
   KNOWN_LIMITATIONS.md.
 - Versión del paquete de salud y de solución: siguen en 1; los campos nuevos van en bytes que
-  estaban a 0.
+  estaban a 0. La caducidad de la calidad y la precisión (arriba) usa codificaciones que ya
+  existían: no cambia ni un byte del formato.
 - El RTCM va **sin envoltorio**: los bytes nativos RTCM3, que ya traen longitud y CRC-24Q. No
   hace falta secuencia propia: el enlace ATT es ordenado y fiable en capa de enlace; lo que se
   pierde en el equipo se cuenta en la salud.

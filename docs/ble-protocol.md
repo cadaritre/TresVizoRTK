@@ -75,20 +75,48 @@ La misma carga va por el WebSocket `/ws/telemetry` como trama de tipo `0x02`.
 | Offset | Tipo | Significado |
 | --- | --- | --- |
 | 0 | uint8 | Versión del paquete: `1` |
-| 1 | uint16 | **Precisión horizontal mostrada por Meridian V**, mm (ver abajo); 0xFFFF sin estimación. Hasta 0.7.8, sigma cruda del peor eje |
-| 3 | uint16 | **Precisión vertical mostrada por Meridian V**, mm; 0xFFFF sin estimación. Hasta 0.7.8, sigma vertical cruda |
+| 1 | uint16 | **Precisión horizontal mostrada por Meridian V**, mm (ver abajo); 0xFFFF sin estimación **vigente** (ver «Vigencia»). Hasta 0.7.8, sigma cruda del peor eje |
+| 3 | uint16 | **Precisión vertical mostrada por Meridian V**, mm; 0xFFFF sin estimación vigente. Hasta 0.7.8, sigma vertical cruda |
 | 5 | uint16 | Edad de la última corrección en s; 0xFFFF sin fuente |
 | 7 | uint8 | Fuente activa: 0 ninguna, 1 BLE, 2 NTRIP, 3 radio |
-| 8 | uint8 | Calidad GGA, espejo del paquete de solución |
+| 8 | uint8 | Calidad de la última GGA si llegó hace 2 s o menos; si no, **0 (sin solución vigente)**. Hasta 0.7.12, la última recibida por vieja que fuera |
 | 9 | uint8 | IMU: reservado, siempre 0 |
 | 10 | uint8 | Satélites **rastreados** (GSV); 255 sin GSV reciente. En 0.7.5 y 0.7.6, usados; antes, 0 |
 | 11 | uint8 | Satélites **visibles** (geometría sobre la máscara del receptor, calculados en el ESP32); 255 sin órbitas o sin posición. Antes de 0.7.10, 0 |
-| 12 | uint16 | Sigma **cruda** del UM980, horizontal del peor eje (N/E), mm; 0xFFFF sin estimación. Desde 0.7.9 |
-| 14 | uint16 | Sigma **cruda** del UM980, vertical, mm; 0xFFFF sin estimación. Desde 0.7.9 |
+| 12 | uint16 | Sigma **cruda** del UM980, horizontal del peor eje (N/E), mm; 0xFFFF sin estimación vigente. Desde 0.7.9 |
+| 14 | uint16 | Sigma **cruda** del UM980, vertical, mm; 0xFFFF sin estimación vigente. Desde 0.7.9 |
 | 16 | uint8 | Banderas: bit 0 = bytes 1-4 son precisión mostrada; bit 1 = bytes 12-15 traen la cruda; bit 2 = bytes 17-19 traen contadores RTCM (desde 0.7.11). 0 en firmware anterior |
 | 17 | uint8 | Desde 0.7.11, con el bit 2 del byte 16: tramas RTCM tiradas camino del UM980 (módulo 256) |
 | 18 | uint8 | Desde 0.7.11, con el bit 2: tramas RTCM rechazadas al llegar por CRC o formato (módulo 256) |
 | 19 | uint8 | Desde 0.7.11, con el bit 2: ocupación de la cola hacia el UM980 en % (255 = no se sabe) |
+
+**Vigencia de la calidad y la precisión.** La salud es también el latido: sale a
+1 Hz **siempre** que el enlace está arriba, haya solución o no, y las apps la
+toman por fresca porque llega cada segundo. Por eso lo que viene del receptor
+caduca en el equipo, medido con el reloj monotónico del ESP32 desde la llegada
+de la sentencia (no con la hora UTC de la GGA):
+
+- Byte 8: la calidad de la última GGA si llegó hace **2 s** o menos; si no, o si
+  no ha llegado ninguna desde el arranque, 0.
+- Bytes 1–4 y 12–15: la precisión de la última GST si llegó hace 2 s o menos
+  **y** hay solución vigente; si no, 0xFFFF en los cuatro (sin estimación). La
+  sigma describe una solución: sin solución no hay precisión que enseñar, igual
+  que en `/api/status`.
+- 2 s y no los 500 ms con que se notifica la solución: la GGA puede ir a 1 Hz,
+  la GST va siempre a 1 Hz y la salud sale con una fase cualquiera respecto a
+  ellas. Con 500 ms, casi la mitad de los paquetes de un equipo sano saldrían
+  vencidos y la precisión parpadearía; 2 s aguantan además una sentencia perdida
+  suelta.
+- No cambian por esto: la edad de las correcciones y la fuente (bytes 5–7), los
+  rastreados y los visibles (10–11, cada uno con su propia vigencia: 10 s de GSV
+  y 30 s del cálculo) ni los contadores RTCM (17–19).
+
+Hasta 0.7.12 la salud copiaba la última GGA y la última GST sin mirar cuándo
+llegaron: con el receptor mudo, seguía diciendo FIJO y dando la última
+precisión indefinidamente, y las apps pintan la precisión de la salud. El
+formato no cambia: 0 y 0xFFFF ya significaban «sin solución» y «sin
+estimación». Código: `lib/protocol/src/health_timing.h` e
+`include/health_solution.h`; pruebas en `test/health_solution_test.cpp`.
 
 **Precisión mostrada (desde 0.7.9).** Métrica de producto que fijó el
 propietario el 27-09-2026; **no es una sigma del receptor**. La gobierna la sigma

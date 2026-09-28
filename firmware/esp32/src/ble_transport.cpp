@@ -63,8 +63,9 @@ std::atomic<uint16_t> connIntervalUnits{0};
 // Paquete de salud: 1 Hz **siempre** que haya alguien conectado, haya posicion
 // o no. Hasta 0.7.10 solo salia detras de una solucion nueva y sin fix no
 // llegaba ni la edad de las correcciones ni señal de vida. Ahora es tambien el
-// latido del protocolo: 20 bytes por segundo, que ya se mandaban.
-constexpr uint32_t kHealthPeriodMs = 1000;
+// latido del protocolo: 20 bytes por segundo, que ya se mandaban. El mismo
+// periodo que el WebSocket (`protocol::kHealthPeriodMs`, health_timing.h).
+constexpr uint32_t kHealthPeriodMs = protocol::kHealthPeriodMs;
 // Telemetria que no salio porque la controladora no tenia hueco. Es estado: se
 // manda la siguiente epoca (la mas nueva), no se encola la vieja. Si sube mucho,
 // la radio va saturada.
@@ -239,14 +240,15 @@ void publishTelemetry() {
             lastHealth = millis();
             // Armada en `health_report.h`, igual que por WebSocket. Bytes 1-4 =
             // precision mostrada por Meridian V; 12-15 = sigma cruda del UM980;
-            // 17-19 = contadores de RTCM.
+            // 17-19 = contadores de RTCM. Calidad y precision caducan a los 2 s
+            // de la ultima GGA y GST: el reloj se lee despues de la instantanea.
             uint8_t report[20];
-            health_report::build(report, snapshot);
+            health_report::build(report, snapshot, esp_timer_get_time());
             health->setValue(report, sizeof(report)); health->notify();
         } else ++telemetrySkipped;
     }
     const auto& s = snapshot.solution;
-    if (!snapshot.enabled || !snapshot.accepted || !s.has_utc || esp_timer_get_time() - s.arrival_us > 500000 || s.utc_ms == lastEpoch) return;
+    if (!snapshot.enabled || !snapshot.accepted || !s.has_utc || esp_timer_get_time() - s.arrival_us > protocol::kSolutionMaxAgeUs || s.utc_ms == lastEpoch) return;
     // Máximo 5 Hz (`protocol::kMinSolutionIntervalMs`). Se sigue mirando cada
     // 20 ms para mandar cada época en cuanto se puede, no con retraso.
     if (millis() - lastSolution < protocol::kMinSolutionIntervalMs) return;

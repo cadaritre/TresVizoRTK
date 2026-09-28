@@ -171,7 +171,7 @@ void tick() {
 
     // Salud: armada en `health_report.h`, igual que por Bluetooth.
     uint8_t report[20];
-    health_report::build(report, snapshot);
+    health_report::build(report, snapshot, esp_timer_get_time());
     broadcast(kHealth, report);
 }
 

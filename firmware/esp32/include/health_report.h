@@ -7,29 +7,25 @@
 #include "gnss_sky.h"
 #include "gnss_visible.h"
 #include "health_packet.h"
+#include "health_solution.h"
 
 // El paquete de salud que mandan el Bluetooth y el WebSocket, armado en un
 // solo sitio para que los dos no puedan dar cifras distintas. La codificacion
-// y la regla de precision mostrada estan en `lib/protocol/src/health_packet.h`.
+// y la regla de precision mostrada estan en `lib/protocol/src/health_packet.h`;
+// la caducidad de la calidad y la precision, en `health_solution.h` y
+// `lib/protocol/src/health_timing.h`.
 namespace health_report {
 
-inline void build(uint8_t report[20], const gnss_receiver::Snapshot& snapshot) {
+// `nowUs`: esp_timer_get_time() leído **después** de tomar `snapshot`, para que
+// una GGA llegada entre las dos lecturas no quede «en el futuro».
+inline void build(uint8_t report[20], const gnss_receiver::Snapshot& snapshot, uint64_t nowUs) {
     protocol::HealthInputs in;
-    if (snapshot.precision_accepted) {
-        const auto& p = snapshot.precision;
-        // Cruda del UM980, tal como llega en GST: no se toca.
-        in.um980RawHorizontalSigmaMm = protocol::sigmaToMm(
-            protocol::um980WorstAxisHorizontalSigmaM(p.latitude_sigma_m, p.longitude_sigma_m, p.horizontal_sigma_m));
-        in.um980RawVerticalSigmaMm = protocol::sigmaToMm(p.altitude_sigma_m);
-    }
-    // Precision que Meridian V enseña (decision de producto): la gobierna la
-    // horizontal cruda. Sin estimacion del receptor sale 0xFFFF.
-    in.meridianDisplay = protocol::meridianDisplayFromRaw(in.um980RawHorizontalSigmaMm);
+    // Calidad y precision, solo si la GGA y la GST siguen vigentes (2 s).
+    fillFromReceiver(in, snapshot, nowUs);
     const uint32_t age = correction_router::ageMs();
     in.correctionAgeSeconds = age == UINT32_MAX ? protocol::kUnknownMm
                                                 : uint16_t(std::min<uint32_t>(age / 1000, 65534));
     in.source = uint8_t(correction_router::sourceCode());
-    in.quality = uint8_t(snapshot.solution.quality);
     // Satelites **rastreados** (GSV). 255 = sin GSV reciente.
     unsigned tracked = 0;
     in.tracked = gnss_sky::tracked(tracked) ? uint8_t(std::min(tracked, 254u)) : 255;

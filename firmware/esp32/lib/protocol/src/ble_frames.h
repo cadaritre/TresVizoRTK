@@ -39,6 +39,12 @@ constexpr size_t kMaxResponsePayloadBytes = kMaxNotificationBytes - kResponseHea
 // fluctuacion y con 200 justos se saltaria alguna. A 10 Hz sale una de cada dos.
 constexpr unsigned kMaxSolutionRateHz = 5;
 constexpr uint32_t kMinSolutionIntervalMs = 190;
+// Una época solo se notifica si llegó hace esto o menos (reloj del ESP32 desde
+// la llegada). Se mira cada 20 ms y cada época nueva sale en cuanto llega; si
+// lleva medio segundo esperando (enlace sin hueco, bucle parado), ya no es la
+// posición de ahora y no se manda: la app ve que dejan de llegar y vence sus
+// datos. La salud tiene su propia ventana (health_timing.h).
+constexpr uint64_t kSolutionMaxAgeUs = 500000;
 
 // Bytes de JSON por trama con el MTU negociado. Nunca menos que sin negociar
 // ni mas de lo que ofrece el equipo. C++11: el firmware compila con gnu++11.
