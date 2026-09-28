@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 
 namespace instrument {
-constexpr const char* kVersion = "0.7.6";
+constexpr const char* kVersion = "0.7.7";
 void begin();
 void tick();
 // Contraseña de la red Wi-Fi propia. Es la única credencial del equipo: el

@@ -31,7 +31,7 @@ Respuestas de hasta 4096 bytes en paquetes del tamaño del MTU negociado: uint16
 | --- | --- | --- |
 | 0 | uint16 | Secuencia; vuelve a 0 después de 65535 |
 | 2 | uint8 | Calidad GGA 0–8 |
-| 3 | uint8 | Satélites **rastreados** (GSV); 255 desconocido. Hasta 0.7.4, usados (GGA) |
+| 3 | uint8 | Satélites **usados** (GGA); 255 desconocido. En 0.7.5 y 0.7.6, rastreados |
 | 4 | uint32 | Hora UTC del día en ms; **sin fecha** |
 | 8 | int32 | Latitud × 10⁷ grados; INT32_MIN inválido |
 | 12 | int32 | Longitud × 10⁷ grados; INT32_MIN inválido |
@@ -52,18 +52,29 @@ La misma carga va por el WebSocket `/ws/telemetry` como trama de tipo `0x02`.
 | 7 | uint8 | Fuente activa: 0 ninguna, 1 BLE, 2 NTRIP, 3 radio |
 | 8 | uint8 | Calidad GGA, espejo del paquete de solución |
 | 9 | uint8 | IMU: reservado, siempre 0 |
-| 10 | uint8 | Satélites usados (GGA); 255 desconocido. **Desde 0.7.5**; antes, 0 |
+| 10 | uint8 | Satélites **rastreados** (GSV); 255 sin GSV reciente. En 0.7.5 y 0.7.6, usados; antes, 0 |
 | 11–19 | — | Sin usar |
 
-**Desde 0.7.5 la telemetría enseña lo mismo que el panel**, por decisión del
-propietario: rastreados en el byte 3 de la solución y el peor eje en la sigma
-horizontal de la salud. Es un cambio de significado de dos campos existentes, y
-**no sube la versión, a propósito**: la app del propietario ya los lee y así
-enseña lo mismo sin tocarla, mientras que una versión nueva podía dejarla sin
-sigmas ni edad de correcciones si exige `1`. Quien necesite el significado
-anterior lo distingue por `firmware_version` de `/api/status`: hasta 0.7.4, byte
-3 = usados y sigma horizontal = combinada. Los usados siguen en el byte 10 y en
-`solution.satellites_used`.
+**Desde 0.7.7 cada byte trae lo que dice su nombre.** En 0.7.5 el propietario
+pidió que la telemetría enseñara lo mismo que el panel, y se hizo cambiando el
+byte 3 a rastreados. Salió mal: las apps lo seguían leyendo como usados, así que
+por Bluetooth enseñaban rastreados con el nombre de usados, por Wi-Fi enseñaban
+los usados de verdad y **cada punto se guardaba con los rastreados como si
+fueran usados**. En 0.7.7 el byte 3 vuelve a ser usados, los rastreados pasan al
+byte 10 de la salud y las apps enseñan esos; los puntos siguen guardando los
+usados. La sigma horizontal sigue siendo la del peor eje, como en el panel.
+
+La versión del paquete sigue en `1`, a propósito: una versión nueva podía dejar
+sin sigmas ni edad de correcciones a una app que exige `1`. Quien lea un equipo
+más viejo lo distingue por `firmware_version` de `/api/status`:
+
+| Firmware | Byte 3 de la solución | Byte 10 de la salud | Sigma horizontal |
+| --- | --- | --- | --- |
+| Hasta 0.7.4 | Usados | 0 | Combinada √(σN² + σE²) |
+| 0.7.5 y 0.7.6 | Rastreados | Usados | Peor eje |
+| Desde 0.7.7 | Usados | Rastreados | Peor eje |
+
+Por HTTP no cambia nada: `solution.satellites_used` y `solution.satellites_tracked`.
 
 ## Correcciones
 

@@ -451,7 +451,8 @@ del propietario, Campo y la telemetría enseñan ahora lo mismo:
   `solution.east_sigma_m`. `horizontal_sigma_m` sigue siendo la combinada.
 - BLE y WebSocket **cambian el significado de dos campos**: byte 3 de la solución
   = rastreados, y sigma horizontal de la salud = peor eje. El byte 10 de la salud
-  lleva los usados. Detalle y compatibilidad en
+  lleva los usados. **0.7.7 devuelve los usados al byte 3 y pasa los rastreados
+  al byte 10**; ver abajo. Detalle y compatibilidad en
   [el protocolo BLE](../../docs/ble-protocol.md#salud-20-bytes-little-endian-1-hz).
 - `GET /api/gnss/sky` añade `tracked`.
 
@@ -534,4 +535,29 @@ decisión del propietario, todo queda en 5 Hz como máximo:
 
 **Sin probar:** la frecuencia por Bluetooth medida en el teléfono (mismo código
 que el WebSocket).
+
+## Versión 0.7.7
+
+### Usados y rastreados, cada uno en su byte
+
+0.7.5 puso los rastreados en el byte 3 de la solución, donde el protocolo dice
+usados, y las apps no se enteraron: por Bluetooth enseñaban los rastreados con
+el nombre de usados, por Wi-Fi enseñaban los usados de GGA y **cada punto
+capturado por Bluetooth se guardaba con los rastreados como si fueran usados**.
+Se detectó revisando la app de iOS.
+
+- El byte 3 de la solución vuelve a ser **usados** (GGA), por BLE y por WebSocket.
+- El byte 10 de la salud pasa a ser **rastreados** (GSV); 255 sin GSV reciente.
+- La sigma horizontal de la salud sigue siendo la del peor eje, y la versión del
+  paquete sigue en `1`.
+- Las apps enseñan los rastreados, del byte 10 o de `solution.satellites_tracked`
+  por Wi-Fi, y guardan los usados con cada punto.
+
+Tabla de qué lleva cada byte según la versión en
+[el protocolo BLE](../../docs/ble-protocol.md#salud-20-bytes-little-endian-1-hz).
+
+### Verificación de esta entrega
+
+- Compilación con `-Wall -Wextra` sin avisos: RAM 27.8 %, flash 79.8 %.
+- **Sin cargar al equipo todavía** ni probada por WebSocket, BLE o las apps.
 

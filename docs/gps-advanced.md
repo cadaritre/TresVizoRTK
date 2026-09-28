@@ -169,9 +169,12 @@ rastreados y pocos usados son señales débiles que la solución descarta.
 - `GET /api/status` → `solution.satellites_tracked`, junto a `satellites_used`.
   **Se omite si no hay GSV reciente** (diez segundos): un cero diría que el
   receptor no oye nada cuando lo que pasa es que no se le pidió GSV.
-- Telemetría BLE y WebSocket: byte 3 de la solución = rastreados; los usados, en
-  el byte 10 de la salud. Ver [protocolo BLE](ble-protocol.md#salud-20-bytes-little-endian-1-hz).
-- Campo enseña solo los rastreados, por decisión del propietario.
+- Telemetría BLE y WebSocket: desde 0.7.7, los rastreados van en el byte 10 de
+  la salud y el byte 3 de la solución lleva los usados, como al principio. En
+  0.7.5 y 0.7.6 estaban al revés y las apps guardaban los rastreados como
+  usados. Ver [protocolo BLE](ble-protocol.md#salud-20-bytes-little-endian-1-hz).
+- Campo y las apps enseñan solo los rastreados, por decisión del propietario;
+  los puntos capturados guardan los usados.
 
 ### Por qué hay un límite de cuarenta
 
@@ -213,8 +216,8 @@ banda afuera de una ventana:
   `dropped` y `omitted` en cero; la respuesta pesa 2.6 KB. Los primeros 42 s
   llegaron 9.7 GGA por segundo, sin desbordes ni errores de UART; no es una
   medida de carga.
-- WebSocket: los rastreados llegan en el byte 3 de la solución y coinciden
-  con `/api/status`.
+- WebSocket, con 0.7.5: los rastreados llegaban en el byte 3 de la solución y
+  coincidían con `/api/status`. Desde 0.7.7 van en el byte 10 de la salud.
 
 **Falta:** la telemetría por BLE (mismo código que el WebSocket, sin cliente
 para probarlo), un cielo abierto con más de cien observaciones y el emisor de QZSS,
