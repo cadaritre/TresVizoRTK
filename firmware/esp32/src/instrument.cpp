@@ -46,6 +46,21 @@ bool apReady = false;
 bool pendingNetwork = false;
 uint32_t networkChangedAt = 0;
 uint32_t lastConnectionAttempt = 0;
+// Red elegida a mano. Si está a la vista se prefiere a la de mejor señal: al
+// encender el equipo se une a la mejor, y sin esto no había forma de quedarse
+// en otra. Se guarda en NVS para que valga también tras reiniciar.
+String preferredSsid;
+// Estación en pausa: el usuario soltó la red y el equipo no se vuelve a unir
+// solo hasta que elija una o se reinicie. Solo en RAM: al encender en campo se
+// espera que se conecte.
+bool stationPaused = false;
+// Soltar la red o cambiar de red se hace un segundo después, en `tick()`:
+// hacerlo dentro del handler cortaría la respuesta a quien lo pidió por esa
+// misma red.
+enum class StationAction : uint8_t { none, connect, disconnect };
+StationAction pendingStationAction = StationAction::none;
+String pendingConnectSsid;
+uint32_t stationActionAt = 0;
 bool pendingRestart = false;
 uint32_t restartRequestedAt = 0;
 // Espejo atómico de la existencia de redes guardadas: la tarea NTRIP lo lee
@@ -105,6 +120,8 @@ void config(JsonDocument& response) {
         item["mask"] = networks[i].mask;
     }
     response["networks_max"] = kMaxNetworks;
+    response["station_paused"] = stationPaused;
+    response["preferred_ssid"] = preferredSsid;
     response["ap_ssid"] = networkName;
     // El panel no pide clave, así que ocultar la del AP aquí no protegería nada
     // y en cambio impediría leerla para unir un teléfono.
@@ -157,6 +174,12 @@ bool joinBestVisible() {
     for (int i = 0; i < scanFound; ++i) {
         const int index = findNetwork(WiFi.SSID(i));
         if (index < 0) continue;
+        // La que el usuario eligió a mano gana si está a la vista, aunque otra
+        // llegue con mejor señal.
+        if (!preferredSsid.isEmpty() && networks[index].ssid == preferredSsid) {
+            best = index;
+            break;
+        }
         const int32_t rssi = WiFi.RSSI(i);
         if (best < 0 || rssi > bestRssi) {
             best = index;
@@ -195,6 +218,11 @@ bool persistConfig(uint32_t nextRevision, const String& name, uint32_t refresh,
     return preferences.putString("config", encoded) == encoded.length();
 }
 
+void setPreferred(const String& ssid) {
+    preferredSsid = ssid;
+    if (storageReady) preferences.putString("wifi_pref", ssid);
+}
+
 void adoptNetworks(const SavedNetwork* list, size_t count) {
     for (size_t i = 0; i < kMaxNetworks; ++i) {
         networks[i].ssid = i < count ? list[i].ssid : String();
@@ -214,6 +242,8 @@ void adoptNetworks(const SavedNetwork* list, size_t count) {
         stationPassword = "";
         joinRequested = count > 0;
     }
+    // Una preferida que ya no está guardada deja de serlo.
+    if (!preferredSsid.isEmpty() && findNetwork(preferredSsid) < 0) setPreferred("");
 }
 
 bool validString(JsonVariantConst field, bool (*rule)(const char*)) {
@@ -391,10 +421,51 @@ int wifiNetworks(const String& method, JsonVariantConst body, JsonDocument& resp
     for (JsonPairConst pair : body.as<JsonObjectConst>()) {
         const String name = pair.key().c_str();
         if (name != "ssid" && name != "password" && name != "forget" &&
-            name != "ip" && name != "gateway" && name != "mask") {
+            name != "ip" && name != "gateway" && name != "mask" &&
+            name != "connect" && name != "disconnect") {
             error(response, "unknown_setting", "La solicitud contiene un campo no admitido.");
             return 400;
         }
+    }
+    // Soltar la red o pasar a otra guardada. No toca la lista ni necesita el
+    // almacenamiento para actuar; la preferida se guarda si se puede.
+    const bool wantsConnect = !body["connect"].isNull();
+    const bool wantsDisconnect = !body["disconnect"].isNull();
+    if (wantsConnect || wantsDisconnect) {
+        if (body.as<JsonObjectConst>().size() != 1) {
+            error(response, "invalid_request", "Conectar o desconectar van solos en la solicitud.");
+            return 400;
+        }
+        if (wantsDisconnect) {
+            if (!body["disconnect"].is<bool>() || !body["disconnect"].as<bool>()) {
+                error(response, "invalid_request", "Para soltar la red, envía \"disconnect\": true.");
+                return 400;
+            }
+            // En pausa desde ya, para que la respuesta lo diga; la radio suelta
+            // la red un segundo después.
+            stationPaused = true;
+            pendingStationAction = StationAction::disconnect;
+            stationActionAt = millis();
+            config(response);
+            return 200;
+        }
+        if (!validString(body["connect"], config_rules::ssid)) {
+            error(response, "invalid_ssid", "El nombre de red no puede superar 32 bytes ni contener controles.");
+            return 400;
+        }
+        const String ssid = body["connect"].as<const char*>();
+        if (findNetwork(ssid) < 0) {
+            error(response, "not_found", "Esa red no está guardada.");
+            return 404;
+        }
+        stationPaused = false;
+        setPreferred(ssid);
+        pendingStationAction = StationAction::connect;
+        pendingConnectSsid = ssid;
+        stationActionAt = millis();
+        config(response);
+        response["connecting"] = ssid;
+        return 200;
     }
     if (!storageReady) {
         error(response, "storage_unavailable", "No se pudo abrir el almacenamiento interno de ajustes.");
@@ -564,7 +635,8 @@ void status(JsonDocument& response) {
     wifi["ap_clients"] = WiFi.softAPgetStationNum();
     const bool connected = WiFi.status() == WL_CONNECTED;
     wifi["station_state"] = !networkCount ? "not_configured"
-        : (connected ? "connected" : (scanState == ScanState::running ? "scanning" : "connecting"));
+        : (connected ? "connected"
+           : (stationPaused ? "paused" : (scanState == ScanState::running ? "scanning" : "connecting")));
     wifi["station_ssid"] = stationSsid;
     wifi["networks_saved"] = networkCount;
     if (connected) {
@@ -779,6 +851,9 @@ void begin() {
         }
     }
     stationPresent = networkCount > 0;
+    // La red elegida a mano la última vez, si sigue guardada.
+    preferredSsid = storageReady ? preferences.getString("wifi_pref", "") : String();
+    if (!preferredSsid.isEmpty() && findNetwork(preferredSsid) < 0) preferredSsid = "";
     WiFi.persistent(false);
     WiFi.mode(WIFI_AP_STA); // radio activa para la fuente de entropía del RNG
     // Solo se respeta una contraseña guardada si el propietario la fijó a
@@ -813,6 +888,23 @@ void tick() {
         pendingNetwork = false;
         joinRequested = networkCount > 0;
     }
+    if (pendingStationAction != StationAction::none && config_rules::elapsed(now, stationActionAt, 1000)) {
+        const StationAction action = pendingStationAction;
+        pendingStationAction = StationAction::none;
+        if (action == StationAction::disconnect) {
+            WiFi.disconnect(false, false);
+            stationSsid = "";
+            stationPassword = "";
+        } else {
+            const int index = findNetwork(pendingConnectSsid);
+            // Si la olvidaron en ese segundo, vuelve la autoconexión normal.
+            if (index >= 0) {
+                connectTo(networks[index]);
+            } else {
+                joinRequested = networkCount > 0;
+            }
+        }
+    }
     if (scanState == ScanState::running) {
         const int16_t found = WiFi.scanComplete();
         if (found >= 0) {
@@ -821,7 +913,7 @@ void tick() {
             scanFinishedAt = now;
             // Los resultados se aprovechan venga el escaneo de donde venga: si
             // el equipo está suelto, se une sin pedir otro barrido.
-            if (networkCount && WiFi.status() != WL_CONNECTED && !joinBestVisible()) {
+            if (networkCount && !stationPaused && WiFi.status() != WL_CONNECTED && !joinBestVisible()) {
                 lastConnectionAttempt = now;
             }
         } else if (found == WIFI_SCAN_FAILED || config_rules::elapsed(now, scanStartedAt, 20000)) {
@@ -830,7 +922,7 @@ void tick() {
             lastConnectionAttempt = now;
         }
     }
-    if (networkCount && scanState != ScanState::running && WiFi.status() != WL_CONNECTED &&
+    if (networkCount && !stationPaused && scanState != ScanState::running && WiFi.status() != WL_CONNECTED &&
         (joinRequested || config_rules::elapsed(now, lastConnectionAttempt, 30000))) {
         joinRequested = false;
         startScan();

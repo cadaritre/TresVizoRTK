@@ -561,3 +561,30 @@ Tabla de qué lleva cada byte según la versión en
 - Compilación con `-Wall -Wextra` sin avisos: RAM 27.8 %, flash 79.8 %.
 - **Sin cargar al equipo todavía** ni probada por WebSocket, BLE o las apps.
 
+## Versión 0.7.8
+
+### Soltar la red Wi-Fi y pasar a otra
+
+Al encender, el equipo se une solo a la red guardada con mejor señal, y no había
+forma sencilla de soltarla para pasar a otra: había que olvidarla y perder su
+contraseña. `POST /api/wifi/networks` admite ahora dos acciones, cada una sola
+en el cuerpo:
+
+- `{"connect":"<ssid>"}`: una red guardada; responde `404 not_found` si no lo
+  está. Un segundo después el equipo deja la red actual y se une a esa, que queda
+  como **preferida**. La preferida se guarda en NVS y, si está a la vista, se
+  elige antes que las demás aunque llegue con peor señal, también tras
+  reiniciar. Si falla, a los 30 s vuelve la autoconexión normal.
+- `{"disconnect":true}`: un segundo después el equipo deja la red y **no se
+  vuelve a unir solo** hasta un `connect` o un reinicio. La red propia del
+  equipo y el Bluetooth siguen funcionando.
+
+El segundo de espera es para que la respuesta llegue a quien lo pidió por esa
+misma red. `GET /api/wifi/networks` añade `station_paused` y `preferred_ssid`, y
+`GET /api/status` → `wifi.station_state` puede valer `paused`. Olvidar la red
+preferida la deja de ser.
+
+### Verificación de esta entrega
+
+- Compilación: PENDIENTE.
+- En el equipo: PENDIENTE.
