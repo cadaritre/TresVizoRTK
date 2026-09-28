@@ -662,3 +662,45 @@ distinto.
     aparte en la PC para la misma hora y posición; byte 11 = 44.
 - **Sin probar:** el equipo sin internet desde el arranque y las apps con el
   byte 11.
+
+## Versión 0.7.11
+
+Entrega del 27-09-2026 por la noche: endurecimiento del Bluetooth y de las correcciones.
+Auditoría, contrato y medidas en [`docs/connectivity/`](../../docs/connectivity/); el
+contrato v3 está en [BLE_CONTRACT.md](../../docs/connectivity/BLE_CONTRACT.md). Todo es
+aditivo: una app que solo sabe la versión 2 del protocolo funciona igual.
+
+- **RTCM sin respuesta.** `a04c0005` admite escritura sin respuesta además de con
+  respuesta. Con respuesta, el RTCM y las órdenes compartían el único carril ATT (una
+  escritura con respuesta en vuelo por enlace), y la respuesta la manda la biblioteca
+  antes de `onWrite`, así que nunca confirmó nada. Medido con respuesta: tope de
+  ≈2.8 kB/s a 30 ms de intervalo, y las órdenes suben de 75–93 ms a 90–153 ms con RTCM.
+- **Cola hacia el UM980 por bytes** (`lib/protocol/src/rtcm_queue.h`, 8 KiB): antes eran
+  cuatro tramas y, con la UART a 115200, una época MSM de 6 a 10 tramas que llegaba de
+  golpe perdía tramas. Solo tramas enteras, las más viejas fuera, caducidad de 2 s, y
+  una trama empezada se termina siempre. Contadores nuevos en `subsystems.gnss`.
+- **Salud a 1 Hz siempre** (antes solo detrás de una solución nueva, así que sin fix no
+  llegaba ni la edad de correcciones ni señal de vida). Es el latido del protocolo. Sus
+  bytes 17-19 llevan contadores de RTCM (bit 2 del byte 16).
+- **Telemetría con hueco y detrás de las respuestas**: si la controladora no tiene sitio,
+  la época no se fuerza y sale la siguiente (`telemetry_skipped`).
+- **Conexión de 15 a 30 ms** pedida por el equipo; el estado BLE informa el intervalo
+  vigente, el mayor hueco del bucle y la orden más lenta. `protocol_version` 3.
+- Aviso de «servicios cambiados» tras conectar, **apagado** por defecto
+  (`-DTRESVIZO_BLE_SERVICE_CHANGED`), para probar con un iPhone contra las tablas GATT
+  viejas que guardan los clientes (ver límites).
+
+### Verificación de esta entrega
+
+- Pruebas en la PC (`g++ -std=c++17 -Wall -Wextra`): las 12 de `test/` en verde, con la
+  nueva `rtcm_queue_test` (2 000 vueltas del anillo con cuadre exacto, desalojo de las más
+  viejas, caducidad, generación y vuelta de `millis()`) y los bytes 17-19 en
+  `health_packet_test`.
+- Compilación PlatformIO sin avisos propios: RAM 30.4 %, flash 80.9 %.
+- En el equipo (USB en la Mac, bajo techo y sin fix): 0.7.11 arranca, 5 GGA/s sin
+  errores de UART, heap interno libre ≈97 KB (0.7.10: ≈106 KB). Por Bluetooth, con la
+  Mac como central: MTU 247, intervalo 30 ms, respuestas rearmadas sin huecos, órdenes a
+  40–126 ms (mediana 40) durante 70 s aunque el equipo escaneaba Wi-Fi cada 30 s.
+- **Sin probar:** RTCM sin respuesta de punta a punta (la Mac tiene la tabla GATT del
+  equipo en caché de un firmware viejo: no ve la característica de salud, que existe, ni
+  la escritura sin respuesta), fix, NTRIP real, sesión larga y las apps.
