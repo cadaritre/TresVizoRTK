@@ -96,6 +96,13 @@ def cmd_replay(args) -> int:
     return 0
 
 
+def cmd_anonymize(args) -> int:
+    from bench.session import anonymize_session
+    changed = anonymize_session(Path(args.session), Path(args.out))
+    print(f"{args.out}: {changed} notificaciones de respuesta con redes o IP tapadas (mismo número de bytes)")
+    return 0
+
+
 def cmd_list(_args) -> int:
     from bench.scenarios import SCENARIOS
     for name, scenario in SCENARIOS.items():
@@ -191,6 +198,11 @@ def build_parser() -> argparse.ArgumentParser:
     replay = sub.add_parser("replay", help="reproducir una sesión grabada contra el decodificador")
     replay.add_argument("session", help="sesion.jsonl")
     replay.set_defaults(func=cmd_replay)
+
+    anonymize = sub.add_parser("anonymize", help="tapar redes Wi-Fi e IP de una sesión antes de versionarla")
+    anonymize.add_argument("session")
+    anonymize.add_argument("out")
+    anonymize.set_defaults(func=cmd_anonymize)
 
     listing = sub.add_parser("list", help="escenarios disponibles")
     listing.set_defaults(func=cmd_list)

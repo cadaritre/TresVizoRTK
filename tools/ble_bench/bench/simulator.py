@@ -228,8 +228,8 @@ class SimulatedMeridian:
             step = min(length - sent, budget)
             budget -= step
             self.uart_in_flight[3] = sent + step
-            self.uart_bytes_written += step
             if self.uart_in_flight[3] >= length:
+                self.uart_bytes_written += length  # enteros: el estado del equipo los da enteros
                 self.uart_sent += 1
                 self.uart_in_flight = None
 

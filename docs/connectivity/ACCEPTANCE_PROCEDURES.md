@@ -315,5 +315,8 @@ Cada uno con su motivo.
   contra las cabeceras compiladas (`tests/firmware_parity.cpp`; con
   `MERIDIAN_FIRMWARE_LIB=…/firmware/esp32/lib` se compara con otra copia del firmware),
   escenarios contra el simulador, grabar y reproducir.
-- Una sesión grabada mañana se reproduce igual (`$BANCO replay`): sirve para comprobar que un
-  cambio del decodificador o del análisis no cambia las conclusiones.
+- Una sesión grabada se reproduce igual (`$BANCO replay`). Para convertirla en prueba de
+  regresión: `$BANCO anonymize …/sesion.jsonl tools/ble_bench/tests/fixtures/<qué-es>.jsonl`
+  (tapa nombres de red, IP y el nombre del equipo sin cambiar el troceo) y correr las pruebas:
+  la primera vez escriben su `.resumen.txt` de referencia para revisarlo; después, cualquier
+  cambio del decodificador o del análisis que cambie las conclusiones hace fallar la prueba.

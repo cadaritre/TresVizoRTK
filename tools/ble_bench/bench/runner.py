@@ -91,7 +91,9 @@ class Bench:
     async def connect(self) -> None:
         started = self.recorder.now()
         link = self.link_factory()
-        link.on_unexpected_disconnect = self._lost
+        # El aviso lleva la conexión que lo dio: uno tardío de la conexión A no
+        # puede tirar la conexión B (identidad de sesión).
+        link.on_unexpected_disconnect = lambda: self._lost(link)
         try:
             await link.connect()
             gatt = {name: sorted(link.properties(uuid)) for uuid, name in p.CHARACTERISTIC_NAMES.items()}
@@ -132,7 +134,10 @@ class Bench:
     def rtcm_mode(self) -> str:
         return "con respuesta" if self.rtcm_with_response else "sin respuesta"
 
-    def _lost(self) -> None:
+    def _lost(self, link: Link) -> None:
+        if link is not self.link:
+            self.record("note", text="aviso de desconexión tardío de una conexión anterior: ignorado")
+            return
         self.record("disconnected", expected=False)
         self._fail_waiters("enlace perdido")
 

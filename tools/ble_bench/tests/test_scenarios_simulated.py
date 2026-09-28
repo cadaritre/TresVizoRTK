@@ -221,6 +221,26 @@ class Scenarios(unittest.TestCase):
         self.assertEqual(bench.analyzer.disconnects_unexpected, 1)
         self.assertEqual(bench.analyzer.disconnects_expected, 0)
 
+    def test_late_disconnect_callback_of_an_old_link_is_ignored(self):
+        async def scenario():
+            device = SimulatedMeridian()
+            with tempfile.TemporaryDirectory() as tmp:
+                recorder = Recorder(Path(tmp) / "s.jsonl")
+                bench = Bench(lambda: SimulatedLink(device), recorder)
+                await bench.connect()
+                old = bench.link
+                await bench.disconnect()
+                await bench.connect()
+                old.on_unexpected_disconnect()          # llega tarde, de la conexión anterior
+                answer = await bench.request("GET", "/api/ble")
+                await bench.disconnect()
+                recorder.close()
+                return bench, answer
+        bench, answer = asyncio.run(scenario())
+        self.assertEqual(answer["status"], 200)
+        self.assertEqual(bench.analyzer.disconnects_unexpected, 0)
+        self.assertIn("tardío", "\n".join(bench.analyzer.notes))
+
     def test_replay_of_a_simulated_run_matches_live(self):
         bench, path, tmp = run("rtcm-ordenes", duration_s=1.5, command_period_s=0.5, select_ble_source=True)
         _, events = read_session(path)

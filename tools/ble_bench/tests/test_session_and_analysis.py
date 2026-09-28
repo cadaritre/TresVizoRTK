@@ -77,6 +77,32 @@ class RecordAndReplay(unittest.TestCase):
                 read_session(path)
 
 
+class Anonymize(unittest.TestCase):
+    def test_networks_and_ips_are_masked_without_changing_framing(self):
+        from bench.session import anonymize_events
+        body = json.dumps({"id": 3, "status": 200, "body": {"wifi": {"ap_ssid": "TresVizo-C81D",
+                          "station_ssid": "Casa de Carlos", "station_ip": "192.168.1.44"}, "firmware_version": "0.7.11"}})
+        frames = p.encode_response_frames(9, body.encode(), 23)
+        link = "TresVizo-C81D [6F1B-UUID] por Bluetooth"
+        events = [Event(0.0, "connected", info={"link": link, "mtu": 247}),
+                  Event(0.0, "note", info={"text": f"conectado: {link}; MTU 247"}),
+                  Event(0.0, "request", info={"id": 3, "method": "GET", "path": "/api/status"})]
+        events += [Event(0.1 + i * 0.01, "notify", "response", f) for i, f in enumerate(frames)]
+        # Un mensaje con hueco también se tapa: se trabaja por desplazamiento.
+        broken = p.encode_response_frames(10, body.encode(), 23)
+        events += [Event(1.0 + i * 0.01, "notify", "response", f) for i, f in enumerate(broken) if i != 2]
+        clean = anonymize_events(events)
+        joined = b"".join(e.data[5:] for e in clean if e.data)
+        for secret in (b"Casa", b"Carlos", b"C81D", b"192.168.1.44"):
+            self.assertNotIn(secret, joined)
+        self.assertEqual([len(e.data or b"") for e in clean], [len(e.data or b"") for e in events])
+        # Mismo resumen salvo las notas, que llevan el nombre del equipo tapado.
+        without_notes = lambda text: [l for l in text.splitlines() if not l.startswith("nota:")]  # noqa: E731,E741
+        self.assertEqual(without_notes(analyze_events(clean).render()), without_notes(analyze_events(events).render()))
+        self.assertIn(b"0.7.11", joined)
+        self.assertNotIn("C81D", json.dumps([e.info for e in clean]))
+
+
 class AnalyzerFacts(unittest.TestCase):
     def feed(self, analyzer, *events):
         for event in events:
