@@ -21,7 +21,14 @@ unsigned count=0, index=0;
 bool sent=false, ack=false, readback=false, overflowed=false;
 uint32_t started=0, launched=0, job=0;
 std::atomic<uint32_t> modeAt{0};
-std::atomic<bool> running{false}, rover{false}, ellipsoid{false};
+std::atomic<bool> running{false}, rover{false};
+// Referencia de la altura que entrega el receptor. **Sin confirmar al arrancar**
+// (reauditoría de 0.7.13, R02): antes arrancaba en «MSL del receptor» y solo
+// cambiaba con el OK de un `CONFIG UNDULATION` enviado; un receptor que ya tenía
+// guardado 0.0000 no recibía la orden y se publicaba como MSL una altura
+// elipsoidal. Ahora la fija también la lectura de CONFIG de la reconciliación.
+enum class Undulation : uint8_t { unknown, ellipsoid, receiverMsl };
+std::atomic<uint8_t> undulation{static_cast<uint8_t>(Undulation::unknown)};
 bool bootQueried=false;
 // Tiempo que se espera a que CONFIG termine de escupir sus lineas.
 constexpr uint32_t kConfigSettleMs = 700;
@@ -173,8 +180,8 @@ void acceptLine() {
         // encola a mitad de trabajo, que no pasan por `launch`.
         if(commands[index]=="SAVECONFIG") profileState.saved=true;
         else if(!isQuery(commands[index])) profileState.saved=false;
-        if(commands[index]=="CONFIG UNDULATION 0.0000") ellipsoid=true;
-        if(commands[index]=="CONFIG UNDULATION AUTO") ellipsoid=false;
+        if(commands[index]=="CONFIG UNDULATION 0.0000") undulation=static_cast<uint8_t>(Undulation::ellipsoid);
+        if(commands[index]=="CONFIG UNDULATION AUTO") undulation=static_cast<uint8_t>(Undulation::receiverMsl);
     }
     if(commands[index]=="MODE" && !strncmp(line,"#MODE,",6)) {
         char* p=strchr(line,';'); if(!p)return;
@@ -256,7 +263,15 @@ bool busy(){return running;}
 bool roverReady(){return rover && !running && millis()-modeAt.load()<30000;}
 bool isBase(){return mode.startsWith("MODE BASE");}
 bool isRover(){return mode=="MODE ROVER SURVEY";}
-const char* heightReference(){return ellipsoid?"ellipsoidal_user_configured":"receiver_msl";}
+// nullptr = sin confirmar: se publica como null y las apps y el panel lo dicen
+// («Referencia no confirmada»), nunca como MSL por defecto.
+const char* heightReference(){
+    switch(static_cast<Undulation>(undulation.load())) {
+        case Undulation::ellipsoid: return "ellipsoidal_user_configured";
+        case Undulation::receiverMsl: return "receiver_msl";
+        default: return nullptr;
+    }
+}
 double elevationMaskDeg(){
     if(!mutex||xSemaphoreTake(mutex,pdMS_TO_TICKS(100))!=pdTRUE)return 5.0;
     const double mask=profileState.elevation_deg;
@@ -316,6 +331,12 @@ void applyReconciliation(bool userPreferences) {
         const auto& e = receiver_baseline::kExpected[i];
         ++reconciliation.checked;
         const String leido = readValueFor(e.key);
+        // La ondulación leída fija la referencia de la altura (R02). Un valor
+        // manual distinto de 0 no es ninguna de las dos: se queda sin confirmar.
+        if(String(e.key) == "UNDULATION") {
+            if(leido == String(e.expected)) undulation=static_cast<uint8_t>(Undulation::ellipsoid);
+            else if(leido.indexOf("AUTO") >= 0) undulation=static_cast<uint8_t>(Undulation::receiverMsl);
+        }
         // Una clave ausente cuenta como diferente: no se supone que el valor por
         // defecto del receptor sea el que queremos. Aplicarla no cuesta nada y
         // deja el equipo en un estado conocido.
