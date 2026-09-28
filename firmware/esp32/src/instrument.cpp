@@ -126,8 +126,9 @@ void config(JsonDocument& response) {
     response["station_paused"] = stationPaused;
     response["preferred_ssid"] = preferredSsid;
     response["ap_ssid"] = networkName;
-    // El panel no pide clave, así que ocultar la del AP aquí no protegería nada
-    // y en cambio impediría leerla para unir un teléfono.
+    // Sale por HTTP y USB: el panel no pide clave, la lee para unir un teléfono
+    // y la reenvía al guardar. Por Bluetooth, que va sin emparejar, la quita
+    // `protocol::stripSecrets` en ble_transport.cpp antes de responder.
     response["ap_password"] = apKey;
     response["persistence_ready"] = storageReady;
     response["stored_config_valid"] = configValid;

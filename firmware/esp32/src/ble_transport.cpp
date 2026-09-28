@@ -7,6 +7,7 @@
 #include "correction_output.h"
 #include "ble_frames.h"
 #include "ble_address.h"
+#include "secret_redaction.h"
 #include "health_report.h"
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -290,12 +291,21 @@ void dispatchNextRequest() {
             authorized = true;
             const String method = input["method"] | "";
             const String path = input["path"] | "";
-            // La recuperación/cambio de credenciales permanece exclusivamente por USB.
+            // Por BLE no se recuperan credenciales (`/api/access` es solo del
+            // USB), ni se leen grabaciones, ni se carga firmware. Cambiar la
+            // contraseña del AP o añadir redes Wi-Fi sí se admite (comodidad,
+            // decisión del propietario): la OTA exige firma desde 0.7.13, así
+            // que llegar al Wi-Fi ya no permite cargar un firmware ajeno.
             if (path == "/api/recording/read" || path == "/api/access" || (path.startsWith("/api/update/") && method != "GET") || (method != "GET" && method != "POST" && method != "PUT")) {
                 code = 400; body["error"] = "unsupported_operation";
             } else code = dispatchRequest(method, path, input["body"].as<JsonVariantConst>(), body);
         }
     }
+    // BLE va sin emparejar: cualquiera al alcance lee estas respuestas. Las
+    // credenciales (`ap_password` de /api/config, /api/wifi/networks y sus
+    // respuestas de guardado) se quitan de toda respuesta, a cualquier
+    // profundidad. HTTP, USB y WebSocket no cambian.
+    protocol::stripSecrets(body.as<JsonVariant>());
     output["status"] = code; output["body"] = body;
     serializeJson(output, pending);
     if (pending.length() > 4096) pending = "{\"status\":413,\"body\":{\"error\":\"response_too_large\"}}";
