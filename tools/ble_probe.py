@@ -45,13 +45,17 @@ async def main():
    print('BLE autenticado:',good['body']['subsystems']['ble'],flush=True)
    # La recuperacion de credenciales sigue siendo exclusiva del USB fisico.
    blocked=await call(3,'/api/access');assert blocked['status']==400
+   # Desde 0.7.13 ninguna respuesta BLE lleva credenciales: ap_password solo por HTTP y USB.
+   config=await call(25,'/api/config');assert config['status']==200 and 'ap_ssid' in config['body'],config
+   assert 'ap_password' not in config['body'],'La contraseña del Wi-Fi propio salió por BLE'
+   print('Configuración por BLE sin la contraseña del Wi-Fi propio',flush=True)
    gps=await call(4,'/api/gnss/control','POST',{'action':'query'});assert gps['status']==202
    for identity in range(5,25):
     await asyncio.sleep(.25);gps=await call(identity,'/api/gnss/control')
     if gps['body']['state']!='running':break
    assert gps['body']['state']=='confirmed' and 'UM980' in gps['body']['version'],gps
    print('GPS consultado por BLE → ESP32 → UART: confirmado',flush=True)
-   print('PASSED: BLE sin emparejamiento, notificaciones fragmentadas, credenciales solo por USB, consulta de estado GNSS',flush=True)
+   print('PASSED: BLE sin emparejamiento, notificaciones fragmentadas, sin credenciales por BLE, consulta de estado GNSS',flush=True)
  finally:
   try:print('Estado BLE final:',device.request('GET','/api/status')['body']['subsystems']['ble'],flush=True)
   finally:device.close()

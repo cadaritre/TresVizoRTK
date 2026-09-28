@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Carga OTA por consola USB, conserva NVS y verifica el arranque en el otro slot."""
+"""Carga OTA por consola USB, conserva NVS y verifica el arranque en el otro slot.
+
+Desde 0.7.13 el equipo solo acepta firmware-signed.bin (tools/firmware_signing/README.md)."""
 import argparse
 import base64
 import hashlib
@@ -14,6 +16,8 @@ def main():
     parser.add_argument('--port')
     args=parser.parse_args()
     image=args.image.read_bytes()
+    if image[-72:-64]!=b'TVZSIG01':
+        raise SystemExit('El firmware no trae la firma del propietario. Usa el archivo firmware-signed.bin.')
     device=Instrument(args.port or detect_port())
     session=None
     def call(path,body=None,method='POST'):

@@ -1,6 +1,15 @@
 "use strict";
 (() => {
+  // Firmware firmado (desde 0.7.13): firmware.bin + "TVZSIG01" + firma de 64 bytes.
+  // Contrato en lib/protocol/src/signed_firmware.h; el equipo lo comprueba igual.
+  const SIGNATURE_MAGIC = "TVZSIG01", SIGNATURE_TRAILER_BYTES = 72;
+  const UNSIGNED_MESSAGE = "El firmware no trae la firma del propietario. Usa el archivo firmware-signed.bin.";
   let capability = null, running = false;
+  async function signed(image) {
+    if (image.size < SIGNATURE_TRAILER_BYTES) return false;
+    const tail = new Uint8Array(await image.slice(image.size - SIGNATURE_TRAILER_BYTES, image.size - SIGNATURE_TRAILER_BYTES + SIGNATURE_MAGIC.length).arrayBuffer());
+    return String.fromCharCode(...tail) === SIGNATURE_MAGIC;
+  }
   async function refresh() {
     if (running) return;
     try {
@@ -8,7 +17,12 @@
       text("update-version", `${capability.firmware_version} · ${capability.active_slot}`);
       text("update-recovery", capability.automatic_boot_rollback ? "Rollback de bootloader habilitado" : "Recuperación por USB");
       $("update-start").disabled = capability.state === "receiving";
-      $("update-rollback").disabled = !capability.previous_image_present || capability.state === "receiving";
+      // Volver a una imagen que no exige firma reabriría la carga de firmware ajeno.
+      const unsafePrevious = capability.previous_image_signature_required === false;
+      $("update-rollback").disabled = !capability.previous_image_present || unsafePrevious || capability.state === "receiving";
+      $("update-rollback").title = unsafePrevious && capability.previous_image_present ? "La imagen anterior no exige firma; solo se restaura por cable USB." : "";
+      if (capability.signature_required && !$("update-message").textContent)
+        text("update-message", "Este equipo solo instala firmware firmado: elige firmware-signed.bin y su manifest.json.");
     } catch { text("update-version", "Sin comunicación o firmware anterior sin OTA"); }
   }
   $("update-form").addEventListener("submit", async event => {
@@ -18,6 +32,7 @@
     try {
       const image = $("update-image").files[0], file = $("update-manifest").files[0];
       if (!image || !file || file.size > 8192) throw new Error("Selecciona imagen y manifiesto válidos.");
+      if (capability.signature_required && !(await signed(image))) throw new Error(UNSIGNED_MESSAGE);
       const manifest = JSON.parse(await file.text());
       if (manifest.hardware_id !== capability.hardware_id || manifest.size !== image.size || image.size > capability.max_image_bytes || !/^[0-9a-f]{64}$/.test(manifest.sha256))
         throw new Error("El manifiesto, la imagen o el modelo de equipo no coinciden.");

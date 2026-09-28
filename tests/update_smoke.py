@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Validación OTA en ESP32 real; --install realiza cambio de slot con la imagen local."""
+"""Validación OTA en ESP32 real; --install realiza cambio de slot con la imagen firmada local.
+
+Desde 0.7.13 el equipo solo acepta firmware-signed.bin (lo deja `pio run` con la
+clave del propietario; tools/firmware_signing/README.md)."""
 import argparse
 import base64
 import hashlib
@@ -24,10 +27,13 @@ try:
     status=call('/api/update',method='GET')
     assert status['automatic_boot_rollback']
     assert status['hardware_id']=='tresvizo-esp32s3-4m-v1'
-    image=(ROOT/'firmware/esp32/.pio/build/esp32s3_usb/firmware.bin').read_bytes()
+    assert status['signature_required'] and status['image_authenticity']=='owner_signed_ecdsa_p256',status
+    image=(ROOT/'firmware/esp32/.pio/build/esp32s3_usb/firmware-signed.bin').read_bytes()
+    assert image[-72:-64]==b'TVZSIG01','Se necesita firmware-signed.bin'
     manifest={'hardware_id':status['hardware_id'],'size':len(image),'sha256':hashlib.sha256(image).hexdigest()}
     call('/api/update/begin',dict(manifest,hardware_id='different_board'),400)
     call('/api/update/begin',dict(manifest,size=0xffffffff),400)
+    call('/api/update/begin',dict(manifest,size=1024+72-1),400)  # menos que imagen mínima + firma
     call('/api/update/begin',dict(manifest,sha256='x'*64),400)
     assert device._exchange('POST','/api/update/begin',manifest,'wrong-key')['status']==401
     start=call('/api/update/begin',manifest);session=start['session']
@@ -43,15 +49,21 @@ try:
     call('/api/update/finish',{'session':session},409)
     call('/api/update/abort',{'session':session})
     assert call('/api/update',method='GET')['active_slot']==status['active_slot']
-    for expected_hash, expected_state in [('0'*64,'hash_mismatch'),(hashlib.sha256(image[:1024]).hexdigest(),'invalid_image')]:
-        start=call('/api/update/begin',dict(manifest,size=1024,sha256=expected_hash));session=start['session']
-        for offset in (0,576):
-            call('/api/update/chunk',{'session':session,'offset':offset,'data':base64.b64encode(image[offset:min(offset+576,1024)]).decode()})
+    # Archivos de 2048 bytes: SHA equivocado; sin firma (los 72 finales son
+    # imagen); y firma real pegada a una imagen que no es la firmada.
+    unsigned=image[:2048]
+    wrong_signature=image[:2048-72]+image[-72:]
+    for data, expected_hash, expected_state in [(unsigned,'0'*64,'hash_mismatch'),
+                                                (unsigned,hashlib.sha256(unsigned).hexdigest(),'signature_missing'),
+                                                (wrong_signature,hashlib.sha256(wrong_signature).hexdigest(),'signature_invalid')]:
+        start=call('/api/update/begin',dict(manifest,size=len(data),sha256=expected_hash));session=start['session']
+        for offset in range(0,len(data),576):
+            call('/api/update/chunk',{'session':session,'offset':offset,'data':base64.b64encode(data[offset:offset+576]).decode()})
         call('/api/update/finish',{'session':session},400)
         result=call('/api/update',method='GET')
-        assert result['state']==expected_state
+        assert result['state']==expected_state,result
         assert not result['previous_image_present'],'Imagen fallida ofrecida como restauración'
-    print(f'OTA rechazos, autenticación, duplicados, hash, imagen truncada y aborto: {checks} comprobaciones OK',flush=True)
+    print(f'OTA rechazos, autenticación, duplicados, hash, sin firma, firma ajena y aborto: {checks} comprobaciones OK',flush=True)
     if args.install:
         start=call('/api/update/begin',manifest);session=start['session'];last=time.monotonic()
         for offset in range(0,len(image),576):
@@ -64,6 +76,7 @@ try:
         new=call('/api/update',method='GET')
         assert new['active_slot']!=status['active_slot'],new
         assert new['boot_confirmed'],new
+        assert new['signature_required'],new
         after=call('/api/config',method='GET')
         assert after==original,'La actualización cambió ajustes persistentes'
         print('OTA completa: nuevo slot, arranque confirmado y ajustes conservados.',flush=True)
