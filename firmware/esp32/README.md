@@ -599,3 +599,8 @@ preferida la deja de ser.
     `400`;
   - NTRIP volvió solo a `streaming` tras la carga.
 - **Sin probar:** cambiar a otra red distinta que esté a la vista, y las apps.
+
+**Panel:** en «Redes guardadas», «Desconectar» en la red actual y «Conectar» en
+las demás, con la marca «preferida» y el aviso de pausa; al guardar una red
+nueva pregunta si conectar ya. Commiteado después de cargar 0.7.8: llega al
+equipo con la siguiente versión que se compile.

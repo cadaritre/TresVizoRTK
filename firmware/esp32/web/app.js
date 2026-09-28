@@ -254,6 +254,8 @@ function renderStatus(data) {
   const states = {
     connected: "Conectado",
     connecting: "Intentando conectar",
+    scanning: "Buscando la red",
+    paused: "Sin red, en pausa",
     not_configured: "Sin configurar",
   };
   text("station-state", states[data.wifi.station_state] || "Desconocido");
@@ -509,9 +511,27 @@ function renderSaved(value) {
     list.append(empty);
     return;
   }
+  // En pausa, el equipo no se une a ninguna red hasta que se elija una.
+  if (value.station_paused) {
+    const paused = document.createElement("li");
+    paused.className = "hint";
+    paused.textContent = "Sin red: el equipo no se conecta solo hasta que elijas una.";
+    list.append(paused);
+  }
   saved.forEach((network) => {
     const actions = document.createElement("span");
     actions.className = "row-actions";
+    // La red actual se suelta; las demás se eligen. Así se pasa de la red a
+    // la que el equipo se unió solo al encender a otra, sin olvidarla.
+    const current = !value.station_paused && value.wifi_ssid === network.ssid;
+    const link = document.createElement("button");
+    link.type = "button";
+    link.className = "button secondary";
+    link.textContent = current ? "Desconectar" : "Conectar";
+    link.addEventListener("click", () =>
+      current ? disconnectNetwork(network.ssid) : connectNetwork(network.ssid),
+    );
+    actions.append(link);
     const address = document.createElement("button");
     address.type = "button";
     address.className = "button secondary";
@@ -524,9 +544,44 @@ function renderSaved(value) {
     forget.addEventListener("click", () => forgetNetwork(network.ssid));
     actions.append(address, forget);
     // Enseñar la dirección en la lista evita tener que ir a buscarla al router.
-    const label = network.ip ? `${network.ssid} · ${network.ip} fija` : `${network.ssid} · automática`;
+    let label = network.ip ? `${network.ssid} · ${network.ip} fija` : `${network.ssid} · automática`;
+    if (value.preferred_ssid === network.ssid) label += " · preferida";
     list.append(listRow(label, actions));
   });
+}
+async function connectNetwork(ssid) {
+  if (wifiBusy) return;
+  wifiBusy = true;
+  wifiMessage(`Conectando a ${ssid}…`);
+  try {
+    renderSaved(await api("/api/wifi/networks", "POST", { connect: ssid }));
+    wifiMessage(
+      `El equipo deja la red actual y se une a ${ssid}, que queda como preferida. ` +
+        "Si este panel llega por la red que suelta, recárgalo cuando el equipo esté en la nueva.",
+    );
+  } catch (error) {
+    wifiMessage(error.message, true);
+  } finally {
+    wifiBusy = false;
+  }
+}
+async function disconnectNetwork(ssid) {
+  if (wifiBusy) return;
+  const sure = window.confirm(
+    `¿Desconectar de ${ssid}?\n\nEl equipo deja esa red y no se vuelve a conectar solo hasta que elijas otra o lo reinicies. ` +
+      "Si este panel llega por esa misma red, perderás la conexión; por la red del equipo no pasa nada.",
+  );
+  if (!sure) return;
+  wifiBusy = true;
+  wifiMessage(`Desconectando de ${ssid}…`);
+  try {
+    renderSaved(await api("/api/wifi/networks", "POST", { disconnect: true }));
+    wifiMessage("El equipo soltó la red y queda en pausa hasta que elijas una.");
+  } catch (error) {
+    wifiMessage(error.message, true);
+  } finally {
+    wifiBusy = false;
+  }
 }
 async function forgetNetwork(ssid) {
   if (wifiBusy) return;
@@ -545,14 +600,18 @@ async function saveNetwork(ssid, password) {
   if (wifiBusy) return;
   wifiBusy = true;
   wifiMessage(`Guardando ${ssid}…`);
+  let saved = false;
   try {
     renderSaved(await api("/api/wifi/networks", "POST", { ssid, password }));
-    wifiMessage(`${ssid} guardada. El equipo intentará conectarse en unos segundos.`);
+    wifiMessage(`${ssid} guardada.`);
+    saved = true;
   } catch (error) {
     wifiMessage(error.message, true);
   } finally {
     wifiBusy = false;
   }
+  // Guardarla no suelta la red en la que ya está el equipo: se pregunta.
+  if (saved && window.confirm(`¿Conectar ahora a ${ssid}?`)) connectNetwork(ssid);
 }
 function renderScan(value) {
   const list = $("wifi-scan-list");
