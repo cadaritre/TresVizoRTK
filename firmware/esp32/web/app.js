@@ -231,6 +231,13 @@ function renderStatus(data) {
     : 2000;
   connected(true);
   text("device-name", data.device_name);
+  // Qué equipo es (0.7.14): sin `product`, un MeridianV de siempre. El Meridian3
+  // no lleva microSD: se quita todo acceso a Registro / PPK.
+  const productName = data.product_name || "MeridianV";
+  text("product-name", productName);
+  text("product-name-detail", productName);
+  const hasMicrosd = data.hardware_features?.microsd !== false;
+  document.querySelectorAll('[data-page="recording"]').forEach((element) => { element.hidden = !hasMicrosd; });
   const ble = data.subsystems?.ble;
   text("ble-state", ble?.state === "advertising" ? "Disponible para emparejar" : ble?.state === "authorized" ? "App autenticada" : ble?.state === "connected" ? "Cliente conectado" : "No disponible en este firmware");
   text("uptime", duration(data.uptime_ms));

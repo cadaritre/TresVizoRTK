@@ -1,3 +1,4 @@
+#include "product.h"
 #include "sd_recorder.h"
 #include "ntrip_input.h"
 #include "gnss_control.h"
@@ -27,9 +28,10 @@
 namespace instrument {
 namespace {
 Preferences preferences;
-// El equipo se llama MeridianV y el nombre no se edita: la red que emite debe
-// ser reconocible en campo sin consultar a nadie. 3Vizo es la marca del panel.
-constexpr const char* kDeviceName = "MeridianV";
+// El equipo se llama como su producto (MeridianV o Meridian3, lib/protocol/src/
+// product.h) y el nombre no se edita: la red que emite debe ser reconocible en
+// campo sin consultar a nadie. 3Vizo es la marca del panel.
+constexpr const char* kDeviceName = product::kCurrent.name;
 String deviceName = kDeviceName;
 String stationSsid;
 String stationPassword;
@@ -619,6 +621,19 @@ void status(JsonDocument& response) {
     response["api_version"] = 1;
     response["firmware_version"] = kVersion;
     response["device_name"] = deviceName;
+    // Qué equipo es (desde 0.7.14): las apps deciden por aquí qué enseñar. Un
+    // firmware sin `product` es un MeridianV. `hardware_features` dice lo que el
+    // producto lleva, no lo que ya está integrado (eso va en `subsystems`).
+    response["product"] = product::kCurrent.key;
+    response["product_name"] = product::kCurrent.name;
+    {
+        JsonObject features = response["hardware_features"].to<JsonObject>();
+        features["microsd"] = product::kCurrent.microsd;
+        features["imu"] = product::kCurrent.imu;
+        features["radio"] = product::kCurrent.radio;
+        features["battery"] = product::kCurrent.battery;
+        features["aux_port"] = product::kCurrent.auxPort;
+    }
     response["phase"] = "commissioning";
     response["uptime_ms"] = static_cast<uint64_t>(esp_timer_get_time() / 1000);
     memory_health::status(response["memory"].to<JsonObject>());
@@ -653,6 +668,9 @@ void status(JsonDocument& response) {
     for (const char* subsystem : {"gnss", "imu", "microsd", "ntrip", "ble"}) {
         response["subsystems"][subsystem]["state"] = "not_integrated";
     }
+    // Lo que el producto no lleva no está «sin integrar»: no existe.
+    if (!product::kCurrent.imu) response["subsystems"]["imu"]["state"] = "not_present";
+    if (!product::kCurrent.microsd) response["subsystems"]["microsd"]["state"] = "not_present";
     ble_transport::status(response["subsystems"]["ble"].as<JsonObject>());
     ntrip_input::status(response["subsystems"]["ntrip"].as<JsonObject>());
     // Fuente y antigüedad de correcciones en el estado general: la vista de
@@ -719,7 +737,7 @@ void status(JsonDocument& response) {
               "El último reinicio lo provocó el watchdog: una tarea dejó de responder y el equipo se reinició solo. Anota qué estabas haciendo.");
     }
     correction_output::status(response["corrections_out"].to<JsonObject>());
-    sd_recorder::status(response["subsystems"]["microsd"].as<JsonObject>());
+    if (product::kCurrent.microsd) sd_recorder::status(response["subsystems"]["microsd"].as<JsonObject>());
     response["solution"]["fix"] = nullptr;
     response["solution"]["latitude_deg"] = nullptr;
     response["solution"]["longitude_deg"] = nullptr;
@@ -904,10 +922,10 @@ void begin() {
     deviceName = kDeviceName;
     networkName = kDeviceName;
     WiFi.setAutoReconnect(true);
-    WiFi.setHostname("meridianv");
-    // Nombre en la red local: "meridianv.local" sigue funcionando aunque el
-    // DHCP reparta otra dirección en la siguiente conexión.
-    MDNS.begin("meridianv");
+    WiFi.setHostname(product::kCurrent.hostname);
+    // Nombre en la red local: "meridianv.local" (o "meridian3.local") sigue
+    // funcionando aunque el DHCP reparta otra dirección en la siguiente conexión.
+    MDNS.begin(product::kCurrent.hostname);
     MDNS.addService("http", "tcp", 80);
     WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
     apReady = WiFi.softAP(networkName.c_str(), apKey.c_str(), 1, false, 4);
@@ -1028,7 +1046,11 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         return firmware_update::request(method,path,body,response);
     }
     if (firmware_update::busy() && method != "GET") { error(response,"updating","Actualización en curso. Espera antes de modificar el equipo."); return 409; }
-    if(path=="/api/recording" || path.startsWith("/api/recording/"))return sd_recorder::request(method,path,body,response);
+    if(path=="/api/recording" || path.startsWith("/api/recording/")) {
+        // El Meridian3 no lleva microSD: la ruta no existe, no está «no disponible».
+        if(!product::kCurrent.microsd){error(response,"not_present","Este equipo no tiene tarjeta microSD para grabar.");return 404;}
+        return sd_recorder::request(method,path,body,response);
+    }
     if(path=="/api/ntrip/input") return ntrip_input::request(method,body,response);
     if(path=="/api/ntrip/profiles") return ntrip_input::profileRequest(method,body,response);
     if(path=="/api/ble") return ble_transport::request(method,body,response);
@@ -1089,7 +1111,9 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         response["base"]["state"] = "uart_control_available";
         response["base"]["can_preview"] = true;
         response["base"]["can_apply"] = gnss_receiver::snapshot().enabled;
-        JsonDocument storage;sd_recorder::status(storage.to<JsonObject>());
+        JsonDocument storage;
+        if (product::kCurrent.microsd) sd_recorder::status(storage.to<JsonObject>());
+        else { storage["state"] = "not_present"; storage["available"] = false; }
         response["recording"]["state"] = storage["state"];
         response["recording"]["can_start"] = storage["available"].as<bool>() && !sd_recorder::active();
         response["recording"]["can_stop"] = sd_recorder::active();

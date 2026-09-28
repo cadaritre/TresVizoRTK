@@ -1,3 +1,4 @@
+#include "product.h"
 #include "firmware_update.h"
 #include "instrument.h"
 #include "correction_router.h"
@@ -12,7 +13,9 @@
 
 namespace firmware_update {
 namespace {
-constexpr char hardware[] = "tresvizo-esp32s3-4m-v1";
+// Distinto por producto (product.h): una imagen del MeridianV no se instala en un
+// Meridian3 ni al revés, aunque los dos lleven el mismo ESP32-S3.
+constexpr const char* hardware = product::kCurrent.hardwareId;
 constexpr size_t chunkLimit = 576;
 
 // Identidad de esta imagen, en la seccion que ESP-IDF deja justo detras del

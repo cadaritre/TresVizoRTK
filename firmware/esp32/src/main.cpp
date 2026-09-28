@@ -1,3 +1,4 @@
+#include "product.h"
 #include "sd_recorder.h"
 #include "ntrip_input.h"
 #include "correction_output.h"
@@ -146,7 +147,7 @@ void handleSerialLine() {
         output["body"]["station_ssid"] = WiFi.SSID();
         output["body"]["station_url"] = WiFi.status() == WL_CONNECTED
             ? String("http://") + WiFi.localIP().toString() : String();
-        output["body"]["mdns_url"] = "http://meridianv.local";
+        output["body"]["mdns_url"] = String("http://") + product::kCurrent.hostname + ".local";
         serialReply(output);
         return;
     }
@@ -194,7 +195,8 @@ void setup() {
     memory_health::begin();
     gnss_control::begin();
     instrument::begin();
-    sd_recorder::begin();
+    // El Meridian3 no lleva microSD: ni se busca la tarjeta.
+    if (product::kCurrent.microsd) sd_recorder::begin();
     gnss_receiver::begin();
     // Antes que NTRIP: si el usuario eligió BLE, la autoconexión del perfil no
     // debe quitárselo al arrancar.
