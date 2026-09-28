@@ -41,7 +41,7 @@ flowchart LR
 
 | Qué | Cómo | Ritmo |
 | --- | --- | --- |
-| Estado de navegación fusionado (inclinación, rumbo si lo hay, punta del bastón, calidad de la fusión, estado de calibración) | Característica nueva **`a04c0007`**, notify, paquete propio con **byte de versión**, secuencia, tiempo del ESP32 (ms) y hora UTC de la época GNSS | 5 Hz, como la solución |
+| Estado de navegación fusionado (inclinación, rumbo si lo hay, punta del bastón, calidad de la fusión, estado de calibración) | Característica nueva **`a04c0007`** (sube `kGattTableGeneration`, `ble_address.h`, para que ningún teléfono se quede con la tabla sin ella), notify, paquete propio con **byte de versión**, secuencia, tiempo del ESP32 (ms) y hora UTC de la época GNSS | 5 Hz, como la solución |
 | Estado de la IMU en la salud | Byte 9 de la salud (hoy «IMU: reservado, 0») pasa a estado de la IMU con un bit nuevo en el byte 16 | 1 Hz |
 | Crudos de diagnóstico | Característica **`a04c0008`**, notify, **apagada por defecto**; se enciende con una orden y se apaga sola al desconectar; lotes de muestras con su tiempo del ESP32 | lo que quepa, nunca en operación normal |
 | Capacidad | `imu_available`, `tilt_compensation` en el estado BLE y en `/api/capabilities` | — |

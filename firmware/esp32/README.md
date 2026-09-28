@@ -663,6 +663,31 @@ distinto.
 - **Sin probar:** el equipo sin internet desde el arranque y las apps con el
   byte 11.
 
+## Versión 0.7.12
+
+Entrega del 28-09-2026: **una dirección Bluetooth por tabla GATT**, para que ningún teléfono
+se quede con la tabla de otro firmware.
+
+- Sin emparejamiento, el teléfono guarda la tabla GATT por dirección y no se entera de que
+  cambió. Con 0.7.11, la Mac de las pruebas seguía viendo 4 características en vez de 5, sin la
+  de salud y con el RTCM solo con respuesta.
+- Ahora el equipo se anuncia con una dirección **aleatoria estática** derivada de la MAC del
+  chip y de `kGattTableGeneration` (`lib/protocol/src/ble_address.h`, prueba
+  `test/ble_address_test.cpp`). **Quien cambie la tabla sube la generación.** 0.7.12 es la
+  generación 1, con la misma tabla que 0.7.11.
+- Costo, una vez por cambio de tabla: cada teléfono ve un equipo nuevo y se conecta desde
+  «Cerca». El que quedó en «Recordados» con la dirección anterior ya no aparece.
+- `GET /api/ble` añade `gatt_table_generation`, `address`, `address_type` y, si la pila
+  rechazó la dirección, `address_error`. Si no se puede usar la aleatoria, el equipo sigue con
+  la pública, como antes. `protocol_version` sigue en 3: las tramas no cambiaron.
+- Descartados: emparejar (cada recarga o borrado de la NVS lo rompe en campo) y el aviso de
+  «servicios cambiados» sin emparejar (macOS no redescubre; sigue como sonda apagada).
+- **Probado** en el equipo por USB y Bluetooth desde la Mac que tenía la tabla vieja: se
+  anuncia como `random_static` sin error de la pila; la Mac vio las 5 características,
+  `a04c0005` con escritura sin respuesta y la salud a 0.99–1.05 s; 51 órdenes en 15 s con
+  mediana 41 ms y máximo 128 ms.
+- **Sin probar:** iPhone y Android con 0.7.12 (hay que conectarlos una vez desde «Cerca»).
+
 ## Versión 0.7.11
 
 Entrega del 27-09-2026 por la noche: endurecimiento del Bluetooth y de las correcciones.

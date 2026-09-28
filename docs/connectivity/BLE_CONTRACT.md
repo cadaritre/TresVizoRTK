@@ -17,6 +17,12 @@ Sufijo común: `-8f24-4adb-a350-77ef6339c320`. Servicio `a04c0001`.
 | `a04c0005` | write **y write-without-response (v3)** | RTCM | Flujo RTCM3 en trozos; el equipo rearma tramas y comprueba CRC-24Q |
 | `a04c0006` | notify | TELEMETRÍA (estado) + LATIDO (v3) | Salud, 20 B, **1 Hz siempre** con el enlace arriba (v3) |
 
+Dirección: desde 0.7.12, **aleatoria estática derivada de la MAC del chip y de la generación de
+esta tabla** (`kGattTableGeneration` en `lib/protocol/src/ble_address.h`; hoy 1). **Quien cambie
+esta tabla sube la generación**: así ningún teléfono se queda con una copia vieja
+(KNOWN_LIMITATIONS.md). El cliente no debe depender de la dirección: el equipo se reconoce por el
+servicio `a04c0001` y su nombre.
+
 MTU: el equipo ofrece 247 (`protocol::kPreferredAttMtu`). Medido hoy con una Mac: 247. Nunca
 suponer 20 B: el tamaño de escritura sale de `maximumWriteValueLength` (iOS) o del MTU
 negociado − 3 (Android).

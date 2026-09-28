@@ -18,7 +18,7 @@ equipo no mandaba ni la edad de las correcciones.
 | C2 | **iOS entregaba todo el RTCM a CoreBluetooth sin esperar confirmación**: la cola real era la interna de CoreBluetooth, sin límite, y las órdenes esperaban detrás. Con un caster por encima de 2.8 kB/s (MSM7) el atraso crece sin fin | Auditoría iOS: `BLETransport.swift:333-348` (D1). Unido a C1 es la explicación de la inestabilidad con RTCM + órdenes |
 | C3 | **Cola hacia el UM980 de 4 tramas** con UART a 115200: una época MSM de 6–10 tramas que llega de golpe perdía tramas en cada época | `gnss_receiver.cpp` 0.7.10; `adbf364` de Android ya había visto lo mismo en el teléfono (se perdía la 1006) |
 | C4 | **La salud solo salía detrás de una solución nueva**: sin fix o sin hora UTC, ni edad de correcciones ni señal de vida | `ble_transport.cpp:233` 0.7.10 |
-| C5 | **Tabla GATT vieja en caché del cliente**: un cliente que se conectó a un firmware viejo no ve lo nuevo (ni la salud ni la escritura sin respuesta), porque sin emparejamiento no le llega «servicios cambiados» | Mac: 4 de 5 características; el equipo sí las tiene (handle 52). Con una dirección nueva, la misma Mac vio las 5 al instante |
+| C5 | **Tabla GATT vieja en caché del cliente**: un cliente que se conectó a un firmware viejo no ve lo nuevo (ni la salud ni la escritura sin respuesta), porque sin emparejamiento no le llega «servicios cambiados» | Mac: 4 de 5 características; el equipo sí las tiene (handle 52). Con una dirección nueva, la misma Mac vio las 5 al instante. **Resuelto en 0.7.12**: dirección por tabla GATT (`ble_address.h`) |
 
 ## 3. Sospechas no confirmadas (o descartadas)
 
@@ -128,9 +128,9 @@ decodificador en las apps. Nada del transporte cambia.
 
 ## 12. Riesgos que quedan
 
-[KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md): tablas GATT viejas en teléfonos (decisión: dirección
-nueva o «servicios cambiados» probado con iPhone), sin emparejamiento (decisión del
-propietario), UART a 115200, heap en sesiones largas, y todo lo que necesita fix y campo.
+[KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md): sin emparejamiento (decisión del propietario), heap
+en sesiones largas, y todo lo que necesita fix y campo. Las tablas GATT viejas quedaron
+resueltas en 0.7.12 (§14).
 
 ## 13. Ramas, commits y archivos
 
@@ -149,8 +149,21 @@ Estado al cerrar: firmware con 12 pruebas C++ y 85 del banco en Python en verde,
 
 ## 14. Decisiones que quedan para el propietario
 
-1. **Tablas GATT viejas en los teléfonos**: dirección Bluetooth nueva y fija (cada app vuelve a
-   elegir el equipo una vez) o probar «servicios cambiados» con un iPhone (bandera de firmware).
+Actualizado el 28-09-2026: el propietario probó las apps en su Moto G100 y su iPhone 16 Pro Max
+y pasó todo a `main` en los tres repositorios (las ramas `los-residentes*` se borraron; su
+trabajo está entero en `main`). Decidió además:
+
+- **1 → resuelta en 0.7.12**: una dirección Bluetooth por tabla GATT (KNOWN_LIMITATIONS.md).
+  Comprobada con la Mac que tenía la tabla vieja.
+- **6 → se queda como está**: el GPS del teléfono sigue también en Cuenta en Android.
+- **7 → no se sube**: el crudo para PPK se graba siempre a 1 Hz (`OBSVMB COM2 1`) y se descarga
+  por Wi-Fi; a 1 Hz la UART de 115200 sobra. Solo se reabre si la salud enseña tramas RTCM
+  descartadas.
+- **8 → ya no aplica**: las apps de `main` son las de `los-residentes`.
+
+Siguen abiertas:
+
+1. ~~Tablas GATT viejas en los teléfonos~~ (resuelta, arriba).
 2. **Emparejamiento**: sigue sin él (decisión de 0.6.2); riesgo en KNOWN_LIMITATIONS.md.
 3. **Proyectos en el ZIP**: se exportan y se comprueban, pero no se restauran (ADR-0008 de
    iOS). Sin iCloud ni Drive, los proyectos ya no se respaldan solos.
@@ -158,8 +171,6 @@ Estado al cerrar: firmware con 12 pruebas C++ y 85 del banco en Python en verde,
    usb-serial-for-android o no (Q-81).
 5. **Desfase de antena Trimble**: la app usa L1 de NGS (128.4 mm), el fabricante dice 149.1 mm
    a un «centro de fase nominal» (ADR-A123, Q-80).
-6. **GPS del teléfono también en Cuenta** (solo Android): quitarlo o dejarlo.
-7. **UART al UM980 a más de 115200**.
-8. **Con 0.7.11, usar las apps de `los-residentes`**: las de `main` enseñan, con razón, un aviso rojo
-   de versión (el equipo anuncia la 3 y ellas conocen la 2); las tramas se leerían bien, pero les
-   falta el latido y el RTCM sin respuesta.
+6. ~~GPS del teléfono también en Cuenta~~ (se queda).
+7. ~~UART al UM980 a más de 115200~~ (no se sube).
+8. ~~Con 0.7.11, usar las apps de `los-residentes`~~ (ya están en `main`).

@@ -1,32 +1,40 @@
 # Limitaciones conocidas y riesgos
 
-## Tabla GATT vieja en caché del cliente (importante)
+## Tabla GATT vieja en caché del cliente (resuelta en 0.7.12)
 
 Una Mac que se conectó hace tiempo a un firmware antiguo siguió viendo, con 0.7.11 cargado,
 **4 características en vez de 5** (sin la de salud `a04c0006`) y la de RTCM **sin** escritura
 sin respuesta. El primer escaneo la nombró con el nombre antiguo del equipo («TresVizo-C81D»):
 la Mac usa lo que guardó. Sin emparejamiento el cliente no recibe el aviso de «servicios
 cambiados» (la pila solo lo manda a emparejados). **Confirmado del lado del equipo**: la
-característica de salud existe (handle 52; respuestas 44, solución 47), así que lo que ve la
-Mac es su copia vieja. Mandar el aviso a mano, al conectar o 1.5 s después, sale bien del equipo
-(`ESP_OK`) pero macOS no redescubre; queda en el firmware **apagado por defecto**
-(`-DTRESVIZO_BLE_SERVICE_CHANGED`) para probarlo con un iPhone, porque si iOS lo atiende a mitad
-de sesión, una app sin `didModifyServices` se quedaría con características muertas. **Un iPhone o Android que se conectó con un firmware viejo puede estar
-igual**: sin salud y sin RTCM sin respuesta, aunque el equipo los tenga.
+característica de salud existía (handle 52; respuestas 44, solución 47), así que lo que veía la
+Mac era su copia vieja. Un iPhone o Android que se conectó con un firmware viejo podía estar
+igual.
 
-- Mitigado en las apps: la salud no se exige para estar lista; el modo de escritura del RTCM
-  sale de las propiedades descubiertas; iOS atiende `didModifyServices`; Android usa
-  `BluetoothGatt.refresh()` si faltan características.
-- Para confirmarlo mañana: un teléfono que **nunca** se haya conectado al equipo (o nRF Connect
-  recién instalado) debe ver 5 características y `a04c0005` con `write` + `write no response`.
-- **Prueba hecha**: con el equipo anunciándose, solo para la prueba, con otra dirección (aleatoria
-  estática), la misma Mac vio al instante las 5 características y la escritura sin respuesta.
-  Una dirección nueva y fija (derivada de la MAC) arreglaría las tablas viejas de todos los
-  clientes de una vez, a cambio de que cada app vuelva a elegir el equipo una vez (el
-  identificador que guardan iOS y Android cambia). **Lo decide el propietario.**
-- Arreglo de fondo, pendiente: «servicios cambiados» enviado **después** de que el cliente
-  active su indicación, o caché robusta (Database Hash, ESP-IDF `BT_GATTS_ROBUST_CACHING`), que
-  el Arduino precompilado no trae activada.
+**Arreglo (0.7.12, decisión del propietario del 28-09-2026): una dirección por tabla GATT.** El
+equipo ya no se anuncia con la dirección pública del chip sino con una **aleatoria estática
+derivada de ella y de `kGattTableGeneration`** (`lib/protocol/src/ble_address.h`, probada en
+`test/ble_address_test.cpp`). Cada vez que la tabla cambia, la generación sube, el equipo
+aparece con otra dirección y todo cliente lee la tabla desde cero. **Comprobado el 28-09-2026**
+con la misma Mac de la caché vieja: con 0.7.12 vio las 5 características, `a04c0005` con
+escritura sin respuesta (propiedades `0xc`) y la salud a 0.99–1.05 s.
+
+- **El costo**: tras una actualización que cambie la tabla, cada teléfono ve un equipo nuevo.
+  Se conecta una vez desde «Cerca»; el que quedó en «Recordados» con la dirección vieja ya no
+  aparece y se puede olvidar. Pasa **una vez por cambio de tabla**, no en cada actualización.
+- `GET /api/ble` dice `gatt_table_generation`, `address`, `address_type` (`random_static`, o
+  `public` si la pila no aceptó la aleatoria: entonces vuelve el riesgo de la tabla vieja) y,
+  si la pila rechazó la dirección, `address_error`.
+- Descartado, para que no se vuelva a proponer sin motivo: **emparejar** (cada recarga del
+  firmware o borrado de la NVS rompe el emparejamiento y obliga a olvidarlo en los ajustes del
+  teléfono) y el aviso de «servicios cambiados» sin emparejar (sale bien del equipo, `ESP_OK`,
+  pero macOS no redescubre; sigue en el firmware **apagado por defecto** como sonda,
+  `-DTRESVIZO_BLE_SERVICE_CHANGED`).
+- Las apps siguen degradando bien si una característica falta (la salud no se exige para estar
+  lista; el modo de escritura del RTCM sale de las propiedades descubiertas; iOS atiende
+  `didModifyServices`) y enseñan «Tabla Bluetooth desactualizada» en Equipo › Bluetooth si con
+  protocolo 3 no ven la salud. Android **no** llama a `BluetoothGatt.refresh()` (lo decía una
+  versión anterior de este documento; no estaba en el código).
 
 ## Seguridad (sin cambios, decisión del propietario desde 0.6.2)
 

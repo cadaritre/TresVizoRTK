@@ -41,3 +41,9 @@ anuncia una versión mayor que 3. Una versión nueva no se añade sin comprobar 
   usar lo nuevo, y el equipo mantiene lo viejo mientras haya apps publicadas que lo usen.
 - Una característica nueva **no** aparece en un cliente con la tabla en caché (ver
   KNOWN_LIMITATIONS.md): toda función nueva debe degradar bien si su característica falta.
+- **Toda modificación de la tabla GATT sube `kGattTableGeneration`**
+  (`lib/protocol/src/ble_address.h`): característica añadida o quitada, propiedades o
+  descriptores cambiados. Desde 0.7.12 la dirección BLE del equipo sale de esa generación, así
+  que un cambio de tabla es un equipo nuevo para los teléfonos y nadie se queda con la tabla
+  vieja. Es independiente de `protocol_version`: la versión dice qué formato hablan las
+  tramas; la generación, qué tabla tiene el equipo. 0.7.12 = generación 1 (la tabla de 0.7.11).

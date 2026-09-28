@@ -19,6 +19,15 @@ Todos comparten sufijo `-8f24-4adb-a350-77ef6339c320`:
 | a04c0005 | Escritura con respuesta ATT **y, desde 0.7.11, sin respuesta**: fragmentos RTCM3 |
 | a04c0006 | Notificaciones: salud a 1 Hz (desde 0.7.11, siempre; antes solo detrás de una solución) |
 
+**Dirección (desde 0.7.12).** El equipo se anuncia con una dirección **aleatoria estática**
+derivada de la MAC Bluetooth del chip y de la generación de la tabla GATT
+(`kGattTableGeneration`, `lib/protocol/src/ble_address.h`; 1 desde 0.7.12). Toda modificación de
+esta tabla sube la generación: el equipo aparece con otra dirección y ningún teléfono se queda con
+una copia vieja de la tabla (pasaba sin emparejamiento, ver
+[KNOWN_LIMITATIONS.md](connectivity/KNOWN_LIMITATIONS.md)). `GET /api/ble` dice
+`gatt_table_generation`, `address` y `address_type`. El formato de las tramas no cambió:
+`protocol_version` sigue en 3.
+
 ## Versión 3 (firmware 0.7.11)
 
 Todo aditivo; el contrato completo y las reglas del cliente están en
