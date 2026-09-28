@@ -30,7 +30,38 @@ Desde esta carpeta:
 
 El puerto puede cambiar. Detener el puente USB y cerrar otros monitores antes de cargar. La carga inicial contó con respaldo completo local de la flash, excluido de Git. No usar `erase_flash` como preparación habitual; borraría también ajustes y clave.
 
-Las dos particiones de aplicación dejan espacio para evolución posterior; no existe actualización OTA en esta versión. Los recursos web se empaquetan al compilar, sin `uploadfs`.
+Los recursos web se empaquetan al compilar, sin `uploadfs`.
+
+### Actualización por OTA: solo firmware firmado (desde 0.7.13)
+
+Las dos particiones de aplicación permiten actualizar sin cable desde el panel,
+las apps o `tools/firmware_upload.py` (por USB). **El equipo solo instala
+`firmware-signed.bin`**: `firmware.bin` seguido de 72 bytes con la firma ECDSA
+P-256 del propietario. `pio run` lo deja junto a `firmware.bin`
+(`.pio/build/esp32s3_usb/`) si la clave privada está en la Mac; sin ella avisa y
+compila igual, y `firmware.bin` sigue valiendo para cargar por USB con
+`pio run -t upload`. Clave, respaldo y firma a mano en
+[`tools/firmware_signing/`](../../tools/firmware_signing/README.md).
+
+- `begin` recibe tamaño y SHA-256 del **archivo firmado**, como antes; a la flash
+  solo va la imagen. En `finish`, tras el SHA del archivo, se comprueba la firma
+  con la clave pública embebida (`include/firmware_signing_key.h`) **antes** de
+  validar la imagen y de tocar el arranque. Sin firma: «El firmware no trae la
+  firma del propietario. Usa el archivo firmware-signed.bin.» Firma que no
+  verifica: «La firma del firmware no es válida; no se instala.» En los dos casos
+  se invalida la partición destino y el arranque no cambia (estados
+  `signature_missing` y `signature_invalid`).
+- `/api/update/rollback` solo vuelve a una imagen que **también exija firma**
+  (0.7.13 o posterior); si no, 409 «La imagen anterior no exige firma; no se
+  restaura por la API. Usa el cable USB.». Volver a 0.7.12 reabriría la carga de
+  firmware ajeno. La versión de la otra partición se lee de una identidad propia
+  en el byte 288 de la imagen (`.rodata_custom_desc`), porque en Arduino-ESP32
+  `esp_app_desc_t.version` dice siempre «esp-idf: v4.4.7 38eeba213a».
+- `GET /api/update` informa `image_authenticity: "owner_signed_ecdsa_p256"`,
+  `signature_required: true` y `previous_image_signature_required`.
+- Formato y lógica en `lib/protocol/src/signed_firmware.h`, probados en
+  `test/signed_firmware_test.cpp`. La verificación ECDSA en sí es de mbedtls y
+  solo corre en el equipo.
 
 ## Abrir el panel
 
@@ -60,12 +91,12 @@ El HTTP del prototipo depende de la protección y confianza de la red Wi-Fi. No 
 
 ## API versión 1
 
-Todas las rutas HTTP de API requieren `X-Device-Key`. No hay CORS habilitado.
+Desde 0.6.2 ninguna ruta pide clave (`X-Device-Key` se retiró). No hay CORS habilitado.
 
 | Método y ruta | Comportamiento |
 | --- | --- |
 | `GET /api/status` | Estado real, capacidades pendientes y campos GNSS nulos. |
-| `GET /api/config` | Ajustes sin contraseñas, revisión y disponibilidad NVS. |
+| `GET /api/config` | Ajustes, revisión y disponibilidad NVS. Por HTTP y USB incluye `ap_password` (el panel la lee y la reenvía); **por BLE sale sin ella** desde 0.7.13. Las contraseñas de redes externas y NTRIP no salen nunca. |
 | `PUT /api/config` | Actualización parcial con `revision` obligatoria; 409 si está obsoleta. |
 | `POST /api/restart` | 202; programa reinicio después de responder. |
 
@@ -84,6 +115,10 @@ clang++ -std=c++11 -Wall -Wextra -Werror -I include test/config_rules_test.cpp -
 /tmp/tresvizo-config-test
 node --check web/app.js
 ```
+
+`test/secret_redaction_test.cpp` necesita además ArduinoJson, que queda en
+`.pio/libdeps/` tras un `pio run`: añadir
+`-I .pio/libdeps/esp32s3_usb/ArduinoJson/src`.
 
 Desde la raíz, con el puente detenido:
 

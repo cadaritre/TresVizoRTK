@@ -4,13 +4,15 @@
 
 La actualización implementada corresponde a la aplicación del **ESP32-S3 de 4 MB** y su panel embebido. No actualiza el UM980, radios ni bootloader; cada uno necesita procedimiento del fabricante y comprobación de modelo. No exponer un botón genérico que pueda enviar una imagen del ESP32 al GPS.
 
-El panel ofrece selección de `firmware.bin` y `manifest.json`, carga con progreso y restauración de la imagen anterior. USB JSON y HTTP autenticado comparten el controlador; el banco de la Mac lo retransmite al ESP32 real. BLE consulta estado pero no lleva imágenes.
+El panel ofrece selección de `firmware-signed.bin` y `manifest.json`, carga con progreso y restauración de la imagen anterior. USB JSON y HTTP comparten el controlador; el banco de la Mac lo retransmite al ESP32 real. BLE consulta estado pero no lleva imágenes.
 
 ## Particiones y validación
 
-Se conservan NVS y dos particiones OTA de `0x1e0000` (1920 KiB) cada una. Se escribe únicamente la partición inactiva. Antes de activar: ID de hardware `tresvizo-esp32s3-4m-v1`, tamaño, cabecera ESP32-S3, descriptor de aplicación, SHA-256 y validación de imagen de Espressif. No aceptar imágenes de flash completa ni `bootloader.bin`.
+Se conservan NVS y dos particiones OTA de `0x1e0000` (1920 KiB) cada una. Se escribe únicamente la partición inactiva. Antes de activar: ID de hardware `tresvizo-esp32s3-4m-v1`, tamaño, cabecera ESP32-S3, descriptor de aplicación, SHA-256 del archivo, **firma del propietario** y validación de imagen de Espressif. No aceptar imágenes de flash completa ni `bootloader.bin`.
 
-El manifiesto actual es proporcionado por el propietario, **sin firma digital**. SHA-256 detecta corrupción y que la imagen coincide con ese manifiesto; no certifica quién la publicó. La distribución comercial deberá incorporar firmas y custodia de claves antes de habilitar un actualizador por Internet. No se queman eFuses ni se activa Secure Boot durante este prototipo.
+**Desde 0.7.13 la imagen va firmada.** El archivo que se sube es `firmware-signed.bin`: `firmware.bin` seguido de `TVZSIG01` y la firma ECDSA P-256 `r||s` sobre el SHA-256 de la imagen (72 bytes; `firmware/esp32/lib/protocol/src/signed_firmware.h`). A la flash solo va la imagen. En `finish`, tras el SHA-256 del archivo (integridad del transporte), el equipo comprueba la firma con la clave pública embebida (`firmware/esp32/include/firmware_signing_key.h`); sin firma o con una que no verifica, invalida la partición destino y no cambia el arranque. La clave privada es del propietario y vive fuera del repositorio; custodia, respaldo y firma en [`tools/firmware_signing/`](../tools/firmware_signing/README.md). Un actualizador por Internet seguiría necesitando decidir la distribución de las imágenes; la firma ya certifica quién las publicó. No se queman eFuses ni se activa Secure Boot: con acceso físico, el USB sigue cargando cualquier imagen.
+
+`/api/update/rollback` solo restaura una imagen anterior que también exija firma (0.7.13 o posterior); si no, 409 y hay que usar el USB. Volver a 0.7.12 o anterior reabriría la carga de firmware sin firma.
 
 El SDK/bootloader instalado tiene `CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE=1`. La aplicación confirma el arranque después de 5 s, con servidor HTTP iniciado y bucle atendiendo. Si una imagen pendiente reinicia antes de confirmarse, el bootloader puede regresar a la imagen anterior válida. La prueba saludable no equivale a validar cada sensor; no exigir posición GNSS para poder arrancar dentro de un edificio. La caída intencionada antes de confirmar debe ensayarse por separado. Recuperación final por USB si no queda una imagen arrancable.
 
@@ -25,9 +27,9 @@ Desde la raíz:
 ~/.platformio/penv/bin/python tools/firmware_package.py
 ```
 
-Salida local ignorada por Git: `data/local/releases/<versión>/firmware.bin` y `manifest.json`. Se conserva esquema de configuración NVS v1. Las futuras migraciones deben leer la versión anterior, validar en memoria, escribir atómicamente y mantener compatibilidad con rollback; no borrar ajustes para resolver una migración.
+`pio run` deja `firmware-signed.bin` junto a `firmware.bin` si está la clave del propietario. Salida local ignorada por Git: `data/local/releases/<versión>/firmware-signed.bin` y `manifest.json` (tamaño y SHA-256 del archivo firmado). Se conserva esquema de configuración NVS v1. Las futuras migraciones deben leer la versión anterior, validar en memoria, escribir atómicamente y mantener compatibilidad con rollback; no borrar ajustes para resolver una migración.
 
-Rutas: GET `/api/update`; POST `/api/update/begin` con `hardware_id,size,sha256`; `/chunk` con `session,offset,data` base64 (hasta 576 bytes decodificados); `/finish`, `/abort` con `session`; `/rollback`. Desde 0.6.2 no existe clave de acceso: el token de sesión es lo único que ata los bloques a una carga concreta, y **la imagen no se verifica contra ninguna firma**. Quien alcance la red del equipo puede sustituir su firmware. Firmware y API muestran versión y capacidades, no solo un número comercial.
+Rutas: GET `/api/update` (con `image_authenticity: "owner_signed_ecdsa_p256"`, `signature_required` y `previous_image_signature_required`); POST `/api/update/begin` con `hardware_id,size,sha256` del archivo firmado; `/chunk` con `session,offset,data` base64 (hasta 576 bytes decodificados); `/finish`, `/abort` con `session`; `/rollback`. Desde 0.6.2 no existe clave de acceso: el token de sesión es lo único que ata los bloques a una carga concreta. Hasta 0.7.12 **la imagen no se verificaba contra ninguna firma** y quien alcanzara la red del equipo podía sustituir su firmware; desde 0.7.13 solo puede cargar lo que firmó el propietario. Firmware y API muestran versión y capacidades, no solo un número comercial.
 
 ## Módulos y radios
 

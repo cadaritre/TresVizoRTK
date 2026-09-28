@@ -67,7 +67,7 @@ Esta sección sustituye los estados históricos anteriores para estos componente
 
 | Componente | Implementado y límite actual |
 | --- | --- |
-| Actualización ESP32 | Panel y API autenticada, doble partición, SHA-256, comprobación de hardware e imagen, confirmación de arranque y restauración anterior. Cargas completas reales comprobadas conservando NVS. Firma de distribución pendiente. |
+| Actualización ESP32 | Panel y API autenticada, doble partición, SHA-256, comprobación de hardware e imagen, confirmación de arranque y restauración anterior. Cargas completas reales comprobadas conservando NVS. Desde 0.7.13 solo acepta `firmware-signed.bin` (firma ECDSA P-256 del propietario, [firma del firmware](../tools/firmware_signing/README.md)); compila y la firma se verifica en la Mac, falta probar la carga en el equipo. |
 | Extensiones de correcciones | Router RTCM3 con CRC, fuente única y colas limitadas; BLE integrado. Interfaces reservadas para NTRIP y radio en ESP32; necesitan su controlador y validación por modelo. |
 | BLE | Servicio, comandos autenticados, telemetría y recepción RTCM compilados y anunciados por la placa. Emparejamiento con la futura app y rendimiento extremo a extremo pendientes. |
 | GNSS por USB | Banco real en la Mac, demultiplexado Unicore/NMEA/RTCM, épocas GGA a 10 Hz y estado sin posición cuando corresponde. UART GPS–ESP32 permanece desactivada y sin cablear. |

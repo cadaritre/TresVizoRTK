@@ -36,14 +36,30 @@ escritura sin respuesta (propiedades `0xc`) y la salud a 0.99–1.05 s.
   protocolo 3 no ven la salud. Android **no** llama a `BluetoothGatt.refresh()` (lo decía una
   versión anterior de este documento; no estaba en el código).
 
-## Seguridad (sin cambios, decisión del propietario desde 0.6.2)
+## Seguridad (BLE abierto por decisión del propietario desde 0.6.2; F07 cerrado en 0.7.13)
 
 - **Cualquiera al alcance puede conectarse** y escribir órdenes y correcciones: no hay
   emparejamiento, PIN ni cifrado. Las órdenes incluyen `POST /api/restart` y cambiar de modo.
 - Mitigaciones vigentes: un solo cliente a la vez (el equipo deja de anunciarse mientras hay
   uno conectado); el transporte se apaga desde Conexiones y se persiste; el RTCM por BLE se
-  ignora en modo base; la carga de firmware, la lectura de grabaciones y las credenciales no van
-  por BLE.
+  ignora en modo base; la carga de firmware y la lectura de grabaciones no van por BLE.
+- **Hasta 0.7.12 la contraseña del Wi-Fi propio sí salía por BLE** (`ap_password` en
+  `GET /api/config`, `GET /api/wifi/networks` y las respuestas de guardado). Este documento
+  decía lo contrario: el filtro solo cortaba `/api/access`. Con ella se llegaba al HTTP, que no
+  pide clave, y desde ahí a cargar un firmware **sin firma** (hallazgo F07).
+- **Desde 0.7.13**, dos medidas:
+  - Ninguna respuesta BLE lleva credenciales: `protocol::stripSecrets`
+    (`lib/protocol/src/secret_redaction.h`, prueba `test/secret_redaction_test.cpp`) quita a
+    cualquier profundidad toda clave con nombre de credencial que no sea booleana. HTTP, USB y
+    WebSocket no cambian: el panel la sigue leyendo y reenviando. Una app que lea la
+    configuración por BLE ya no la recibe (en el código de iOS: «—» y «Copiar» desactivado).
+  - La OTA exige la firma ECDSA P-256 del propietario, y `rollback` solo vuelve a imágenes que
+    también la exijan (`firmware/esp32/README.md`, «Actualización por OTA»).
+- **Lo que sigue abierto, a sabiendas:** cambiar la contraseña del AP o añadir una red Wi-Fi
+  **sí** se admite por BLE (comodidad, decisión del propietario). Alguien cerca puede fijar una
+  contraseña que conoce, o unir el equipo a una red suya, y entrar al HTTP: leer y cambiar la
+  configuración, reiniciar, cambiar de modo, o dejar al propietario fuera del Wi-Fi hasta que
+  la cambie de nuevo por la app o el USB. Lo que ya no puede es instalar un firmware ajeno.
 - Riesgo real en obra: alguien cerca con una app genérica puede reiniciar el equipo o mandarle
   correcciones basura (el CRC las filtra si están mal formadas, no si son de otra base).
 - Endurecimiento posible sin fricción: exigir que la primera orden de una conexión venga de una

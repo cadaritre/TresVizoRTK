@@ -23,7 +23,12 @@ NTRIP hacia un caster, caster propio sirviendo a un rover, lectura de sourcetabl
 estacionamiento de base, promedio de coordenadas y los paquetes BLE de
 telemetría. Compilan y están cargados; nadie los ha ejecutado de principio a fin.
 
-**Sin integrar:** IMU (no hay hardware), radio UHF, firma de firmware y la
+**OTA firmada (desde 0.7.13):** el equipo solo instala por OTA `firmware-signed.bin`,
+con la firma ECDSA P-256 del propietario, y por Bluetooth ninguna respuesta lleva
+contraseñas. Compila y la firma se comprueba en la Mac; falta probar la carga en
+el equipo. Clave y procedimiento en [firma del firmware](tools/firmware_signing/README.md).
+
+**Sin integrar:** IMU (no hay hardware), radio UHF y la
 aplicación móvil. La microSD está preparada en código y deshabilitada hasta
 validar el cableado. La carcasa vigente es la [V2 mecánica](mechanical/v2/README.md),
 todavía sin imprimir ni ensayar.
