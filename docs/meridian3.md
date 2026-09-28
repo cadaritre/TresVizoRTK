@@ -73,5 +73,11 @@ los dos.
 - Alimentación: power bank externo por el USB-C de la tapa. Cómo llega la alimentación al
   UM980 desde esa única entrada está en `mechanical/meridian3/README.md` y en
   `hardware/`; lo que no esté comprobado va marcado «por confirmar».
-- Carcasa: `mechanical/meridian3/`, del tamaño de V2 (Ø54 mm) con los arreglos de V2.1, sin
-  IMU, batería ni tapa del puerto auxiliar; la tapa solo tiene la abertura del USB-C.
+- Carcasa: `mechanical/meridian3/`, **Ø54 mm como V2** con los arreglos de V2.1, sin IMU,
+  batería ni tapa del puerto auxiliar; el panel solo tiene la abertura del USB-C. **No cabe en
+  los 106.9 mm de alto de V2**: con un latiguillo coaxial entre la antena y el carrier queda en
+  **150.6 mm**. Si la antena HA-901A trae SMA macho y se enrosca directo al carrier, bajaría a
+  ~105.6 mm (sin modelar). Veredicto, pila de alturas y dudas en
+  `mechanical/meridian3/README.md`.
+- El USB-C no está en la ESP32-S3-Tiny sino en su Tiny-Adapter (unida por un FPC): la
+  Tiny-Adapter va atornillada a una repisa de la tapa del panel, alineada con la abertura.
