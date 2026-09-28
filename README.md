@@ -6,6 +6,14 @@ El objetivo es disponer de un software de instrumento robusto en el ESP32-S3, to
 
 El objetivo de desarrollo es alcanzar aproximadamente 2 cm de precisión en condiciones favorables. Esa cifra no representa una capacidad implementada, medida ni garantizada. La operación bajo árboles es un interés de investigación del proyecto y tampoco implica una garantía de precisión bajo vegetación.
 
+## Productos
+
+- **MeridianV**: el receptor completo que se está construyendo (IMU, microSD, radio, batería
+  integrada, puerto auxiliar).
+- **Meridian3**: el sencillo, ESP32-S3 + UM980 + power bank externo por USB-C; rover y base
+  sin grabar. Mismo firmware con otro perfil (`pio run -e meridian3`) y su propia carcasa. Ver
+  [docs/meridian3.md](docs/meridian3.md).
+
 ## Estado actual
 
 El firmware **0.6.2** corre sobre el ESP32-S3 y el equipo se llama **MeridianV**.
