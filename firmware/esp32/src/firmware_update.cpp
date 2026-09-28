@@ -4,6 +4,9 @@
 #include "correction_router.h"
 #include "firmware_signing_key.h"
 #include "signed_firmware.h"
+#include "verified_image.h"
+#include <Preferences.h>
+#include <esp_partition.h>
 #include <esp_ota_ops.h>
 #include <esp_app_format.h>
 #include <esp_image_format.h>
@@ -75,6 +78,46 @@ bool signatureValid(const uint8_t* digest, const uint8_t* signature) {
     mbedtls_ecp_point_free(&key); mbedtls_ecp_group_free(&group);
     return valid;
 }
+// Registro persistente de las imágenes cuya firma se verificó en este equipo
+// (verified_image.h, reauditoría R01): SHA-256 de la partición, por etiqueta.
+constexpr const char* kVerifiedNamespace = "ota_verified";
+bool partitionDigest(const esp_partition_t* partition, uint8_t* digest) {
+    return partition && esp_partition_get_sha256(partition, digest) == ESP_OK;
+}
+// Antes de la primera escritura: si no se puede borrar, no se escribe.
+bool forgetVerified(const esp_partition_t* partition) {
+    Preferences store;
+    if (!partition || !store.begin(kVerifiedNamespace, false)) return false;
+    const bool ok = !store.isKey(partition->label) || store.remove(partition->label);
+    store.end();
+    return ok;
+}
+// Tras verificar la firma y validar la imagen. Si falla, solo se pierde poder
+// volver a ella por la API: el arranque nuevo no depende de esto.
+bool rememberVerified(const esp_partition_t* partition) {
+    uint8_t digest[verified_image::kDigestBytes];
+    Preferences store;
+    if (!partitionDigest(partition, digest) || !store.begin(kVerifiedNamespace, false)) return false;
+    const bool ok = store.putBytes(partition->label, digest, sizeof(digest)) == sizeof(digest);
+    store.end();
+    return ok;
+}
+bool requiresSignature(const esp_partition_t* partition);
+verified_image::Verdict rollbackVerdict(const esp_partition_t* partition) {
+    esp_app_desc_t descriptor;
+    const bool present = partition && esp_ota_get_partition_description(partition, &descriptor) == ESP_OK;
+    uint8_t recorded[verified_image::kDigestBytes], current[verified_image::kDigestBytes];
+    bool recordPresent = false;
+    Preferences store;
+    if (present && store.begin(kVerifiedNamespace, true)) {
+        recordPresent = store.getBytesLength(partition->label) == sizeof(recorded) &&
+                        store.getBytes(partition->label, recorded, sizeof(recorded)) == sizeof(recorded);
+        store.end();
+    }
+    const bool digestOk = present && partitionDigest(partition, current);
+    return verified_image::rollback(present, present && requiresSignature(partition), recordPresent && digestOk,
+                                    recorded, current);
+}
 // ¿La imagen de `partition` exige firma? Solo entonces se puede volver a ella:
 // una anterior a 0.7.13 aceptaria despues cualquier firmware por la red.
 bool requiresSignature(const esp_partition_t* partition) {
@@ -105,7 +148,8 @@ void status(JsonDocument& out) {
     const bool previousPresent = next && esp_ota_get_partition_description(next, &previousImage) == ESP_OK;
     out["previous_image_present"] = previousPresent;
     // Si es falso, `/api/update/rollback` contesta 409: el panel apaga el botón.
-    out["previous_image_signature_required"] = previousPresent && requiresSignature(next);
+    // Desde 0.7.14 exige además que este equipo haya verificado su firma (R01).
+    out["previous_image_signature_required"] = previousPresent && rollbackVerdict(next) == verified_image::Verdict::allowed;
 }
 }
 bool busy() { return active || restart; }
@@ -125,6 +169,8 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         const uint32_t size = body["size"];
         if (size < signed_firmware::kMinFileBytes) return fail(out,400,"El archivo es demasiado pequeño para ser un firmware firmado. Usa el archivo firmware-signed.bin.");
         if (!target || size - signed_firmware::kTrailerBytes > target->size) return fail(out,400,"Tamaño de imagen fuera de la partición OTA.");
+        // Antes de tocar la partición: que deje de contar como verificada (R01).
+        if (!forgetVerified(target)) return fail(out,503,"No se pudo preparar la partición inactiva.");
         if (esp_ota_begin(target,OTA_WITH_SEQUENTIAL_WRITES,&handle) != ESP_OK) return fail(out,503,"No se pudo preparar la partición inactiva.");
         correction_router::select("none");
         mbedtls_sha256_init(&fileHash); mbedtls_sha256_starts_ret(&fileHash,0);
@@ -138,11 +184,15 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
     if (path == "/api/update/rollback") {
         if (busy()) return fail(out,409,"Actualización en curso.");
         const auto next = esp_ota_get_next_update_partition(nullptr);
-        esp_app_desc_t descriptor;
-        if (!next || esp_ota_get_partition_description(next,&descriptor) != ESP_OK)
-            return fail(out,409,"No hay una imagen anterior válida para restaurar.");
-        if (!requiresSignature(next))
-            return fail(out,409,"La imagen anterior no exige firma; no se restaura por la API. Usa el cable USB.");
+        switch (rollbackVerdict(next)) {
+            case verified_image::Verdict::allowed: break;
+            case verified_image::Verdict::no_image:
+                return fail(out,409,"No hay una imagen anterior válida para restaurar.");
+            case verified_image::Verdict::unsigned_version:
+                return fail(out,409,"La imagen anterior no exige firma; no se restaura por la API. Usa el cable USB.");
+            default:
+                return fail(out,409,"Este equipo no verificó la firma de la imagen anterior (se cargó por cable o su carga no terminó); no se restaura por la API. Usa el cable USB.");
+        }
         if (esp_ota_set_boot_partition(next) != ESP_OK)
             return fail(out,409,"No hay una imagen anterior válida para restaurar.");
         state = "rollback_scheduled"; restart = true; restartAt = millis(); status(out); return 202;
@@ -203,6 +253,8 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         mbedtls_sha256_free(&fileHash); mbedtls_sha256_free(&imageHash);
         const esp_err_t validated = esp_ota_end(handle); active = false;
         if (validated != ESP_OK) { invalidateTarget(); state = "invalid_image"; return fail(out,400,"La imagen no pasó la validación de Espressif."); }
+        // Firma verificada e imagen válida: desde ahora se puede volver a ella.
+        rememberVerified(target);
         if (esp_ota_set_boot_partition(target) != ESP_OK) { state = "activation_failed"; return fail(out,503,"No se pudo activar la imagen; se conserva el arranque actual."); }
         state = "restart_scheduled"; restart = true; restartAt = millis(); status(out); return 202;
     }
