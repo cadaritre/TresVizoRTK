@@ -128,3 +128,33 @@ decodificador en las apps. Nada del transporte cambia.
 [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md): tablas GATT viejas en teléfonos (decisión: dirección
 nueva o «servicios cambiados» probado con iPhone), sin emparejamiento (decisión del
 propietario), UART a 115200, heap en sesiones largas, y todo lo que necesita fix y campo.
+
+## 13. Ramas, commits y archivos
+
+Todo en la rama **`los-residentes`** de cada repositorio, integrado commit a commit (sin
+reescribir nada) desde las ramas de trabajo `los-residentes-*`, que se conservan.
+
+| Repositorio | Desde | Commits | Archivos |
+| --- | --- | --- | --- |
+| Firmware (`TresVizoRTK`) | `f982382` (0.7.10) | 26 | 61 (firmware, pruebas C++, `docs/connectivity/`, `tools/ble_bench/`, `tools/ble_bench_mac/`) |
+| iOS (`TresVizoField`) | `f57f17f` | 27 | 56 (núcleo BLE, transporte, GPS del teléfono, respaldo ZIP, pantallas sin tirones, documentos) |
+| Android (`TresVizoFieldAndroid`) | `ec8b6a4` | 81 | 180 (transporte BLE, receptores de otras marcas, GPS del teléfono, respaldo ZIP, paridad, pruebas del desfase de base, documentos) |
+
+Estado al cerrar: firmware con 12 pruebas C++ y 85 del banco en Python en verde, compilado y
+**cargado en el equipo**; iOS compila y 734 pruebas del núcleo en verde; Android compila,
+1 764 pruebas en verde y APK de depuración. Nada se ha probado en un teléfono ni con fix.
+
+## 14. Decisiones que quedan para el propietario
+
+1. **Tablas GATT viejas en los teléfonos**: dirección Bluetooth nueva y fija (cada app vuelve a
+   elegir el equipo una vez) o probar «servicios cambiados» con un iPhone (bandera de firmware).
+2. **Emparejamiento**: sigue sin él (decisión de 0.6.2); riesgo en KNOWN_LIMITATIONS.md.
+3. **Proyectos en el ZIP**: se exportan y se comprueban, pero no se restauran (ADR-0008 de
+   iOS). Sin iCloud ni Drive, los proyectos ya no se respaldan solos.
+4. **Cables USB–serie de fabricante** (FTDI, PL2303, CP210x, CH340) en Android: biblioteca
+   usb-serial-for-android o no (Q-81).
+5. **Desfase de antena Trimble**: la app usa L1 de NGS (128.4 mm), el fabricante dice 149.1 mm
+   a un «centro de fase nominal» (ADR-A123, Q-80).
+6. **GPS del teléfono también en Cuenta** (solo Android): quitarlo o dejarlo.
+7. **UART al UM980 a más de 115200**.
+8. **No dar 0.7.11 a quien use una app de `main`**: enseña un aviso rojo de versión que es falso.
