@@ -139,9 +139,9 @@ reescribir nada) desde las ramas de trabajo `los-residentes-*`, que se conservan
 
 | Repositorio | Desde | Commits | Archivos |
 | --- | --- | --- | --- |
-| Firmware (`TresVizoRTK`) | `f982382` (0.7.10) | 26 | 61 (firmware, pruebas C++, `docs/connectivity/`, `tools/ble_bench/`, `tools/ble_bench_mac/`) |
-| iOS (`TresVizoField`) | `f57f17f` | 30 | 74 (núcleo BLE, transporte, GPS del teléfono, respaldo ZIP, pantallas sin tirones, defectos que encontró la paridad, documentos) |
-| Android (`TresVizoFieldAndroid`) | `ec8b6a4` | 89 | 185 (transporte BLE, receptores de otras marcas, GPS del teléfono, respaldo ZIP, paridad, pruebas del desfase de base, documentos) |
+| Firmware (`TresVizoRTK`) | `f982382` (0.7.10) | 30 | 61 (firmware, pruebas C++, `docs/connectivity/`, `tools/ble_bench/`, `tools/ble_bench_mac/`) |
+| iOS (`TresVizoField`) | `f57f17f` | 29 | 68 (núcleo BLE, transporte, GPS del teléfono, respaldo ZIP, pantallas sin tirones, defectos que encontró la paridad, documentos) |
+| Android (`TresVizoFieldAndroid`) | `ec8b6a4` | 89 | 183 (transporte BLE, receptores de otras marcas, GPS del teléfono, respaldo ZIP, paridad, pruebas del desfase de base, documentos) |
 
 Estado al cerrar: firmware con 12 pruebas C++ y 85 del banco en Python en verde, compilado y
 **cargado en el equipo**; iOS compila y 734 pruebas del núcleo en verde; Android compila,
