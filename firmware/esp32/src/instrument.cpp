@@ -12,6 +12,7 @@
 #include "config_rules.h"
 #include "base_plan.h"
 #include "base_survey.h"
+#include "receiver_silence.h"
 #include "telemetry_ws.h"
 #include "health_packet.h"
 #include "gnss_visible.h"
@@ -674,9 +675,13 @@ void status(JsonDocument& response) {
         item["code"] = code; item["level"] = level; item["message"] = text;
     };
     const auto receiver = gnss_receiver::snapshot();
-    if (receiver.enabled && !receiver.accepted) {
+    // Por la antigüedad de la última GGA, no por el contador: así salta en la
+    // misma sesión en que el receptor pierde sus salidas (receiver_silence.h).
+    const uint64_t ggaAgeUs = receiver.accepted
+        ? static_cast<uint64_t>(esp_timer_get_time()) - receiver.solution.arrival_us : 0;
+    if (receiver_silence::silent(receiver.enabled, receiver.accepted, ggaAgeUs)) {
         raise("receiver_silent", "error",
-              "El enlace con el receptor funciona pero no emite posiciones. Suele ser que perdió sus salidas: aplica una frecuencia en GPS avanzado.");
+              "El enlace con el receptor funciona pero hace varios segundos que no llega ninguna GGA. Suele ser que perdió sus salidas: aplica una frecuencia en GPS avanzado.");
     }
     if (receiver.start_failed) {
         raise("uart_failed", "error", "La UART del receptor no arrancó.");

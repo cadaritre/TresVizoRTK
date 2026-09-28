@@ -39,6 +39,11 @@ struct Profile {
     String rtcm;                     // resumen del perfil RTCM aplicado
     int dgps_timeout_s = -1;         // -1 = desconocido
     bool saved = false;              // SAVECONFIG confirmado en esta sesion
+    // Tasa de GGA de la ultima `telemetry` u `outputs` confirmada. La usa
+    // `rover` para reponer las salidas que su UNLOG quita. 0 = ninguna en esta
+    // sesion del ESP32: `addPositionOutputs` usa entonces el tope del producto
+    // (kDefaultGgaRateHz).
+    unsigned gga_rate_hz = 0;
 } profileState;
 
 // Reconciliación: qué se leyó del receptor, qué difería y qué se corrigió.
@@ -105,6 +110,33 @@ const char* rateFor(unsigned hz) {
 constexpr unsigned kMaxOutputRateHz = 5;
 constexpr const char* kRateCapMessage = "La frecuencia maxima es 5 Hz: el enlace con el telefono no sostiene mas.";
 bool validRate(unsigned hz) { return rateFor(hz) != nullptr && hz <= kMaxOutputRateHz; }
+// Tasa de GGA cuando esta sesion del ESP32 aun no ha aplicado ninguna: el tope
+// del producto, que es tambien la que ponen las apps.
+constexpr unsigned kDefaultGgaRateHz = kMaxOutputRateHz;
+// Tasa de GGA pedida por el trabajo en curso; se apunta al confirmarse.
+unsigned pendingGgaHz = 0;
+
+// Salidas de posicion hacia el ESP32: GGA a la tasa pedida y GST, GSV y GSA a
+// 1 Hz. Las usan `telemetry` y `rover` (que las repone tras su UNLOG).
+//
+// GST acompaña siempre a GGA: sin ella el panel no puede decir con qué
+// precisión estima el receptor. Va a 1 Hz aunque la posición vaya más
+// rápido; la desviación no cambia a 5 Hz y cargar la UART no ayuda.
+// GSV y GSA acompanan a GGA por el mismo motivo que GST: sin ellas la
+// pantalla de satelites no puede decir nada del cielo, y "diez
+// satelites" sin saber cuantos hay a la vista no distingue una antena
+// mala de un cielo tapado. Van a 1 Hz aunque la posicion vaya mas rapido:
+// el cielo no cambia en doscientos milisegundos. Con GGA a 10 Hz, GST, GSV y
+// GSA a 1 Hz la estimacion del enlace rondaba el 20 % de los 115200 baudios;
+// desde el tope de 5 Hz es menos.
+void addPositionOutputs(unsigned ggaHz) {
+    const char* rate = rateFor(ggaHz);
+    if(!rate || ggaHz > kMaxOutputRateHz) rate = rateFor(kDefaultGgaRateHz);
+    add(String("GPGGA COM2 ")+rate);
+    add("GPGST COM2 1");
+    add("GPGSV COM2 1");
+    add("GPGSA COM2 1");
+}
 
 void acceptLine() {
     line[length]=0; char* star=strrchr(line,'*');
@@ -174,6 +206,7 @@ int prepare(const String& name, JsonDocument& out) {
     // a encenderlas despues: obligarle a perder el fijo entero para evitar
     // perder dos tramas.
     count=index=0;sent=ack=readback=false;overflowed=false;failure="";expectedMode="";action=name;
+    pendingGgaHz=0;
     return 0;
 }
 int launch(JsonDocument& out) {
@@ -186,6 +219,7 @@ int launch(JsonDocument& out) {
 void commitProfile() {
     if(action=="mask"){profileState.elevation_known=true;}
     else if(action=="constellations"){profileState.constellations_known=true;}
+    if(pendingGgaHz) profileState.gga_rate_hz=pendingGgaHz;
     // Cualquier acción que modifica configuración termina con SAVECONFIG, así
     // que al confirmarse queda persistida en el receptor.
     if(action=="save"||action=="rover"||action=="base"||action=="telemetry"||action=="stop_outputs"||
@@ -485,25 +519,25 @@ int start(JsonVariantConst body,JsonDocument& out) {
         // las mete **entrelazadas con el NMEA de la posicion**, que es la
         // sospecha mas firme de por que se descartaba el 13 % de las tramas GGA.
         //
-        // Se puede limpiar sin miedo porque todos los perfiles de la app ponen
-        // `rover` y `telemetry` juntos: la salida de posicion se vuelve a
-        // configurar acto seguido.
-        if(name=="rover") {rover=false;mode="";add("UNLOG COM2");add("MODE ROVER SURVEY");add("CONFIG UNDULATION 0.0000");add("MODE");expectedMode="MODE ROVER SURVEY";}
-        // GST acompaña siempre a GGA: sin ella el panel no puede decir con qué
-        // precisión estima el receptor. Va a 1 Hz aunque la posición vaya más
-        // rápido; la desviación no cambia a 10 Hz y cargar la UART no ayuda.
-        // GSV y GSA acompanan a GGA por el mismo motivo que GST: sin ellas la
-        // pantalla de satelites no puede decir nada del cielo, y "diez
-        // satelites" sin saber cuantos hay a la vista no distingue una antena
-        // mala de un cielo tapado. Van a 1 Hz aunque la posicion vaya a diez:
-        // el cielo no cambia en cien milisegundos, y a 10 Hz cargarian la UART
-        // de verdad. Con GGA a 10 Hz, GST, GSV y GSA a 1 Hz la estimacion del
-        // enlace ronda el 20 % de los 115200 baudios.
+        // **Y repone las salidas de posicion en el mismo trabajo**, antes del
+        // SAVECONFIG. Hasta 0.7.12 este comentario decia que no hacia falta
+        // porque «todos los perfiles de la app ponen `rover` y `telemetry`
+        // juntos». No era verdad: el boton del panel y el «Pasar a rover» de
+        // las dos apps mandan solo `rover`, y el receptor se quedaba sin GGA
+        // —y lo guardaba asi, de modo que tampoco volvia al apagarlo—.
+        //
+        // Se reponen GGA a la ultima tasa aplicada (5 Hz si esta sesion del
+        // ESP32 no aplico ninguna) y GST, GSV y GSA a 1 Hz: lo mismo que
+        // `telemetry`. Son 9 ordenes, por debajo de las 20 de un trabajo.
+        if(name=="rover") {
+            rover=false;mode="";
+            add("UNLOG COM2");add("MODE ROVER SURVEY");add("CONFIG UNDULATION 0.0000");add("MODE");
+            expectedMode="MODE ROVER SURVEY";
+            addPositionOutputs(profileState.gga_rate_hz);
+        }
         if(name=="telemetry") {
-            add(String("GPGGA COM2 ")+rateFor(telemetryHz));
-            add("GPGST COM2 1");
-            add("GPGSV COM2 1");
-            add("GPGSA COM2 1");
+            addPositionOutputs(telemetryHz);
+            pendingGgaHz=telemetryHz;
         }
         if(name=="stop_outputs") add("UNLOG COM2");
         if(name=="mask") {
@@ -527,6 +561,7 @@ int start(JsonVariantConst body,JsonDocument& out) {
                 const String messageName=entry["name"].as<const char*>();
                 const unsigned hz=entry["hz"];
                 add(messageName+" COM2 "+rateFor(hz));
+                if(name=="outputs" && messageName=="GPGGA") pendingGgaHz=hz;
                 if(summary.length())summary+=", ";
                 summary+=messageName+" "+String(hz)+" Hz";
             }
