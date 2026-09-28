@@ -11,11 +11,49 @@ GPIO18 RX y GPIO17 TX, 115200, COM2 del UM980. `GET /api/gnss/control` informa t
 - `{"action":"query"}`: VERSIONA y MODE.
 - `{"action":"rover"}`: MODE ROVER SURVEY, UNDULATION AUTO y lectura MODE.
 - `{"action":"telemetry","hz":10}`: GPGGA COM2; frecuencias 1, 5 o 10 Hz.
+
+> **Superado.** Así era en 0.5.0. Después de 0.7.12, `rover` envía `UNLOG COM2`,
+> `MODE ROVER SURVEY`, `CONFIG UNDULATION 0.0000` (elipsoidal, no AUTO), `MODE`,
+> repone `GPGGA` a la última tasa aplicada (5 Hz por defecto) con `GPGST`, `GPGSV`
+> y `GPGSA` a 1 Hz, y termina con `SAVECONFIG` solo si el modo leído es rover.
+> `telemetry` envía `GPGGA COM2 <tasa>`, `GPGST`, `GPGSV` y `GPGSA` a 1 Hz y
+> `SAVECONFIG`; admite 1, 2 y 5 Hz (tope de 0.7.6). Contrato vigente en
+> [configuración avanzada del receptor](gps-advanced.md).
 - `{"action":"raw_profile"}`: OBSVMB COM2 1, efemérides GPS/GLO/GAL/BDS/BD3 cada 30 s. Requiere verificar capacidad del enlace a 115200 y almacenamiento; no se activa durante el ensayo inicial sin tarjeta.
 
 El dueño de UART envía comandos y RTCM sin intercalar sus bytes. Un comando a la vez; ACK asociado al texto exacto, checksum XOR de control y CRC32 de VERSIONA, lectura MODE cuando procede. Timeout de respuesta 4 s: estado parcial/incierto, sin reintento automático de mutaciones. Se mantiene recepción GGA durante consultas. Se bloquea reconfiguración con correcciones seleccionadas o grabación activa. No hay endpoint de comando libre y no se envía SAVECONFIG.
 
-`POST /api/base/apply` recibe el mismo plan validado por `/api/base/plan`. Para coordenadas conocidas solo acepta WGS84, usa altura ARP elipsoidal calculada y UNDULATION=0. Promedio usa MODE BASE ID TIME. La respuesta final **base_mode_confirmed_coordinates_unverified** solo confirma modo: aún deben contrastarse coordenadas GGA, altura y convergencia antes de publicar correcciones. No se configura una base con coordenadas de prueba en el GPS real. La referencia de altura del panel sigue la configuración aplicada.
+`POST /api/base/apply` recibe el mismo plan validado por `/api/base/plan`. Para coordenadas conocidas solo acepta WGS84, usa altura ARP elipsoidal calculada y UNDULATION=0. Promedio usa MODE BASE ID TIME. Después de 0.7.12, UNDULATION 0.0000 va en los dos métodos y el trabajo termina con SAVECONFIG, que solo se envía si el MODE leído es base. La respuesta final **base_mode_confirmed_coordinates_unverified** solo confirma modo: aún deben contrastarse coordenadas GGA, altura y convergencia antes de publicar correcciones. No se configura una base con coordenadas de prueba en el GPS real. La referencia de altura del panel sigue la configuración aplicada.
+
+### Promedio del ESP32 · `/api/base/survey` (después de 0.7.12)
+
+La GGA del receptor ya es la posición de la antena (`CONFIG ANTENNADELTAHEN 0 0 0`,
+`include/receiver_baseline.h`), así que **la media se declara tal cual** en
+`MODE BASE`. Hasta 0.7.12 se le sumaban además la altura de antena y el case, y
+la base quedaba alta en esa cantidad. La altura de antena del operador solo sirve
+para informar la cota de la marca (`include/base_plan.h`, `surveyHeights`):
+
+| Campo | Significado |
+| --- | --- |
+| `height_to_set_m` | Altura elipsoidal que se declara: la media de la antena, sin sumas. Nula sin muestras |
+| `mark_ellipsoid_height_m` | Nuevo. Cota elipsoidal de la marca en el suelo = media − `antenna_vertical_m` − `case_offset_m`. Informativa. Nula sin muestras |
+| `antenna_vertical_m` | Nuevo. La altura de antena del último `start`. Nula si no se ha pedido promedio |
+| `case_offset_m` | La constante única del case (0.10 m, no medida), la de `base_plan.h` |
+
+Se cancela (`state: "cancelled"`, motivo en `reason`) si llega una época sin
+posición o sin altura, si se pierde la calidad exigida, si pasan más de 3 s sin
+GGA, o si al cumplirse el tiempo la última época aceptada tiene más de 2.5 s o
+hay menos de la mitad de las épocas que daría 1 Hz (mínimo dos). Reglas y
+motivos en `include/base_average.h`. Si la base queda aplicada pero el receptor no
+confirma el `SAVECONFIG`, el estado es `applied` y `reason` lo dice.
+
+«Usar coordenada actual» del panel rellena la altura **del suelo** = altura de la
+antena − altura de antena del formulario − case, porque `/api/base/plan` trata
+ese campo como suelo y le suma antena y case.
+
+La alarma `receiver_silent` de `/api/status` salta con más de 5 s sin ninguna GGA
+(`include/receiver_silence.h`), no solo con el contador de GGA en cero: así sale
+en la misma sesión en que el receptor pierde sus salidas.
 
 ## NTRIP directo
 
@@ -51,6 +89,8 @@ sintaxis verificada y límites en [configuración avanzada del receptor](gps-adv
 Se mantiene que no existe endpoint de comando libre. Cambia la afirmación «no se
 envía SAVECONFIG»: ahora puede enviarse, pero solo mediante una acción propia que
 exige confirmación explícita, y sigue sin enviarse en ninguna otra operación.
+(Superado desde 0.6.2: casi todo cambio termina con SAVECONFIG, y después de 0.7.12
+también la base. Ver [configuración avanzada](gps-advanced.md#persistencia).)
 
 La entrega del RTCM al receptor deja de ser invisible: `subsystems.gnss` publica
 `correction_frames_sent` y `correction_frames_dropped`, y el binario nativo Unicore

@@ -58,14 +58,24 @@ enviar nada.
 
 | Cuerpo | Efecto |
 | --- | --- |
-| `{"action":"mask","elevation_deg":10}` | `MASK 10.00` |
-| `{"action":"constellations","gps":true,"bds":true,"glo":true,"gal":false,"qzss":true}` | Un `MASK`/`UNMASK` por sistema |
-| `{"action":"outputs","messages":[{"name":"GPGGA","hz":10}]}` | `GPGGA COM2 0.1` |
-| `{"action":"rtcm_base","messages":[{"name":"RTCM1005","hz":5}]}` | `RTCM1005 COM2 0.2` |
-| `{"action":"dgps_timeout","seconds":60}` | `CONFIG DGPS TIMEOUT 60` |
-| `{"action":"stop_outputs"}` | `UNLOG COM2` |
+| `{"action":"rover"}` | `UNLOG COM2`, `MODE ROVER SURVEY`, `CONFIG UNDULATION 0.0000`, `MODE`, `GPGGA COM2 <última tasa, 5 Hz por defecto>`, `GPGST COM2 1`, `GPGSV COM2 1`, `GPGSA COM2 1`, `SAVECONFIG` |
+| `{"action":"telemetry","hz":5}` | `GPGGA COM2 0.2`, `GPGST COM2 1`, `GPGSV COM2 1`, `GPGSA COM2 1`, `SAVECONFIG`. Tope 5 Hz |
+| `{"action":"mask","elevation_deg":10}` | `MASK 10.00`, `SAVECONFIG` |
+| `{"action":"constellations","gps":true,"bds":true,"glo":true,"gal":false,"qzss":true}` | Un `MASK`/`UNMASK` por sistema, `SAVECONFIG` |
+| `{"action":"outputs","messages":[{"name":"GPGGA","hz":5}]}` | `GPGGA COM2 0.2`, `SAVECONFIG` |
+| `{"action":"rtcm_base","messages":[{"name":"RTCM1005","hz":5}]}` | `RTCM1005 COM2 0.2`, `SAVECONFIG` |
+| `{"action":"dgps_timeout","seconds":60}` | `CONFIG DGPS TIMEOUT 60`, `SAVECONFIG` |
+| `{"action":"stop_outputs"}` | `UNLOG COM2`, `SAVECONFIG` |
 | `{"action":"config_query"}` | `MASK`, con lectura de las líneas `$CONFIG,MASK,…` |
 | `{"action":"save","confirm":true}` | `SAVECONFIG` |
+| `POST /api/base/apply` | `CONFIG UNDULATION 0.0000`, `MODE BASE …`, `MODE` y, solo si el modo leído es base, `SAVECONFIG` |
+
+**Después de 0.7.12**, `rover` repone las salidas de posición antes de guardar
+(antes quitaba todas con `UNLOG COM2` y guardaba así: el receptor se quedaba sin
+GGA incluso tras apagarlo) y la base se guarda (antes no se enviaba `SAVECONFIG`
+aunque el estado dijera `saved: true`). En todo trabajo con modo esperado
+(`rover`, base), el `SAVECONFIG` solo se envía si el `MODE` leído es el pedido; si
+no, el trabajo acaba en `partial_or_unknown` y no se guarda nada.
 
 Reglas de validación aplicadas antes de enviar: campos desconocidos se rechazan;
 la lista de mensajes admite de 1 a 8 entradas de una lista blanca; no se permite
@@ -236,6 +246,16 @@ GGA, con el enlace UART intacto.
 - El panel advierte que guardar también hace persistente una configuración errónea.
 - `persisted_to_receiver` solo pasa a `true` cuando el receptor confirma el comando
   en esta sesión; no se conserva entre reinicios del ESP32.
+
+Desde 0.6.2 casi todo cambio termina con `SAVECONFIG` (tabla de arriba). **Después
+de 0.7.12** el significado de `saved` (en `/api/gnss/control`) y de
+`persisted_to_receiver` (en `/api/gnss/profile`) es exacto: el último trabajo que
+escribió configuración terminó con un `SAVECONFIG` que el receptor contestó con
+`OK`. Pasa a `false` al lanzar cualquier trabajo que escriba y con cada `OK` de una
+escritura (también las correcciones de la reconciliación, que no se guardan), y a
+`true` solo con el `OK` del `SAVECONFIG`. Un `SAVECONFIG` rechazado deja el trabajo
+en `failed` con el motivo en `error`. Hasta 0.7.12 se ponía a `true` por el nombre
+de la acción, y aplicar una base lo marcaba sin haber guardado nada.
 
 `FRESET` y `RESET` del manual (§8.2 y §8.3) **no** se exponen: borran efemérides,
 posición y configuración del receptor y no forman parte de esta entrega.
