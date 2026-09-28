@@ -586,5 +586,16 @@ preferida la deja de ser.
 
 ### Verificación de esta entrega
 
-- Compilación: PENDIENTE.
-- En el equipo: PENDIENTE.
+- Compilación con `-Wall -Wextra` sin avisos nuevos, en un árbol limpio en el
+  commit de esta versión: RAM 27.8 %, flash 79.9 %.
+- Carga por USB con `tools/firmware_upload.py`: arranque confirmado en `app1`. El
+  chequeo final dice «Los ajustes cambiaron» porque `/api/config` trae los dos
+  campos nuevos; los demás ajustes, iguales. Para cargar hay que parar NTRIP.
+- En el equipo, por la consola USB:
+  - `disconnect` → `paused`, sin volver a unirse en 40 s;
+  - `connect` a la red de siempre → conectado en ~3 s y la red queda como
+    preferida;
+  - `connect` a una red no guardada → `404`, y `disconnect` con otro campo →
+    `400`;
+  - NTRIP volvió solo a `streaming` tras la carga.
+- **Sin probar:** cambiar a otra red distinta que esté a la vista, y las apps.
