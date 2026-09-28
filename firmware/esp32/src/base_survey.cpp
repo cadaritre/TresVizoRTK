@@ -1,4 +1,5 @@
 #include "base_survey.h"
+#include "base_plan.h"
 #include "gnss_receiver.h"
 #include "gnss_control.h"
 #include "ntrip_input.h"
@@ -21,22 +22,16 @@ uint32_t startedAt = 0;
 uint32_t samples = 0;
 uint32_t stationId = 0;
 double antennaVertical = 0;
+// Hay una altura de antena del operador que enseñar: sin promedio pedido en
+// esta sesión no la hay, y se publica nula en vez de cero.
+bool antennaKnown = false;
 // Sumas en doble precisión. A un metro de escala y unas miles de épocas no hay
 // pérdida apreciable, y evita el coste de un acumulador compensado.
 double sumLat = 0, sumLon = 0, sumHeight = 0;
 // El motivo del fallo vive fuera del atomic: este guarda el puntero y necesita
 // que la cadena siga existiendo.
 String failureText;
-JsonDocument stopRequest() {
-    JsonDocument body;
-    body["action"] = "stop";
-    return body;
-}
 uint32_t lastEpoch = UINT32_MAX;
-
-// La altura del case todavía no está medida. Hasta entonces se suma una
-// constante: cambiarla aquí es cambiarla en todo el firmware.
-constexpr double kCaseOffsetM = 0.10;
 
 bool matches(unsigned quality) {
     switch (required) {
@@ -96,14 +91,15 @@ void tick() {
     if (s.utc_ms == lastEpoch) {
         if (now - startedAt >= wantedSeconds * 1000UL && samples) {
             // Tiempo cumplido: aplicar la media como coordenada de la base.
+            const auto heights = base_plan::surveyHeights(sumHeight / samples, antennaVertical);
             JsonDocument plan;
             plan["method"] = "known";
             plan["station_id"] = stationId;
             plan["latitude_deg"] = sumLat / samples;
             plan["longitude_deg"] = sumLon / samples;
-            // La coordenada promediada es la del receptor; lo que se declara a
-            // la base es la altura del punto más la antena y el case.
-            plan["arp_ellipsoid_height_m"] = sumHeight / samples + antennaVertical + kCaseOffsetM;
+            // La media es la posición de la antena y se declara tal cual; ver
+            // `base_plan::surveyHeights`. La altura de antena no se suma aquí.
+            plan["arp_ellipsoid_height_m"] = heights.declaredEllipsoidHeightM;
             // Una base no consume correcciones, y tenerlas activas bloquea la
             // aplicación del modo. Se cierran aquí en vez de fallar al final de
             // un promedio de varios minutos por algo que sabíamos de antemano.
@@ -138,7 +134,7 @@ void tick() {
     sumLat += s.latitude_deg;
     sumLon += s.longitude_deg;
     // GGA entrega altura sobre el geoide; la base se declara en elipsoidal.
-    sumHeight += s.altitude_msl_m + (std::isfinite(s.geoid_separation_m) ? s.geoid_separation_m : 0);
+    sumHeight += base_plan::ggaEllipsoidHeightM(s.altitude_msl_m, s.geoid_separation_m);
     ++samples;
 }
 
@@ -150,17 +146,28 @@ void status(JsonObject out) {
     out["samples"] = samples;
     const uint32_t elapsed = active() ? (millis() - startedAt) / 1000 : 0;
     out["seconds_elapsed"] = elapsed;
-    out["case_offset_m"] = kCaseOffsetM;
+    out["case_offset_m"] = base_plan::kCaseOffsetM;
+    // La altura de antena que dio el operador, para que el desglose de la cota
+    // de la marca se pueda enseñar entero. Nula si no se ha pedido promedio.
+    if (antennaKnown) out["antenna_vertical_m"] = antennaVertical;
+    else out["antenna_vertical_m"] = nullptr;
     // Media acumulada hasta ahora: el usuario ve la coordenada que va a quedar
     // mientras se forma, en vez de esperar a ciegas a que termine.
     if (samples) {
+        const auto heights = base_plan::surveyHeights(sumHeight / samples, antennaVertical);
         out["latitude_deg"] = sumLat / samples;
         out["longitude_deg"] = sumLon / samples;
-        out["height_to_set_m"] = sumHeight / samples + antennaVertical + kCaseOffsetM;
+        // Lo que se declara en MODE BASE: la media de la antena, tal cual.
+        // Hasta 0.7.12 llevaba sumadas la antena y el case (ver base_plan.h).
+        out["height_to_set_m"] = heights.declaredEllipsoidHeightM;
+        // Cota elipsoidal de la marca en el suelo: media − antena − case.
+        // Informativa; no se envía al receptor.
+        out["mark_ellipsoid_height_m"] = heights.markEllipsoidHeightM;
     } else {
         out["latitude_deg"] = nullptr;
         out["longitude_deg"] = nullptr;
         out["height_to_set_m"] = nullptr;
+        out["mark_ellipsoid_height_m"] = nullptr;
     }
     // Sin ondulación informada la altura elipsoidal sería la del geoide: se
     // advierte en vez de entregar una coordenada con decenas de metros de error.
@@ -208,6 +215,7 @@ int request(const String& method, JsonVariantConst body, JsonDocument& out) {
     wantedSeconds = body["seconds"];
     stationId = body["station_id"];
     antennaVertical = body["antenna_vertical_m"];
+    antennaKnown = true;
     sumLat = sumLon = sumHeight = 0;
     samples = 0;
     lastEpoch = UINT32_MAX;

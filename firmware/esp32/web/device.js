@@ -217,7 +217,36 @@
     const bar=$('base-station-bar');
     if(bar)bar.hidden=!known;
   }
-  $('base-use-current')?.addEventListener('click',()=>{
+  // «Usar coordenada actual» copia la posición de la ANTENA, pero el campo de
+  // altura del plan es la del punto en el suelo: el equipo le suma después la
+  // antena y el case. Hasta 0.7.12 se copiaba la de la antena tal cual y la
+  // base quedaba alta en antena + case. Ahora se rellena el suelo:
+  //   suelo = altura de la antena − altura de antena del formulario − case
+  // con el case que declara el propio equipo, y se rehace si cambia la antena.
+  let copiedAntenna=null; // {ellipsoidM, caseM, filled}
+  let caseOffsetM=null;
+  async function loadCaseOffset(){
+    if(Number.isFinite(caseOffsetM))return caseOffsetM;
+    const survey=await api('/api/base/survey');
+    if(!Number.isFinite(survey.case_offset_m))throw new Error('El equipo no informó la altura del case.');
+    caseOffsetM=survey.case_offset_m;
+    return caseOffsetM;
+  }
+  function fillGroundHeight(){
+    const antenna=Number($('base-antenna').value||0);
+    const ground=copiedAntenna.ellipsoidM-antenna-copiedAntenna.caseM;
+    copiedAntenna.filled=ground.toFixed(4);
+    $('base-height').value=copiedAntenna.filled;
+    const empty=$('base-antenna').value===''?' (campo vacío: se tomó 0)':'';
+    return `Altura del suelo = ${copiedAntenna.ellipsoidM.toFixed(4)} m (antena, elipsoidal) − ${antenna.toFixed(3)} m de antena${empty} − ${copiedAntenna.caseM.toFixed(3)} m de case = ${copiedAntenna.filled} m. Si cambias la altura de antena, se recalcula.`;
+  }
+  $('base-antenna')?.addEventListener('input',()=>{
+    // Solo si el campo sigue teniendo lo que se copió: lo que el usuario
+    // escribió a mano no se pisa.
+    if(!copiedAntenna||$('base-height').value!==copiedAntenna.filled)return;
+    text('base-result',fillGroundHeight());
+  });
+  $('base-use-current')?.addEventListener('click',async()=>{
     const solution=(window.latestStatusSnapshot||{}).solution;
     if(!solution||!Number.isFinite(solution.latitude_deg)||!Number.isFinite(solution.longitude_deg)){
       text('base-result','No hay una posición vigente del receptor. Espera a que entregue solución.');
@@ -226,16 +255,24 @@
     setBaseMethod('known');
     $('base-lat').value=solution.latitude_deg.toFixed(9);
     $('base-lon').value=solution.longitude_deg.toFixed(9);
+    copiedAntenna=null;
     // La altura que entrega GGA es MSL del receptor; el plan pide elipsoidal.
     // Se reconstruye sumando la ondulación solo si el receptor la informó.
     const separation=solution.geoid_separation_m;
-    if(Number.isFinite(solution.height_m)&&Number.isFinite(separation)){
-      $('base-height').value=(solution.height_m+separation).toFixed(4);
-      text('base-result',`Coordenada copiada con solución ${solution.fix||'desconocida'}. Altura elipsoidal reconstruida sumando la ondulación informada (${separation.toFixed(3)} m). Revisa datum y altura de antena antes de preparar.`);
-    } else {
+    if(!Number.isFinite(solution.height_m)||!Number.isFinite(separation)){
       $('base-height').value='';
-      text('base-result',`Coordenada copiada con solución ${solution.fix||'desconocida'}. El receptor no informó ondulación del geoide, así que la altura elipsoidal hay que introducirla a mano: la de GGA es MSL y no sirve tal cual.`);
+      text('base-result',`Coordenada copiada con solución ${solution.fix||'desconocida'}. El receptor no informó ondulación del geoide, así que la altura elipsoidal del suelo hay que introducirla a mano: la de GGA es MSL y no sirve tal cual.`);
+      return;
     }
+    let caseM;
+    try{caseM=await loadCaseOffset();}
+    catch(error){
+      $('base-height').value='';
+      text('base-result',`Coordenada copiada, pero sin altura: ${error.message} Introduce a mano la altura elipsoidal del suelo.`);
+      return;
+    }
+    copiedAntenna={ellipsoidM:solution.height_m+separation,caseM,filled:''};
+    text('base-result',`Coordenada copiada con solución ${solution.fix||'desconocida'}. Ondulación informada: ${separation.toFixed(3)} m. ${fillGroundHeight()}`);
   });
   $('base-use-average')?.addEventListener('click',()=>{
     setBaseMethod('average');
@@ -282,7 +319,12 @@
     const n=(v,unit,digits)=>Number.isFinite(v)?`${v.toFixed(digits)}${unit}`:'—';
     text('base-average-lat',n(d.latitude_deg,'°',9));
     text('base-average-lon',n(d.longitude_deg,'°',9));
+    // Lo que se declara es la media de la antena tal cual; la marca en el suelo
+    // es media − antena − case, solo informativa.
     text('base-average-height',n(d.height_to_set_m,' m',4));
+    text('base-average-mark',Number.isFinite(d.mark_ellipsoid_height_m)
+      ? `${d.mark_ellipsoid_height_m.toFixed(4)} m (antena ${n(d.antenna_vertical_m,' m',3)}, case ${n(d.case_offset_m,' m',3)})`
+      : '—');
     const parts=[labels[d.state]||d.state];
     if(running)parts.push(`solo con solución ${d.required_quality}`);
     if(d.reason)parts.push(d.reason);

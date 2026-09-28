@@ -395,7 +395,7 @@
           <div class="notice">«Estacionar la base aquí» envía la coordenada al receptor. Que la acepte no significa que sea exacta.</div>
           <div class="two-columns lower">
             <article class="panel"><h2>Modo del equipo</h2><p>Consulta el modo efectivo y activa rover en el panel GPS conectado al ESP32 de esta página.</p><p>El rover recibirá correcciones desde la app por BLE o desde un caster por Wi-Fi.</p><button class="button secondary" data-page="corrections">Ver correcciones ↗</button></article>
-            <article class="panel"><h2>Cómo se declara la coordenada</h2><p>Marco siempre <b>WGS84</b> y altura siempre <b>elipsoidal</b>: el equipo no transforma coordenadas, así que no se te pide declarar un datum que no tendría efecto.</p><p>La altura que introduces es la del punto en el suelo. El equipo le suma la altura de antena que midas y <b>10 cm del case</b>, todavía sin medir sobre la carcasa real.</p><p>Promediar establece una referencia local repetible; no garantiza exactitud absoluta si la solución de partida no la tiene.</p></article>
+            <article class="panel"><h2>Cómo se declara la coordenada</h2><p>Marco siempre <b>WGS84</b> y altura siempre <b>elipsoidal</b>: el equipo no transforma coordenadas, así que no se te pide declarar un datum que no tendría efecto.</p><p>Con coordenada conocida, la altura que introduces es la del punto en el suelo. El equipo le suma la altura de antena que midas y <b>10 cm del case</b>, todavía sin medir sobre la carcasa real.</p><p>Al promediar, la media ya es la posición de la antena y se declara <b>tal cual</b>. La altura de antena solo sirve para informarte de la cota de la marca en el suelo.</p><p>Promediar establece una referencia local repetible; no garantiza exactitud absoluta si la solución de partida no la tiene.</p></article>
           </div>
           <form id="base-plan-form" class="panel lower">
             <h2>Preparar estación base</h2>
@@ -417,7 +417,7 @@
             <label for="base-id">Identificador de estación</label><input id="base-id" type="number" min="0" max="4095" step="1" value="1" required />
             <fieldset id="base-known"><legend>Coordenadas del punto</legend>
               <div class="two-columns"><div><label for="base-lat">Latitud (grados decimales)</label><input id="base-lat" type="number" min="-90" max="90" step="any" required /></div><div><label for="base-lon">Longitud (grados decimales)</label><input id="base-lon" type="number" min="-180" max="180" step="any" required /></div></div>
-              <label for="base-height">Altura elipsoidal del punto (m)</label><input id="base-height" type="number" min="-30000" max="30000" step="any" required /><small class="field-help">Siempre elipsoidal sobre WGS84. No introduzcas altura ortométrica o sobre el nivel del mar.</small>
+              <label for="base-height">Altura elipsoidal del punto (m)</label><input id="base-height" type="number" min="-30000" max="30000" step="any" required /><small class="field-help">Siempre elipsoidal sobre WGS84, del punto en el suelo, no de la antena. No introduzcas altura ortométrica o sobre el nivel del mar. «Usar coordenada actual» la calcula restando la antena y el case.</small>
               <label for="base-antenna">Altura vertical hacia base de receptor (m)</label><input id="base-antenna" type="number" min="0" max="100" step="any" required /><small class="field-help">Medición vertical, no inclinada, desde el punto del terreno hasta la base del receptor. El equipo suma por su cuenta los 10 cm del case.</small>
             </fieldset>
             <fieldset id="base-average" hidden disabled><legend>Promediar en el sitio</legend>
@@ -430,7 +430,7 @@
                 <option value="any">Cualquier solución</option>
               </select>
               <small class="field-help">Si la calidad elegida se pierde durante el promedio, se cancela y se te dice por qué: una media contaminada no se distingue a simple vista de una buena.</small>
-              <label for="base-antenna-avg">Altura vertical hacia base de receptor (m)</label><input id="base-antenna-avg" type="number" min="0" max="100" step="any" value="0" />
+              <label for="base-antenna-avg">Altura vertical hacia base de receptor (m)</label><input id="base-antenna-avg" type="number" min="0" max="100" step="any" value="0" /><small class="field-help">No cambia lo que se declara: la media ya es la antena. Solo sirve para calcular la cota de la marca en el suelo (media − antena − case).</small>
               <div class="button-row">
                 <button class="button primary" type="button" id="base-average-start">Iniciar promedio</button>
                 <button class="button secondary" type="button" id="base-average-cancel">Cancelar</button>
@@ -441,7 +441,8 @@
                 <dl class="detail-list">
                   <div><dt>Latitud media</dt><dd id="base-average-lat">—</dd></div>
                   <div><dt>Longitud media</dt><dd id="base-average-lon">—</dd></div>
-                  <div><dt>Altura que se fijará</dt><dd id="base-average-height">—</dd></div>
+                  <div><dt>Altura que se declara (antena)</dt><dd id="base-average-height">—</dd></div>
+                  <div><dt>Cota de la marca (suelo)</dt><dd id="base-average-mark">—</dd></div>
                 </dl>
               </div>
               <p id="base-average-state" role="status"></p>
