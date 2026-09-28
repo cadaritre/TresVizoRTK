@@ -56,6 +56,14 @@ igual**: sin salud y sin RTCM sin respuesta, aunque el equipo los tenga.
 - 0.7.11 bajó el heap interno libre de ~106 KB a ~97 KB tras arrancar (cola estática de 8 KiB).
   Hay 2 MB de PSRAM libres: la cola puede ir ahí si hace falta.
 
+## Menores, vistos al escribir el decodificador del banco
+
+- `Rtcm3Parser::overflow` (`lib/gnss/src/rtcm3.h:25`) no sube nunca: el contador existe pero
+  siempre vale 0.
+- Una petición BLE con JSON inválido recibe `400 invalid_request` **sin `id`**: el cliente no la
+  puede asociar a su orden y la da por vencida al agotar el plazo. Solo pasa con una trama
+  corrupta; las apps no mandan JSON inválido.
+
 ## Sin validar todavía
 
 RTCM **sin** respuesta de punta a punta (ningún cliente de hoy tenía la tabla al día), sesión
