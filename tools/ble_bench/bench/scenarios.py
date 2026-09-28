@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Awaitable, Callable, Iterator
 
 from . import rtcm
-from .protocol import COMMAND_UUID
+from .protocol import CHARACTERISTIC_NAMES, COMMAND_UUID
 from .runner import Bench
 
 # Pausa tras el flujo para que el ESP32 vacíe su cola a la UART (4 tramas de
@@ -61,8 +61,10 @@ def rtcm_source(options: ScenarioOptions, note: Callable[[str], None]) -> Iterat
 
 async def _open(bench: Bench, options: ScenarioOptions, rtcm_needed: bool) -> None:
     await bench.connect()
+    gatt = {name: sorted(bench.link.properties(uuid)) for uuid, name in CHARACTERISTIC_NAMES.items()}
     bench.note(f"conectado: {bench.link.description}; MTU {bench.link.negotiated_mtu}; "
-               f"RTCM se escribirá {bench.rtcm_mode}")
+               f"RTCM se escribirá {bench.rtcm_mode}; tabla GATT vista: "
+               + ", ".join(f"{name} {'/'.join(props) or 'FALTA'}" for name, props in gatt.items()))
     await bench.snapshot("inicio")
     if rtcm_needed:
         await bench.ensure_ble_source(options.select_ble_source)

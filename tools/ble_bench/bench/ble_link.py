@@ -14,6 +14,8 @@ la escritura sin respuesta espera hueco en la pila son cosas a medir mañana.
 """
 from __future__ import annotations
 
+import asyncio
+
 from . import protocol as p
 from .link import Link, LinkError, NotifyCallback
 
@@ -43,6 +45,7 @@ class BleakLink(Link):
         self._client = None
         self._device = None
         self._requested_disconnect = False
+        self._loop: asyncio.AbstractEventLoop | None = None
         self.on_unexpected_disconnect = None
 
     @property
@@ -84,6 +87,7 @@ class BleakLink(Link):
 
     async def connect(self) -> None:
         BleakClient, _ = _bleak()
+        self._loop = asyncio.get_running_loop()
         self._device = await self._find()
         self._requested_disconnect = False
         self._client = BleakClient(self._device, disconnected_callback=self._disconnected,
@@ -96,8 +100,10 @@ class BleakLink(Link):
             raise LinkError("conectado, pero sin el servicio a04c0001: ¿es un Meridian V?")
 
     def _disconnected(self, _client) -> None:
+        # bleak dice que lo llama en el bucle de eventos; si no fuera así, se pasa
+        # al bucle igualmente: el banco no es seguro entre hilos.
         if not self._requested_disconnect and self.on_unexpected_disconnect:
-            self.on_unexpected_disconnect()
+            self._loop.call_soon_threadsafe(self.on_unexpected_disconnect)
 
     async def disconnect(self) -> None:
         self._requested_disconnect = True

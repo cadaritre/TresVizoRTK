@@ -123,7 +123,9 @@ def cmd_run(args) -> int:
     if args.sim:
         from bench.simulator import SimulatedLink, SimulatedMeridian, SimulatorOptions
         device = SimulatedMeridian(SimulatorOptions(receiver_talking=not args.sim_silent_receiver,
-                                                    write_without_response=not args.sim_no_wwr))
+                                                    write_without_response=not args.sim_no_wwr,
+                                                    protocol_version=2 if args.sim_v2 else 3,
+                                                    stale_gatt=args.sim_stale_gatt))
         link_factory = lambda: SimulatedLink(device)  # noqa: E731
         link_kind = "simulador"
     else:
@@ -199,6 +201,9 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--sim", action="store_true", help="contra el simulador en proceso, sin radio")
     run.add_argument("--sim-silent-receiver", action="store_true", help="simulador con el UM980 mudo")
     run.add_argument("--sim-no-wwr", action="store_true", help="simulador sin escritura sin respuesta en RTCM")
+    run.add_argument("--sim-v2", action="store_true", help="simulador como 0.7.10 (contrato v2)")
+    run.add_argument("--sim-stale-gatt", action="store_true",
+                     help="simulador visto con la tabla GATT vieja en caché (sin salud ni sin respuesta)")
     run.add_argument("--address", help="dirección (en macOS, el UUID que asigna CoreBluetooth)")
     run.add_argument("--name", help="parte del nombre anunciado, si no se filtra por servicio")
     run.add_argument("--duration", type=float, help="segundos")

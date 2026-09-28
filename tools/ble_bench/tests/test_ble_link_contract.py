@@ -139,6 +139,7 @@ class BleakLinkContract(unittest.TestCase):
             link.on_unexpected_disconnect = lambda: unexpected.append(1)
             await link.connect()
             FakeClient.instances[-1].drop()
+            await asyncio.sleep(0)  # el aviso llega por el bucle de eventos
             with self.assertRaises(LinkError):
                 await link.write(p.COMMAND_UUID, b"{}\n", with_response=True)
         asyncio.run(scenario())
