@@ -66,6 +66,11 @@ BLE_STATUS_KEYS = ("state", "protocol_version", "att_mtu", "rtcm_write_without_r
 # bytes y el estado dice cuántos hay dentro (`correction_queue_bytes`).
 DEVICE_UART_QUEUE_FRAMES = 4
 PERCENTILES = (50, 95)
+MAX_TRANSITIONS_SHOWN = 20   # el resumen enseña las primeras; el CSV las tiene todas
+
+
+def GGA_NAME(quality: int) -> str:  # noqa: N802 - mismo nombre que la tabla del protocolo
+    return p.GGA_QUALITIES.get(quality, f"desconocida ({quality})")
 
 
 def extract_status(body: dict) -> dict:
@@ -149,6 +154,10 @@ class Analyzer:
         self.ble_status: dict = {}
         self.gatt_warnings: list[str] = []
         self.qualities: dict[str, int] = {}
+        # Cambios de calidad (FLOTANTE → FIJO…) con su instante de llegada. No se
+        # borra al reconectar: interesa la historia entera de la sesión.
+        self.quality_transitions: list[tuple[float, str, str]] = []
+        self._last_quality: int | None = None
         self.pending_requests: dict[int, tuple[float, str, str]] = {}
         self.latencies_s: list[float] = []
         self.latency_by_path: dict[str, list[float]] = {}
@@ -198,14 +207,14 @@ class Analyzer:
         data = event.data or b""
         self.streams.setdefault(name, StreamStats()).add(event.t, len(data))
         if name == "solution":
-            self._solution(data)
+            self._solution(data, event.t)
         elif name == "health":
             self._health(data)
         elif name == "response":
             return self._response(event.t, data)
         return []
 
-    def _solution(self, data: bytes) -> None:
+    def _solution(self, data: bytes, t: float = 0.0) -> None:
         try:
             packet = p.decode_solution(data)
         except p.ProtocolError:
@@ -217,6 +226,9 @@ class Analyzer:
                 self.solution_missing += gap
             elif gap < 0:
                 self.solution_anomalies += 1
+        if self._last_quality is not None and packet.quality != self._last_quality:
+            self.quality_transitions.append((t, GGA_NAME(self._last_quality), packet.quality_name))
+        self._last_quality = packet.quality
         self.last_solution = packet
         self.qualities[packet.quality_name] = self.qualities.get(packet.quality_name, 0) + 1
 
@@ -363,11 +375,31 @@ class Analyzer:
         self.notes.append(str(event.info.get("text", "")))
 
     # -- resultados -------------------------------------------------------
+    def device_restarts(self) -> list[float]:
+        """Instantes (de la foto siguiente) en que el `uptime_ms` del equipo volvió atrás."""
+        restarts = []
+        for (_, _, before), (t, _, after) in zip(self.statuses, self.statuses[1:]):
+            a, b = before.get("uptime_ms"), after.get("uptime_ms")
+            if isinstance(a, int) and isinstance(b, int) and b < a:
+                restarts.append(t)
+        return restarts
+
     def status_delta(self) -> dict[str, int | None]:
-        """Diferencia de contadores entre la primera y la última foto del equipo."""
+        """Diferencia de contadores entre la primera y la última foto del equipo.
+
+        Si el equipo se reinició entre medias, sus contadores volvieron a cero: la
+        diferencia se toma desde la primera foto posterior al último reinicio.
+        """
         if len(self.statuses) < 2:
             return {}
-        first, last = self.statuses[0][2], self.statuses[-1][2]
+        start = 0
+        for index, ((_, _, before), (_, _, after)) in enumerate(zip(self.statuses, self.statuses[1:]), start=1):
+            a, b = before.get("uptime_ms"), after.get("uptime_ms")
+            if isinstance(a, int) and isinstance(b, int) and b < a:
+                start = index
+        if start == len(self.statuses) - 1:
+            return {}
+        first, last = self.statuses[start][2], self.statuses[-1][2]
         delta = {}
         for name in STATUS_COUNTERS:
             a, b = first.get(name), last.get(name)
@@ -393,6 +425,10 @@ class Analyzer:
                      f"enviadas {self.rtcm_sent_frames} / {self.rtcm_sent_bytes} B "
                      f"(descartadas en la Mac sin enviar: {self.rtcm_discarded_frames}, "
                      f"escrituras fallidas: {self.rtcm_write_failures})")
+        if self.device_restarts():
+            lines.append("✘ el equipo se reinició durante la sesión: lo enviado por la Mac no se puede cuadrar "
+                         "contra sus contadores, que volvieron a cero; ver «contadores del equipo» desde el reinicio")
+            return lines
         delta = self.status_delta()
         valid = delta.get("ble.rtcm_valid_frames")
         if valid is None:
@@ -487,6 +523,11 @@ class Analyzer:
             out.append(f"solución: {self.solution_missing} paquetes perdidos por secuencia, "
                        f"{self.solution_anomalies} saltos atrás o repetidos, {self.solution_decode_errors} ilegibles; "
                        f"calidades {self.qualities}")
+        if self.quality_transitions:
+            shown = ", ".join(f"{t:.1f} s {a}→{b}" for t, a, b in self.quality_transitions[:MAX_TRANSITIONS_SHOWN])
+            more = len(self.quality_transitions) - MAX_TRANSITIONS_SHOWN
+            out.append(f"cambios de calidad: {len(self.quality_transitions)} ({shown}"
+                       + (f", y {more} más" if more > 0 else "") + ")")
         silent = self.receiver_silent()
         if silent:
             out.append("⚠ 0 bytes de telemetría del receptor: el ESP32 no ha aceptado ni una trama del UM980 "
@@ -536,6 +577,10 @@ class Analyzer:
                           f"máx {max(self.rtcm_frame_durations_s) * 1000:.1f} ms"
                           if self.rtcm_frame_durations_s else ""))
             out += ["  " + line for line in self.reconcile_rtcm()]
+        restarts = self.device_restarts()
+        if restarts:
+            out.append(f"⚠ el equipo se reinició {len(restarts)} vez/veces (uptime_ms volvió atrás; foto a los "
+                       + ", ".join(f"{t:.0f} s" for t in restarts) + ")")
         delta = self.status_delta()
         if delta:
             changed = {k: v for k, v in delta.items() if v}

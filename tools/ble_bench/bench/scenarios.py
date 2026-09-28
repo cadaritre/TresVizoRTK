@@ -215,6 +215,7 @@ async def long_session(bench: Bench, options: ScenarioOptions) -> None:
                 if not await bench.reconnect_with_backoff():
                     bench.note("no volvió tras la escalera completa; fin de la sesión")
                     break
+                await bench.snapshot("tras reconectar")  # delata un reinicio del equipo (uptime)
                 await bench.ensure_ble_source(options.select_ble_source)
             await bench.stream_rtcm(source, options.rate_bytes_per_second,
                                     min(LONG_SESSION_SLICE_S, end - loop.time()))

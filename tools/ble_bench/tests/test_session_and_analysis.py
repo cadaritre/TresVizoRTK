@@ -97,6 +97,14 @@ class AnalyzerFacts(unittest.TestCase):
         self.assertEqual(a.solution_anomalies, 0)
         self.assertEqual(a.disconnects_unexpected, 1)
 
+    def test_quality_transitions(self):
+        a = Analyzer()
+        for t, quality in ((0.2, 1), (0.4, 5), (0.6, 5), (0.8, 4), (1.0, 5)):
+            a.consume(Event(t, "notify", "solution", p.encode_solution(int(t * 5), quality, 20, 0, 1.0, 1.0, 1.0)))
+        self.assertEqual([(a_, b) for _, a_, b in a.quality_transitions],
+                         [("autónoma", "FLOTANTE"), ("FLOTANTE", "FIJO"), ("FIJO", "FLOTANTE")])
+        self.assertIn("cambios de calidad: 3", a.render())
+
     def test_receiver_silent_is_said_plainly(self):
         a = Analyzer()
         silent = extract_status({"subsystems": {"gnss": {"accepted_gga": 0, "native_frames_valid": 0,
@@ -136,6 +144,18 @@ class AnalyzerFacts(unittest.TestCase):
         self.feed(a, Event(2, "status", info={"snapshot": dict(zero, **{"ble.rtcm_valid_frames": 3,
                                                                        "ble.rtcm_crc_errors": 2})}))
         self.assertIn("✘ 2 tramas enviadas no llegaron válidas", "\n".join(a.reconcile_rtcm()))
+
+    def test_device_restart_splits_the_counters(self):
+        a = Analyzer()
+        snap = lambda up, valid: {"uptime_ms": up, "ble.rtcm_valid_frames": valid}  # noqa: E731
+        self.feed(a, Event(0, "status", info={"snapshot": snap(50_000, 100)}),
+                  Event(60, "status", info={"snapshot": snap(3_000, 5)}),
+                  Event(120, "status", info={"snapshot": snap(63_000, 65)}),
+                  Event(61, "rtcm_sent", info={"bytes": 100}))
+        self.assertEqual(a.device_restarts(), [60])
+        self.assertEqual(a.status_delta()["ble.rtcm_valid_frames"], 60)
+        self.assertIn("se reinició", "\n".join(a.reconcile_rtcm()))
+        self.assertIn("⚠ el equipo se reinició 1", a.render())
 
     def test_uncorrelated_and_timeouts(self):
         a = Analyzer()
