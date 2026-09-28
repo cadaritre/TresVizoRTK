@@ -16,10 +16,10 @@
 
 ## Matriz
 
-| Firmware | Protocolo BLE | App sin cambios de hoy (`main`) | Apps de `los-residentes` |
+| Firmware | Protocolo BLE | App sin cambios de hoy (`main`) | Apps de `los-residentes` (entienden de la 2 a la 3; el aviso solo sale con un equipo más nuevo) |
 | --- | --- | --- | --- |
 | ≤ 0.7.10 | 2 | Funciona como hasta hoy (RTCM con respuesta sin ritmo en iOS: el defecto D1) | Detectan que no hay `writeWithoutResponse`: RTCM con respuesta, **una en vuelo**, órdenes primero. Latido v2 |
-| 0.7.11 | 3 | Funciona igual que con 0.7.10 (escribe con respuesta, ignora los bytes 17–19). Recibe salud también sin fix, lo que antes no pasaba: inocuo | RTCM sin respuesta con ritmo (si la tabla está al día), latido a 1 Hz, contadores RTCM |
+| 0.7.11 | 3 | Funciona igual que con 0.7.10 (escribe con respuesta, ignora los bytes 17–19). Recibe salud también sin fix, lo que antes no pasaba: inocuo. **Pero** Equipo › Bluetooth enseña en rojo «El equipo habla la versión 3 del protocolo Bluetooth y esta app la 2. Las tramas podrían leerse mal.» (iOS y Android de `main` comparan con `==`): es falso, v3 es aditiva. Conviene no dar 0.7.11 a quien use una app de `main` | RTCM sin respuesta con ritmo (si la tabla está al día), latido a 1 Hz, contadores RTCM |
 
 ## Regla para cambios futuros
 
