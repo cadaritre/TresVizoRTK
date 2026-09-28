@@ -70,6 +70,23 @@ Cada `run` deja en `tools/ble_bench/sesiones-banco/<fecha>-<escenario>/` (fuera 
    app. Si hay una captura real (`.rtcm3`), `$BANCO rtcm-check archivo` la valida como lo haría
    el ESP32 y `--rtcm-file archivo` la repite en bucle.
 
+### Orden sugerido con el banco (unas 2 h)
+
+| Paso | Orden | Tiempo | Para qué |
+| --- | --- | --- | --- |
+| 1 | `$BANCO run telemetria --duration 30` | 1 min | Triaje: tabla GATT, `protocol_version`, salud a 1 Hz, receptor oyéndose (pruebas 1 y 14) |
+| 2 | `$BANCO run reconexiones --cycles 20` | 2 min | Prueba 2 |
+| 3 | `$BANCO run rtcm-1k --select-ble-source`, luego `rtcm-3k` y `rtcm-6k` | 7 min | Prueba 3 |
+| 4 | `$BANCO run rtcm-ordenes --rate 3000 --command-period 1 --select-ble-source` (y con `--no-command-priority`) | 5 min | Pruebas 4 y 5 |
+| 5 | `$BANCO run corte-rtcm --select-ble-source` y `$BANCO run corte-orden` | 3 min | Desconexión a mitad de RTCM y de una orden |
+| 6 | `$BANCO run rafagas --select-ble-source` | 2 min | Prueba 11 (parte del banco) |
+| 7 | `$BANCO run malformados --select-ble-source` | 1 min | Prueba 13 |
+| 8 | `$BANCO run saturacion --select-ble-source` | 1 min | Prueba 16 |
+| 9 | `$BANCO run sesion-larga --duration 3600 --select-ble-source` | 60 min | Prueba 15 (y 6 u 8 si se provoca un corte) |
+
+Al terminar, devolver la fuente de correcciones a la que estaba (desde la app o el panel): el
+banco la deja en `ble` si se usó `--select-ble-source`.
+
 ## Cómo leer el resumen
 
 | Línea | Qué es | De dónde sale |
@@ -219,6 +236,21 @@ Cada uno con su motivo.
 - **Pasa** si vuelve sola en ≤ 2 escalones de la escalera tras recuperar la cobertura y no hay
   tramas caducadas en el equipo por RTCM viejo. **Falla** si no vuelve o si al volver sube
   `correction_frames_expired` de golpe.
+
+### Complemento de 6 y 8: cortes provocados desde el banco
+
+- **A mitad de RTCM**: `$BANCO run corte-rtcm --select-ble-source`. El banco corta el enlace a
+  mitad del flujo, reconecta y sigue con tramas nuevas. **Pasa** si `rtcm_crc_errors` sube como
+  mucho 1 (la trama que se estaba escribiendo), el cuadre después de reconectar es exacto y lo
+  que quedó en la cola de la Mac figura como descartado («no se reenvía»). **Falla** si el ESP32
+  acepta tramas de antes del corte tras reconectar o si el rearmado queda atascado (válidas
+  que no suben).
+- **A mitad de una orden**: `$BANCO run corte-orden --cycles 5`. Pide `/api/gnss/sky` (unos
+  2.5 kB, ~10 tramas con MTU 247), corta al llegar la primera trama, reconecta y pregunta
+  `GET /api/ble`. **Pasa** si en los cinco ciclos la orden nueva recibe su respuesta y el
+  rearmado no ve tramas huérfanas ni reinicios del mensaje viejo (el firmware tira la
+  respuesta a medias al cambiar de conexión). Si el banco dice «la respuesta llegó entera antes
+  del corte», ese ciclo no cuenta: repetir.
 
 ## 9. Segundo plano / primer plano
 

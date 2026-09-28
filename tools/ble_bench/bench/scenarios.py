@@ -136,7 +136,12 @@ async def disconnect_during_command(bench: Bench, options: ScenarioOptions) -> N
         waiter.add_done_callback(lambda f: f.exception() if not f.cancelled() else None)
         if not await bench.wait_first_response_frame(5.0):
             bench.note(f"ciclo {cycle + 1}: la respuesta grande no empezó a llegar en 5 s")
+        # Con MTU 247 la respuesta entera son ~10 tramas y puede llegar en uno o dos
+        # eventos de conexión: si ya está completa, el corte no fue «a mitad».
+        whole = waiter.done() and not waiter.cancelled() and waiter.exception() is None
         await bench.disconnect(reason="corte a mitad de una orden")
+        if whole:
+            bench.note(f"ciclo {cycle + 1}: la respuesta llegó entera antes del corte; este ciclo no cuenta como «a mitad»")
         await asyncio.sleep(PAUSE_BEFORE_RECONNECT_S)
         await bench.connect()
         try:
