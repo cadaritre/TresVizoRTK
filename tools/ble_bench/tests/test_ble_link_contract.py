@@ -171,3 +171,67 @@ class BleakLinkContract(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SimulatedBleakClient(FakeClient):
+    """Un BleakClient falso que por dentro habla con el Meridian simulado."""
+    device_model = None
+
+    def __init__(self, device, disconnected_callback=None, timeout=10.0):
+        super().__init__(device, disconnected_callback, timeout)
+        from bench.simulator import SimulatedLink
+        self.link = SimulatedLink(SimulatedBleakClient.device_model)
+        self.mtu_size = self.link.device.options.mtu
+        self.services = FakeServices({uuid: sorted(self.link.properties(uuid)) for uuid in TABLE_V3})
+
+    async def connect(self):
+        await self.link.connect()
+        self.is_connected = True
+
+    async def disconnect(self):
+        await self.link.disconnect()
+        await super().disconnect()
+
+    async def start_notify(self, uuid, callback):
+        await self.link.start_notify(uuid, lambda data: callback(None, bytearray(data)))
+
+    async def write_gatt_char(self, uuid, data, response=None):
+        await self.link.write(uuid, bytes(data), with_response=bool(response))
+
+
+class CommandLineWithBleak(unittest.TestCase):
+    """El camino de mañana (`run` sin --sim) de punta a punta, con bleak falso."""
+
+    def setUp(self):
+        self.saved = sys.modules.get("bleak")
+        module = types.ModuleType("bleak")
+        module.BleakClient = SimulatedBleakClient
+        module.BleakScanner = FakeScanner
+        sys.modules["bleak"] = module
+
+    def tearDown(self):
+        if self.saved is None:
+            sys.modules.pop("bleak", None)
+        else:
+            sys.modules["bleak"] = self.saved
+
+    def test_run_without_sim_goes_through_bleak_link(self):
+        import importlib.util
+        import tempfile
+        from pathlib import Path
+        from bench.simulator import SimulatedMeridian
+        SimulatedBleakClient.device_model = SimulatedMeridian()
+        cli_path = Path(__file__).resolve().parents[1] / "__main__.py"
+        spec = importlib.util.spec_from_file_location("ble_bench_cli", cli_path)
+        cli = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cli)
+        import contextlib
+        import io
+        with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()):
+            code = cli.main(["run", "rtcm-1k", "--duration", "1.2", "--select-ble-source", "--out", tmp])
+            summary = (Path(tmp) / "resumen.txt").read_text(encoding="utf-8")
+        self.assertEqual(code, 0)
+        self.assertIn("(bluetooth)", summary)
+        self.assertIn("MeridianV-TEST", summary)
+        self.assertIn("modo de escritura sin respuesta", summary)
+        self.assertIn("✔ enviadas = válidas en el ESP32", summary)
