@@ -163,6 +163,33 @@ void onGapEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t* parameters
     if (event == ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT && parameters->update_conn_params.status == ESP_BT_STATUS_SUCCESS)
         connIntervalUnits = parameters->update_conn_params.conn_int;
 }
+// **La tabla GATT que guarda el cliente puede ser de otro firmware.** Medido
+// el 27-09-2026: una Mac que se conecto a un firmware antiguo seguia viendo,
+// con 0.7.11 cargado, cuatro caracteristicas (sin la de salud) y la de RTCM sin
+// escritura sin respuesta. Sin emparejamiento la pila no avisa de «servicios
+// cambiados» a nadie. Mandarlo al conectar no basta: el cliente aun no se ha
+// suscrito a ese aviso. Se manda una vez, un rato despues de conectar.
+//
+// **Apagado por defecto** (`-DTRESVIZO_BLE_SERVICE_CHANGED` lo enciende). Con la
+// Mac, el aviso sale (ESP_OK) pero macOS no redescubre; en un iPhone no se ha
+// probado. Si iOS lo atiende, invalida lo descubierto a mitad de sesion y una
+// app que no implemente didModifyServices se quedaria con caracteristicas
+// muertas: no se enciende hasta probarlo con las apps de campo.
+constexpr uint32_t kServiceChangedDelayMs = 1500;
+std::atomic<esp_gatt_if_t> gattsInterface{ESP_GATT_IF_NONE};
+esp_bd_addr_t peerAddress = {};
+uint32_t connectedAtMs = 0;
+bool serviceChangedSent = true;
+#ifdef TRESVIZO_BLE_SERVICE_CHANGED
+esp_err_t serviceChangedResult = ESP_OK;
+#endif
+void onGattsEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gattsIf, esp_ble_gatts_cb_param_t* parameters) {
+    if (event != ESP_GATTS_CONNECT_EVT) return;
+    gattsInterface = gattsIf;
+    memcpy(peerAddress, parameters->connect.remote_bda, sizeof(esp_bd_addr_t));
+    connectedAtMs = millis();
+    serviceChangedSent = false;
+}
 // Hay hueco en la controladora para una notificacion mas en esta conexion.
 bool controllerHasRoom() { return esp_ble_get_cur_sendable_packets_num(connectionId.load()) > 0; }
 void put32(uint8_t* p, int32_t value) {
@@ -277,6 +304,7 @@ void begin(Dispatch dispatch, Authenticate authenticate) {
     // Un cliente que no negocia sigue en 23 y recibe tramas de 20 bytes.
     BLEDevice::setMTU(protocol::kPreferredAttMtu);
     BLEDevice::setCustomGapHandler(onGapEvent);
+    BLEDevice::setCustomGattsHandler(onGattsEvent);
     server = BLEDevice::createServer();
     server->setCallbacks(new ConnectionCallbacks());
     auto service = server->createService(serviceId);
@@ -326,6 +354,13 @@ void tick() {
     if (advertise.exchange(false)) BLEDevice::startAdvertising();
     if (!connected) { pending = ""; offset = 0; return; }
     if (responseGeneration != generation.load()) { pending = ""; offset = 0; }
+#ifdef TRESVIZO_BLE_SERVICE_CHANGED
+    if (!serviceChangedSent && millis() - connectedAtMs >= kServiceChangedDelayMs) {
+        serviceChangedSent = true;
+        const esp_gatt_if_t gattsIf = gattsInterface.load();
+        if (gattsIf != ESP_GATT_IF_NONE) serviceChangedResult = esp_ble_gatts_send_service_change_indication(gattsIf, peerAddress);
+    }
+#endif
     // Orden de prioridad en cada pasada: primero la respuesta a una orden (el
     // telefono espera por ella), luego la telemetria si queda hueco (es estado:
     // si no sale, sale la siguiente, mas nueva), y al final se despacha la
@@ -353,6 +388,9 @@ void status(JsonObject out) {
     out["telemetry_skipped"] = telemetrySkipped.load();
     out["max_loop_gap_ms"] = maxTickGapMs.load();
     out["max_request_dispatch_ms"] = maxDispatchMs.load();
+#ifdef TRESVIZO_BLE_SERVICE_CHANGED
+    out["service_changed_result"] = int(serviceChangedResult);
+#endif
     out["dropped_requests"] = dropped.load();
     // MTU negociado con el telefono conectado (23 = sin negociar) y tramas de
     // respuesta mandadas sin hueco en la controladora (hueco G5).
