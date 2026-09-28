@@ -160,4 +160,6 @@ Estado al cerrar: firmware con 12 pruebas C++ y 85 del banco en Python en verde,
    a un «centro de fase nominal» (ADR-A123, Q-80).
 6. **GPS del teléfono también en Cuenta** (solo Android): quitarlo o dejarlo.
 7. **UART al UM980 a más de 115200**.
-8. **No dar 0.7.11 a quien use una app de `main`**: enseña un aviso rojo de versión que es falso.
+8. **Con 0.7.11, usar las apps de `los-residentes`**: las de `main` enseñan, con razón, un aviso rojo
+   de versión (el equipo anuncia la 3 y ellas conocen la 2); las tramas se leerían bien, pero les
+   falta el latido y el RTCM sin respuesta.
