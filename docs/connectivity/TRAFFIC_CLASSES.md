@@ -13,6 +13,33 @@ y qué prioridad tiene. Nada se trata igual «porque va por el mismo Bluetooth»
 | **DIAGNÓSTICO** | Contadores en `GET /api/ble` y `/api/status`, bytes 17–19 de la salud | ↔ | Por consulta y a 1 Hz | — | CONTROL / telemetría |
 | **IMU futura** | No existe todavía | equipo → teléfono | Ver IMU_READINESS.md | — | — |
 
+## WebSocket (`/ws/telemetry`)
+
+Las mismas cargas que el Bluetooth (trama `0x01` solución y `0x02` salud: el tipo y los 20 bytes
+del BLE) y las mismas reglas de estado: la salud a 1 Hz aunque no haya solución; la solución,
+solo época nueva llegada hace ≤ 500 ms y a ≤ 5 Hz.
+
+- **Envía la tarea httpd, no el bucle principal.** En cada pasada (20 ms) `loopTask` arma lo que
+  toque y lo encola con `httpd_queue_work`; la lista de clientes solo la toca httpd. Hasta
+  0.7.12 enviaba el bucle principal: un cliente que dejaba de confirmar lo paraba hasta 2 s
+  (`send_wait_timeout`), Bluetooth y consola incluidos, y la lista se cambiaba desde dos tareas
+  sin cerrojo.
+- **Una tanda en vuelo como mucho.** Si la anterior no ha salido no se apila otra: nada se da por
+  enviado y en la pasada siguiente se arma lo más nuevo (`sends_deferred`). Lo que espera más de
+  500 ms en la tarea httpd —ocupada con una petición del panel o de la API, que puede esperar
+  hasta 1 s al mutex del instrumento— se tira (`sends_expired`). Es el precio de no tocar sus
+  sesiones desde otra tarea: mientras httpd atiende una petición, la telemetría espera.
+- **Envío sin esperar** (`MSG_DONTWAIT`, `httpd_sess_set_send_override`). Si el búfer TCP del
+  cliente está lleno (5760 bytes, unos 40 s de telemetría sin confirmar) o solo cabe parte de la
+  trama, el cliente se cierra (`clients_dropped`) en el acto en vez de parar la tarea httpd 2 s.
+  Una escritura parcial cuenta como fallo: la capa WebSocket de IDF 4.4 solo mira si el envío dio
+  negativo (comprobado desensamblando `httpd_ws_send_frame_async`), y una trama cortada dejaría
+  el flujo ilegible.
+- Antes de escribir se comprueba que el descriptor sigue siendo un WebSocket
+  (`httpd_ws_get_fd_info`): la sesión puede haberse cerrado y el número, reutilizado.
+- Contadores en `/api/status` → `telemetry_stream`: `clients`, `frames_sent`, `clients_dropped`,
+  `sends_deferred`, `sends_expired`.
+
 ## Qué es estado y qué es evento
 
 - **Estado** (se puede coalescer, vale el último): posición, calidad, satélites, precisión,
