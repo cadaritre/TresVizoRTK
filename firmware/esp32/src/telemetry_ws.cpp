@@ -4,6 +4,7 @@
 #include "gnss_sky.h"
 #include "ble_frames.h"
 #include "health_report.h"
+#include "health_timing.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -20,6 +21,11 @@ httpd_handle_t server = nullptr;
 constexpr size_t kMaxClients = 2;
 int clients[kMaxClients];
 size_t clientCount = 0;
+
+// Cada cuánto se mira si hay algo que mandar, como en Bluetooth. El tope de la
+// solución lo pone `protocol::kMinSolutionIntervalMs`; el de la salud,
+// `protocol::kHealthPeriodMs`.
+constexpr uint32_t kSamplePeriodMs = 20;
 
 uint32_t lastSample = 0, lastHealth = 0, lastEpoch = 0, lastSolution = 0;
 uint16_t sampleSequence = 0;
@@ -133,17 +139,32 @@ void stop() {
 
 void tick() {
     if (!server || !clientCount) return;
-    // Se mira cada 20 ms, como en Bluetooth; el tope de envío lo pone
-    // `protocol::kMinSolutionIntervalMs`, más abajo.
-    if (millis() - lastSample < 20) return;
+    if (millis() - lastSample < kSamplePeriodMs) return;
     lastSample = millis();
 
     const auto snapshot = gnss_receiver::snapshot();
+    // Después de la instantánea: una GGA llegada entre las dos lecturas no puede
+    // quedar «en el futuro» y dar la vuelta a la resta.
+    const uint64_t nowUs = esp_timer_get_time();
+
+    // Salud a 1 Hz, independiente de la solución, igual que por Bluetooth: es
+    // también el latido. Hasta 0.7.12 iba detrás de la puerta de la solución y,
+    // sin GGA, época repetida o tope de 5 Hz, no salía: sin fix el WebSocket se
+    // quedaba sin edad de correcciones ni señal de vida.
+    if (millis() - lastHealth >= protocol::kHealthPeriodMs) {
+        lastHealth = millis();
+        // Armada en `health_report.h`, igual que por Bluetooth; calidad y
+        // precisión caducan a los 2 s de la última GGA y GST.
+        uint8_t report[20];
+        health_report::build(report, snapshot, nowUs);
+        broadcast(kHealth, report);
+    }
+
     const auto& s = snapshot.solution;
     // La misma puerta que el BLE: sin época nueva no se manda nada. Repetir la
     // anterior inflaría la frecuencia medida sin añadir una sola medición.
     if (!snapshot.enabled || !snapshot.accepted || !s.has_utc
-        || esp_timer_get_time() - s.arrival_us > 500000 || s.utc_ms == lastEpoch) return;
+        || nowUs - s.arrival_us > protocol::kSolutionMaxAgeUs || s.utc_ms == lastEpoch) return;
     // Máximo 5 Hz, el mismo tope que el Bluetooth (`protocol::kMinSolutionIntervalMs`).
     if (millis() - lastSolution < protocol::kMinSolutionIntervalMs) return;
     lastSolution = millis();
@@ -163,16 +184,6 @@ void tick() {
     put32(sample + 16, s.has_position && std::isfinite(s.altitude_msl_m)
           && fabs(s.altitude_msl_m) < 2147483.0 ? lround(s.altitude_msl_m * 1000) : INT32_MIN);
     broadcast(kSolution, sample);
-
-    // Salud a 1 Hz, igual que por Bluetooth: la sigma y la antigüedad de las
-    // correcciones no cambian a la velocidad de la posición.
-    if (millis() - lastHealth < 1000) return;
-    lastHealth = millis();
-
-    // Salud: armada en `health_report.h`, igual que por Bluetooth.
-    uint8_t report[20];
-    health_report::build(report, snapshot, esp_timer_get_time());
-    broadcast(kHealth, report);
 }
 
 void status(JsonObject out) {

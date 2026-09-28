@@ -70,7 +70,10 @@ Se notifica únicamente una época nueva con llegada menor a 500 ms, y **como m�
 
 ## Salud (20 bytes, little-endian, 1 Hz)
 
-La misma carga va por el WebSocket `/ws/telemetry` como trama de tipo `0x02`.
+La misma carga va por el WebSocket `/ws/telemetry` como trama de tipo `0x02`,
+**también a 1 Hz y aparte de la solución**, como latido. Hasta 0.7.12, por
+WebSocket la salud solo salía detrás de una solución nueva: sin GGA (sin fix,
+receptor mudo) dejaba de llegar.
 
 | Offset | Tipo | Significado |
 | --- | --- | --- |
