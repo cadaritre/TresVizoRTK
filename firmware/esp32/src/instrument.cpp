@@ -735,6 +735,15 @@ void status(JsonDocument& response) {
     // RTCM aceptado por el router llegó realmente al receptor.
     health["correction_frames_sent"] = gnss.correction_frames_sent;
     health["correction_frames_dropped"] = gnss.correction_frames_dropped;
+    // Desde 0.7.11: el detalle de la cola hacia el UM980 (lib/protocol/src/rtcm_queue.h).
+    // Recibido por la fuente (`corrections.accepted_frames`) = escrito a la UART
+    // (`correction_frames_sent`) + desalojado + caducado + lo que queda en cola.
+    health["correction_bytes_written"] = gnss.correction_bytes_written;
+    health["correction_frames_evicted"] = gnss.correction_frames_evicted;
+    health["correction_frames_expired"] = gnss.correction_frames_expired;
+    health["correction_queue_bytes"] = gnss.correction_queue_bytes;
+    health["correction_queue_high_water_bytes"] = gnss.correction_queue_high_water_bytes;
+    health["correction_queue_capacity_bytes"] = gnss.correction_queue_capacity_bytes;
     // Salud del binario nativo Unicore; es el formato de OBSVMB usado para PPK.
     health["native_frames_valid"] = gnss.native_valid;
     health["native_frames_invalid"] = gnss.native_invalid;

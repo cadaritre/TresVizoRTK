@@ -63,6 +63,19 @@ inline uint16_t sigmaToMm(double metres) {
 // y entonces los bytes 1-4 son la sigma cruda (hasta 0.7.7).
 constexpr uint8_t kFlagDisplayPrecision = 0x01;  // bytes 1-4 = precision mostrada por Meridian V
 constexpr uint8_t kFlagRawPrecision = 0x02;      // bytes 12-15 = sigma cruda del UM980
+// Desde 0.7.11: bytes 17-19 = contadores de RTCM del equipo. Sin la bandera,
+// esos bytes son 0 y no significan nada (firmware anterior).
+constexpr uint8_t kFlagRtcmCounters = 0x04;
+
+// Ocupacion de la cola de correcciones hacia el UM980, en por ciento, para el
+// byte 19. Redondea hacia arriba: una cola con algo dentro nunca dice 0. Sin
+// cola (UART sin configurar) no hay cifra: 255.
+constexpr uint8_t kUnknownPercent = 255;
+inline uint8_t queuePercent(uint32_t usedBytes, uint32_t capacityBytes) {
+    if (!capacityBytes) return kUnknownPercent;
+    const uint64_t percent = (uint64_t(usedBytes) * 100 + capacityBytes - 1) / capacityBytes;
+    return uint8_t(percent > 100 ? 100 : percent);
+}
 
 struct HealthInputs {
     uint16_t um980RawHorizontalSigmaMm = kUnknownMm;  // peor eje, max(sigma N, sigma E)
@@ -73,6 +86,15 @@ struct HealthInputs {
     uint8_t quality = 0;
     uint8_t tracked = 255;                            // 255 = sin GSV reciente
     uint8_t visible = 255;                            // 255 = desconocido (sin orbitas o sin posicion)
+    // Contadores de RTCM (bytes 17-19), para que el telefono sepa si las
+    // correcciones que manda llegan al receptor sin tener que pedir el estado.
+    // Los dos primeros son **contadores que dan la vuelta a 256**: la app mira
+    // la diferencia entre dos paquetes, no el valor. A 1 Hz y con menos de diez
+    // tramas por segundo no pueden dar la vuelta entre dos paquetes.
+    bool hasRtcmCounters = false;
+    uint8_t rtcmFramesDiscarded = 0;   // desalojadas o caducadas camino del UM980
+    uint8_t rtcmFramesRejected = 0;    // descartadas por CRC o formato al llegar
+    uint8_t rtcmQueuePercent = kUnknownPercent;
 };
 
 inline void put16(uint8_t* target, uint16_t value) {
@@ -94,5 +116,11 @@ inline void encodeHealth(uint8_t report[20], const HealthInputs& in) {
     put16(report + 12, in.um980RawHorizontalSigmaMm);
     put16(report + 14, in.um980RawVerticalSigmaMm);
     report[16] = kFlagDisplayPrecision | kFlagRawPrecision;
+    if (in.hasRtcmCounters) {
+        report[16] |= kFlagRtcmCounters;
+        report[17] = in.rtcmFramesDiscarded;
+        report[18] = in.rtcmFramesRejected;
+        report[19] = in.rtcmQueuePercent;
+    }
 }
 }  // namespace protocol

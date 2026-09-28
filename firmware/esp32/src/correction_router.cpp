@@ -52,6 +52,7 @@ bool submit(Source source, const uint8_t* frame, size_t length) {
     lastAccepted = millis(); ++accepted; return true;
 }
 uint32_t generation() { return revision; }
+uint32_t rejectedFrames() { return rejected; }
 uint32_t ageMs() {
     const uint32_t mark = lastAccepted.load();
     if (selected == Source::None || !mark) return UINT32_MAX;

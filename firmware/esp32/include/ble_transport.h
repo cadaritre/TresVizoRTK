@@ -11,4 +11,7 @@ void status(JsonObject out);
 // PIN se retiraron por decisión del propietario: la app de campo se conecta sin
 // pasos previos y la única barrera es el alcance de la radio.
 int request(const String& method, JsonVariantConst body, JsonDocument& out);
+// Tramas RTCM que llegaron por Bluetooth con CRC o formato malos: el rearmado
+// las tira antes de que lleguen al router. Para el byte 18 del paquete de salud.
+uint32_t rtcmParserRejected();
 }

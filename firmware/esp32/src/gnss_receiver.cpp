@@ -8,6 +8,7 @@
 #include "wire_filter.h"
 #include "rtcm3.h"
 #include "correction_output.h"
+#include "rtcm_queue.h"
 #ifdef TRESVIZO_TASK_WDT
 #include <esp_task_wdt.h>
 #endif
@@ -25,11 +26,24 @@ portMUX_TYPE lock = portMUX_INITIALIZER_UNLOCKED;
 Snapshot state;
 #ifdef TRESVIZO_GNSS_CONFIGURED
 HardwareSerial uart(2);
-struct Correction { uint32_t arrival, generation; uint16_t length; uint8_t bytes[1029]; };
-QueueHandle_t corrections = nullptr;
+// Correcciones camino del UM980: cola **por bytes** (lib/protocol/src/rtcm_queue.h).
+// Hasta 0.7.10 eran cuatro tramas y una época MSM de cuatro constelaciones son
+// de 6 a 10: la UART a 115200 (≈11.5 kB/s) no alcanzaba a vaciarlas cuando
+// llegaban de golpe y se tiraban tramas en cada época. 8 KiB caben una época
+// completa del peor caso (MSM7, cuatro constelaciones, 1005/1033/1230, unos
+// 6 kB) mientras la anterior aún sale, y equivalen a unos 0.7 s de UART: más
+// no sirve, porque lo que espere más de kCorrectionMaxAgeMs se tira igual.
+constexpr size_t kCorrectionQueueBytes = 8192;
+// Una corrección que esperó más que esto ya no ayuda al receptor: el UM980
+// trabaja con la época más reciente y las viejas solo le quitan UART.
+constexpr uint32_t kCorrectionMaxAgeMs = 2000;
+protocol::RtcmFrameQueue<kCorrectionQueueBytes> corrections;
+// Productores: el Bluetooth (tarea de Bluedroid) y NTRIP; consumidor: gnss_rx.
+portMUX_TYPE correctionsLock = portMUX_INITIALIZER_UNLOCKED;
+struct Outbound { uint16_t length; uint8_t bytes[protocol::RtcmFrameQueue<kCorrectionQueueBytes>::kMaxFrameBytes]; };
 
-// Fuera de la pila de la tarea: la trama son 1029 bytes y "gnss_rx" tiene 4 KiB.
-Correction outbound = {};
+// Fuera de la pila de la tarea: la trama son 1029 bytes.
+Outbound outbound = {};
 constexpr size_t kBlock = 512;
 uint8_t rawBlock[kBlock];
 char textBlock[kBlock];
@@ -89,20 +103,28 @@ void acquire(void*) {
             if (textLength) gnss_control::feed(textBlock, textLength);
         }
         if (!outbound.length) gnss_control::tick(uart);
-        if (!gnss_control::busy() && !outbound.length && xQueueReceive(corrections, &outbound, 0) == pdTRUE) sent = 0;
+        // Las órdenes de configuración al UM980 van por la misma UART: mientras
+        // haya una en curso no se empieza otra trama, para no intercalar bytes.
+        if (!gnss_control::busy() && !outbound.length) {
+            // La caducidad y la generación se miran **al sacar**, antes del
+            // primer byte. Una trama empezada se termina siempre: dejarla a
+            // medias en la UART le costaría al UM980 también la siguiente.
+            portENTER_CRITICAL(&correctionsLock);
+            outbound.length = uint16_t(corrections.pop(outbound.bytes, millis(), kCorrectionMaxAgeMs, correction_router::generation()));
+            portEXIT_CRITICAL(&correctionsLock);
+            sent = 0;
+        }
         if (outbound.length) {
-            if (millis() - outbound.arrival > 2000 || outbound.generation != correction_router::generation()) {
-                portENTER_CRITICAL(&lock); ++state.correction_frames_dropped; portEXIT_CRITICAL(&lock);
+            const size_t remaining = outbound.length - sent;
+            const size_t available = uart.availableForWrite();
+            const size_t count = std::min<size_t>(128, std::min(remaining, available));
+            if (count) sent += uart.write(outbound.bytes + sent, count);
+            if (sent == outbound.length) {
+                portENTER_CRITICAL(&lock);
+                ++state.correction_frames_sent;
+                state.correction_bytes_written += outbound.length;
+                portEXIT_CRITICAL(&lock);
                 outbound.length = 0;
-            } else {
-                const size_t remaining = outbound.length - sent;
-                const size_t available = uart.availableForWrite();
-                const size_t count = std::min<size_t>(128, std::min(remaining, available));
-                if (count) sent += uart.write(outbound.bytes + sent, count);
-                if (sent == outbound.length) {
-                    portENTER_CRITICAL(&lock); ++state.correction_frames_sent; portEXIT_CRITICAL(&lock);
-                    outbound.length = 0;
-                }
             }
         }
         portENTER_CRITICAL(&lock);
@@ -134,13 +156,6 @@ void begin() {
         ++state.uart_errors;
         portEXIT_CRITICAL(&lock);
     });
-    corrections = xQueueCreate(4, sizeof(Correction));
-    if (!corrections) {
-        portENTER_CRITICAL(&lock);
-        state.start_failed = true;
-        portEXIT_CRITICAL(&lock);
-        return;
-    }
     uart.begin(TRESVIZO_GNSS_BAUD, SERIAL_8N1, TRESVIZO_GNSS_RX, TRESVIZO_GNSS_TX);
     // La tarea UART no depende del temporizador HTTP ni del mutex de configuración.
     //
@@ -161,10 +176,13 @@ void begin() {
 bool enqueueCorrections(const uint8_t* data, size_t length) {
 #ifdef TRESVIZO_GNSS_CONFIGURED
     if (length > 1029 || length < 6 || !snapshot().enabled) return false;
-    Correction frame = {}; frame.arrival = millis(); frame.generation = correction_router::generation(); frame.length = length;
-    memcpy(frame.bytes, data, length);
-    if (xQueueSend(corrections, &frame, 0) == pdTRUE) return true;
-    portENTER_CRITICAL(&lock); ++state.correction_frames_dropped; portEXIT_CRITICAL(&lock);
+    // Siempre entra: si no cabe, la cola desaloja las tramas más viejas y lo
+    // cuenta (`correction_frames_evicted`). La nueva vale más que la atrasada.
+    size_t evicted = 0;
+    portENTER_CRITICAL(&correctionsLock);
+    const bool queued = corrections.push(data, length, millis(), correction_router::generation(), evicted);
+    portEXIT_CRITICAL(&correctionsLock);
+    return queued;
 #else
     (void)data; (void)length;
 #endif
@@ -174,6 +192,18 @@ Snapshot snapshot() {
     portENTER_CRITICAL(&lock);
     Snapshot copy = state;
     portEXIT_CRITICAL(&lock);
+#ifdef TRESVIZO_GNSS_CONFIGURED
+    portENTER_CRITICAL(&correctionsLock);
+    const auto counters = corrections.counters();
+    copy.correction_queue_bytes = corrections.usedBytes();
+    copy.correction_queue_high_water_bytes = corrections.highWaterBytes();
+    portEXIT_CRITICAL(&correctionsLock);
+    copy.correction_queue_capacity_bytes = kCorrectionQueueBytes;
+    copy.correction_frames_evicted = counters.framesEvicted;
+    copy.correction_frames_expired = counters.framesExpired + counters.framesTooLarge;
+    // El total de siempre: todo lo que entró a la cola y no llegó al UM980.
+    copy.correction_frames_dropped = copy.correction_frames_evicted + copy.correction_frames_expired;
+#endif
     return copy;
 }
 }

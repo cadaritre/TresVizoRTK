@@ -79,6 +79,24 @@ int main() {
     assert(report[16] == (protocol::kFlagDisplayPrecision | protocol::kFlagRawPrecision));
     for (unsigned i = 17; i < 20; ++i) assert(report[i] == 0);
 
+    // Desde 0.7.11: contadores de RTCM en 17-19, con su bandera. Sin la bandera,
+    // los bytes siguen en 0 (lo de arriba).
+    {
+        protocol::HealthInputs c;
+        c.hasRtcmCounters = true;
+        c.rtcmFramesDiscarded = uint8_t(300);  // da la vuelta: 300 mod 256 = 44
+        c.rtcmFramesRejected = 3;
+        c.rtcmQueuePercent = protocol::queuePercent(4100, 8192);
+        uint8_t r[20];
+        protocol::encodeHealth(r, c);
+        assert(r[16] == (protocol::kFlagDisplayPrecision | protocol::kFlagRawPrecision | protocol::kFlagRtcmCounters));
+        assert(r[17] == 44 && r[18] == 3 && r[19] == 51);
+    }
+    assert(protocol::queuePercent(0, 8192) == 0);
+    assert(protocol::queuePercent(1, 8192) == 1);        // algo dentro nunca es 0
+    assert(protocol::queuePercent(8192, 8192) == 100);
+    assert(protocol::queuePercent(10, 0) == protocol::kUnknownPercent);
+
     std::printf("health_packet_test OK\n");
     return 0;
 }

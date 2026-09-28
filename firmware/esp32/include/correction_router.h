@@ -23,4 +23,7 @@ uint32_t generation();
 uint32_t ageMs();
 // Fuente activa como número, para el paquete BLE: 0 ninguna, 1 BLE, 2 NTRIP, 3 radio.
 uint8_t sourceCode();
+// Tramas rechazadas al entrar (fuente no seleccionada, formato, CRC o sin UART),
+// de todas las fuentes. Para el byte 18 del paquete de salud.
+uint32_t rejectedFrames();
 }

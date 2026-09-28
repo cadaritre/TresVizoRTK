@@ -46,6 +46,32 @@ constexpr uint32_t kFlowControlMaxWaitMs = 50;
 // peticiones y este numero sube, la causa es esta y no la antena ni la
 // distancia. Si se queda en cero, los 50 ms bastan.
 std::atomic<uint32_t> forcedFrames{0};
+// Conexion rapida para ordenes y correcciones: 15 a 30 ms, en unidades de
+// 1.25 ms. Dentro de lo que Apple admite para accesorios (minimo >= 15 ms y
+// multiplo de 15, maximo >= minimo + 15, latencia <= 30, supervision de 2 a 6 s
+// y maximo * (latencia + 1) * 3 < supervision). Android lo acepta o lo ajusta.
+// Sin pedirlo, iOS se queda en 30 ms y Android en unos 45 ms: una orden con
+// respuesta tarda al menos dos intervalos en ir y volver.
+constexpr uint16_t kConnIntervalMinUnits = 12;   // 15 ms
+constexpr uint16_t kConnIntervalMaxUnits = 24;   // 30 ms
+constexpr uint16_t kPeripheralLatency = 0;       // el equipo contesta en cada evento: latencia de ordenes minima
+constexpr uint16_t kSupervisionTimeoutUnits = 400;  // 4 s, en unidades de 10 ms
+// Intervalo de conexion vigente, en unidades de 1.25 ms (0 = no se sabe).
+std::atomic<uint16_t> connIntervalUnits{0};
+// Paquete de salud: 1 Hz **siempre** que haya alguien conectado, haya posicion
+// o no. Hasta 0.7.10 solo salia detras de una solucion nueva y sin fix no
+// llegaba ni la edad de las correcciones ni señal de vida. Ahora es tambien el
+// latido del protocolo: 20 bytes por segundo, que ya se mandaban.
+constexpr uint32_t kHealthPeriodMs = 1000;
+// Telemetria que no salio porque la controladora no tenia hueco. Es estado: se
+// manda la siguiente epoca (la mas nueva), no se encola la vieja. Si sube mucho,
+// la radio va saturada.
+std::atomic<uint32_t> telemetrySkipped{0};
+// Mediciones del propio transporte, desde la ultima conexion: el mayor hueco
+// entre dos pasadas del bucle (si pasa de unos 50 ms, algo bloquea el bucle y
+// retrasa posicion y respuestas) y la orden mas lenta en despacharse.
+std::atomic<uint32_t> maxTickGapMs{0}, maxDispatchMs{0};
+uint32_t lastTickMs = 0;
 bool ready = false;
 Preferences settings;
 String pending;
@@ -60,7 +86,16 @@ class ConnectionCallbacks : public BLEServerCallbacks {
         // barrera que queda es el alcance de la radio.
         connectionId = parameters->connect.conn_id;
         attMtu = protocol::kMinimumAttMtu;
+        connIntervalUnits = parameters->connect.conn_params.interval;
+        maxTickGapMs = 0; maxDispatchMs = 0; lastTickMs = 0;
         ++generation; connected = true; authorized = true;
+        esp_ble_conn_update_params_t wanted = {};
+        memcpy(wanted.bda, parameters->connect.remote_bda, sizeof(esp_bd_addr_t));
+        wanted.min_int = kConnIntervalMinUnits;
+        wanted.max_int = kConnIntervalMaxUnits;
+        wanted.latency = kPeripheralLatency;
+        wanted.timeout = kSupervisionTimeoutUnits;
+        esp_ble_gap_update_conn_params(&wanted);
     }
     // El telefono negocia el MTU nada mas conectarse; iPhone pide 185 o mas.
     void onMtuChanged(BLEServer*, esp_ble_gatts_cb_param_t* parameters) override {
@@ -68,6 +103,7 @@ class ConnectionCallbacks : public BLEServerCallbacks {
     }
     void onDisconnect(BLEServer*) override {
         attMtu = protocol::kMinimumAttMtu;
+        connIntervalUnits = 0;
         ++generation; connected = false; authorized = false;
         // Solo volver a anunciarse si el transporte sigue habilitado.
         advertise = enabled.load();
@@ -122,9 +158,109 @@ class CorrectionCallbacks : public BLECharacteristicCallbacks {
         correctionAccepted = parser.accepted; correctionRejected = parser.rejected;
     }
 };
+// El intervalo que de verdad quedo tras negociar (el telefono decide).
+void onGapEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t* parameters) {
+    if (event == ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT && parameters->update_conn_params.status == ESP_BT_STATUS_SUCCESS)
+        connIntervalUnits = parameters->update_conn_params.conn_int;
+}
+// Hay hueco en la controladora para una notificacion mas en esta conexion.
+bool controllerHasRoom() { return esp_ble_get_cur_sendable_packets_num(connectionId.load()) > 0; }
 void put32(uint8_t* p, int32_t value) {
     const uint32_t encoded = static_cast<uint32_t>(value);
     for (int i = 0; i < 4; ++i) p[i] = encoded >> (8*i);
+}
+void sendResponseFrame() {
+    // Tramas del tamano del MTU negociado: con 247, una respuesta de 2 kB son 9
+    // tramas en vez de 134. Con 23 siguen siendo de 20 bytes.
+    //
+    // Y solo si la controladora tiene hueco para esta conexion, como hace el
+    // ejemplo de caudal de ESP-IDF: una notificacion que no cabe se pierde en
+    // silencio, y la app descarta la respuesta entera por el hueco en los
+    // desplazamientos. Con tramas de 244 el riesgo de llenarla es mucho mayor
+    // que con las de 20.
+    const bool due = !pending.isEmpty() && millis() - lastSend >= 5;
+    const bool room = due && controllerHasRoom();
+    if (due && (room || millis() - lastSend >= kFlowControlMaxWaitMs)) {
+        if (!room) ++forcedFrames;
+        uint8_t frame[protocol::kMaxNotificationBytes];
+        const size_t length = protocol::encodeResponseFrame(frame, messageId, offset, pending.c_str(), pending.length(),
+                                                            protocol::responsePayloadBytes(attMtu.load()));
+        responses->setValue(frame, length); responses->notify();
+        offset += length - protocol::kResponseHeaderBytes; lastSend = millis();
+        if (offset == pending.length()) pending = "";
+    }
+}
+void publishTelemetry() {
+    if (!authorized || millis() - lastSample < 20) return;
+    lastSample = millis();
+    const auto snapshot = gnss_receiver::snapshot();
+    // Salud a 1 Hz, independiente de la posicion: es tambien el latido.
+    if (millis() - lastHealth >= kHealthPeriodMs) {
+        if (controllerHasRoom()) {
+            lastHealth = millis();
+            // Armada en `health_report.h`, igual que por WebSocket. Bytes 1-4 =
+            // precision mostrada por Meridian V; 12-15 = sigma cruda del UM980;
+            // 17-19 = contadores de RTCM.
+            uint8_t report[20];
+            health_report::build(report, snapshot);
+            health->setValue(report, sizeof(report)); health->notify();
+        } else ++telemetrySkipped;
+    }
+    const auto& s = snapshot.solution;
+    if (!snapshot.enabled || !snapshot.accepted || !s.has_utc || esp_timer_get_time() - s.arrival_us > 500000 || s.utc_ms == lastEpoch) return;
+    // Máximo 5 Hz (`protocol::kMinSolutionIntervalMs`). Se sigue mirando cada
+    // 20 ms para mandar cada época en cuanto se puede, no con retraso.
+    if (millis() - lastSolution < protocol::kMinSolutionIntervalMs) return;
+    // Sin hueco no se fuerza: la epoca se da por no enviada y en la siguiente
+    // pasada se manda la mas nueva que haya.
+    if (!controllerHasRoom()) { ++telemetrySkipped; return; }
+    lastSolution = millis();
+    lastEpoch = s.utc_ms;
+    uint8_t sample[20] = {};
+    ++sampleSequence;
+    sample[0] = sampleSequence; sample[1] = sampleSequence >> 8;
+    sample[2] = s.quality;
+    // Satélites **usados** en la solución (GGA), como dice el protocolo desde el
+    // principio: las apps los guardan con cada punto. En 0.7.5 y 0.7.6 iban aquí
+    // los rastreados y los puntos se registraban con la cifra equivocada; los
+    // rastreados van en el byte 10 de la salud. 255 = desconocido.
+    sample[3] = s.has_satellites ? uint8_t(std::min(s.satellites, 254u)) : 255;
+    put32(sample + 4, s.utc_ms);
+    put32(sample + 8, s.has_position ? lround(s.latitude_deg * 1e7) : INT32_MIN);
+    put32(sample + 12, s.has_position ? lround(s.longitude_deg * 1e7) : INT32_MIN);
+    put32(sample + 16, s.has_position && std::isfinite(s.altitude_msl_m) && fabs(s.altitude_msl_m) < 2147483.0 ? lround(s.altitude_msl_m * 1000) : INT32_MIN);
+    solutions->setValue(sample, sizeof(sample)); solutions->notify();
+}
+void dispatchNextRequest() {
+    Request request;
+    if (xQueueReceive(requests, &request, 0) != pdTRUE) return;
+    if (request.generation != generation.load() || millis() - request.arrival > 5000) { ++dropped; return; }
+    const uint32_t startedMs = millis();
+    JsonDocument input, output, body;
+    const auto error = deserializeJson(input, request.json, DeserializationOption::NestingLimit(5));
+    int code = 400;
+    if (error || !input.is<JsonObject>() || !input["id"].is<uint32_t>()) {
+        body["error"] = "invalid_request";
+    } else {
+        output["id"] = input["id"];
+        if (!authenticateRequest(input["key"] | "")) {
+            code = 401; body["error"] = "unauthorized";
+        } else {
+            authorized = true;
+            const String method = input["method"] | "";
+            const String path = input["path"] | "";
+            // La recuperación/cambio de credenciales permanece exclusivamente por USB.
+            if (path == "/api/recording/read" || path == "/api/access" || (path.startsWith("/api/update/") && method != "GET") || (method != "GET" && method != "POST" && method != "PUT")) {
+                code = 400; body["error"] = "unsupported_operation";
+            } else code = dispatchRequest(method, path, input["body"].as<JsonVariantConst>(), body);
+        }
+    }
+    output["status"] = code; output["body"] = body;
+    serializeJson(output, pending);
+    if (pending.length() > 4096) pending = "{\"status\":413,\"body\":{\"error\":\"response_too_large\"}}";
+    responseGeneration = request.generation; offset = 0; ++messageId;
+    const uint32_t took = millis() - startedMs;
+    if (took > maxDispatchMs.load()) maxDispatchMs = took;
 }
 }
 void begin(Dispatch dispatch, Authenticate authenticate) {
@@ -140,6 +276,7 @@ void begin(Dispatch dispatch, Authenticate authenticate) {
     // Ofrecer un MTU mayor (hueco G5): el telefono elige el menor de los dos.
     // Un cliente que no negocia sigue en 23 y recibe tramas de 20 bytes.
     BLEDevice::setMTU(protocol::kPreferredAttMtu);
+    BLEDevice::setCustomGapHandler(onGapEvent);
     server = BLEDevice::createServer();
     server->setCallbacks(new ConnectionCallbacks());
     auto service = server->createService(serviceId);
@@ -150,7 +287,15 @@ void begin(Dispatch dispatch, Authenticate authenticate) {
     responses->addDescriptor(new BLE2902());
     solutions = service->createCharacteristic(solutionId, BLECharacteristic::PROPERTY_NOTIFY);
     solutions->addDescriptor(new BLE2902());
-    auto corrections = service->createCharacteristic(correctionId, BLECharacteristic::PROPERTY_WRITE);
+    // Con y **sin** respuesta (desde 0.7.11). En ATT solo cabe una escritura con
+    // respuesta en vuelo por enlace, asi que el RTCM y las ordenes iban por un
+    // solo carril; y la respuesta ATT la manda la biblioteca **antes** de
+    // llamar a onWrite, de modo que nunca decia que la trama hubiera entrado a
+    // la cola del UM980. Sin respuesta, el RTCM deja libre el carril de las
+    // ordenes; la perdida se ve en los contadores (salud, bytes 17-19, y
+    // /api/status). Las apps viejas siguen escribiendo con respuesta.
+    auto corrections = service->createCharacteristic(correctionId,
+        BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_WRITE_NR);
     corrections->setAccessPermissions(ESP_GATT_PERM_WRITE);
     corrections->setCallbacks(new CorrectionCallbacks());
     // Salud del equipo, aparte de la posición: precisión estimada, antigüedad de
@@ -168,6 +313,9 @@ void begin(Dispatch dispatch, Authenticate authenticate) {
 }
 void tick() {
     if (!ready) return;
+    const uint32_t tickMs = millis();
+    if (connected && lastTickMs && tickMs - lastTickMs > maxTickGapMs.load()) maxTickGapMs = tickMs - lastTickMs;
+    lastTickMs = connected ? tickMs : 0;
     // Apagado: dejar de anunciarse y soltar a quien esté conectado. La radio BLE
     // del SDK no se desinicializa aquí: hacerlo y rehacerlo fragmenta el heap.
     if (!enabled) {
@@ -178,95 +326,33 @@ void tick() {
     if (advertise.exchange(false)) BLEDevice::startAdvertising();
     if (!connected) { pending = ""; offset = 0; return; }
     if (responseGeneration != generation.load()) { pending = ""; offset = 0; }
-    if (pending.isEmpty()) {
-        Request request;
-        if (xQueueReceive(requests, &request, 0) == pdTRUE) {
-            if (request.generation != generation.load() || millis() - request.arrival > 5000) { ++dropped; return; }
-            JsonDocument input, output, body;
-            const auto error = deserializeJson(input, request.json, DeserializationOption::NestingLimit(5));
-            int code = 400;
-            if (error || !input.is<JsonObject>() || !input["id"].is<uint32_t>()) {
-                body["error"] = "invalid_request";
-            } else {
-                output["id"] = input["id"];
-                if (!authenticateRequest(input["key"] | "")) {
-                    code = 401; body["error"] = "unauthorized";
-                } else {
-                    authorized = true;
-                    const String method = input["method"] | "";
-                    const String path = input["path"] | "";
-                    // La recuperación/cambio de credenciales permanece exclusivamente por USB.
-                    if (path == "/api/recording/read" || path == "/api/access" || (path.startsWith("/api/update/") && method != "GET") || (method != "GET" && method != "POST" && method != "PUT")) {
-                        code = 400; body["error"] = "unsupported_operation";
-                    } else code = dispatchRequest(method, path, input["body"].as<JsonVariantConst>(), body);
-                }
-            }
-            output["status"] = code; output["body"] = body;
-            serializeJson(output, pending);
-            if (pending.length() > 4096) pending = "{\"status\":413,\"body\":{\"error\":\"response_too_large\"}}";
-            responseGeneration = request.generation; offset = 0; ++messageId;
-        }
-    }
-    // Tramas del tamano del MTU negociado: con 247, una respuesta de 2 kB son 9
-    // tramas en vez de 134. Con 23 siguen siendo de 20 bytes.
-    //
-    // Y solo si la controladora tiene hueco para esta conexion, como hace el
-    // ejemplo de caudal de ESP-IDF: una notificacion que no cabe se pierde en
-    // silencio, y la app descarta la respuesta entera por el hueco en los
-    // desplazamientos. Con tramas de 244 el riesgo de llenarla es mucho mayor
-    // que con las de 20.
-    const bool due = !pending.isEmpty() && millis() - lastSend >= 5;
-    const bool room = due && esp_ble_get_cur_sendable_packets_num(connectionId.load()) > 0;
-    if (due && (room || millis() - lastSend >= kFlowControlMaxWaitMs)) {
-        if (!room) ++forcedFrames;
-        uint8_t frame[protocol::kMaxNotificationBytes];
-        const size_t length = protocol::encodeResponseFrame(frame, messageId, offset, pending.c_str(), pending.length(),
-                                                            protocol::responsePayloadBytes(attMtu.load()));
-        responses->setValue(frame, length); responses->notify();
-        offset += length - protocol::kResponseHeaderBytes; lastSend = millis();
-        if (offset == pending.length()) pending = "";
-    }
-    if (!authorized || millis() - lastSample < 20) return;
-    lastSample = millis();
-    const auto snapshot = gnss_receiver::snapshot();
-    const auto& s = snapshot.solution;
-    if (!snapshot.enabled || !snapshot.accepted || !s.has_utc || esp_timer_get_time() - s.arrival_us > 500000 || s.utc_ms == lastEpoch) return;
-    // Máximo 5 Hz (`protocol::kMinSolutionIntervalMs`). Se sigue mirando cada
-    // 20 ms para mandar cada época en cuanto se puede, no con retraso.
-    if (millis() - lastSolution < protocol::kMinSolutionIntervalMs) return;
-    lastSolution = millis();
-    lastEpoch = s.utc_ms;
-    uint8_t sample[20] = {};
-    ++sampleSequence;
-    sample[0] = sampleSequence; sample[1] = sampleSequence >> 8;
-    sample[2] = s.quality;
-    // Satélites **usados** en la solución (GGA), como dice el protocolo desde el
-    // principio: las apps los guardan con cada punto. En 0.7.5 y 0.7.6 iban aquí
-    // los rastreados y los puntos se registraban con la cifra equivocada; los
-    // rastreados van en el byte 10 de la salud. 255 = desconocido.
-    sample[3] = s.has_satellites ? uint8_t(std::min(s.satellites, 254u)) : 255;
-    put32(sample + 4, s.utc_ms);
-    put32(sample + 8, s.has_position ? lround(s.latitude_deg * 1e7) : INT32_MIN);
-    put32(sample + 12, s.has_position ? lround(s.longitude_deg * 1e7) : INT32_MIN);
-    put32(sample + 16, s.has_position && std::isfinite(s.altitude_msl_m) && fabs(s.altitude_msl_m) < 2147483.0 ? lround(s.altitude_msl_m * 1000) : INT32_MIN);
-    solutions->setValue(sample, sizeof(sample)); solutions->notify();
-    // Salud a 1 Hz: la sigma y la antigüedad de correcciones no cambian a la
-    // velocidad de la posición y mandarlas a 10 Hz solo gastaría radio.
-    if (millis() - lastHealth < 1000) return;
-    lastHealth = millis();
-    // Salud: armada en `health_report.h`, igual que por WebSocket. Bytes 1-4 =
-    // precision mostrada por Meridian V; 12-15 = sigma cruda del UM980.
-    uint8_t report[20];
-    health_report::build(report, snapshot);
-    health->setValue(report, sizeof(report)); health->notify();
+    // Orden de prioridad en cada pasada: primero la respuesta a una orden (el
+    // telefono espera por ella), luego la telemetria si queda hueco (es estado:
+    // si no sale, sale la siguiente, mas nueva), y al final se despacha la
+    // siguiente orden. Asi la telemetria nunca empuja a una respuesta, y una
+    // orden lenta no retrasa la posicion que ya estaba lista.
+    sendResponseFrame();
+    publishTelemetry();
+    if (pending.isEmpty()) dispatchNextRequest();
 }
+
 void status(JsonObject out) {
     out["state"] = !ready ? "start_failed" : (!enabled ? "disabled" : (connected ? "connected" : "advertising"));
     out["enabled"] = enabled.load();
     // Sin emparejamiento ni PIN por decisión del propietario: cualquier equipo
     // dentro del alcance puede escribir, incluidas las correcciones.
     out["pairing_required"] = false;
-    out["protocol_version"] = 2;
+    // 3 desde 0.7.11: RTCM con escritura sin respuesta, salud a 1 Hz siempre y
+    // contadores de RTCM en sus bytes 17-19. Todo aditivo: una app de la
+    // version 2 sigue funcionando igual.
+    out["protocol_version"] = 3;
+    out["rtcm_write_without_response"] = true;
+    out["health_period_ms"] = kHealthPeriodMs;
+    const uint16_t interval = connIntervalUnits.load();
+    if (connected && interval) out["conn_interval_ms"] = interval * 1.25; else out["conn_interval_ms"] = nullptr;
+    out["telemetry_skipped"] = telemetrySkipped.load();
+    out["max_loop_gap_ms"] = maxTickGapMs.load();
+    out["max_request_dispatch_ms"] = maxDispatchMs.load();
     out["dropped_requests"] = dropped.load();
     // MTU negociado con el telefono conectado (23 = sin negociar) y tramas de
     // respuesta mandadas sin hueco en la controladora (hueco G5).
@@ -280,6 +366,7 @@ void status(JsonObject out) {
     out["file_download_available"] = false;
     out["telemetry_hardware_validated"] = false;
 }
+uint32_t rtcmParserRejected() { return correctionRejected.load(); }
 int request(const String& method, JsonVariantConst body, JsonDocument& out) {
     if (method == "GET") { status(out.to<JsonObject>()); return 200; }
     if (method != "POST" || !body.is<JsonObjectConst>() || body.size() != 1) return 400;

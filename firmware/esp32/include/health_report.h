@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <cstdint>
+#include "ble_transport.h"
 #include "correction_router.h"
 #include "gnss_receiver.h"
 #include "gnss_sky.h"
@@ -35,6 +36,14 @@ inline void build(uint8_t report[20], const gnss_receiver::Snapshot& snapshot) {
     // Satelites **visibles** (geometria sobre la mascara). 255 = no se sabe.
     unsigned visible = 0;
     in.visible = gnss_visible::visible(visible) ? uint8_t(std::min(visible, 254u)) : 255;
+    // Contadores de RTCM (desde 0.7.11): lo que el equipo tiró camino del UM980
+    // y lo que llegó corrupto. Sin UART configurada no hay cola y no se mandan.
+    if (snapshot.correction_queue_capacity_bytes) {
+        in.hasRtcmCounters = true;
+        in.rtcmFramesDiscarded = uint8_t(snapshot.correction_frames_dropped);
+        in.rtcmFramesRejected = uint8_t(correction_router::rejectedFrames() + ble_transport::rtcmParserRejected());
+        in.rtcmQueuePercent = protocol::queuePercent(snapshot.correction_queue_bytes, snapshot.correction_queue_capacity_bytes);
+    }
     protocol::encodeHealth(report, in);
 }
 
