@@ -4,7 +4,7 @@ Estado al 27-09-2026 por la noche. **Nada se da por pasado sin evidencia.** El e
 por USB en la Mac, bajo techo (sin fix), con firmware 0.7.11 de `los-residentes`; el cliente BLE
 fue la Mac (CoreBluetooth, app de banco hecha para esto), que tiene la tabla GATT del equipo en
 caché de un firmware viejo (ver KNOWN_LIMITATIONS.md). Cómo correr cada prueba:
-[ACCEPTANCE_PROCEDURES.md](ACCEPTANCE_PROCEDURES.md) y `tools/ble_bench/` (Barry).
+[ACCEPTANCE_PROCEDURES.md](ACCEPTANCE_PROCEDURES.md) y `tools/ble_bench/` (Python) o `tools/ble_bench_mac/` (CoreBluetooth).
 
 | # | Prueba | Se espera | Resultado de hoy | Estado |
 | --- | --- | --- | --- | --- |

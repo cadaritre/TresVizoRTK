@@ -25,7 +25,7 @@ tiraban tramas **en cada época**.
 receptor descarta las correcciones viejas por sí mismo. Nunca se parte una trama: una trama a
 medias en la UART le cuesta al UM980 también la siguiente, y una trama empezada se termina.
 
-## Del lado del teléfono (lo implementan Jill y Chris)
+## Del lado del teléfono (las dos apps)
 
 | Cola | Capacidad | Al llenarse | Caducidad | Se ve en |
 | --- | --- | --- | --- | --- |

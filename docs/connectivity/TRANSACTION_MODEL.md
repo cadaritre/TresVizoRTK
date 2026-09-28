@@ -20,7 +20,7 @@ banderas de inicio y final. No es «mandar, esperar un rato y suponer». No se r
 - **Una finalización**: éxito con `status`, error del equipo con su texto, plazo vencido o
   sesión cerrada. Nunca dos. Una respuesta con `id` desconocido o ya resuelto se descarta.
 - **Plazo** desde que se confirmó la **última** escritura de la petición, no desde que se
-  encoló (con RTCM delante, contar desde el encolado inventaba plazos vencidos: Jill, D2).
+  encoló (con RTCM delante, contar desde el encolado inventaba plazos vencidos: defecto D2 de la auditoría iOS).
 - **Reintento solo de lo que es seguro repetir** (tabla). Una mutación con resultado incierto
   **no se repite sola**: se consulta el estado y se decide con lo que diga el equipo. El
   `GnssJobRunner` ya lo hace así («una respuesta perdida lanza exactamente una orden»).

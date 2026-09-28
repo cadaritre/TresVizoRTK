@@ -100,7 +100,7 @@ flowchart LR
 | --- | --- | --- | --- |
 | 1 | RTCM y órdenes comparten el único carril de escritura con respuesta de ATT; la respuesta ATT no confirma nada (se manda antes de `onWrite`) | `ble_transport.cpp:146,153` (0.7.10); `BLECharacteristic.cpp:303-322` de Arduino | Arreglado en 0.7.11 (`WRITE_NR` aditivo) |
 | 2 | RTCM con respuesta topa en ≈2.8 kB/s; órdenes +50 % de latencia con RTCM | Medido con la Mac como central, ver ACCEPTANCE_TESTS.md | Explica la inestabilidad con casters pesados |
-| 3 | iOS entrega todo el RTCM a CoreBluetooth sin esperar confirmación: cola interna sin límite, órdenes detrás | Jill, `BLETransport.swift:333-348` | En arreglo (Jill) |
+| 3 | iOS entrega todo el RTCM a CoreBluetooth sin esperar confirmación: cola interna sin límite, órdenes detrás | `BLETransport.swift:333-348` (auditoría del cliente iOS) | Arreglado en la app iOS |
 | 4 | Cola hacia el UM980 de 4 tramas: una época MSM de 6-10 tramas que llega de golpe perdía tramas | `gnss_receiver.cpp` (0.7.10) | Arreglado en 0.7.11 |
 | 5 | Salud solo detrás de una solución nueva | `ble_transport.cpp:233` (0.7.10) | Arreglado en 0.7.11 |
 | 6 | Tabla GATT vieja en caché del cliente (sin emparejamiento no le llega «servicios cambiados») | Mac con 4 de 5 características y sin `WRITE_NR` tras cargar 0.7.11 | Mitigado en las apps; sin arreglo en el equipo todavía |
