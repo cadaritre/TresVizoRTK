@@ -13,6 +13,7 @@
 #include "base_plan.h"
 #include "base_survey.h"
 #include "telemetry_ws.h"
+#include "health_packet.h"
 
 #include <Preferences.h>
 #include <WiFi.h>
@@ -758,17 +759,31 @@ void status(JsonDocument& response) {
             // GST llega en su propia trama: solo se publica si es tan reciente
             // como la posición, para no mezclar una sigma vieja con un fix nuevo.
             if (gnss.precision_accepted && now - gnss.precision.arrival_us <= 2000000) {
-                if (std::isfinite(gnss.precision.horizontal_sigma_m))
-                    out["horizontal_sigma_m"] = gnss.precision.horizontal_sigma_m;
-                // Por eje, además de la combinada: es como la dan otros equipos
-                // (Emlid: RMS de Este y de Norte), y la combinada sale √2 mayor
-                // que cada eje sin que la solución sea peor.
-                if (std::isfinite(gnss.precision.latitude_sigma_m))
-                    out["north_sigma_m"] = gnss.precision.latitude_sigma_m;
-                if (std::isfinite(gnss.precision.longitude_sigma_m))
-                    out["east_sigma_m"] = gnss.precision.longitude_sigma_m;
-                if (std::isfinite(gnss.precision.altitude_sigma_m))
-                    out["vertical_sigma_m"] = gnss.precision.altitude_sigma_m;
+                const auto& p = gnss.precision;
+                // **Sigmas CRUDAS del UM980** (GST), tal como llegan, con nombre
+                // propio: diagnóstico y registros. No se modifican ni se quitan.
+                // Hasta 0.7.8 iban en `horizontal/north/east/vertical_sigma_m`.
+                if (std::isfinite(p.horizontal_sigma_m)) out["um980_raw_horizontal_sigma_m"] = p.horizontal_sigma_m;
+                if (std::isfinite(p.latitude_sigma_m)) out["um980_raw_north_sigma_m"] = p.latitude_sigma_m;
+                if (std::isfinite(p.longitude_sigma_m)) out["um980_raw_east_sigma_m"] = p.longitude_sigma_m;
+                if (std::isfinite(p.altitude_sigma_m)) out["um980_raw_vertical_sigma_m"] = p.altitude_sigma_m;
+                // **Precision MOSTRADA por Meridian V**: metrica de producto del
+                // propietario (27-09-2026), la misma regla que los bytes 1-4 de
+                // la salud (`health_packet.h`). No es una sigma del receptor.
+                //
+                // Va en los campos que la app ya pinta por Wi-Fi —la peor de
+                // norte y este, y la vertical—, porque la app no calcula
+                // precision: solo enseña lo que manda el equipo.
+                const auto display = protocol::meridianDisplayFromRaw(protocol::sigmaToMm(
+                    protocol::um980WorstAxisHorizontalSigmaM(p.latitude_sigma_m, p.longitude_sigma_m, p.horizontal_sigma_m)));
+                if (display.horizontal != protocol::kUnknownMm) {
+                    out["display_horizontal_precision_mm"] = display.horizontal;
+                    out["display_vertical_precision_mm"] = display.vertical;
+                    out["horizontal_sigma_m"] = display.horizontal / 1000.0;
+                    out["north_sigma_m"] = display.horizontal / 1000.0;
+                    out["east_sigma_m"] = display.horizontal / 1000.0;
+                    out["vertical_sigma_m"] = display.vertical / 1000.0;
+                }
             }
             out["arrival_time_us"] = gnss.solution.arrival_us;
             if (gnss.solution.has_utc) out["utc_time_of_day_ms"] = gnss.solution.utc_ms;

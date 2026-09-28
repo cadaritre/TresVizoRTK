@@ -6,6 +6,7 @@
 #include "correction_router.h"
 #include "correction_output.h"
 #include "ble_frames.h"
+#include "health_report.h"
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLE2902.h>
@@ -253,33 +254,10 @@ void tick() {
     // velocidad de la posición y mandarlas a 10 Hz solo gastaría radio.
     if (millis() - lastHealth < 1000) return;
     lastHealth = millis();
-    uint8_t report[20] = {};
-    report[0] = 1; // versión del paquete de salud
-    // Sigmas en milímetros. 0xFFFF significa "el receptor no la estima".
-    const auto sigma = [](double metres) -> uint16_t {
-        if (!std::isfinite(metres) || metres < 0 || metres > 65.0) return 0xFFFF;
-        return uint16_t(lround(metres * 1000));
-    };
-    // Horizontal por eje, la peor de norte y este, igual que el panel. Hasta
-    // 0.7.4 era la combinada √(σN² + σE²), √2 mayor con la misma solución.
-    const auto& p = snapshot.precision;
-    const double horizontal = std::isfinite(p.latitude_sigma_m) && std::isfinite(p.longitude_sigma_m)
-        ? std::max(p.latitude_sigma_m, p.longitude_sigma_m) : p.horizontal_sigma_m;
-    const uint16_t h = snapshot.precision_accepted ? sigma(horizontal) : 0xFFFF;
-    const uint16_t v = snapshot.precision_accepted ? sigma(snapshot.precision.altitude_sigma_m) : 0xFFFF;
-    report[1] = h; report[2] = h >> 8;
-    report[3] = v; report[4] = v >> 8;
-    const uint32_t age = correction_router::ageMs();
-    // 0xFFFF = sin fuente conectada; el resto, segundos desde la última trama.
-    const uint16_t ageSeconds = age == UINT32_MAX ? 0xFFFF : uint16_t(std::min<uint32_t>(age / 1000, 65534));
-    report[5] = ageSeconds; report[6] = ageSeconds >> 8;
-    report[7] = uint8_t(correction_router::sourceCode());
-    report[8] = s.quality;
-    report[9] = 0; // IMU: sin hardware todavía, reservado para no renumerar después
-    // Satélites **rastreados** (GSV), lo que enseñan el panel y las apps. En
-    // 0.7.5 y 0.7.6 iban aquí los usados. 255 = sin GSV reciente.
-    unsigned tracked = 0;
-    report[10] = gnss_sky::tracked(tracked) ? uint8_t(std::min(tracked, 254u)) : 255;
+    // Salud: armada en `health_report.h`, igual que por WebSocket. Bytes 1-4 =
+    // precision mostrada por Meridian V; 12-15 = sigma cruda del UM980.
+    uint8_t report[20];
+    health_report::build(report, snapshot);
     health->setValue(report, sizeof(report)); health->notify();
 }
 void status(JsonObject out) {
