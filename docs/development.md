@@ -37,6 +37,15 @@ La preparación de GNSS por USB, parser compartido, compilación de pruebas y ca
 
 Desde 0.5.0 se habilita PSRAM Quad y se comprueba memoria en la placa. UART GPIO18/17 habilitada desde 0.4.1. Las menciones iniciales a interfaces desactivadas corresponden al primer arranque; ver [servicios actuales](esp32-services.md).
 
+## Banco Bluetooth desde la Mac
+
+`tools/ble_bench/` decodifica el protocolo BLE, genera y valida RTCM3, corre los escenarios de
+la matriz de aceptación contra el equipo por Bluetooth (con `bleak`) o contra un simulador en
+proceso, y graba y reproduce sesiones. Instalación, uso y criterios de cada prueba en
+[procedimientos de aceptación](connectivity/ACCEPTANCE_PROCEDURES.md). Sus pruebas corren sin
+equipo y con la biblioteca estándar: `cd tools/ble_bench && python3 -m unittest`; una de ellas
+compila las cabeceras de `firmware/esp32/lib` y compara byte a byte con el decodificador.
+
 ## Trabajo desde Windows
 
 `tools/usb_console.py` funciona en Windows desde 0.6.0: `fcntl` y `termios` pasaron
