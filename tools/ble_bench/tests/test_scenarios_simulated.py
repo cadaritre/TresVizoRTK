@@ -3,6 +3,8 @@
 No prueba el equipo: prueba que el banco mide bien, para que mañana lo que
 diga contra el Meridian V sea creíble.
 """
+from __future__ import annotations
+
 import asyncio
 import tempfile
 import unittest

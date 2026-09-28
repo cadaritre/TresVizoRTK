@@ -13,6 +13,8 @@ Si un cambio del decodificador o del análisis cambia un resumen, esta prueba fa
 y el cambio tiene que ser a propósito: se regenera el .resumen.txt y se dice por qué.
 La sesión que hay hoy salió del **simulador**, no del equipo.
 """
+from __future__ import annotations
+
 import unittest
 from pathlib import Path
 

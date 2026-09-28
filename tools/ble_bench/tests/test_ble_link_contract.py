@@ -5,6 +5,8 @@ adaptador llama a lo que la documentación de bleak dice que existe, que no
 confunde una desconexión pedida con una inesperada y que lee las propiedades
 descubiertas de verdad (no la versión del firmware).
 """
+from __future__ import annotations
+
 import asyncio
 import sys
 import types

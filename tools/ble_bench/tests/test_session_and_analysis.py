@@ -1,4 +1,6 @@
 """Grabación, reproducción y resumen: sin radio y sin simulador."""
+from __future__ import annotations
+
 import json
 import tempfile
 import unittest

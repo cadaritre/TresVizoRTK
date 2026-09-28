@@ -52,15 +52,27 @@ class Bench:
         self.rtcm_with_response = True
         self._waiters: dict[int, asyncio.Future] = {}
         self._next_id = 1
-        self._command_lock = asyncio.Lock()
-        self._first_response_frame = asyncio.Event()
         # Contrato v3, regla 2: si hay una orden escribiéndose, el siguiente hueco
         # del carril ATT es suyo y el RTCM espera. Se puede apagar para medir
         # la diferencia (--no-command-priority).
         self.command_priority = command_priority
+        # Cerrojo y eventos se crean dentro del bucle que los usa: en Python 3.9
+        # quedan atados al bucle en el que nacen (`_primitives`).
+        self._loop_of_primitives = None
+        self._command_lock: asyncio.Lock | None = None
+        self._first_response_frame: asyncio.Event | None = None
+        self._lane_free: asyncio.Event | None = None
+        recorder.subscribe(self._on_event)
+
+    def _primitives(self) -> None:
+        loop = asyncio.get_running_loop()
+        if self._loop_of_primitives is loop:
+            return
+        self._loop_of_primitives = loop
+        self._command_lock = asyncio.Lock()
+        self._first_response_frame = asyncio.Event()
         self._lane_free = asyncio.Event()
         self._lane_free.set()
-        recorder.subscribe(self._on_event)
 
     # -- eventos ------------------------------------------------------------
     def record(self, kind: str, **info) -> Event:
@@ -75,7 +87,7 @@ class Bench:
             waiter = self._waiters.get(message.get("id"))
             if waiter is not None and not waiter.done():
                 waiter.set_result(message)
-        if event.kind == "notify" and event.characteristic == "response":
+        if event.kind == "notify" and event.characteristic == "response" and self._first_response_frame:
             self._first_response_frame.set()
 
     def _notify_handler(self, name: str):
@@ -89,6 +101,7 @@ class Bench:
         return self.link is not None and self.link.is_connected
 
     async def connect(self) -> None:
+        self._primitives()
         started = self.recorder.now()
         link = self.link_factory()
         # El aviso lleva la conexión que lo dio: uno tardío de la conexión A no
@@ -184,6 +197,7 @@ class Bench:
     async def send_request(self, method: str, path: str, body: object | None = None) -> tuple[int, asyncio.Future]:
         """Escribe la orden y devuelve (id, futuro de la respuesta) sin esperarla."""
         self._check_allowed(method, path)
+        self._primitives()
         if not self.connected:
             raise LinkError("sin conexión")
         request_id = self._allocate_id()
@@ -208,6 +222,7 @@ class Bench:
     async def request(self, method: str, path: str, body: object | None = None,
                       timeout_s: float | None = None) -> dict:
         """Una orden y su respuesta, de una en una, como la app. Nunca reintenta."""
+        self._primitives()
         async with self._command_lock:
             request_id, waiter = await self.send_request(method, path, body)
             try:
@@ -253,6 +268,7 @@ class Bench:
     # -- RTCM ---------------------------------------------------------------
     async def write_rtcm_frame(self, frame: bytes) -> bool:
         """Una trama entera, en trozos de MTU − 3. True si todos los trozos salieron."""
+        self._primitives()
         loop = asyncio.get_running_loop()
         started = loop.time()
         chunks = p.chunk_for_write(frame, self.link.negotiated_mtu or p.MINIMUM_ATT_MTU)
@@ -362,6 +378,7 @@ class Bench:
 
     def arm_response_frame_watch(self) -> None:
         """Antes de mandar la orden: luego `wait_first_response_frame` no se pierde la trama."""
+        self._primitives()
         self._first_response_frame.clear()
 
     async def wait_first_response_frame(self, timeout_s: float) -> bool:

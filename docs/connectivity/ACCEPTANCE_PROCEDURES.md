@@ -23,7 +23,8 @@ python3 -m venv ~/.venvs/meridian-bench
 ```
 
 Si `pip` no encuentra ruedas de `pyobjc` para Python 3.14 (bleak las necesita en macOS), crear
-el entorno con un Python anterior (`python3.13 -m venv …`). La primera conexión hace que macOS
+el entorno con el Python de las herramientas de Xcode (`/usr/bin/python3 -m venv …`, 3.9): el
+banco y sus pruebas corren también con 3.9 (comprobado; la instalación de bleak ahí, no). La primera conexión hace que macOS
 pida permiso de Bluetooth para la Terminal (Ajustes → Privacidad y seguridad → Bluetooth).
 
 En lo que sigue, desde la raíz del repositorio del firmware:

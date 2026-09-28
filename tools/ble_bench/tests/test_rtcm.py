@@ -2,6 +2,8 @@
 
 Vectores de `firmware/esp32/test/rtcm3_test.cpp`.
 """
+from __future__ import annotations
+
 import random
 import unittest
 

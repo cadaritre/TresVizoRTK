@@ -6,6 +6,8 @@
     ~/.venvs/meridian-bench/bin/python -m pip install "bleak>=0.22"
 
 y correr el banco con ese intérprete (`~/.venvs/meridian-bench/bin/python tools/ble_bench …`).
+Si pip no encuentra ruedas de pyobjc para el Python por defecto, crear el entorno con
+`/usr/bin/python3` (3.9): el banco corre desde 3.9.
 La primera vez, macOS pide permiso de Bluetooth para la Terminal.
 
 Lo que dice aquí de la pila de macOS está tomado de la documentación de bleak y

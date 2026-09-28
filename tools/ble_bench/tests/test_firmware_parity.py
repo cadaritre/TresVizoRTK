@@ -3,6 +3,8 @@
 Compila `tests/firmware_parity.cpp` contra `firmware/esp32/lib/*/src` y compara
 su salida con el decodificador. Se salta solo si no hay compilador de C++.
 """
+from __future__ import annotations
+
 import os
 import random
 import shutil

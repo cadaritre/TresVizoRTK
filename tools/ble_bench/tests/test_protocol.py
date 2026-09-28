@@ -4,6 +4,8 @@ Los vectores son los de `firmware/esp32/test/ble_frames_test.cpp` y
 `firmware/esp32/test/health_packet_test.cpp`: si una de las dos pruebas cambia,
 la otra tiene que cambiar igual.
 """
+from __future__ import annotations
+
 import json
 import math
 import struct
