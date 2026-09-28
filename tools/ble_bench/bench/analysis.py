@@ -30,6 +30,11 @@ STATUS_COUNTERS = {
     "gnss.rejected_gga": ("subsystems", "gnss", "rejected_gga"),
     "gnss.native_frames_valid": ("subsystems", "gnss", "native_frames_valid"),
     "gnss.uart_errors": ("subsystems", "gnss", "uart_errors"),
+    # Contrato v3 (0.7.11). En un firmware anterior no existen y quedan en None.
+    "ble.telemetry_skipped": ("subsystems", "ble", "telemetry_skipped"),
+    "gnss.correction_bytes_written": ("subsystems", "gnss", "correction_bytes_written"),
+    "gnss.correction_frames_evicted": ("subsystems", "gnss", "correction_frames_evicted"),
+    "gnss.correction_frames_expired": ("subsystems", "gnss", "correction_frames_expired"),
 }
 STATUS_FIELDS = {
     "firmware_version": ("firmware_version",),
@@ -44,9 +49,21 @@ STATUS_FIELDS = {
     "corrections.age_ms": ("corrections", "age_ms"),
     "gnss.state": ("subsystems", "gnss", "state"),
     "receiver_role": ("receiver_role",),
+    "ble.rtcm_write_without_response": ("subsystems", "ble", "rtcm_write_without_response"),
+    "ble.conn_interval_ms": ("subsystems", "ble", "conn_interval_ms"),
+    "ble.health_period_ms": ("subsystems", "ble", "health_period_ms"),
+    "ble.max_loop_gap_ms": ("subsystems", "ble", "max_loop_gap_ms"),
+    "ble.max_request_dispatch_ms": ("subsystems", "ble", "max_request_dispatch_ms"),
+    "gnss.correction_queue_bytes": ("subsystems", "gnss", "correction_queue_bytes"),
+    "gnss.correction_queue_high_water_bytes": ("subsystems", "gnss", "correction_queue_high_water_bytes"),
+    "gnss.correction_queue_capacity_bytes": ("subsystems", "gnss", "correction_queue_capacity_bytes"),
 }
-# La cola del ESP32 hacia la UART: cuatro tramas (gnss_receiver.cpp:137). Lo que
-# queda dentro al tomar la foto no es pérdida.
+# Lo que el banco guarda de GET /api/ble (el mismo objeto que subsystems.ble).
+BLE_STATUS_KEYS = ("state", "protocol_version", "att_mtu", "rtcm_write_without_response", "health_period_ms",
+                   "conn_interval_ms", "rtcm_available", "response_frames_forced", "telemetry_skipped")
+# La cola del ESP32 hacia la UART hasta 0.7.10: cuatro tramas (gnss_receiver.cpp:137).
+# Lo que queda dentro al tomar la foto no es pérdida. Desde 0.7.11 la cola es por
+# bytes y el estado dice cuántos hay dentro (`correction_queue_bytes`).
 DEVICE_UART_QUEUE_FRAMES = 4
 PERCENTILES = (50, 95)
 
@@ -83,8 +100,11 @@ class StreamStats:
     max_interval_s: float = 0.0
     max_interval_at_s: float | None = None
     intervals: list[float] = field(default_factory=list)
+    connections: int = 1
 
     def add(self, t: float, size: int) -> None:
+        if self.first_t is not None and self.last_t is None:
+            self.connections += 1
         if self.last_t is not None:
             interval = t - self.last_t
             self.intervals.append(interval)
@@ -96,10 +116,16 @@ class StreamStats:
         self.count += 1
         self.total_bytes += size
 
+    def break_continuity(self) -> None:
+        """Tras conectar o desconectar: el hueco entre dos conexiones no es un intervalo."""
+        self.last_t = None
+
     def rate_hz(self) -> float | None:
-        if self.count < 2 or self.last_t == self.first_t:
+        """Ritmo medio dentro de las conexiones (sin contar los huecos entre ellas)."""
+        if len(self.intervals) < 1:
             return None
-        return (self.count - 1) / (self.last_t - self.first_t)
+        span = sum(self.intervals)
+        return len(self.intervals) / span if span > 0 else None
 
 
 class Analyzer:
@@ -114,7 +140,14 @@ class Analyzer:
         self.solution_anomalies = 0
         self.last_solution: p.SolutionPacket | None = None
         self.last_health: p.HealthPacket | None = None
-        self.health_extension_seen = 0
+        self.health_with_rtcm_counters = 0
+        self.health_rtcm_discarded = 0     # suma de diferencias módulo 256 del byte 17
+        self.health_rtcm_rejected = 0      # ídem byte 18
+        self.health_queue_percent_max: int | None = None
+        self._health_previous: p.HealthPacket | None = None
+        self.gatt: dict[str, list[str]] = {}
+        self.ble_status: dict = {}
+        self.gatt_warnings: list[str] = []
         self.qualities: dict[str, int] = {}
         self.pending_requests: dict[int, tuple[float, str, str]] = {}
         self.latencies_s: list[float] = []
@@ -129,6 +162,7 @@ class Analyzer:
         self.rtcm_generated_frames = self.rtcm_generated_bytes = 0
         self.rtcm_sent_frames = self.rtcm_sent_bytes = 0
         self.rtcm_sent_invalid = 0      # corruptas a propósito: no cuentan como esperadas
+        self.rtcm_sent_valid_bytes = 0
         self.rtcm_writes = 0
         self.rtcm_write_failures = 0
         self.rtcm_discarded_frames = 0
@@ -192,9 +226,18 @@ class Analyzer:
         except p.ProtocolError:
             self.health_decode_errors += 1
             return
+        previous, self._health_previous = self._health_previous, packet
         self.last_health = packet
-        if packet.has_extension:
-            self.health_extension_seen += 1
+        if not packet.has_rtcm_counters:
+            return
+        self.health_with_rtcm_counters += 1
+        if packet.rtcm_queue_percent is not None:
+            self.health_queue_percent_max = max(self.health_queue_percent_max or 0, packet.rtcm_queue_percent)
+        if previous is not None and previous.has_rtcm_counters:
+            self.health_rtcm_discarded += p.counter_delta_mod256(previous.rtcm_frames_discarded_mod256,
+                                                                 packet.rtcm_frames_discarded_mod256)
+            self.health_rtcm_rejected += p.counter_delta_mod256(previous.rtcm_frames_rejected_mod256,
+                                                                packet.rtcm_frames_rejected_mod256)
 
     def _response(self, t: float, data: bytes) -> list[dict]:
         done = []
@@ -250,6 +293,8 @@ class Analyzer:
         self.rtcm_sent_bytes += int(event.info["bytes"])
         if event.info.get("valid") is False:
             self.rtcm_sent_invalid += 1
+        else:
+            self.rtcm_sent_valid_bytes += int(event.info["bytes"])
         self.rtcm_writes += int(event.info.get("writes", 1))
         self.rtcm_write_modes.add(event.info.get("mode", "?"))
         if "duration_s" in event.info:
@@ -258,10 +303,19 @@ class Analyzer:
     def _on_rtcm_discarded(self, event: Event) -> None:
         self.rtcm_discarded_frames += int(event.info.get("frames", 1))
 
+    def _break_streams(self) -> None:
+        for stats in self.streams.values():
+            stats.break_continuity()
+        self.last_solution = None       # la secuencia se cuenta por conexión
+        self._health_previous = None    # los contadores de la salud, también
+
     def _on_connected(self, event: Event) -> None:
         self.connects += 1
         self.reassembler.reset()
-        self.last_solution = None  # la secuencia se cuenta por conexión
+        self._break_streams()
+        if isinstance(event.info.get("gatt"), dict):
+            self.gatt = event.info["gatt"]
+            self._check_gatt()
         if "mtu" in event.info and event.info["mtu"] is not None:
             self.mtu_values.append(int(event.info["mtu"]))
         if "ready_s" in event.info:
@@ -276,9 +330,31 @@ class Analyzer:
         else:
             self.disconnects_unexpected += 1
         self.reassembler.reset()
+        self._break_streams()
         # Una desconexión invalida lo pedido: no hay respuesta que esperar.
         self.requests_cancelled += len(self.pending_requests)
         self.pending_requests.clear()
+
+    def _on_ble_status(self, event: Event) -> None:
+        self.ble_status = dict(event.info.get("status") or {})
+        self._check_gatt()
+
+    def _check_gatt(self) -> None:
+        """Tabla GATT en caché: el equipo dice v3 pero la pila ve la tabla vieja."""
+        version = self.ble_status.get("protocol_version")
+        if not self.gatt or not isinstance(version, int) or version < p.PROTOCOL_VERSION_WITH_HEARTBEAT:
+            return
+        warnings = []
+        if not self.gatt.get("health"):
+            warnings.append("falta la característica de salud a04c0006")
+        if self.ble_status.get("rtcm_write_without_response") and \
+                "write-without-response" not in self.gatt.get("correction", []):
+            warnings.append("a04c0005 no anuncia escritura sin respuesta")
+        for warning in warnings:
+            text = (f"tabla GATT en caché: el equipo dice protocolo {version} pero {warning}. "
+                    "No es un fallo del equipo: la pila de este lado recuerda la tabla de un firmware viejo")
+            if text not in self.gatt_warnings:
+                self.gatt_warnings.append(text)
 
     def _on_status(self, event: Event) -> None:
         self.statuses.append((event.t, event.info.get("label", ""), event.info.get("snapshot", {})))
@@ -345,13 +421,37 @@ class Analyzer:
         if dropped and valid and dropped >= valid:
             lines.append("✘ el enrutador no admitió ninguna: la fuente activa no es BLE "
                          "(PUT /api/corrections/source {\"source\":\"ble\"}) o el equipo trabaja como base")
-        if accepted and uart_sent is not None and uart_dropped is not None:
+        evicted = delta.get("gnss.correction_frames_evicted")
+        expired = delta.get("gnss.correction_frames_expired")
+        last = self.statuses[-1][2]
+        if accepted and uart_sent is not None and evicted is not None and expired is not None:
+            # Contrato v3: aceptadas = escritas + desalojadas + caducadas + en cola.
+            in_queue = accepted - uart_sent - evicted - expired
+            queue_bytes = last.get("gnss.correction_queue_bytes")
+            lines.append(f"cola hacia el UM980: desalojadas {evicted}, caducadas {expired}, "
+                         f"{queue_bytes} B dentro al final, máximo {last.get('gnss.correction_queue_high_water_bytes')} "
+                         f"de {last.get('gnss.correction_queue_capacity_bytes')} B")
+            if in_queue == 0 or (in_queue > 0 and queue_bytes):
+                lines.append(f"✔ aceptadas = escritas al UM980 + desalojadas + caducadas + {in_queue} en cola")
+            else:
+                lines.append(f"✘ no cuadra el último salto: aceptadas {accepted}, escritas {uart_sent}, "
+                             f"desalojadas {evicted}, caducadas {expired}, {queue_bytes} B en cola (diferencia {in_queue})")
+            written = delta.get("gnss.correction_bytes_written")
+            valid_bytes = self.rtcm_sent_valid_bytes
+            if written is not None and not evicted and not expired and not queue_bytes:
+                mark = "✔" if written == valid_bytes else "?"
+                lines.append(f"{mark} bytes escritos a la UART {written} / bytes RTCM válidos enviados {valid_bytes}")
+        elif accepted and uart_sent is not None and uart_dropped is not None:
             in_queue = accepted - uart_sent - uart_dropped
             if 0 <= in_queue <= DEVICE_UART_QUEUE_FRAMES:
                 lines.append(f"✔ aceptadas = escritas al UM980 + descartadas + {in_queue} en cola")
             else:
                 lines.append(f"✘ no cuadra el último salto: aceptadas {accepted}, escritas {uart_sent}, "
                              f"descartadas {uart_dropped} (diferencia {in_queue})")
+        if self.health_with_rtcm_counters:
+            lines.append(f"según la salud (v3): tiradas camino del UM980 +{self.health_rtcm_discarded}, "
+                         f"rechazadas al llegar +{self.health_rtcm_rejected}, cola máx "
+                         f"{'—' if self.health_queue_percent_max is None else str(self.health_queue_percent_max) + ' %'}")
         return lines
 
     def render(self, title: str = "Resumen") -> str:
@@ -395,12 +495,21 @@ class Analyzer:
         elif (solution is None or not solution.count) and (health is None or not health.count) and duration > 3:
             out.append("⚠ ni solución ni salud: o el receptor no emite (ver /api/status → subsystems.gnss) "
                        "o no hay suscripción; la salud solo sale detrás de una solución nueva (ble_transport.cpp:255)")
+        if health is not None and health.count and health.max_interval_s * 1000 > p.HEALTH_SILENCE_DEGRADED_MS \
+                and (self.ble_status.get("protocol_version") or 0) >= p.PROTOCOL_VERSION_WITH_HEARTBEAT:
+            out.append(f"✘ latido: {health.max_interval_s:.1f} s sin salud con el enlace arriba "
+                       f"(el contrato v3 da la sesión por medio muerta a los {p.HEALTH_SILENCE_DEGRADED_MS / 1000:.0f} s)")
+        out += [f"⚠ {warning}" for warning in self.gatt_warnings]
+        if self.ble_status:
+            out.append("estado BLE al conectar: " + ", ".join(f"{k} {v}" for k, v in self.ble_status.items()))
         if self.last_health is not None:
             h = self.last_health
             out.append(f"última salud: fuente {h.correction_source_name}, edad de corrección "
                        f"{'—' if h.correction_age_seconds is None else str(h.correction_age_seconds) + ' s'}, "
                        f"rastreados {'—' if h.satellites_tracked is None else h.satellites_tracked}, "
-                       f"banderas 0x{h.flags:02x}" + (f", bytes 17-19 {h.extension_bytes.hex()}" if h.has_extension else ""))
+                       f"banderas 0x{h.flags:02x}"
+                       + (f", cola RTCM {'—' if h.rtcm_queue_percent is None else str(h.rtcm_queue_percent) + ' %'}"
+                          if h.has_rtcm_counters else ""))
         if self.requests_sent:
             p50, p95 = (percentile(self.latencies_s, rank) for rank in PERCENTILES)
             fmt = lambda v: "—" if v is None else f"{v * 1000:.0f} ms"  # noqa: E731
@@ -438,6 +547,11 @@ class Analyzer:
                        f"fuente {last.get('corrections.active_source')}, GNSS {last.get('gnss.state')}, "
                        f"heap libre {last.get('free_heap_bytes')} (mín {last.get('min_free_heap_bytes')}), "
                        f"alertas {last.get('alerts')}")
+            if last.get("ble.conn_interval_ms") is not None or last.get("ble.max_loop_gap_ms") is not None:
+                out.append(f"equipo (v3): intervalo de conexión {last.get('ble.conn_interval_ms')} ms, "
+                           f"telemetría saltada por falta de hueco {last.get('ble.telemetry_skipped')}, "
+                           f"bucle BLE máx {last.get('ble.max_loop_gap_ms')} ms, "
+                           f"despacho de orden máx {last.get('ble.max_request_dispatch_ms')} ms")
         out += [f"nota: {note}" for note in self.notes]
         return "\n".join(out)
 

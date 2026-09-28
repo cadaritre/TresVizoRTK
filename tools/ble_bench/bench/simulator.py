@@ -8,8 +8,15 @@ el resumen se ensayen hoy y mañana digan lo mismo contra el equipo:
   vez en tramas del MTU con 5 ms entre tramas (`:218`);
 - solución a 5 Hz como máximo y salud a 1 Hz **solo detrás de una solución
   nueva** (`:233`, `:255`): con el receptor mudo no sale ninguna de las dos;
-- RTCM: rearmado con CRC, admisión solo si la fuente activa es BLE, cola de
-  cuatro tramas hacia la UART, caducidad de 2 s y los mismos contadores.
+- RTCM: rearmado con CRC, admisión solo si la fuente activa es BLE, cola hacia
+  la UART, caducidad de 2 s y los mismos contadores.
+
+Por defecto imita el contrato v3 (firmware 0.7.11, BLE_CONTRACT.md): salud a
+1 Hz siempre, con contadores de RTCM; `a04c0005` con escritura sin respuesta;
+cola por bytes (8 KiB) que desaloja las tramas más viejas. Con
+`protocol_version=2` vuelve a 0.7.10: salud solo detrás de una solución y cola
+de cuatro tramas. `stale_gatt=True` imita una pila que recuerda la tabla GATT
+de un firmware viejo (sin salud ni escritura sin respuesta).
 
 No es el firmware: el tiempo de radio, el intervalo de conexión y la pila
 Bluedroid no se simulan. Lo que pase aquí no demuestra nada del equipo real.
@@ -30,7 +37,9 @@ from .link import Link, LinkError, NotifyCallback
 REQUEST_QUEUE_DEPTH = 2              # ble_transport.cpp:132
 RESPONSE_FRAME_SPACING_S = 0.005     # ble_transport.cpp:218
 TELEMETRY_TICK_S = 0.020             # ble_transport.cpp:229
-UART_QUEUE_FRAMES = 4                # gnss_receiver.cpp:137
+UART_QUEUE_FRAMES = 4                # v2: gnss_receiver.cpp:137
+UART_QUEUE_CAPACITY_BYTES = 8192     # v3: correction_queue_capacity_bytes
+UART_QUEUE_RECORD_HEADER_BYTES = 10  # v3: rtcm_queue.h, kRecordHeaderBytes
 CORRECTION_EXPIRY_S = 2.0            # gnss_receiver.cpp:94
 PARSER_IDLE_RESET_S = 2.0            # ble_transport.cpp:115
 UART_BYTES_PER_SECOND = 11520        # 115200 baudios, 8N1 (platformio.ini)
@@ -49,6 +58,8 @@ class SimulatorOptions:
     response_frame_duplicate_probability: float = 0.0
     seed: int = 7
     firmware_version: str = "simulador"
+    protocol_version: int = 3
+    stale_gatt: bool = False
 
 
 class SimulatedMeridian:
@@ -70,17 +81,30 @@ class SimulatedMeridian:
         self.router_rejected = 0
         self.uart_sent = 0
         self.uart_dropped = 0
+        self.uart_evicted = 0
+        self.uart_expired = 0
+        self.uart_bytes_written = 0
+        self.uart_queue_bytes = 0
+        self.uart_queue_high_water = 0
+        self.telemetry_skipped = 0
         self.uart_queue: deque = deque()
         self.uart_in_flight = None
         self.accepted_gga = 0
         self.sequence = 0
 
     # -- HTTP sobre BLE -----------------------------------------------------
+    @property
+    def v3(self) -> bool:
+        return self.options.protocol_version >= 3
+
     def ble_status(self) -> dict:
         connected = self.connection is not None and self.connection.is_connected
-        return {
+        extra = {"rtcm_write_without_response": self.options.write_without_response, "health_period_ms": 1000,
+                 "conn_interval_ms": 30.0 if connected else None, "telemetry_skipped": self.telemetry_skipped,
+                 "max_loop_gap_ms": 5, "max_request_dispatch_ms": 3} if self.v3 else {}
+        return {**extra, 
             "state": "connected" if connected else "advertising",
-            "enabled": True, "pairing_required": False, "protocol_version": 2,
+            "enabled": True, "pairing_required": False, "protocol_version": self.options.protocol_version,
             "dropped_requests": self.dropped_requests,
             "att_mtu": self.connection.negotiated_mtu if connected else p.MINIMUM_ATT_MTU,
             "response_frames_forced": self.forced_frames, "control_available": True,
@@ -100,7 +124,13 @@ class SimulatedMeridian:
                          "accepted_gga": self.accepted_gga, "rejected_gga": 0, "line_overflows": 0,
                          "uart_errors": 0, "correction_frames_sent": self.uart_sent,
                          "correction_frames_dropped": self.uart_dropped,
-                         "native_frames_valid": 0, "native_frames_invalid": 0},
+                         "native_frames_valid": 0, "native_frames_invalid": 0,
+                         **({"correction_bytes_written": self.uart_bytes_written,
+                             "correction_frames_evicted": self.uart_evicted,
+                             "correction_frames_expired": self.uart_expired,
+                             "correction_queue_bytes": self.uart_queue_bytes,
+                             "correction_queue_high_water_bytes": self.uart_queue_high_water,
+                             "correction_queue_capacity_bytes": UART_QUEUE_CAPACITY_BYTES} if self.v3 else {})},
             },
             "corrections": {"active_source": self.selected_source, "chosen_source": self.selected_source,
                             "format": "rtcm3", "generation": self.source_generation,
@@ -133,7 +163,27 @@ class SimulatedMeridian:
         return 404, {"error": "not_found"}
 
     # -- RTCM ---------------------------------------------------------------
+    def health_inputs(self) -> p.HealthInputs:
+        source = {"none": 0, "ble": 1, "ntrip": 2}.get(self.selected_source, 0)
+        talking = self.options.receiver_talking
+        inputs = p.HealthInputs(
+            um980_raw_horizontal_sigma_mm=12 if talking else p.UNKNOWN_U16,
+            um980_raw_vertical_sigma_mm=20 if talking else p.UNKNOWN_U16,
+            meridian_display=p.meridian_display_precision(12 if talking else p.UNKNOWN_U16),
+            correction_age_seconds=1 if source and self.router_accepted else p.UNKNOWN_U16, source=source,
+            quality=4 if talking else 0, tracked=34 if talking else p.UNKNOWN_SATELLITES,
+            visible=40 if talking else p.UNKNOWN_SATELLITES)
+        if self.v3:
+            inputs.has_rtcm_counters = True
+            inputs.rtcm_frames_discarded = self.uart_dropped % 256
+            inputs.rtcm_frames_rejected = (self.router_rejected + self.ble_parser.rejected) % 256
+            inputs.rtcm_queue_percent = p.queue_percent(self.uart_queue_bytes, UART_QUEUE_CAPACITY_BYTES)
+        return inputs
+
     def submit_correction(self, frame: bytes, now: float) -> None:
+        if self.v3:
+            self._submit_v3(frame, now)
+            return
         if self.selected_source != "ble" or not rtcm.frame_is_valid(frame) or len(self.uart_queue) >= UART_QUEUE_FRAMES:
             if len(self.uart_queue) >= UART_QUEUE_FRAMES:
                 self.uart_dropped += 1
@@ -143,6 +193,23 @@ class SimulatedMeridian:
         self.router_accepted += 1
         self.uart_queue.append((now, self.source_generation, len(frame)))
 
+    def _submit_v3(self, frame: bytes, now: float) -> None:
+        """Como 0.7.11: la cola por bytes nunca rechaza; desaloja las más viejas."""
+        if self.selected_source != "ble" or not rtcm.frame_is_valid(frame):
+            self.router_rejected += 1
+            self.ble_dropped += 1
+            return
+        needed = UART_QUEUE_RECORD_HEADER_BYTES + len(frame)
+        while UART_QUEUE_CAPACITY_BYTES - self.uart_queue_bytes < needed and self.uart_queue:
+            _, _, length = self.uart_queue.popleft()
+            self.uart_queue_bytes -= UART_QUEUE_RECORD_HEADER_BYTES + length
+            self.uart_evicted += 1
+            self.uart_dropped += 1
+        self.router_accepted += 1
+        self.uart_queue.append((now, self.source_generation, len(frame)))
+        self.uart_queue_bytes += needed
+        self.uart_queue_high_water = max(self.uart_queue_high_water, self.uart_queue_bytes)
+
     def drain_uart(self, now: float, elapsed_s: float) -> None:
         budget = UART_BYTES_PER_SECOND * elapsed_s
         while budget > 0:
@@ -150,14 +217,18 @@ class SimulatedMeridian:
                 if not self.uart_queue:
                     return
                 self.uart_in_flight = list(self.uart_queue.popleft()) + [0]
+                self.uart_queue_bytes = max(0, self.uart_queue_bytes - UART_QUEUE_RECORD_HEADER_BYTES
+                                            - self.uart_in_flight[2])
             arrival, generation, length, sent = self.uart_in_flight
-            if now - arrival > CORRECTION_EXPIRY_S or generation != self.source_generation:
+            if sent == 0 and (now - arrival > CORRECTION_EXPIRY_S or generation != self.source_generation):
                 self.uart_dropped += 1
+                self.uart_expired += 1
                 self.uart_in_flight = None
                 continue
             step = min(length - sent, budget)
             budget -= step
             self.uart_in_flight[3] = sent + step
+            self.uart_bytes_written += step
             if self.uart_in_flight[3] >= length:
                 self.uart_sent += 1
                 self.uart_in_flight = None
@@ -191,10 +262,14 @@ class SimulatedLink(Link):
         return self.device.options.mtu if self._connected else None
 
     def properties(self, characteristic_uuid: str) -> set[str]:
+        options = self.device.options
         if characteristic_uuid == p.CORRECTION_UUID:
-            return {"write", "write-without-response"} if self.device.options.write_without_response else {"write"}
+            announced = options.write_without_response and self.device.v3 and not options.stale_gatt
+            return {"write", "write-without-response"} if announced else {"write"}
         if characteristic_uuid == p.COMMAND_UUID:
             return {"write"}
+        if characteristic_uuid == p.HEALTH_UUID and options.stale_gatt:
+            return set()
         return {"notify"}
 
     async def connect(self) -> None:
@@ -312,8 +387,12 @@ class SimulatedLink(Link):
         while True:
             await asyncio.sleep(TELEMETRY_TICK_S)
             now = loop.time()
+            if device.v3 and now - last_health >= p.HEALTH_INTERVAL_MS / 1000:
+                # v3: salud a 1 Hz siempre, haya solución o no (latido).
+                last_health = now
+                self._notify(p.HEALTH_UUID, p.encode_health(device.health_inputs()))
             if not device.options.receiver_talking:
-                continue  # como el firmware: sin época nueva no sale ni solución ni salud
+                continue  # sin época nueva no sale solución (ni salud en v2)
             if now - last_epoch >= RECEIVER_EPOCH_S:
                 last_epoch = now
                 device.accepted_gga += 1
@@ -324,15 +403,10 @@ class SimulatedLink(Link):
             utc_ms = int((now * 1000) % 86_400_000)
             self._notify(p.SOLUTION_UUID, p.encode_solution(device.sequence, 4, 28, utc_ms,
                                                             19.4326077, -99.1332080, 2240.5))
-            if now - last_health < p.HEALTH_INTERVAL_MS / 1000:
+            if device.v3 or now - last_health < p.HEALTH_INTERVAL_MS / 1000:
                 continue
-            last_health = now
-            source = {"none": 0, "ble": 1, "ntrip": 2}.get(device.selected_source, 0)
-            self._notify(p.HEALTH_UUID, p.encode_health(p.HealthInputs(
-                um980_raw_horizontal_sigma_mm=12, um980_raw_vertical_sigma_mm=20,
-                meridian_display=p.meridian_display_precision(12),
-                correction_age_seconds=1 if source else p.UNKNOWN_U16, source=source, quality=4,
-                tracked=34, visible=40)))
+            last_health = now  # v2: la salud solo sale detrás de una solución nueva
+            self._notify(p.HEALTH_UUID, p.encode_health(device.health_inputs()))
 
     async def _uart(self) -> None:
         loop = asyncio.get_running_loop()

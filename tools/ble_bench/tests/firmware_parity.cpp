@@ -10,6 +10,20 @@
 #include <string>
 #include <vector>
 
+// Contadores de RTCM de la salud (contrato v3, 0.7.11). Con las cabeceras de
+// antes no existen: se detectan con SFINAE para que el volcado compile con las dos.
+template <class T>
+auto setRtcmCounters(T& in, uint8_t discarded, uint8_t rejected, uint8_t percent, int)
+    -> decltype(in.hasRtcmCounters, bool()) {
+    in.hasRtcmCounters = true;
+    in.rtcmFramesDiscarded = discarded;
+    in.rtcmFramesRejected = rejected;
+    in.rtcmQueuePercent = percent;
+    return true;
+}
+template <class T>
+bool setRtcmCounters(T&, uint8_t, uint8_t, uint8_t, long) { return false; }
+
 static void hex(const uint8_t* data, size_t length) {
     for (size_t i = 0; i < length; ++i) std::printf("%02x", data[i]);
 }
@@ -58,6 +72,15 @@ int main() {
         uint8_t report[20];
         protocol::encodeHealth(report, in);
         std::printf("health %u %u %u %u %u %u %u ", c.h, c.v, c.age, c.source, c.quality, c.tracked, c.visible);
+        hex(report, sizeof(report)); std::printf("\n");
+    }
+    // Salud con contadores de RTCM, si las cabeceras los tienen.
+    for (const uint8_t* c : {(const uint8_t*)"\x2c\x03\x33", (const uint8_t*)"\x00\x00\xff", (const uint8_t*)"\xff\xfe\x64"}) {
+        protocol::HealthInputs in;
+        const bool supported = setRtcmCounters(in, c[0], c[1], c[2], 0);
+        uint8_t report[20];
+        protocol::encodeHealth(report, in);
+        std::printf("health_rtcm %d %u %u %u ", supported ? 1 : 0, c[0], c[1], c[2]);
         hex(report, sizeof(report)); std::printf("\n");
     }
     // RTCM3: el flujo de la entrada estandar, byte a byte.

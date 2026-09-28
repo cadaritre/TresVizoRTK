@@ -10,7 +10,7 @@ import asyncio
 from typing import Callable, Iterator
 
 from . import protocol as p
-from .analysis import Analyzer, extract_status
+from .analysis import BLE_STATUS_KEYS, Analyzer, extract_status
 from .link import Link, LinkError
 from .rtcm import Pacer, frame_is_valid, message_number
 from .session import Event, Recorder
@@ -37,7 +37,8 @@ class RequestFailed(RuntimeError):
 
 class Bench:
     def __init__(self, link_factory: Callable[[], Link], recorder: Recorder,
-                 request_timeout_s: float = DEFAULT_REQUEST_TIMEOUT_S, allow_mutations: bool = False):
+                 request_timeout_s: float = DEFAULT_REQUEST_TIMEOUT_S, allow_mutations: bool = False,
+                 command_priority: bool = True):
         self.link_factory = link_factory
         self.recorder = recorder
         self.analyzer = Analyzer()
@@ -49,6 +50,12 @@ class Bench:
         self._next_id = 1
         self._command_lock = asyncio.Lock()
         self._first_response_frame = asyncio.Event()
+        # Contrato v3, regla 2: si hay una orden escribiéndose, el siguiente hueco
+        # del carril ATT es suyo y el RTCM espera. Se puede apagar para medir
+        # la diferencia (--no-command-priority).
+        self.command_priority = command_priority
+        self._lane_free = asyncio.Event()
+        self._lane_free.set()
         recorder.subscribe(self._on_event)
 
     # -- eventos ------------------------------------------------------------
@@ -83,9 +90,18 @@ class Bench:
         link.on_unexpected_disconnect = self._lost
         try:
             await link.connect()
+            gatt = {name: sorted(link.properties(uuid)) for uuid, name in p.CHARACTERISTIC_NAMES.items()}
+            if not gatt["command"] or not gatt["response"]:
+                raise LinkError("faltan las características de órdenes o respuestas: no es un Meridian V utilizable")
             # Respuestas primero: sin esa suscripción una orden no tiene vuelta.
+            # La salud puede faltar si la pila recuerda una tabla GATT vieja
+            # (hallazgo del líder con la Mac): se sigue sin ella y se dice.
             for uuid in (p.RESPONSE_UUID, p.SOLUTION_UUID, p.HEALTH_UUID):
-                await link.start_notify(uuid, self._notify_handler(p.CHARACTERISTIC_NAMES[uuid]))
+                name = p.CHARACTERISTIC_NAMES[uuid]
+                if not gatt[name]:
+                    self.record("note", text=f"la tabla GATT descubierta no trae «{name}» ({uuid}); sin suscripción")
+                    continue
+                await link.start_notify(uuid, self._notify_handler(name))
         except Exception as error:
             self.record("connect_failed", error=f"{type(error).__name__}: {error}")
             try:
@@ -99,8 +115,14 @@ class Bench:
         # 22:12 del canal); si no, con respuesta, como hasta ahora.
         self.rtcm_with_response = "write-without-response" not in properties
         self.record("connected", mtu=link.negotiated_mtu, ready_s=round(self.recorder.now() - started, 4),
-                    link=link.description, correction_properties=sorted(properties),
-                    rtcm_write_mode=self.rtcm_mode)
+                    link=link.description, gatt=gatt, rtcm_write_mode=self.rtcm_mode)
+        # Como las apps (contrato v3, regla 3): tras conectar, el estado BLE.
+        try:
+            answer = await self.request("GET", "/api/ble")
+            body = answer.get("body") if isinstance(answer.get("body"), dict) else {}
+            self.record("ble_status", status={key: body.get(key) for key in BLE_STATUS_KEYS if key in body})
+        except Exception as error:
+            self.note(f"tras conectar, GET /api/ble no contestó: {type(error).__name__}: {error}")
 
     @property
     def rtcm_mode(self) -> str:
@@ -160,6 +182,8 @@ class Bench:
         waiter = asyncio.get_running_loop().create_future()
         self._waiters[request_id] = waiter
         self.record("request", id=request_id, method=method, path=path, bytes=len(line))
+        if self.command_priority:
+            self._lane_free.clear()
         try:
             # Las órdenes siempre con respuesta ATT (a04c0002 solo anuncia WRITE).
             for chunk in p.chunk_for_write(line, self.link.negotiated_mtu or p.MINIMUM_ATT_MTU):
@@ -168,6 +192,8 @@ class Bench:
             self._waiters.pop(request_id, None)
             self.record("command_write_failed", id=request_id, path=path, error=f"{type(error).__name__}: {error}")
             raise
+        finally:
+            self._lane_free.set()
         return request_id, waiter
 
     async def request(self, method: str, path: str, body: object | None = None,
@@ -224,6 +250,7 @@ class Bench:
         written = 0
         try:
             for chunk in chunks:
+                await self._lane_free.wait()
                 await self.link.write(p.CORRECTION_UUID, chunk, with_response=self.rtcm_with_response)
                 written += 1
         except Exception as error:

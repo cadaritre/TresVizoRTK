@@ -50,7 +50,10 @@ FIRST_FRAME_FLAG = 0x01
 LAST_FRAME_FLAG = 0x02
 MIN_SOLUTION_INTERVAL_MS = 190     # protocol::kMinSolutionIntervalMs (5 Hz como máximo)
 MAX_SOLUTION_RATE_HZ = 5
-HEALTH_INTERVAL_MS = 1000          # ble_transport.cpp:255
+HEALTH_INTERVAL_MS = 1000          # v3: 1 Hz siempre con el enlace arriba (kHealthPeriodMs)
+# Contrato v3: 3 s sin salud con el enlace arriba = sesión medio muerta.
+HEALTH_SILENCE_DEGRADED_MS = 3000
+PROTOCOL_VERSION_WITH_HEARTBEAT = 3
 
 SOLUTION_PACKET_BYTES = 20
 HEALTH_PACKET_BYTES = 20
@@ -62,10 +65,13 @@ SEQUENCE_MODULO = 1 << 16
 # Byte 16 de la salud (health_packet.h).
 HEALTH_FLAG_DISPLAY_PRECISION = 0x01  # bytes 1-4 = precisión mostrada por Meridian V
 HEALTH_FLAG_RAW_PRECISION = 0x02      # bytes 12-15 = sigma cruda del UM980
-# Bit 2: reservado para contadores de RTCM en los bytes 17-19, **pendiente del
-# contrato** (docs/connectivity/BLE_CONTRACT.md). Mientras no esté fijado, el
-# decodificador expone esos bytes crudos y no los interpreta.
-HEALTH_FLAG_EXTENSION = 0x04
+# Bit 2 (contrato v3, firmware 0.7.11, BLE_CONTRACT.md): bytes 17-19 = contadores
+# de RTCM. 17 = tramas tiradas camino del UM980 (desalojadas o caducadas), 18 =
+# rechazadas al llegar (CRC o formato); los dos **módulo 256**, se mira la
+# diferencia. 19 = ocupación de la cola hacia el UM980 en % (255 = no se sabe).
+# Sin la bandera esos bytes no significan nada.
+HEALTH_FLAG_RTCM_COUNTERS = 0x04
+UNKNOWN_PERCENT = 255
 
 # Regla de la precisión mostrada (health_packet.h), en milímetros.
 DISPLAY_THRESHOLD_MM = 35
@@ -398,6 +404,9 @@ class HealthPacket:
     raw_vertical_sigma_mm: int | None             # bytes 14-15
     flags: int                                    # byte 16
     extension_bytes: bytes = field(default=b"\x00\x00\x00")  # 17-19, crudos
+    rtcm_frames_discarded_mod256: int | None = None  # byte 17 con la bandera 0x04
+    rtcm_frames_rejected_mod256: int | None = None   # byte 18 con la bandera 0x04
+    rtcm_queue_percent: int | None = None            # byte 19; None sin bandera o 255
 
     @property
     def bytes_1_to_4_are_display_precision(self) -> bool:
@@ -408,8 +417,8 @@ class HealthPacket:
         return bool(self.flags & HEALTH_FLAG_RAW_PRECISION)
 
     @property
-    def has_extension(self) -> bool:
-        return bool(self.flags & HEALTH_FLAG_EXTENSION)
+    def has_rtcm_counters(self) -> bool:
+        return bool(self.flags & HEALTH_FLAG_RTCM_COUNTERS)
 
     @property
     def correction_source_name(self) -> str:
@@ -425,6 +434,7 @@ def decode_health(data: bytes) -> HealthPacket:
      raw_h, raw_v, flags) = struct.unpack_from("<BHHHBBBBBHHB", data)
     unknown16 = lambda value: None if value == UNKNOWN_U16 else value  # noqa: E731
     unknown8 = lambda value: None if value == UNKNOWN_SATELLITES else value  # noqa: E731
+    counters = bool(flags & HEALTH_FLAG_RTCM_COUNTERS)
     return HealthPacket(
         version=version,
         display_horizontal_precision_mm=unknown16(display_h),
@@ -439,7 +449,22 @@ def decode_health(data: bytes) -> HealthPacket:
         raw_vertical_sigma_mm=unknown16(raw_v),
         flags=flags,
         extension_bytes=bytes(data[17:20]),
+        rtcm_frames_discarded_mod256=data[17] if counters else None,
+        rtcm_frames_rejected_mod256=data[18] if counters else None,
+        rtcm_queue_percent=(None if data[19] == UNKNOWN_PERCENT else data[19]) if counters else None,
     )
+
+
+def counter_delta_mod256(previous: int, current: int) -> int:
+    """Diferencia de un contador de un byte que da la vuelta a 256 (bytes 17 y 18)."""
+    return (current - previous) % 256
+
+
+def queue_percent(used_bytes: int, capacity_bytes: int) -> int:
+    """Espejo de protocol::queuePercent: redondeo hacia arriba, 255 sin cola."""
+    if not capacity_bytes:
+        return UNKNOWN_PERCENT
+    return min(100, (used_bytes * 100 + capacity_bytes - 1) // capacity_bytes)
 
 
 @dataclass
@@ -453,15 +478,24 @@ class HealthInputs:
     quality: int = 0
     tracked: int = UNKNOWN_SATELLITES
     visible: int = UNKNOWN_SATELLITES
+    # Contrato v3 (bytes 17-19). Sin `has_rtcm_counters` van a cero, como en v2.
+    has_rtcm_counters: bool = False
+    rtcm_frames_discarded: int = 0
+    rtcm_frames_rejected: int = 0
+    rtcm_queue_percent: int = UNKNOWN_PERCENT
 
 
 def encode_health(inputs: HealthInputs) -> bytes:
-    """Espejo de protocol::encodeHealth (versión 1, bytes 17-19 a cero)."""
-    return struct.pack("<BHHHBBBBBHHB3x", 1, inputs.meridian_display[0], inputs.meridian_display[1],
+    """Espejo de protocol::encodeHealth (versión 1 del paquete; contadores RTCM desde v3)."""
+    flags = HEALTH_FLAG_DISPLAY_PRECISION | HEALTH_FLAG_RAW_PRECISION
+    tail = (0, 0, 0)
+    if inputs.has_rtcm_counters:
+        flags |= HEALTH_FLAG_RTCM_COUNTERS
+        tail = (inputs.rtcm_frames_discarded % 256, inputs.rtcm_frames_rejected % 256, inputs.rtcm_queue_percent)
+    return struct.pack("<BHHHBBBBBHHBBBB", 1, inputs.meridian_display[0], inputs.meridian_display[1],
                        inputs.correction_age_seconds, inputs.source, inputs.quality, 0,
                        inputs.tracked, inputs.visible, inputs.um980_raw_horizontal_sigma_mm,
-                       inputs.um980_raw_vertical_sigma_mm,
-                       HEALTH_FLAG_DISPLAY_PRECISION | HEALTH_FLAG_RAW_PRECISION)
+                       inputs.um980_raw_vertical_sigma_mm, flags, *tail)
 
 
 # ---------------------------------------------------------------------------

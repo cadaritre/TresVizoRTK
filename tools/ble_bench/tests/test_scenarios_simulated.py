@@ -47,12 +47,35 @@ class Scenarios(unittest.TestCase):
         tmp.cleanup()
 
     def test_silent_receiver_is_not_blamed_on_bluetooth(self):
-        bench, _, tmp = run("telemetria", SimulatorOptions(receiver_talking=False), duration_s=1.5)
+        # Contrato v3: la salud sigue llegando (latido) aunque el UM980 esté mudo.
+        bench, _, tmp = run("telemetria", SimulatorOptions(receiver_talking=False), duration_s=2.2)
+        a = bench.analyzer
+        self.assertNotIn("solution", a.streams)
+        self.assertGreaterEqual(a.streams["health"].count, 2)
+        self.assertIsNone(a.last_health.satellites_tracked)
+        self.assertTrue(a.receiver_silent())
+        self.assertIn("No es un fallo de Bluetooth", a.render())
+        tmp.cleanup()
+
+    def test_silent_receiver_with_firmware_v2_sends_nothing(self):
+        # Hasta 0.7.10 la salud solo salía detrás de una solución (ble_transport.cpp:233).
+        bench, _, tmp = run("telemetria", SimulatorOptions(receiver_talking=False, protocol_version=2),
+                            duration_s=1.5)
         a = bench.analyzer
         self.assertNotIn("solution", a.streams)
         self.assertNotIn("health", a.streams)
-        self.assertTrue(a.receiver_silent())
         self.assertIn("No es un fallo de Bluetooth", a.render())
+        tmp.cleanup()
+
+    def test_stale_gatt_table_is_named(self):
+        bench, _, tmp = run("telemetria", SimulatorOptions(stale_gatt=True), duration_s=1.2)
+        a = bench.analyzer
+        self.assertNotIn("health", a.streams)
+        self.assertEqual(bench.rtcm_mode, "con respuesta")
+        text = a.render()
+        self.assertIn("tabla GATT en caché", text)
+        self.assertIn("a04c0006", text)
+        self.assertIn("escritura sin respuesta", text)
         tmp.cleanup()
 
     def test_rtcm_uses_write_without_response_when_announced(self):
@@ -102,11 +125,26 @@ class Scenarios(unittest.TestCase):
         tmp.cleanup()
 
     def test_saturation_is_counted_not_hidden(self):
-        bench, _, tmp = run("saturacion", duration_s=2.0, command_period_s=0.5, select_ble_source=True)
-        delta = bench.analyzer.status_delta()
-        self.assertGreater(delta["gnss.correction_frames_dropped"], 0)
-        self.assertEqual(delta["ble.rtcm_valid_frames"], bench.analyzer.rtcm_sent_frames)
-        self.assertEqual(bench.analyzer.request_timeouts, 0)
+        # Más de lo que saca la UART (11.5 kB/s) durante más de lo que cabe en 8 KiB.
+        bench, _, tmp = run("saturacion", duration_s=2.0, rate_bytes_per_second=25000, command_period_s=0.5,
+                            select_ble_source=True)
+        a = bench.analyzer
+        delta = a.status_delta()
+        self.assertGreater(delta["gnss.correction_frames_evicted"], 0)
+        self.assertEqual(delta["ble.rtcm_valid_frames"], a.rtcm_sent_frames)
+        self.assertEqual(a.request_timeouts, 0)
+        lines = "\n".join(a.reconcile_rtcm())
+        self.assertIn("✔ aceptadas = escritas al UM980 + desalojadas + caducadas", lines)
+        self.assertGreater(a.health_rtcm_discarded, 0)
+        tmp.cleanup()
+
+    def test_saturation_with_firmware_v2(self):
+        bench, _, tmp = run("saturacion", SimulatorOptions(protocol_version=2), duration_s=1.5,
+                            command_period_s=0.5, select_ble_source=True)
+        # v2: sin escritura sin respuesta y cuadre con la fórmula de antes (cola de 4 tramas).
+        self.assertEqual(bench.analyzer.rtcm_write_modes, {"con respuesta"})
+        self.assertIsNone(bench.analyzer.status_delta()["gnss.correction_frames_evicted"])
+        self.assertIn("+ descartadas +", "\n".join(bench.analyzer.reconcile_rtcm()))
         tmp.cleanup()
 
     def test_disconnect_during_rtcm_resends_nothing_old(self):
@@ -121,7 +159,8 @@ class Scenarios(unittest.TestCase):
         bench, _, tmp = run("corte-orden", cycles=2)
         a = bench.analyzer
         self.assertEqual(a.requests_cancelled, 2)
-        self.assertEqual(a.latency_by_path["GET /api/ble"].__len__(), 2)
+        # Una GET /api/ble por conexión (como las apps) y otra tras cada corte.
+        self.assertEqual(len(a.latency_by_path["GET /api/ble"]), a.connects + 2)
         self.assertEqual(a.reassembler.counts["orphan"], 0)
         tmp.cleanup()
 
@@ -129,7 +168,7 @@ class Scenarios(unittest.TestCase):
         bench, _, tmp = run("reconexiones", cycles=3)
         a = bench.analyzer
         self.assertEqual(a.connects, 3)
-        self.assertEqual(len(a.latency_by_path["GET /api/ble"]), 3)
+        self.assertEqual(len(a.latency_by_path["GET /api/ble"]), 2 * 3)
         tmp.cleanup()
 
     def test_malformed_rtcm_and_command(self):

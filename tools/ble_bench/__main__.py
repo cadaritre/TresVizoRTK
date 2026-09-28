@@ -136,10 +136,12 @@ def cmd_run(args) -> int:
             return 2
         link_factory = lambda: BleakLink(address=args.address, name=args.name)  # noqa: E731
         link_kind = "bluetooth"
-    metadata = {"scenario": args.scenario, "link": link_kind, "options": _plain(options)}
+    metadata = {"scenario": args.scenario, "link": link_kind, "options": _plain(options),
+                 "command_priority": not args.no_command_priority}
     metadata["options"]["rtcm_file"] = str(options.rtcm_file) if options.rtcm_file else None
     recorder = Recorder(out / "sesion.jsonl", out / "eventos.csv", metadata=metadata)
-    bench = Bench(link_factory, recorder, allow_mutations=args.select_ble_source)
+    bench = Bench(link_factory, recorder, allow_mutations=args.select_ble_source,
+                  command_priority=not args.no_command_priority)
     print(f"escenario {args.scenario}: {scenario.description}\nregistro en {out}", flush=True)
     code = 0
     try:
@@ -210,6 +212,8 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--seed", type=int)
     run.add_argument("--select-ble-source", action="store_true",
                      help="permite PUT /api/corrections/source {\"source\":\"ble\"} (cambia el estado del equipo)")
+    run.add_argument("--no-command-priority", action="store_true",
+                     help="el RTCM no cede el carril a las órdenes (para medir la diferencia)")
     run.add_argument("--out", help="carpeta de salida (defecto tools/ble_bench/sesiones-banco/…)")
     run.set_defaults(func=cmd_run)
     return parser

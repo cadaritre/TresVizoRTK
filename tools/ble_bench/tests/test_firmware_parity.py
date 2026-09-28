@@ -16,7 +16,8 @@ from bench import rtcm
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
-FIRMWARE_LIB = REPO / "firmware" / "esp32" / "lib"
+# Otra copia del firmware (p. ej. la rama del líder) con MERIDIAN_FIRMWARE_LIB=<…/firmware/esp32/lib>.
+FIRMWARE_LIB = Path(os.environ.get("MERIDIAN_FIRMWARE_LIB", REPO / "firmware" / "esp32" / "lib"))
 COMPILER = shutil.which("c++") or shutil.which("g++") or shutil.which("clang++")
 
 
@@ -93,6 +94,19 @@ class FirmwareParity(unittest.TestCase):
             self.assertEqual(p.encode_health(inputs).hex(), packet)
             decoded = p.decode_health(bytes.fromhex(packet))
             self.assertEqual(decoded.quality, int(quality))
+
+    def test_health_rtcm_counters(self):
+        rows = self.rows("health_rtcm")
+        self.assertEqual(len(rows), 3)
+        for supported, discarded, rejected, percent, packet in rows:
+            inputs = p.HealthInputs(has_rtcm_counters=supported == "1", rtcm_frames_discarded=int(discarded),
+                                    rtcm_frames_rejected=int(rejected), rtcm_queue_percent=int(percent))
+            self.assertEqual(p.encode_health(inputs).hex(), packet)
+            if supported == "0":
+                # Cabeceras anteriores al contrato v3: no hay nada que comparar.
+                continue
+            decoded = p.decode_health(bytes.fromhex(packet))
+            self.assertEqual(decoded.rtcm_frames_discarded_mod256, int(discarded))
 
     def test_rtcm_parser_counts_the_same(self):
         (row,) = self.rows("rtcm")

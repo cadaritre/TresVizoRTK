@@ -210,7 +210,8 @@ class HealthMatchesFirmware(unittest.TestCase):
         self.assertEqual((h.correction_age_seconds, h.correction_source_name, h.quality), (1, "NTRIP", 4))
         self.assertEqual((h.satellites_tracked, h.satellites_visible), (31, 39))
         self.assertTrue(h.bytes_1_to_4_are_display_precision and h.has_raw_precision)
-        self.assertFalse(h.has_extension)
+        self.assertFalse(h.has_rtcm_counters)
+        self.assertIsNone(h.rtcm_queue_percent)
 
     def test_unknowns_are_none_not_zero(self):
         h = p.decode_health(p.encode_health(p.HealthInputs()))
@@ -219,12 +220,33 @@ class HealthMatchesFirmware(unittest.TestCase):
         self.assertIsNone(h.raw_horizontal_sigma_mm)
         self.assertIsNone(h.correction_age_seconds)
 
-    def test_extension_bytes_are_exposed_raw(self):
+    def test_rtcm_counters_v3(self):
+        # Vectores de health_packet_test.cpp en 0.7.11 (contrato v3).
+        report = p.encode_health(p.HealthInputs(has_rtcm_counters=True, rtcm_frames_discarded=300,
+                                                rtcm_frames_rejected=3,
+                                                rtcm_queue_percent=p.queue_percent(4100, 8192)))
+        self.assertEqual(report[16], p.HEALTH_FLAG_DISPLAY_PRECISION | p.HEALTH_FLAG_RAW_PRECISION
+                         | p.HEALTH_FLAG_RTCM_COUNTERS)
+        self.assertEqual(tuple(report[17:20]), (44, 3, 51))
+        h = p.decode_health(report)
+        self.assertTrue(h.has_rtcm_counters)
+        self.assertEqual((h.rtcm_frames_discarded_mod256, h.rtcm_frames_rejected_mod256, h.rtcm_queue_percent),
+                         (44, 3, 51))
+        self.assertEqual(p.queue_percent(0, 8192), 0)
+        self.assertEqual(p.queue_percent(1, 8192), 1)
+        self.assertEqual(p.queue_percent(8192, 8192), 100)
+        self.assertEqual(p.queue_percent(10, 0), p.UNKNOWN_PERCENT)
+        unknown = p.decode_health(p.encode_health(p.HealthInputs(has_rtcm_counters=True)))
+        self.assertIsNone(unknown.rtcm_queue_percent)
+        self.assertEqual(p.counter_delta_mod256(250, 4), 10)
+        self.assertEqual(p.counter_delta_mod256(7, 7), 0)
+
+    def test_bytes_17_19_ignored_without_flag(self):
         report = bytearray(p.encode_health(p.HealthInputs()))
-        report[16] |= p.HEALTH_FLAG_EXTENSION
         report[17:20] = b"\x01\x02\x03"
         h = p.decode_health(bytes(report))
-        self.assertTrue(h.has_extension)
+        self.assertFalse(h.has_rtcm_counters)
+        self.assertIsNone(h.rtcm_frames_discarded_mod256)
         self.assertEqual(h.extension_bytes, b"\x01\x02\x03")
 
     def test_bad_version_and_length(self):
