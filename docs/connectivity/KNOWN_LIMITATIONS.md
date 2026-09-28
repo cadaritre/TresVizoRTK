@@ -6,8 +6,12 @@ Una Mac que se conectó hace tiempo a un firmware antiguo siguió viendo, con 0.
 **4 características en vez de 5** (sin la de salud `a04c0006`) y la de RTCM **sin** escritura
 sin respuesta. El primer escaneo la nombró con el nombre antiguo del equipo («TresVizo-C81D»):
 la Mac usa lo que guardó. Sin emparejamiento el cliente no recibe el aviso de «servicios
-cambiados» (la pila solo lo manda a emparejados); mandarlo a mano al conectar no bastó
-(probado y retirado). **Un iPhone o Android que se conectó con un firmware viejo puede estar
+cambiados» (la pila solo lo manda a emparejados). **Confirmado del lado del equipo**: la
+característica de salud existe (handle 52; respuestas 44, solución 47), así que lo que ve la
+Mac es su copia vieja. Mandar el aviso a mano, al conectar o 1.5 s después, sale bien del equipo
+(`ESP_OK`) pero macOS no redescubre; queda en el firmware **apagado por defecto**
+(`-DTRESVIZO_BLE_SERVICE_CHANGED`) para probarlo con un iPhone, porque si iOS lo atiende a mitad
+de sesión, una app sin `didModifyServices` se quedaría con características muertas. **Un iPhone o Android que se conectó con un firmware viejo puede estar
 igual**: sin salud y sin RTCM sin respuesta, aunque el equipo los tenga.
 
 - Mitigado en las apps: la salud no se exige para estar lista; el modo de escritura del RTCM
