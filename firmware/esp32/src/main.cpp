@@ -9,6 +9,7 @@
 #include <WiFi.h>
 #include <esp_http_server.h>
 #include "telemetry_ws.h"
+#include "gnss_visible.h"
 #include <freertos/semphr.h>
 #include "config_rules.h"
 #include "instrument.h"
@@ -200,6 +201,7 @@ void setup() {
     ntrip_input::begin();
     correction_output::begin();
     base_survey::begin();
+    gnss_visible::begin();
     ble_transport::begin(dispatch, authenticated);
     httpd_config_t configuration = HTTPD_DEFAULT_CONFIG();
     configuration.uri_match_fn = httpd_uri_match_wildcard;

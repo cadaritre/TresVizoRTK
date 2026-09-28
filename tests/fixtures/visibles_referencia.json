@@ -1,0 +1,416 @@
+{
+ "descripcion": "Fijaciones para probar el calculo de satelites visibles (SGP4 de referencia y Kepler+J2). Posicion redondeada a proposito; no es la del equipo.",
+ "posicion": {
+  "lat_deg": 28.6,
+  "lon_deg": -106.1,
+  "altura_elipsoidal_m": 1500.0
+ },
+ "tle_fuente": "https://celestrak.org/NORAD/elements/gp.php?GROUP=gnss&FORMAT=tle (descargado 2026-09-27 ~17:45 -06:00)",
+ "definicion_visible": "elevacion geometrica >= mascara de elevacion del receptor (por defecto 5 grados; leer /api/gnss/profile -> elevation_mask_deg); constelaciones GPS, GLONASS, Galileo, BeiDou y QZSS del grupo gnss de CelesTrak; sin SBAS ni NavIC. Propagacion Kepler+J2 desde los elementos medios del TLE (difiere de SGP4 menos de 0.15 grados en 72 h).",
+ "tolerancia_recomendada_deg": 0.2,
+ "instantes": [
+  {
+   "utc": "2026-09-28T00:30:00Z",
+   "t_unix": 1790555400.0,
+   "satelites": [
+    {
+     "nombre": "GPS BIIR-5  (PRN 22)",
+     "sistema": "GPS",
+     "tle1": "1 26407U 00040A   26270.25755789  .00000020  00000+0  00000+0 0  9998",
+     "tle2": "2 26407  54.8360 211.1117 0117563 304.0914 237.9330  2.00558413191999",
+     "sgp4_el": 29.546,
+     "sgp4_az": 259.996,
+     "kepler_j2_el": 29.548,
+     "kepler_j2_az": 259.972
+    },
+    {
+     "nombre": "COSMOS 2434 (721)",
+     "sistema": "GLO",
+     "tle1": "1 32393U 07065A   26270.08093322  .00000030  00000+0  00000+0 0  9993",
+     "tle2": "2 32393  64.3185 188.4814 0002038  48.5240  98.8629  2.13101359145949",
+     "sgp4_el": 2.272,
+     "sgp4_az": 66.607,
+     "kepler_j2_el": 2.313,
+     "kepler_j2_az": 66.594
+    },
+    {
+     "nombre": "GSAT0202 (GALILEO 6)",
+     "sistema": "GAL",
+     "tle1": "1 40129U 14050B   26267.30639365  .00000005  00000+0  00000+0 0  9997",
+     "tle2": "2 40129  48.7890 268.4477 1689319 183.9197 174.5774  1.85520321 82324",
+     "sgp4_el": 26.152,
+     "sgp4_az": 203.255,
+     "kepler_j2_el": 26.186,
+     "kepler_j2_az": 203.21
+    },
+    {
+     "nombre": "GPS BIIF-10 (PRN 08)",
+     "sistema": "GPS",
+     "tle1": "1 40730U 15033A   26267.94136118  .00000016  00000+0  00000+0 0  9997",
+     "tle2": "2 40730  53.9130 262.9663 0117755  30.6491 330.0423  2.00550998 81990",
+     "sgp4_el": 39.056,
+     "sgp4_az": 49.717,
+     "kepler_j2_el": 39.082,
+     "kepler_j2_az": 49.697
+    },
+    {
+     "nombre": "GSAT0210 (GALILEO 13)",
+     "sistema": "GAL",
+     "tle1": "1 41550U 16030B   26269.53252088  .00000011  00000+0  00000+0 0  9993",
+     "tle2": "2 41550  55.0706 218.9074 0003549 255.7048 104.2182  1.70473438 64390",
+     "sgp4_el": -54.513,
+     "sgp4_az": 74.119,
+     "kepler_j2_el": -54.463,
+     "kepler_j2_az": 74.051
+    },
+    {
+     "nombre": "BEIDOU-3 M1 (C19)",
+     "sistema": "BDS",
+     "tle1": "1 43001U 17069A   26267.46976237  .00000003  00000+0  00000+0 0  9999",
+     "tle2": "2 43001  56.7829  59.8207 0007088 320.0864  39.8776  1.86231384 60455",
+     "sgp4_el": 15.54,
+     "sgp4_az": 183.105,
+     "kepler_j2_el": 15.575,
+     "kepler_j2_az": 183.127
+    },
+    {
+     "nombre": "BEIDOU-3 M7 (C27)",
+     "sistema": "BDS",
+     "tle1": "1 43107U 18003A   26270.37296466 -.00000015  00000+0  00000+0 0  9992",
+     "tle2": "2 43107  54.2339 298.7419 0002890 102.5393 257.5503  1.86228112 59254",
+     "sgp4_el": 5.895,
+     "sgp4_az": 41.105,
+     "kepler_j2_el": 5.896,
+     "kepler_j2_az": 41.066
+    },
+    {
+     "nombre": "BEIDOU-3 M24 (C46)",
+     "sistema": "BDS",
+     "tle1": "1 44542U 19061A   26266.50572373 -.00000008  00000+0  00000+0 0  9997",
+     "tle2": "2 44542  54.4306 179.4090 0020747  95.6918 264.5686  1.86175926 47622",
+     "sgp4_el": 16.002,
+     "sgp4_az": 73.618,
+     "kepler_j2_el": 16.015,
+     "kepler_j2_az": 73.634
+    },
+    {
+     "nombre": "COSMOS 2545 (760)",
+     "sistema": "GLO",
+     "tle1": "1 45358U 20018A   26270.05365493 -.00000001  00000+0  00000+0 0  9998",
+     "tle2": "2 45358  64.2888 308.8333 0012128 237.8225 122.1376  2.13102768 50832",
+     "sgp4_el": 31.009,
+     "sgp4_az": 89.212,
+     "kepler_j2_el": 31.026,
+     "kepler_j2_az": 89.143
+    },
+    {
+     "nombre": "QZS-1R (QZSS/PRN 196)",
+     "sistema": "QZS",
+     "tle1": "1 49336U 21096A   26269.78135419 -.00000192  00000+0  00000+0 0  9997",
+     "tle2": "2 49336  37.6716  78.0826 0744623 270.0779  73.3870  1.00283220 18023",
+     "sgp4_el": -12.634,
+     "sgp4_az": 315.597,
+     "kepler_j2_el": -12.603,
+     "kepler_j2_az": 315.615
+    }
+   ],
+   "conteo_visibles_sgp4": {
+    "GPS": 14,
+    "GLO": 11,
+    "GAL": 13,
+    "BDS": 13
+   },
+   "conteo_visibles_kepler_j2": {
+    "GPS": 14,
+    "GLO": 11,
+    "GAL": 13,
+    "BDS": 13
+   },
+   "total_sgp4": 51,
+   "total_kepler_j2": 51,
+   "conteo_visibles_sgp4_mascara_5": {
+    "GPS": 11,
+    "GLO": 8,
+    "GAL": 8,
+    "BDS": 12
+   },
+   "total_sgp4_mascara_5": 39,
+   "conteo_visibles_kepler_j2_mascara_5": {
+    "GPS": 11,
+    "GLO": 8,
+    "GAL": 8,
+    "BDS": 12
+   },
+   "total_kepler_j2_mascara_5": 39
+  },
+  {
+   "utc": "2026-09-28T06:30:00Z",
+   "t_unix": 1790577000.0,
+   "satelites": [
+    {
+     "nombre": "GPS BIIR-5  (PRN 22)",
+     "sistema": "GPS",
+     "tle1": "1 26407U 00040A   26270.25755789  .00000020  00000+0  00000+0 0  9998",
+     "tle2": "2 26407  54.8360 211.1117 0117563 304.0914 237.9330  2.00558413191999",
+     "sgp4_el": 22.659,
+     "sgp4_az": 129.279,
+     "kepler_j2_el": 22.715,
+     "kepler_j2_az": 129.251
+    },
+    {
+     "nombre": "COSMOS 2434 (721)",
+     "sistema": "GLO",
+     "tle1": "1 32393U 07065A   26270.08093322  .00000030  00000+0  00000+0 0  9993",
+     "tle2": "2 32393  64.3185 188.4814 0002038  48.5240  98.8629  2.13101359145949",
+     "sgp4_el": -81.28,
+     "sgp4_az": 354.357,
+     "kepler_j2_el": -81.268,
+     "kepler_j2_az": 354.371
+    },
+    {
+     "nombre": "GSAT0202 (GALILEO 6)",
+     "sistema": "GAL",
+     "tle1": "1 40129U 14050B   26267.30639365  .00000005  00000+0  00000+0 0  9997",
+     "tle2": "2 40129  48.7890 268.4477 1689319 183.9197 174.5774  1.85520321 82324",
+     "sgp4_el": 55.049,
+     "sgp4_az": 43.677,
+     "kepler_j2_el": 55.037,
+     "kepler_j2_az": 43.596
+    },
+    {
+     "nombre": "GPS BIIF-10 (PRN 08)",
+     "sistema": "GPS",
+     "tle1": "1 40730U 15033A   26267.94136118  .00000016  00000+0  00000+0 0  9997",
+     "tle2": "2 40730  53.9130 262.9663 0117755  30.6491 330.0423  2.00550998 81990",
+     "sgp4_el": -57.815,
+     "sgp4_az": 129.584,
+     "kepler_j2_el": -57.782,
+     "kepler_j2_az": 129.564
+    },
+    {
+     "nombre": "GSAT0210 (GALILEO 13)",
+     "sistema": "GAL",
+     "tle1": "1 41550U 16030B   26269.53252088  .00000011  00000+0  00000+0 0  9993",
+     "tle2": "2 41550  55.0706 218.9074 0003549 255.7048 104.2182  1.70473438 64390",
+     "sgp4_el": -60.613,
+     "sgp4_az": 293.58,
+     "kepler_j2_el": -60.63,
+     "kepler_j2_az": 293.549
+    },
+    {
+     "nombre": "BEIDOU-3 M1 (C19)",
+     "sistema": "BDS",
+     "tle1": "1 43001U 17069A   26267.46976237  .00000003  00000+0  00000+0 0  9999",
+     "tle2": "2 43001  56.7829  59.8207 0007088 320.0864  39.8776  1.86231384 60455",
+     "sgp4_el": 8.115,
+     "sgp4_az": 73.966,
+     "kepler_j2_el": 8.099,
+     "kepler_j2_az": 73.968
+    },
+    {
+     "nombre": "BEIDOU-3 M7 (C27)",
+     "sistema": "BDS",
+     "tle1": "1 43107U 18003A   26270.37296466 -.00000015  00000+0  00000+0 0  9992",
+     "tle2": "2 43107  54.2339 298.7419 0002890 102.5393 257.5503  1.86228112 59254",
+     "sgp4_el": -74.049,
+     "sgp4_az": 154.48,
+     "kepler_j2_el": -74.028,
+     "kepler_j2_az": 154.503
+    },
+    {
+     "nombre": "BEIDOU-3 M24 (C46)",
+     "sistema": "BDS",
+     "tle1": "1 44542U 19061A   26266.50572373 -.00000008  00000+0  00000+0 0  9997",
+     "tle2": "2 44542  54.4306 179.4090 0020747  95.6918 264.5686  1.86175926 47622",
+     "sgp4_el": -68.304,
+     "sgp4_az": 113.676,
+     "kepler_j2_el": -68.317,
+     "kepler_j2_az": 113.585
+    },
+    {
+     "nombre": "COSMOS 2545 (760)",
+     "sistema": "GLO",
+     "tle1": "1 45358U 20018A   26270.05365493 -.00000001  00000+0  00000+0 0  9998",
+     "tle2": "2 45358  64.2888 308.8333 0012128 237.8225 122.1376  2.13102768 50832",
+     "sgp4_el": -66.554,
+     "sgp4_az": 100.885,
+     "kepler_j2_el": -66.537,
+     "kepler_j2_az": 100.893
+    },
+    {
+     "nombre": "QZS-1R (QZSS/PRN 196)",
+     "sistema": "QZS",
+     "tle1": "1 49336U 21096A   26269.78135419 -.00000192  00000+0  00000+0 0  9997",
+     "tle2": "2 49336  37.6716  78.0826 0744623 270.0779  73.3870  1.00283220 18023",
+     "sgp4_el": -26.077,
+     "sgp4_az": 300.758,
+     "kepler_j2_el": -26.036,
+     "kepler_j2_az": 300.709
+    }
+   ],
+   "conteo_visibles_sgp4": {
+    "GPS": 12,
+    "GLO": 9,
+    "BDS": 13,
+    "GAL": 9
+   },
+   "conteo_visibles_kepler_j2": {
+    "GPS": 12,
+    "GLO": 9,
+    "BDS": 13,
+    "GAL": 9
+   },
+   "total_sgp4": 43,
+   "total_kepler_j2": 43,
+   "conteo_visibles_sgp4_mascara_5": {
+    "GPS": 11,
+    "GLO": 7,
+    "BDS": 12,
+    "GAL": 8
+   },
+   "total_sgp4_mascara_5": 38,
+   "conteo_visibles_kepler_j2_mascara_5": {
+    "GPS": 11,
+    "GLO": 7,
+    "BDS": 12,
+    "GAL": 8
+   },
+   "total_kepler_j2_mascara_5": 38
+  },
+  {
+   "utc": "2026-09-29T00:30:00Z",
+   "t_unix": 1790641800.0,
+   "satelites": [
+    {
+     "nombre": "GPS BIIR-5  (PRN 22)",
+     "sistema": "GPS",
+     "tle1": "1 26407U 00040A   26270.25755789  .00000020  00000+0  00000+0 0  9998",
+     "tle2": "2 26407  54.8360 211.1117 0117563 304.0914 237.9330  2.00558413191999",
+     "sgp4_el": 30.625,
+     "sgp4_az": 261.847,
+     "kepler_j2_el": 30.631,
+     "kepler_j2_az": 261.824
+    },
+    {
+     "nombre": "COSMOS 2434 (721)",
+     "sistema": "GLO",
+     "tle1": "1 32393U 07065A   26270.08093322  .00000030  00000+0  00000+0 0  9993",
+     "tle2": "2 32393  64.3185 188.4814 0002038  48.5240  98.8629  2.13101359145949",
+     "sgp4_el": -32.796,
+     "sgp4_az": 95.131,
+     "kepler_j2_el": -32.764,
+     "kepler_j2_az": 95.086
+    },
+    {
+     "nombre": "GSAT0202 (GALILEO 6)",
+     "sistema": "GAL",
+     "tle1": "1 40129U 14050B   26267.30639365  .00000005  00000+0  00000+0 0  9997",
+     "tle2": "2 40129  48.7890 268.4477 1689319 183.9197 174.5774  1.85520321 82324",
+     "sgp4_el": -18.282,
+     "sgp4_az": 219.786,
+     "kepler_j2_el": -18.243,
+     "kepler_j2_az": 219.739
+    },
+    {
+     "nombre": "GPS BIIF-10 (PRN 08)",
+     "sistema": "GPS",
+     "tle1": "1 40730U 15033A   26267.94136118  .00000016  00000+0  00000+0 0  9997",
+     "tle2": "2 40730  53.9130 262.9663 0117755  30.6491 330.0423  2.00550998 81990",
+     "sgp4_el": 37.573,
+     "sgp4_az": 48.512,
+     "kepler_j2_el": 37.598,
+     "kepler_j2_az": 48.495
+    },
+    {
+     "nombre": "GSAT0210 (GALILEO 13)",
+     "sistema": "GAL",
+     "tle1": "1 41550U 16030B   26269.53252088  .00000011  00000+0  00000+0 0  9993",
+     "tle2": "2 41550  55.0706 218.9074 0003549 255.7048 104.2182  1.70473438 64390",
+     "sgp4_el": 45.021,
+     "sgp4_az": 33.411,
+     "kepler_j2_el": 45.08,
+     "kepler_j2_az": 33.405
+    },
+    {
+     "nombre": "BEIDOU-3 M1 (C19)",
+     "sistema": "BDS",
+     "tle1": "1 43001U 17069A   26267.46976237  .00000003  00000+0  00000+0 0  9999",
+     "tle2": "2 43001  56.7829  59.8207 0007088 320.0864  39.8776  1.86231384 60455",
+     "sgp4_el": 41.39,
+     "sgp4_az": 243.502,
+     "kepler_j2_el": 41.426,
+     "kepler_j2_az": 243.576
+    },
+    {
+     "nombre": "BEIDOU-3 M7 (C27)",
+     "sistema": "BDS",
+     "tle1": "1 43107U 18003A   26270.37296466 -.00000015  00000+0  00000+0 0  9992",
+     "tle2": "2 43107  54.2339 298.7419 0002890 102.5393 257.5503  1.86228112 59254",
+     "sgp4_el": 38.295,
+     "sgp4_az": 91.805,
+     "kepler_j2_el": 38.304,
+     "kepler_j2_az": 91.737
+    },
+    {
+     "nombre": "BEIDOU-3 M24 (C46)",
+     "sistema": "BDS",
+     "tle1": "1 44542U 19061A   26266.50572373 -.00000008  00000+0  00000+0 0  9997",
+     "tle2": "2 44542  54.4306 179.4090 0020747  95.6918 264.5686  1.86175926 47622",
+     "sgp4_el": 55.919,
+     "sgp4_az": 15.239,
+     "kepler_j2_el": 55.953,
+     "kepler_j2_az": 15.295
+    },
+    {
+     "nombre": "COSMOS 2545 (760)",
+     "sistema": "GLO",
+     "tle1": "1 45358U 20018A   26270.05365493 -.00000001  00000+0  00000+0 0  9998",
+     "tle2": "2 45358  64.2888 308.8333 0012128 237.8225 122.1376  2.13102768 50832",
+     "sgp4_el": 10.488,
+     "sgp4_az": 36.473,
+     "kepler_j2_el": 10.5,
+     "kepler_j2_az": 36.45
+    },
+    {
+     "nombre": "QZS-1R (QZSS/PRN 196)",
+     "sistema": "QZS",
+     "tle1": "1 49336U 21096A   26269.78135419 -.00000192  00000+0  00000+0 0  9997",
+     "tle2": "2 49336  37.6716  78.0826 0744623 270.0779  73.3870  1.00283220 18023",
+     "sgp4_el": -12.455,
+     "sgp4_az": 315.695,
+     "kepler_j2_el": -12.422,
+     "kepler_j2_az": 315.706
+    }
+   ],
+   "conteo_visibles_sgp4": {
+    "GPS": 14,
+    "GLO": 11,
+    "GAL": 12,
+    "BDS": 12
+   },
+   "conteo_visibles_kepler_j2": {
+    "GPS": 14,
+    "GLO": 11,
+    "GAL": 12,
+    "BDS": 12
+   },
+   "total_sgp4": 49,
+   "total_kepler_j2": 49,
+   "conteo_visibles_sgp4_mascara_5": {
+    "GPS": 11,
+    "GLO": 9,
+    "GAL": 11,
+    "BDS": 12
+   },
+   "total_sgp4_mascara_5": 43,
+   "conteo_visibles_kepler_j2_mascara_5": {
+    "GPS": 12,
+    "GLO": 9,
+    "GAL": 11,
+    "BDS": 12
+   },
+   "total_kepler_j2_mascara_5": 44
+  }
+ ],
+ "nota_conteos": "Kepler+J2 y SGP4 pueden diferir en 1 satelite cuando uno queda a menos de ~0.15 grados de la mascara. Panel y apps usan Kepler+J2 y deben coincidir exactamente entre si."
+}

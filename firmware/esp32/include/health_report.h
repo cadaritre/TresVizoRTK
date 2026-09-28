@@ -4,6 +4,7 @@
 #include "correction_router.h"
 #include "gnss_receiver.h"
 #include "gnss_sky.h"
+#include "gnss_visible.h"
 #include "health_packet.h"
 
 // El paquete de salud que mandan el Bluetooth y el WebSocket, armado en un
@@ -31,6 +32,9 @@ inline void build(uint8_t report[20], const gnss_receiver::Snapshot& snapshot) {
     // Satelites **rastreados** (GSV). 255 = sin GSV reciente.
     unsigned tracked = 0;
     in.tracked = gnss_sky::tracked(tracked) ? uint8_t(std::min(tracked, 254u)) : 255;
+    // Satelites **visibles** (geometria sobre la mascara). 255 = no se sabe.
+    unsigned visible = 0;
+    in.visible = gnss_visible::visible(visible) ? uint8_t(std::min(visible, 254u)) : 255;
     protocol::encodeHealth(report, in);
 }
 

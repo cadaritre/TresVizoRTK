@@ -72,6 +72,7 @@ struct HealthInputs {
     uint8_t source = 0;
     uint8_t quality = 0;
     uint8_t tracked = 255;                            // 255 = sin GSV reciente
+    uint8_t visible = 255;                            // 255 = desconocido (sin orbitas o sin posicion)
 };
 
 inline void put16(uint8_t* target, uint16_t value) {
@@ -89,7 +90,7 @@ inline void encodeHealth(uint8_t report[20], const HealthInputs& in) {
     report[8] = in.quality;
     report[9] = 0;  // IMU: reservado
     report[10] = in.tracked;
-    // Byte 11 libre: reservado para satelites visibles si algun dia los da el equipo.
+    report[11] = in.visible;  // satelites VISIBLES, calculados en el ESP32 (gnss_visible.cpp)
     put16(report + 12, in.um980RawHorizontalSigmaMm);
     put16(report + 14, in.um980RawVerticalSigmaMm);
     report[16] = kFlagDisplayPrecision | kFlagRawPrecision;

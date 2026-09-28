@@ -60,13 +60,22 @@ int main() {
     in.source = 2;
     in.quality = 4;
     in.tracked = 31;
+    in.visible = 39;
     uint8_t report[20];
     protocol::encodeHealth(report, in);
     assert(report[0] == 1);
     assert(get16(report + 1) == 10 && get16(report + 3) == 15);   // mostrada (gobierna H = 12)
     assert(get16(report + 12) == 12 && get16(report + 14) == 39); // cruda, sin tocar
     assert(get16(report + 5) == 1 && report[7] == 2 && report[8] == 4 && report[10] == 31);
-    assert(report[9] == 0 && report[11] == 0);
+    assert(report[9] == 0);
+    assert(report[11] == 39);  // visibles
+    // Sin visibles conocidos, 255 (no 0, que diria «ninguno»).
+    {
+        protocol::HealthInputs unknown;
+        uint8_t r[20];
+        protocol::encodeHealth(r, unknown);
+        assert(r[11] == 255 && get16(r + 1) == protocol::kUnknownMm && get16(r + 12) == protocol::kUnknownMm);
+    }
     assert(report[16] == (protocol::kFlagDisplayPrecision | protocol::kFlagRawPrecision));
     for (unsigned i = 17; i < 20; ++i) assert(report[i] == 0);
 

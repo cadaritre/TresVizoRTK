@@ -27,16 +27,15 @@ assert.equal(values["gnss-quality"], "Sin datos vigentes");
 context.renderGnss({ ...live, solution: { latitude_deg: null, longitude_deg: null, fix: "invalid" } });
 assert.equal(values["gnss-latitude"], "—");
 assert.equal(values["gnss-quality"], "Sin solución");
-// Satélites: solo los rastreados, de GSV. Los usados no se enseñan aunque
-// lleguen; sin GSV no se inventa la cifra, y con datos antiguos no hay ninguna.
+// Satélites: visibles · rastreados; lo que no se sabe va como «—», y con datos
+// antiguos no hay cifra.
+context.renderGnss({ ...live, solution: { ...live.solution, satellites_used: 17, satellites_tracked: 32, satellites_visible: 39 } });
+assert.equal(values["field-satellites"], "39 · 32");
+assert.equal(values["field-satellites-note"], "Visibles · rastreados");
 context.renderGnss({ ...live, solution: { ...live.solution, satellites_used: 17, satellites_tracked: 32 } });
-assert.equal(values["field-satellites"], "32");
-assert.equal(values["field-satellites-note"], "Rastreados");
-context.renderGnss({ ...live, solution: { ...live.solution, satellites_used: 17 } });
-assert.equal(values["field-satellites"], "—");
-assert.equal(values["field-satellites-note"], "Sin GSV del receptor");
+assert.equal(values["field-satellites"], "— · 32");
 context.renderGnss({ ...live, subsystems: { gnss: { state: "stale" } },
-  solution: { ...live.solution, satellites_used: 17, satellites_tracked: 32 } });
+  solution: { ...live.solution, satellites_used: 17, satellites_tracked: 32, satellites_visible: 39 } });
 assert.equal(values["field-satellites"], "—");
 assert.equal(values["field-satellites-note"], "—");
 // Precisión horizontal por eje: la peor de norte y este, no la combinada.

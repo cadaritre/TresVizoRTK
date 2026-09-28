@@ -17,6 +17,9 @@ bool isBase();
 // porque sirve para autorizar una conexion, no para informar del papel.
 bool isRover();
 const char* heightReference();
+// Mascara de elevacion del receptor segun la ultima lectura o aplicacion (5 por
+// defecto del manual N4). La usa el conteo de satelites visibles.
+double elevationMaskDeg();
 int start(JsonVariantConst body, JsonDocument& out);
 int applyBase(JsonVariantConst plan, JsonDocument& out);
 void status(JsonObject out);

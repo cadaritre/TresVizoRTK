@@ -14,6 +14,7 @@
 #include "base_survey.h"
 #include "telemetry_ws.h"
 #include "health_packet.h"
+#include "gnss_visible.h"
 
 #include <Preferences.h>
 #include <WiFi.h>
@@ -755,6 +756,10 @@ void status(JsonDocument& response) {
             // débiles descartadas. Sin GSV reciente no se publica.
             unsigned tracked = 0;
             if (gnss_sky::tracked(tracked)) out["satellites_tracked"] = tracked;
+            // Visibles: los que la geometria pone sobre la mascara, se oigan o
+            // no (gnss_visible.cpp). Se omite si no se sabe.
+            unsigned visible = 0;
+            if (gnss_visible::visible(visible)) out["satellites_visible"] = visible;
             if (std::isfinite(gnss.solution.hdop)) out["hdop"] = gnss.solution.hdop;
             // GST llega en su propia trama: solo se publica si es tan reciente
             // como la posición, para no mezclar una sigma vieja con un fix nuevo.
@@ -1043,7 +1048,7 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
     // El cielo va en su propia ruta y no en /api/status: son varios kilobytes
     // que solo hacen falta con la pantalla de satelites abierta, y el estado se
     // consulta una vez por segundo desde todas partes.
-    if(path=="/api/gnss/sky" && method=="GET"){gnss_sky::publish(response.to<JsonObject>());return 200;}
+    if(path=="/api/gnss/sky" && method=="GET"){gnss_sky::publish(response.to<JsonObject>());gnss_visible::status(response["orbits"].to<JsonObject>());return 200;}
     if(path=="/api/base/apply" && method=="POST") {
         JsonDocument preview;int code=previewBase(body,preview);
         if(code!=200){response=preview;return code;}

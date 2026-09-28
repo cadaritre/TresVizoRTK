@@ -153,13 +153,11 @@ function renderGnss(data) {
   text("field-height-reference", !position ? "—" :
     solution.height_reference === "receiver_msl" ? "MSL del receptor" :
     solution.height_reference === "ellipsoidal_user_configured" ? "Elipsoidal configurada" : "Referencia no confirmada");
-  // Satélites **rastreados**, de GSV: los que el receptor oye. Los usados de
-  // GGA dependen de cuánto descarta la solución y se leían como "agarra pocos";
-  // el propietario pidió quitarlos de Campo. Siguen en la API. Sin GSV reciente
-  // no se sabe, y se dice en la nota en vez de enseñar otra cifra.
+  // Satélites visibles (los calcula el ESP32) · rastreados (GSV).
+  const visible = current && Number.isFinite(solution.satellites_visible) ? solution.satellites_visible : null;
   const tracked = current && Number.isFinite(solution.satellites_tracked) ? solution.satellites_tracked : null;
-  text("field-satellites", tracked === null ? "—" : String(tracked));
-  text("field-satellites-note", !current ? "—" : tracked === null ? "Sin GSV del receptor" : "Rastreados");
+  text("field-satellites", !current ? "—" : `${visible ?? "—"} · ${tracked ?? "—"}`);
+  text("field-satellites-note", !current ? "—" : "Visibles · rastreados");
   text("field-hdop", current && Number.isFinite(solution.hdop) ? solution.hdop.toFixed(1) : "—");
   // Sigma declarada por el receptor, no exactitud comprobada. Se muestra en
   // metros porque es lo que se pregunta en campo; el matiz va en la nota.
