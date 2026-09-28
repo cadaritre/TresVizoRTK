@@ -38,7 +38,13 @@ struct Profile {
     String outputs;                  // resumen de salidas NMEA aplicadas
     String rtcm;                     // resumen del perfil RTCM aplicado
     int dgps_timeout_s = -1;         // -1 = desconocido
-    bool saved = false;              // SAVECONFIG confirmado en esta sesion
+    // Lo que el receptor tiene ahora esta guardado en su NVM: el ultimo trabajo
+    // que escribio configuracion termino con un SAVECONFIG contestado con OK.
+    // Se pone a falso al lanzar cualquier trabajo que escriba y con cada OK de
+    // una escritura; solo el OK del SAVECONFIG lo pone a verdadero. Hasta 0.7.12
+    // lo ponia `commitProfile` por el nombre de la accion, y `applyBase` —que no
+    // enviaba SAVECONFIG— salia con `saved:true`.
+    bool saved = false;
     // Tasa de GGA de la ultima `telemetry` u `outputs` confirmada. La usa
     // `rover` para reponer las salidas que su UNLOG quita. 0 = ninguna en esta
     // sesion del ESP32: `addPositionOutputs` usa entonces el tope del producto
@@ -86,10 +92,9 @@ String readValueFor(const String& key) {
 
 void finish(const char* state, const char* error="") { phase=state;failure=error;running=false; }
 bool add(const String& c) { if(count>=kMaxCommands){overflowed=true;return false;} commands[count++]=c; return true; }
-bool needsReply() {
-    const String& c = commands[index];
-    return c=="MODE" || c=="VERSIONA" || c=="MASK" || c=="CONFIG";
-}
+// Las consultas: leen y no cambian nada. Todo lo demas escribe configuracion.
+bool isQuery(const String& c) { return c=="MODE" || c=="VERSIONA" || c=="MASK" || c=="CONFIG"; }
+bool needsReply() { return isQuery(commands[index]); }
 
 // Tasas admitidas por el UM980 segun manual N4: 1/2/5/10/20 Hz -> 1/0.5/0.2/0.1/0.05.
 // No se usa 1.0/hz con un decimal porque 20 Hz necesita dos.
@@ -153,8 +158,21 @@ void acceptLine() {
     if(!running || !sent) return;
     const String prefix="$command,"+commands[index]+",response: ";
     if(String(line).startsWith(prefix)) {
-        if(String(line+prefix.length())!="OK") {finish("failed","Receptor rechazó el comando.");return;}
+        if(String(line+prefix.length())!="OK") {
+            // Un SAVECONFIG rechazado deja lo aplicado funcionando solo en la
+            // RAM del receptor. `saved` sigue en falso desde el lanzamiento.
+            if(commands[index]=="SAVECONFIG")
+                finish("failed","El receptor rechazó SAVECONFIG: lo aplicado funciona ahora, pero no quedó guardado y se perderá al apagarlo.");
+            else finish("failed","Receptor rechazó el comando.");
+            return;
+        }
         ack=true;
+        // `saved` sigue al receptor: cualquier escritura confirmada deja la
+        // configuracion distinta de la guardada, y solo el OK del SAVECONFIG
+        // la iguala. Cubre tambien las correcciones que la reconciliacion
+        // encola a mitad de trabajo, que no pasan por `launch`.
+        if(commands[index]=="SAVECONFIG") profileState.saved=true;
+        else if(!isQuery(commands[index])) profileState.saved=false;
         if(commands[index]=="CONFIG UNDULATION 0.0000") ellipsoid=true;
         if(commands[index]=="CONFIG UNDULATION AUTO") ellipsoid=false;
     }
@@ -211,6 +229,9 @@ int prepare(const String& name, JsonDocument& out) {
 }
 int launch(JsonDocument& out) {
     if(overflowed||!count){out["message"]="La operación generó demasiados comandos; no se envió nada.";return 400;}
+    // Un trabajo que va a escribir deja de tener lo guardado garantizado desde
+    // ya: si se corta a mitad, lo que quede en el receptor no esta guardado.
+    for(unsigned i=0;i<count;++i) if(!isQuery(commands[i])) {profileState.saved=false;break;}
     phase="running";running=true;++job;launched=millis();
     out["job_id"]=job;out["state"]=phase;out["saved"]=profileState.saved;return 202;
 }
@@ -220,11 +241,8 @@ void commitProfile() {
     if(action=="mask"){profileState.elevation_known=true;}
     else if(action=="constellations"){profileState.constellations_known=true;}
     if(pendingGgaHz) profileState.gga_rate_hz=pendingGgaHz;
-    // Cualquier acción que modifica configuración termina con SAVECONFIG, así
-    // que al confirmarse queda persistida en el receptor.
-    if(action=="save"||action=="rover"||action=="base"||action=="telemetry"||action=="stop_outputs"||
-       action=="mask"||action=="constellations"||action=="dgps_timeout"||
-       action=="outputs"||action=="rtcm_base"){profileState.saved=true;}
+    // `saved` ya no se decide aqui por el nombre de la accion: lo pone el OK
+    // del SAVECONFIG en `acceptLine`.
 }
 
 bool boolField(JsonVariantConst body,const char* name,bool& target){
@@ -244,6 +262,12 @@ double elevationMaskDeg(){
     const double mask=profileState.elevation_deg;
     xSemaphoreGive(mutex);
     return mask;
+}
+bool persisted(){
+    if(!mutex||xSemaphoreTake(mutex,portMAX_DELAY)!=pdTRUE)return false;
+    const bool saved=profileState.saved;
+    xSemaphoreGive(mutex);
+    return saved;
 }
 
 void feed(const char* data, size_t size) {
@@ -369,6 +393,9 @@ void tick(HardwareSerial& uart) {
         // No se persiste, se vuelve a asegurar en cada arranque. Es idempotente,
         // no escribe la NVM, y arregla de paso el caso que pidio el propietario:
         // un receptor recien montado queda bien la primera vez que se enciende.
+        // Esto vale para la reconciliacion. Los trabajos que pide el operador
+        // (rover, frecuencia, base...) si terminan con SAVECONFIG: ver `start`
+        // y `applyBase`, que explica por que lo guardado ahi es correcto.
         action="reconcile";
         reconciliation = Reconciliation();
         reconciliation.reading = true;
@@ -380,6 +407,11 @@ void tick(HardwareSerial& uart) {
     if(running) {
         if(millis()-launched>kJobBudgetMs) {
             finish("partial_or_unknown","Se agotó el tiempo del trabajo; consulta el estado antes de repetir.");
+        } else if(!sent && commands[index]=="SAVECONFIG" && expectedMode.length() && !mode.startsWith(expectedMode)) {
+            // **Se comprueba el modo antes de guardar, no despues.** SAVECONFIG
+            // persiste lo que haya: si el receptor no quedo en el modo pedido,
+            // guardarlo haria que ese modo equivocado sobreviviera al apagado.
+            finish("partial_or_unknown","Modo leído distinto del solicitado; no se envió SAVECONFIG y la configuración no quedó guardada.");
         } else if(!sent) {
             String wire=commands[index]+"\r\n";
             if(uart.availableForWrite()>=int(wire.length())) {
@@ -573,11 +605,9 @@ int start(JsonVariantConst body,JsonDocument& out) {
         // aparenta estar averiado: el enlace responde pero no llega ni una
         // posición. Ha pasado dos veces. La contrapartida es desgaste de la
         // flash del receptor, acotado porque son cambios manuales, no un bucle.
-        // "base" incluido a proposito: una base que pierde corriente y vuelve
-        // en el modo anterior seguiria emitiendo correcciones desde una
-        // coordenada equivocada, y los rovers fijarian con buena pinta sobre
-        // un punto que no es. Es el fallo mas caro de los que puede tener.
-        if(name=="rover"||name=="base"||name=="telemetry"||name=="stop_outputs"||name=="mask"||
+        // La base se guarda en `applyBase`, que es por donde pasa: `start`
+        // rechaza la accion "base" con 400.
+        if(name=="rover"||name=="telemetry"||name=="stop_outputs"||name=="mask"||
            name=="constellations"||name=="dgps_timeout"||name=="outputs"||name=="rtcm_base")
             add("SAVECONFIG");
         if(name=="save") add("SAVECONFIG");
@@ -595,11 +625,28 @@ int applyBase(JsonVariantConst plan,JsonDocument& out) {
     if(!code){
         rover=false;mode="";
         String command="MODE BASE "+String(plan["station_id"].as<unsigned>())+" ";
+        // UNDULATION 0.0000 en los dos metodos, no solo con coordenada
+        // conocida: el SAVECONFIG de abajo la guarda, y tiene que quedar
+        // guardada la buena.
+        add("CONFIG UNDULATION 0.0000");
         if(plan["method"]=="known") {
-            add("CONFIG UNDULATION 0.0000");
             command+=String(plan["latitude_deg"].as<double>(),11)+" "+String(plan["longitude_deg"].as<double>(),11)+" "+String(plan["arp_ellipsoid_height_m"].as<double>(),4);
         } else command+="TIME "+String(plan["average_seconds"].as<unsigned>())+" "+String(plan["reuse_distance_m"].as<double>(),4);
-        add(command);add("MODE");expectedMode="MODE BASE";code=launch(out);
+        add(command);add("MODE");expectedMode="MODE BASE";
+        // **La base se guarda.** Hasta 0.7.12 no se enviaba SAVECONFIG y el
+        // estado decia `saved:true`: una base que pierde corriente vuelve en el
+        // modo anterior y, si era otra base, seguiria emitiendo correcciones
+        // desde una coordenada equivocada; los rovers fijarian con buena pinta
+        // sobre un punto que no es. Es el fallo mas caro que puede tener.
+        //
+        // El reparo de `tick` —«SAVECONFIG persiste tambien lo que este mal»—
+        // no aplica aqui. La clave que lo motivo fue UNDULATION, y esta misma
+        // secuencia la pone en 0.0000 antes del MODE BASE; el resto de la
+        // linea base la asegura la reconciliacion de cada arranque. Y el
+        // SAVECONFIG solo sale si el MODE leido es base (`tick`): un modo
+        // equivocado no se guarda.
+        add("SAVECONFIG");
+        code=launch(out);
         if(code!=202)finish("idle","");
     }
     xSemaphoreGive(mutex);return code;

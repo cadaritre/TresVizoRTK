@@ -68,8 +68,15 @@ void tick() {
     // Esperando la confirmación del receptor tras enviar la coordenada.
     if (!strcmp(state.load(), "applying")) {
         if (gnss_control::busy()) return;
-        if (gnss_control::isBase()) stop("applied", "");
-        else stop("failed", "El receptor no confirmó el modo base. Consulta su estado en GPS avanzado.");
+        if (!gnss_control::isBase()) {
+            stop("failed", "El receptor no confirmó el modo base. Consulta su estado en GPS avanzado.");
+        } else if (!gnss_control::persisted()) {
+            // Es base, pero lo aplicado vive solo en la RAM del receptor: un
+            // corte lo devuelve a su modo anterior. Se dice, no se calla.
+            stop("applied", "La base quedó aplicada, pero el receptor no confirmó el guardado (SAVECONFIG): si se apaga, volverá a su modo anterior. Revisa el estado en GPS avanzado.");
+        } else {
+            stop("applied", "");
+        }
         return;
     }
     if (!active()) return;

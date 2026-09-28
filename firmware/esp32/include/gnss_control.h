@@ -20,7 +20,15 @@ const char* heightReference();
 // Mascara de elevacion del receptor segun la ultima lectura o aplicacion (5 por
 // defecto del manual N4). La usa el conteo de satelites visibles.
 double elevationMaskDeg();
+// El ultimo trabajo que cambio la configuracion termino con un SAVECONFIG que
+// el receptor confirmo con OK. Es lo que publican `saved` y
+// `persisted_to_receiver`. Falso desde que empieza cualquier trabajo que
+// escriba en el receptor hasta ese OK.
+bool persisted();
 int start(JsonVariantConst body, JsonDocument& out);
+// Coordenada conocida o promedio del receptor. Envia `CONFIG UNDULATION
+// 0.0000`, `MODE BASE ...`, `MODE` y, solo si el modo leido es base,
+// `SAVECONFIG`.
 int applyBase(JsonVariantConst plan, JsonDocument& out);
 void status(JsonObject out);
 // Ultima configuracion avanzada aplicada y leida del receptor. Refleja lo que
