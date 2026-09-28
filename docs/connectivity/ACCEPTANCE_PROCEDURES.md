@@ -93,7 +93,8 @@ Cada `run` deja en `tools/ble_bench/sesiones-banco/<fecha>-<escenario>/` (fuera 
 
 ## Umbrales
 
-Propuestos para declarar «pasa»; **el líder los confirma o los cambia** en ACCEPTANCE_TESTS.md.
+Propuestos para declarar «pasa»; **se confirman o se cambian** en ACCEPTANCE_TESTS.md antes de
+la sesión con el equipo.
 Cada uno con su motivo.
 
 | Umbral | Valor | Motivo |

@@ -16,7 +16,7 @@ from bench import rtcm
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
-# Otra copia del firmware (p. ej. la rama del líder) con MERIDIAN_FIRMWARE_LIB=<…/firmware/esp32/lib>.
+# Otra copia del firmware (p. ej. otra rama u otro worktree) con MERIDIAN_FIRMWARE_LIB=<…/firmware/esp32/lib>.
 FIRMWARE_LIB = Path(os.environ.get("MERIDIAN_FIRMWARE_LIB", REPO / "firmware" / "esp32" / "lib"))
 COMPILER = shutil.which("c++") or shutil.which("g++") or shutil.which("clang++")
 

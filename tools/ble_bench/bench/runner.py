@@ -101,7 +101,7 @@ class Bench:
                 raise LinkError("faltan las características de órdenes o respuestas: no es un Meridian V utilizable")
             # Respuestas primero: sin esa suscripción una orden no tiene vuelta.
             # La salud puede faltar si la pila recuerda una tabla GATT vieja
-            # (hallazgo del líder con la Mac): se sigue sin ella y se dice.
+            # (visto con una Mac, KNOWN_LIMITATIONS.md): se sigue sin ella y se dice.
             for uuid in (p.RESPONSE_UUID, p.SOLUTION_UUID, p.HEALTH_UUID):
                 name = p.CHARACTERISTIC_NAMES[uuid]
                 if not gatt[name]:
@@ -117,8 +117,8 @@ class Bench:
             raise
         self.link = link
         properties = link.properties(p.CORRECTION_UUID)
-        # Sin respuesta solo si el firmware lo anuncia (hallazgo del líder,
-        # 22:12 del canal); si no, con respuesta, como hasta ahora.
+        # Sin respuesta solo si la característica descubierta lo anuncia
+        # (BLE_CONTRACT.md, regla 2); si no, con respuesta, como hasta ahora.
         self.rtcm_with_response = "write-without-response" not in properties
         self.record("connected", mtu=link.negotiated_mtu, ready_s=round(self.recorder.now() - started, 4),
                     link=link.description, gatt=gatt, rtcm_write_mode=self.rtcm_mode)
