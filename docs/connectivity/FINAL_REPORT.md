@@ -63,7 +63,7 @@ el banco en Python (`tools/ble_bench/`, siete commits hasta `b8201e5`).
   posición en vistas hijas. Medido en el simulador (redibujos en 4 s con la pantalla quieta):
   Equipo 21 → 2, Estado 29 → 0, Correcciones 24 → 2.
 
-**Android** (rama `los-residentes`: compila, 1 764 pruebas en verde, APK de depuración). Detalle en
+**Android** (rama `los-residentes`: compila, 1 770 pruebas en verde, APK de depuración). Detalle en
 [ANDROID_BLE_ARCHITECTURE.md](ANDROID_BLE_ARCHITECTURE.md).
 - La auditoría encontró bien lo esencial (operaciones GATT en serie, `close()` en cada salida,
   callbacks de otra conexión descartados). Se añadieron: fases y causas con los mismos nombres
@@ -89,7 +89,10 @@ el banco en Python (`tools/ble_bench/`, siete commits hasta `b8201e5`).
   preferencias, receptores, casters sin contraseñas, códigos y, si se pide, proyectos como `.mvz`
   comprobados pero **no restaurados**. Fuera iCloud y la copia en la cuenta de Google.
 - **Paridad iOS ↔ Android**: inventario de ~290 diferencias con archivo y línea de los dos lados
-  (`docs/UI_PARITY.md` de Android) y las que no tenían motivo, arregladas en Android.
+  (`docs/UI_PARITY.md` de Android); las que no tenían motivo, arregladas en Android. Lo que estaba
+  mal en iOS (valores desconocidos pintados como cero, negritas con asteriscos, singulares,
+  doble toque en perfiles NTRIP, «Geoide Geoide») se corrigió en iOS; lo que pide una decisión
+  del propietario (Q-07, Q-08, zoom a 1 cm) queda en `docs/estado.md` de iOS.
 
 ## 5. Cambios de protocolo
 
@@ -137,12 +140,12 @@ reescribir nada) desde las ramas de trabajo `los-residentes-*`, que se conservan
 | Repositorio | Desde | Commits | Archivos |
 | --- | --- | --- | --- |
 | Firmware (`TresVizoRTK`) | `f982382` (0.7.10) | 26 | 61 (firmware, pruebas C++, `docs/connectivity/`, `tools/ble_bench/`, `tools/ble_bench_mac/`) |
-| iOS (`TresVizoField`) | `f57f17f` | 27 | 56 (núcleo BLE, transporte, GPS del teléfono, respaldo ZIP, pantallas sin tirones, documentos) |
-| Android (`TresVizoFieldAndroid`) | `ec8b6a4` | 81 | 180 (transporte BLE, receptores de otras marcas, GPS del teléfono, respaldo ZIP, paridad, pruebas del desfase de base, documentos) |
+| iOS (`TresVizoField`) | `f57f17f` | 30 | 74 (núcleo BLE, transporte, GPS del teléfono, respaldo ZIP, pantallas sin tirones, defectos que encontró la paridad, documentos) |
+| Android (`TresVizoFieldAndroid`) | `ec8b6a4` | 89 | 185 (transporte BLE, receptores de otras marcas, GPS del teléfono, respaldo ZIP, paridad, pruebas del desfase de base, documentos) |
 
 Estado al cerrar: firmware con 12 pruebas C++ y 85 del banco en Python en verde, compilado y
 **cargado en el equipo**; iOS compila y 734 pruebas del núcleo en verde; Android compila,
-1 764 pruebas en verde y APK de depuración. Nada se ha probado en un teléfono ni con fix.
+1 770 pruebas en verde (11 omitidas) y APK de depuración. Nada se ha probado en un teléfono ni con fix.
 
 ## 14. Decisiones que quedan para el propietario
 
