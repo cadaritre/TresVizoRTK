@@ -7,6 +7,7 @@ salen del mismo código.
 from __future__ import annotations
 
 import asyncio
+from collections import deque
 from typing import Callable, Iterator
 
 from . import protocol as p
@@ -28,6 +29,9 @@ READ_ONLY_REQUESTS = {
 MUTATING_REQUESTS = {("PUT", "/api/corrections/source")}
 DEFAULT_REQUEST_TIMEOUT_S = 5.0   # lo mismo que tarda el firmware en caducar una orden
 STREAM_TICK_S = 0.005             # cada cuánto mira el ritmo el emisor de RTCM
+# Cola de la Mac, como la del teléfono (contrato v3, regla 2): por edad y por bytes.
+PHONE_MAX_FRAME_AGE_S = 2.0       # lo que lleva más de 2 s desde que «llegó de la red» se tira
+PHONE_QUEUE_CAPACITY_BYTES = 16384  # 2 s a 6 kB/s son 12 kB: cabe el peor caso de la matriz sin crecer sin límite
 REQUEST_ID_MODULO = 1 << 31       # el firmware exige un uint32 en "id"
 
 
@@ -266,35 +270,77 @@ class Bench:
 
     async def stream_rtcm(self, frames: Iterator[bytes], bytes_per_second: float, duration_s: float,
                           burst_seconds: float = 0.0, stop: asyncio.Event | None = None) -> None:
-        """Manda tramas enteras al ritmo pedido hasta agotar el tiempo o perder el enlace.
+        """RTCM como lo haría la app: un «caster» que entrega tramas y un carril que las escribe.
 
-        No se reenvía nada: una trama que no salió se cuenta como descartada y
-        la siguiente es nueva (política de datos viejos del encargo).
+        El productor saca tramas enteras al ritmo pedido (o a golpes) y las deja en
+        una cola de la Mac **acotada por bytes y por edad**; el consumidor las
+        escribe de una en una. Lo que pasa más de 2 s en la cola se tira, y al
+        llenarse se van las más viejas (contrato v3, regla 2). Nada se reenvía.
         """
         loop = asyncio.get_running_loop()
         pacer = Pacer(bytes_per_second, burst_seconds)
         end = loop.time() + duration_s
-        pending: bytes | None = None
-        while loop.time() < end and self.connected and not (stop and stop.is_set()):
-            due = pacer.due_bytes(loop.time())
-            while self.connected:
-                if pending is None:
-                    try:
-                        pending = next(frames)
-                    except StopIteration:
-                        return
-                    self.record("rtcm_generated", bytes=len(pending), number=message_number(pending))
-                if len(pending) > due:
-                    break
-                ok = await self.write_rtcm_frame(pending)
-                pacer.spend(len(pending))
-                due -= len(pending)
-                pending = None
-                if not ok:
-                    break
-            await asyncio.sleep(STREAM_TICK_S)
-        if pending is not None:
-            self.record("rtcm_discarded", frames=1, bytes=len(pending), reason="fin del flujo o enlace perdido")
+        queue: deque[tuple[float, bytes]] = deque()
+        queued_bytes = 0
+        arrived = asyncio.Event()
+        producing = True
+        self.record("rtcm_stream", bytes_per_second=bytes_per_second, burst_seconds=burst_seconds,
+                    duration_s=duration_s, mode=self.rtcm_mode)
+
+        def running() -> bool:
+            return self.connected and not (stop and stop.is_set())
+
+        def discard(frame: bytes, reason: str) -> None:
+            self.record("rtcm_discarded", frames=1, bytes=len(frame), reason=reason)
+
+        async def produce() -> None:
+            nonlocal queued_bytes, producing
+            pending: bytes | None = None
+            try:
+                while loop.time() < end and running():
+                    due = pacer.due_bytes(loop.time())
+                    while True:
+                        if pending is None:
+                            pending = next(frames, None)
+                            if pending is None:
+                                return
+                        if len(pending) > due:
+                            break
+                        self.record("rtcm_generated", bytes=len(pending), number=message_number(pending))
+                        queue.append((loop.time(), pending))
+                        queued_bytes += len(pending)
+                        pacer.spend(len(pending))
+                        due -= len(pending)
+                        pending = None
+                        while queued_bytes > PHONE_QUEUE_CAPACITY_BYTES and len(queue) > 1:
+                            _, old = queue.popleft()
+                            queued_bytes -= len(old)
+                            discard(old, "cola de la Mac llena (se van las más viejas)")
+                        arrived.set()
+                    await asyncio.sleep(STREAM_TICK_S)
+            finally:
+                producing = False
+                arrived.set()
+
+        producer = asyncio.create_task(produce())
+        try:
+            while running() and (producing or queue):
+                if not queue:
+                    arrived.clear()
+                    await arrived.wait()
+                    continue
+                born, frame = queue.popleft()
+                queued_bytes -= len(frame)
+                if loop.time() - born > PHONE_MAX_FRAME_AGE_S:
+                    discard(frame, "más de 2 s en la cola de la Mac")
+                    continue
+                await self.write_rtcm_frame(frame)
+        finally:
+            producer.cancel()
+            await asyncio.gather(producer, return_exceptions=True)
+            for _, frame in queue:
+                discard(frame, "enlace perdido o flujo parado (no se reenvía)")
+            queue.clear()
 
     async def periodic_requests(self, path: str, period_s: float, stop: asyncio.Event) -> None:
         """Una orden de lectura cada `period_s` hasta que se pida parar. Mide latencias."""

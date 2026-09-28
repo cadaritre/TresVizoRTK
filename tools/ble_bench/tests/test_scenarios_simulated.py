@@ -147,11 +147,27 @@ class Scenarios(unittest.TestCase):
         self.assertIn("+ descartadas +", "\n".join(bench.analyzer.reconcile_rtcm()))
         tmp.cleanup()
 
+    def test_slow_lane_drops_old_frames_in_the_mac_and_says_so(self):
+        # Con respuesta y muy por encima de lo que da el carril: la cola de la Mac
+        # no crece sin límite; se tiran las más viejas y el resumen lo dice.
+        bench, _, tmp = run("rtcm-6k", SimulatorOptions(write_without_response=False), duration_s=2.5,
+                            rate_bytes_per_second=40000, select_ble_source=True)
+        a = bench.analyzer
+        self.assertEqual(a.rtcm_write_modes, {"con respuesta"})
+        self.assertGreater(a.rtcm_discarded_frames, 0)
+        self.assertEqual(a.rtcm_generated_frames, a.rtcm_sent_frames + a.rtcm_discarded_frames)
+        self.assertIn("caudal por debajo del pedido", a.render())
+        self.assertIn("✔ enviadas = válidas", "\n".join(a.reconcile_rtcm()))
+        tmp.cleanup()
+
     def test_disconnect_during_rtcm_resends_nothing_old(self):
         bench, _, tmp = run("corte-rtcm", duration_s=2.0, select_ble_source=True)
         a = bench.analyzer
         self.assertEqual(a.connects, 2)
         self.assertEqual(a.disconnects_expected, 2)
+        # Lo que quedó en la cola de la Mac al cortar se tira, no se manda al volver.
+        self.assertEqual(a.rtcm_generated_frames, a.rtcm_sent_frames + a.rtcm_discarded_frames
+                         + a.rtcm_write_failures)
         self.assertLessEqual(a.status_delta()["ble.rtcm_crc_errors"], 1)
         tmp.cleanup()
 

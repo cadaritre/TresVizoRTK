@@ -84,6 +84,8 @@ Cada `run` deja en `tools/ble_bench/sesiones-banco/<fecha>-<escenario>/` (fuera 
 | `latencia de órdenes p50/p95/máx` | Desde que se empieza a escribir la orden hasta la última trama de la respuesta, por ruta | Reloj monotónico de la Mac |
 | `rearmado de respuestas: anomalías` | `gap` (falta una trama), `duplicate`, `out_of_order`, `orphan`, `restarted`, `invalid_length`, `too_large`, `expired` | `bench/protocol.py` |
 | `RTCM: modo de escritura` | `sin respuesta` si la característica descubierta anuncia `write-without-response`; si no, `con respuesta`. Se decide por las propiedades descubiertas, nunca por la versión | `bench/runner.py` |
+| `descartes de la Mac` | La cola de la Mac imita la del teléfono (contrato v3): tramas enteras, lo que lleva más de 2 s se tira y, pasados 16 KiB, se van las más viejas. Al cortar se vacía: nada se reenvía | `bench/runner.py` |
+| `⚠ caudal por debajo del pedido` | El carril no da el ritmo pedido (típico con respuesta, ≈2.8 kB/s medidos); lo que no cupo se tiró por viejo, no se acumuló | Ídem |
 | Cuadre RTCM | generadas → enviadas → válidas en el ESP32 → aceptadas por el enrutador → escritas al UM980 + desalojadas + caducadas + en cola, con ✔/✘ en cada salto | Eventos del banco y `/api/status` antes y después |
 | `según la salud (v3)` | Lo mismo visto desde los bytes 17-19 de la salud (diferencias módulo 256) | `a04c0006` |
 | `equipo (v3)` | `conn_interval_ms`, `telemetry_skipped`, `max_loop_gap_ms`, `max_request_dispatch_ms` | `subsystems.ble` |
@@ -137,7 +139,8 @@ Cada uno con su motivo.
 - **Banco**, 2 min cada uno:
   `$BANCO run rtcm-1k --select-ble-source`, luego `rtcm-3k` y `rtcm-6k`. Repetir `rtcm-3k`
   con `--msm 4`. Con escritura con respuesta (caché), 6 kB/s no es alcanzable: el banco lo
-  dirá con un caudal medido menor que el pedido; anotarlo, no es un fallo del equipo.
+  dice con `⚠ caudal por debajo del pedido` y los descartes por edad en la Mac; anotarlo, no es
+  un fallo del equipo.
 - **Mirar**: el bloque del cuadre, `caudal`, `tiempo por trama p95`, y la línea de la cola.
 - **Pasa** si en los tres ritmos: `✔ enviadas = válidas en el ESP32`, `✔ aceptadas = escritas
   + desalojadas + caducadas + en cola` con desalojadas y caducadas a 0, y el caudal medido está

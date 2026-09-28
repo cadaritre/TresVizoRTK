@@ -66,6 +66,7 @@ BLE_STATUS_KEYS = ("state", "protocol_version", "att_mtu", "rtcm_write_without_r
 # bytes y el estado dice cuántos hay dentro (`correction_queue_bytes`).
 DEVICE_UART_QUEUE_FRAMES = 4
 PERCENTILES = (50, 95)
+RATE_SHORTFALL_RATIO = 0.95  # por debajo del 95 % del ritmo pedido se avisa
 MAX_TRANSITIONS_SHOWN = 20   # el resumen enseña las primeras; el CSV las tiene todas
 
 
@@ -175,6 +176,8 @@ class Analyzer:
         self.rtcm_writes = 0
         self.rtcm_write_failures = 0
         self.rtcm_discarded_frames = 0
+        self.rtcm_discarded_by_reason: dict[str, int] = {}
+        self.rtcm_target_rates: list[float] = []
         self.rtcm_first_t: float | None = None
         self.rtcm_last_t: float | None = None
         self.rtcm_write_modes: set[str] = set()
@@ -313,7 +316,13 @@ class Analyzer:
             self.rtcm_frame_durations_s.append(float(event.info["duration_s"]))
 
     def _on_rtcm_discarded(self, event: Event) -> None:
-        self.rtcm_discarded_frames += int(event.info.get("frames", 1))
+        count = int(event.info.get("frames", 1))
+        self.rtcm_discarded_frames += count
+        reason = str(event.info.get("reason", "?"))
+        self.rtcm_discarded_by_reason[reason] = self.rtcm_discarded_by_reason.get(reason, 0) + count
+
+    def _on_rtcm_stream(self, event: Event) -> None:
+        self.rtcm_target_rates.append(float(event.info.get("bytes_per_second", 0)))
 
     def _break_streams(self) -> None:
         for stats in self.streams.values():
@@ -425,6 +434,9 @@ class Analyzer:
                      f"enviadas {self.rtcm_sent_frames} / {self.rtcm_sent_bytes} B "
                      f"(descartadas en la Mac sin enviar: {self.rtcm_discarded_frames}, "
                      f"escrituras fallidas: {self.rtcm_write_failures})")
+        if self.rtcm_discarded_by_reason:
+            lines.append("descartes de la Mac: " + "; ".join(f"{reason}: {count}"
+                                                            for reason, count in self.rtcm_discarded_by_reason.items()))
         if self.device_restarts():
             lines.append("✘ el equipo se reinició durante la sesión: lo enviado por la Mac no se puede cuadrar "
                          "contra sus contadores, que volvieron a cero; ver «contadores del equipo» desde el reinicio")
@@ -576,6 +588,11 @@ class Analyzer:
                        + (f"; tiempo por trama p95 {percentile(self.rtcm_frame_durations_s, 95) * 1000:.1f} ms, "
                           f"máx {max(self.rtcm_frame_durations_s) * 1000:.1f} ms"
                           if self.rtcm_frame_durations_s else ""))
+            target = max(self.rtcm_target_rates) if self.rtcm_target_rates else None
+            if target and rate is not None and rate < RATE_SHORTFALL_RATIO * target \
+                    and not self.disconnects_expected + self.disconnects_unexpected > 1:
+                out.append(f"  ⚠ caudal por debajo del pedido ({rate:.0f} de {target:.0f} B/s): el carril no da más "
+                           f"en modo {modes}; lo que no cupo se tiró por viejo en la Mac, no se acumuló")
             out += ["  " + line for line in self.reconcile_rtcm()]
         restarts = self.device_restarts()
         if restarts:
