@@ -16,8 +16,28 @@ Todos comparten sufijo `-8f24-4adb-a350-77ef6339c320`:
 | a04c0002 | Escritura con respuesta ATT: solicitudes JSON |
 | a04c0003 | Notificaciones: respuestas JSON fragmentadas |
 | a04c0004 | Notificaciones: solución GNSS compacta |
-| a04c0005 | Escritura con respuesta ATT: fragmentos RTCM3 |
-| a04c0006 | Notificaciones: salud a 1 Hz |
+| a04c0005 | Escritura con respuesta ATT **y, desde 0.7.11, sin respuesta**: fragmentos RTCM3 |
+| a04c0006 | Notificaciones: salud a 1 Hz (desde 0.7.11, siempre; antes solo detrás de una solución) |
+
+## Versión 3 (firmware 0.7.11)
+
+Todo aditivo; el contrato completo y las reglas del cliente están en
+[`docs/connectivity/BLE_CONTRACT.md`](connectivity/BLE_CONTRACT.md). En resumen:
+
+- `a04c0005` admite escritura **sin respuesta**. En ATT solo cabe una escritura con respuesta en
+  vuelo por enlace, así que el RTCM y las órdenes compartían carril; y la respuesta ATT la manda
+  la biblioteca antes de `onWrite`, así que nunca confirmó que la trama entrara a la cola. Medido
+  con respuesta: tope de ≈2.8 kB/s a 30 ms de intervalo. La app decide por las propiedades
+  descubiertas, no por la versión.
+- La salud sale a 1 Hz **siempre** con el enlace arriba (es el latido) y sus bytes 17–19 llevan
+  contadores de RTCM (bit 2 del byte 16).
+- La cola hacia el UM980 es de 8 KiB por bytes (antes cuatro tramas), con las más viejas fuera
+  en tramas enteras y caducidad de 2 s.
+- El equipo pide conexión de 15 a 30 ms; la telemetría sale solo con hueco en la controladora y
+  detrás de las respuestas.
+- `GET /api/ble`: `protocol_version` 3 y métricas nuevas (`conn_interval_ms`,
+  `telemetry_skipped`, `max_loop_gap_ms`, `max_request_dispatch_ms`, `health_period_ms`,
+  `rtcm_write_without_response`).
 
 ## Control
 
@@ -56,8 +76,10 @@ La misma carga va por el WebSocket `/ws/telemetry` como trama de tipo `0x02`.
 | 11 | uint8 | Satélites **visibles** (geometría sobre la máscara del receptor, calculados en el ESP32); 255 sin órbitas o sin posición. Antes de 0.7.10, 0 |
 | 12 | uint16 | Sigma **cruda** del UM980, horizontal del peor eje (N/E), mm; 0xFFFF sin estimación. Desde 0.7.9 |
 | 14 | uint16 | Sigma **cruda** del UM980, vertical, mm; 0xFFFF sin estimación. Desde 0.7.9 |
-| 16 | uint8 | Banderas: bit 0 = bytes 1-4 son precisión mostrada; bit 1 = bytes 12-15 traen la cruda. 0 en firmware anterior |
-| 17–19 | — | Sin usar |
+| 16 | uint8 | Banderas: bit 0 = bytes 1-4 son precisión mostrada; bit 1 = bytes 12-15 traen la cruda; bit 2 = bytes 17-19 traen contadores RTCM (desde 0.7.11). 0 en firmware anterior |
+| 17 | uint8 | Desde 0.7.11, con el bit 2 del byte 16: tramas RTCM tiradas camino del UM980 (módulo 256) |
+| 18 | uint8 | Desde 0.7.11, con el bit 2: tramas RTCM rechazadas al llegar por CRC o formato (módulo 256) |
+| 19 | uint8 | Desde 0.7.11, con el bit 2: ocupación de la cola hacia el UM980 en % (255 = no se sabe) |
 
 **Precisión mostrada (desde 0.7.9).** Métrica de producto que fijó el
 propietario el 27-09-2026; **no es una sigma del receptor**. La gobierna la sigma
@@ -99,6 +121,6 @@ crudas de GST están en `um980_raw_horizontal_sigma_m` (combinada),
 
 ## Correcciones
 
-Seleccionar `PUT /api/corrections/source {"source":"ble"}` después de autenticar. Escribir tramas RTCM3 fragmentadas; máximo de trama 1029 bytes, CRC24Q obligatorio. Antes de autenticar, los bytes no se procesan. Una sola fuente activa y generación por cambio de fuente; mensajes antiguos no deben pasar al nuevo transporte. Cola UART de cuatro tramas, caducidad 2 s y contadores de descartes. El callback BLE no escribe directamente a UART. Sin UART habilitado, se descartan y se informa `rtcm_available:false`.
+Seleccionar `PUT /api/corrections/source {"source":"ble"}` después de autenticar. Escribir tramas RTCM3 fragmentadas; máximo de trama 1029 bytes, CRC24Q obligatorio. Antes de autenticar, los bytes no se procesan. Una sola fuente activa y generación por cambio de fuente; mensajes antiguos no deben pasar al nuevo transporte. Cola UART de 8 KiB por bytes desde 0.7.11 (antes cuatro tramas), caducidad 2 s, las tramas más viejas fuera y enteras, y contadores de descartes con su motivo en `/api/status` → `subsystems.gnss`. El callback BLE no escribe directamente a UART. Sin UART habilitado, se descartan y se informa `rtcm_available:false`.
 
 Firmware y archivos grandes se transfieren por Wi-Fi/USB. BLE admite consultar estado OTA, pero no iniciar cargas ni restauraciones. Ningún módulo de radio está instalado todavía.
