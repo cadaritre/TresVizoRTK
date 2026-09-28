@@ -1,0 +1,104 @@
+{
+ "units": "mm",
+ "criterio": [
+  "Cotas de lo que va DENTRO del Meridian3. Igual que en V2.1, esta tabla no",
+  "dibuja alojamientos: fija la pila de alturas (stack.py) y las envolventes que",
+  "capacity_check.py prueba contra las piezas impresas.",
+  "'confianza' dice de donde sale cada cifra. 'estimacion' significa que no hay",
+  "plano: se midio sobre una foto o se tomo un valor tipico, y hay que medir la",
+  "pieza real antes de imprimir."
+ ],
+ "carrier_um980": {
+  "descripcion": "BDLX RTK_UM98_V1.0.1 con UM980",
+  "publicado": [11.0, 32.0, 52.0],
+  "_orden": "espesor, ancho, largo. El largo es el del PCB sin el SMA: en la foto de BDLX el PCB mide 32 x ~50 y el SMA sobresale aparte.",
+  "confianza": "publicado (tabla BDLX en referencias/BDLX-UM980-specifications.png)",
+  "alimentacion": {
+   "tension_V": [4.0, 5.5],
+   "tipica_V": 5.0,
+   "corriente_mA_a_5V": 160,
+   "fuente": "tabla BDLX: 'DC 4.0-5.5V Typical: 5.0V', '160mA/5.0V'"
+  },
+  "sma": {
+   "_que_es": "SMA hembra de canto, tumbado sobre la cara de componentes y saliendo por el canto corto.",
+   "sobresale": 11.0,
+   "eje_x_desde_centro": -1.8,
+   "eje_sobre_cara_trasera": 6.2,
+   "radio_hexagono": 4.62,
+   "confianza": "estimacion sobre la foto de BDLX (proporcion 32 mm de ancho); medir",
+   "_nota": "El eje queda hacia el canto del conector lateral de 8 vias. 11 de espesor total = PCB 1.6 + cuerpo del SMA 9.2, de ahi el eje a 6.2 de la cara trasera."
+  },
+  "conector_lateral": {
+   "_que_es": "1.25 mm 8 vias con cierre, en un canto largo, entrada paralela al PCB: el cable sale de lado.",
+   "hueco_necesario": 6.0,
+   "alto_cuerpo": 4.25,
+   "tramo_desde_abajo": 16.0,
+   "confianza": "estimacion: la ficha no da pinout ni cotas; medir clavija y cables enchufados"
+  },
+  "conector_inferior": {
+   "_que_es": "1.25 mm 5 vias en el canto corto opuesto al SMA: con el SMA arriba queda abajo.",
+   "hueco_necesario": 8.0,
+   "ancho_zona": 12.0,
+   "confianza": "estimacion; medir"
+  },
+  "ajuste_vertical": 3.0,
+  "_nota_ajuste": "El carrier se amarra con bridas, no con tornillos: puede subir o bajar 3 mm para que el latiguillo quede recto. Esa carrera se reserva abajo y en el tramo del coaxial."
+ },
+ "latiguillo": {
+  "descripcion": "Coaxial SMA macho recto a SMA macho recto, RG174 o RG316",
+  "diametro": 2.8,
+  "radio_curvatura_por_diametro": 6.0,
+  "_nota_radio": "6 x diametro, el mismo criterio que ya usa option-oem-dome (13 mm para 2.2). Para RG174 salen 16.8 mm.",
+  "clavija_recta_mas_alla_de_la_punta": 16.0,
+  "radio_clavija": 4.75,
+  "rosca_cubierta": 6.0,
+  "tramo_libre": 12.0,
+  "confianza": "estimacion de una clavija de crimpar tipica; medir el latiguillo que se compre",
+  "_nota": "Rectas y no acodadas: una clavija acodada en el eje necesita 12 mm de cuerpo mas el radio de curvatura, unos 30 mm desde el eje, y a este diametro dentro del cuello hay 18.15."
+ },
+ "antena": {
+  "descripcion": "Helice HA-901A atornillada por fuera sobre la tapa",
+  "publicado": {"diametro": 43.5, "altura": 40.8, "tornillos": 3, "metrica": "M2.5", "circulo_pernos": 26.6},
+  "conector": "SMA en el centro de la base",
+  "genero_conector": "por confirmar",
+  "sma_bajo_tapa": 5.0,
+  "_nota_conector": "V2.1 supone un SMA hembra que asoma bajo la tapa. La Harxon HX-CH7609A, de la que la HA-901A es copia, declara 'SMA-J' (macho, en la nomenclatura china). Mirar la antena: si es macho, hace falta latiguillo hembra-macho y se abre la posibilidad de enroscarla directa al carrier (ver README).",
+  "confianza": "etiqueta del propietario para cotas; conector sin comprobar"
+ },
+ "esp32_tiny": {
+  "descripcion": "Waveshare ESP32-S3-Tiny (ESP32-S3FH4R2)",
+  "publicado": [2.45, 18.0, 23.5],
+  "envolvente": [3.5, 18.0, 23.5],
+  "confianza": "publicado",
+  "usb": "NO lleva USB-C: su USB sale por un FPC de 0.5 mm y 8 vias (L1 en el esquema) hacia la Tiny-Adapter.",
+  "pines_alimentacion": "P1-1 VCC_5V (VBUS despues del diodo D1 B5819WS), P1-2 GND, P1-3 3V3 (ME6217)",
+  "fuente": "hardware/references/waveshare/ESP32-S3-Tiny-Sch.pdf"
+ },
+ "tiny_adapter": {
+  "descripcion": "Waveshare Tiny-Adapter: USB-C, BOOT, RESET, LED y FPC hacia la Tiny",
+  "pcb": [1.6, 18.0, 18.0],
+  "agujeros_patron": 14.0,
+  "agujeros_desde_borde": 2.0,
+  "agujero_diametro": 2.2,
+  "metrica": "M2",
+  "receptaculo": {"ancho": 8.94, "alto": 3.26, "largo": 7.35, "eje_sobre_pcb": 1.63},
+  "alto_componentes": 3.5,
+  "confianza": "PCB y patron: plano oficial. Receptaculo: cota estandar USB Type-C de montaje superior; su salida respecto al canto del PCB no esta acotada.",
+  "fuente": "hardware/references/waveshare/Tiny-Adapter.pdf",
+  "alimentacion": "VBUS del USB-C = VSYS, sin diodo, al pin 3 del FPC. CC1 y CC2 con 5.1 k a GND: un cargador USB-C le da 5 V."
+ },
+ "usb_c_clavija": {
+  "descripcion": "Clavija del cable del power bank",
+  "sobremolde_maximo": [12.35, 6.5],
+  "fuente": "maximo de sobremolde de la especificacion USB Type-C (USB-IF); comprobar el cable real",
+  "_nota": "La abertura se hace del tamano del sobremolde, no del receptaculo: el receptaculo queda 3.2 mm hundido y el sobremolde entra hasta apoyar en el."
+ },
+ "inserto_jalon": {
+  "descripcion": "McMaster 90611A121, 5/8-11 UNC hembra",
+  "brida_diametro": 36.5125,
+  "brida_espesor": 2.38125,
+  "barril_diametro": 18.25625,
+  "barril_altura": 9.525,
+  "confianza": "catalogo"
+ }
+}

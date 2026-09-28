@@ -1,0 +1,58 @@
+{
+ "piezas": [
+  {
+   "pieza": "01-threaded-base",
+   "etiqueta": "Meridian3 base con rosca 5/8",
+   "triangulos": 2806,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 26.33,
+   "stl": "01-threaded-base.stl"
+  },
+  {
+   "pieza": "02-logo-tube",
+   "etiqueta": "Meridian3 tubo con logo grabado",
+   "triangulos": 10260,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 65.28,
+   "stl": "02-logo-tube.stl"
+  },
+  {
+   "pieza": "03-antenna-cap",
+   "etiqueta": "Meridian3 tapa de antena",
+   "triangulos": 2632,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 20.54,
+   "stl": "03-antenna-cap.stl"
+  },
+  {
+   "pieza": "04-sled",
+   "etiqueta": "Meridian3 trineo",
+   "triangulos": 1906,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 18.77,
+   "stl": "04-sled.stl"
+  },
+  {
+   "pieza": "05-usb-panel-cover",
+   "etiqueta": "Meridian3 tapa del panel USB-C",
+   "triangulos": 3008,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 4.93,
+   "stl": "05-usb-panel-cover.stl"
+  }
+ ],
+ "todas_cerradas": true,
+ "interferencias": [],
+ "sin_interferencias": true,
+ "deflexion_lineal": 0.05
+}

@@ -1,0 +1,233 @@
+{
+ "paso_trineo": {
+  "radio_collar_mm": 21.0,
+  "radio_max_trineo_mm": 20.4,
+  "holgura_mm": 0.6,
+  "radio_max_carrier_um980_mm": 19.51,
+  "radio_max_tiny_mm": 17.24
+ },
+ "componentes": {
+  "carrier_um980": {
+   "base": 14.0,
+   "tubo": 4.99,
+   "tapa": 28.0,
+   "trineo": 0.5,
+   "tapa_panel": 5.36
+  },
+  "sma_carrier": {
+   "base": 60.11,
+   "tubo": 16.11,
+   "tapa": 22.23,
+   "trineo": 2.08,
+   "tapa_panel": 1.18
+  },
+  "clavija_inferior": {
+   "base": 71.09,
+   "tubo": 15.98,
+   "tapa": 12.94,
+   "trineo": 1.95,
+   "tapa_panel": 1.05
+  },
+  "clavija_superior": {
+   "base": 105.09,
+   "tubo": 16.25,
+   "tapa": 1.25,
+   "trineo": 7.71,
+   "tapa_panel": 21.83
+  },
+  "cable": {
+   "base": 93.28,
+   "tubo": 19.33,
+   "tapa": 16.1,
+   "trineo": 5.01,
+   "tapa_panel": 18.4
+  },
+  "tiny": {
+   "base": 67.0,
+   "tubo": 7.26,
+   "tapa": 4.25,
+   "trineo": 0.5,
+   "tapa_panel": 16.7
+  },
+  "tiny_adapter": {
+   "base": 75.77,
+   "tubo": 0.56,
+   "tapa": 13.37,
+   "trineo": 12.5,
+   "tapa_panel": 0.0
+  }
+ },
+ "entre_componentes_mm": {
+  "tiny_adapter-clavija_inferior": 1.05,
+  "tiny_adapter-cable": 16.23,
+  "tiny_adapter-carrier_um980": 9.82,
+  "tiny-carrier_um980": 5.1,
+  "tiny-clavija_inferior": 6.45
+ },
+ "conector_lateral": {
+  "hueco_hasta_collar_mm": 6.99,
+  "hace_falta_mm": 6.0,
+  "choque_con_piezas_mm3": 0.0,
+  "nota": "El collar del tubo pasa por encima al montar: la clavija enchufada no puede salir de r=21."
+ },
+ "conector_inferior": {
+  "alto_libre_con_carrier_abajo_mm": 8.0,
+  "hace_falta_mm": 8.0,
+  "choque_mm3": 0.0
+ },
+ "coaxial": {
+  "radio_curvatura_mm": 16.8,
+  "desfase_ejes_sma_mm": 0.7,
+  "curva_en_s_pide_mm": 6.8,
+  "tramo_libre_mm": [
+   9.0,
+   15.0
+  ],
+  "clavija_por_anillo": {
+   "radio_clavija_mm": 5.45,
+   "radio_agujero_anillo_mm": 7.0
+  },
+  "tuerca_clavija_inferior_mm": [
+   87.6,
+   102.6
+  ],
+  "ventana_panel_mm": [
+   66.6,
+   106.6
+  ],
+  "fondo_cuello_mm": 113.6,
+  "latiguillo_entre_puntas_sma_mm": [
+   41.0,
+   47.0
+  ],
+  "nota": "Latiguillo recto entre el SMA de la antena y el del carrier. El carrier se sube o baja 3 mm con sus bridas para que el cable quede recto; la tuerca de abajo se aprieta por la ventana del panel con la tapa ya cerrada."
+ },
+ "usb_c": {
+  "eje_receptaculo": {
+   "x": 0.0,
+   "z_mm": 98.61
+  },
+  "sobremolde_maximo_mm": [
+   12.35,
+   6.5
+  ],
+  "cabe_centrado": true,
+  "margen_lateral_mm": 0.53,
+  "margen_vertical_mm": 0.85,
+  "receptaculo_hundido_bajo_superficie_mm": 3.2,
+  "nota": "El margen vertical cubre la duda entre receptaculo de montaje superior (eje a 1.63 sobre el PCB) e intermedio. El sobremolde tiene que entrar recto lo que el receptaculo esta hundido; los acodados, igual."
+ },
+ "montaje_tapa_panel": {
+  "choque_del_barrido_con_el_tubo_mm3": 0.0,
+  "nota": "Caja que envuelve repisa, torres y placa, barrida hacia fuera por la ventana."
+ },
+ "centrado": {
+  "radio_anillo_mm": 17.85,
+  "radio_taladro_cuello_mm": 18.15,
+  "holgura_radial_mm": 0.3,
+  "arco_en_contacto_grados": 360,
+  "cuello_baja_hasta_el_anillo": true
+ },
+ "bayoneta": {
+  "giro_de_cierre_grados": 28.7,
+  "dientes_base_respecto_canal_grados": 28.74,
+  "dientes_tapa_respecto_canal_grados": -28.66,
+  "tubo_cierra_sobre_base_horario": true,
+  "tapa_cierra_horario": true,
+  "choque_al_girar_base_mm3": 0.0,
+  "choque_al_girar_tapa_mm3": 0.0,
+  "choque_al_entrar_base_mm3": 0.0,
+  "choque_al_entrar_tapa_mm3": 0.0,
+  "nota": "Visto desde arriba. Cierra la pieza de arriba girando en sentido horario, como el equipo al enroscarse al jalon."
+ },
+ "seguros": {
+  "base": {
+   "angulo": 193.0,
+   "z_mm": 14.91,
+   "choque_del_nucleo_mm3": 0.0,
+   "plastico_para_la_rosca_mm3": 20.8,
+   "alineado": true
+  },
+  "tapa": {
+   "angulo": 193.0,
+   "z_mm": 140.61,
+   "choque_del_nucleo_mm3": 0.0,
+   "plastico_para_la_rosca_mm3": 16.0,
+   "alineado": true
+  }
+ },
+ "paredes_base_mm": {
+  "pie_0-pie_1": 22.0,
+  "pie_0-seguro_base": 22.67,
+  "pie_0-alojamiento_brida": 2.6,
+  "pie_0-barril": 5.47,
+  "pie_0-paso_esparrago": 2.48,
+  "pie_0-superficie_espigon": 6.17,
+  "pie_0-ranura_pestana_0": 23.46,
+  "pie_0-ranura_pestana_1": 8.55,
+  "pie_0-ranura_ala_-1": 24.73,
+  "pie_0-ranura_ala_+1": 12.55,
+  "pie_1-seguro_base": 3.22,
+  "pie_1-alojamiento_brida": 2.6,
+  "pie_1-barril": 5.47,
+  "pie_1-paso_esparrago": 2.48,
+  "pie_1-superficie_espigon": 6.17,
+  "pie_1-ranura_pestana_0": 8.55,
+  "pie_1-ranura_pestana_1": 23.46,
+  "pie_1-ranura_ala_-1": 12.55,
+  "pie_1-ranura_ala_+1": 24.73,
+  "seguro_base-alojamiento_brida": 1.4,
+  "seguro_base-barril": 4.26,
+  "seguro_base-paso_esparrago": 2.2,
+  "seguro_base-ranura_pestana_0": 1.93,
+  "seguro_base-ranura_pestana_1": 21.15,
+  "seguro_base-ranura_ala_-1": 6.22,
+  "seguro_base-ranura_ala_+1": 21.34
+ },
+ "tornillos_antena_mm": {
+  "nota": "distancia de la cabeza (DIN 912, 4.5 x 2.5) al cuello y al refuerzo del seguro",
+  "120_grados": 2.6,
+  "240_grados": 2.6,
+  "0_grados": 2.6
+ },
+ "tornillos_panel": {
+  "largo_mm": 6,
+  "distancia_punta_mm": 1.5
+ },
+ "rigidez": {
+  "meridian3": {
+   "largo_placa_mm": 93.5,
+   "inercia_entre_filas_mm4": 675,
+   "inercia_en_fila_mm4": 607
+  },
+  "v2": {
+   "largo_placa_mm": 72.0,
+   "inercia_entre_filas_mm4": 88,
+   "inercia_en_fila_mm4": 27
+  },
+  "factor_seccion": [
+   7.6,
+   22.1
+  ],
+  "factor_punta_en_voladizo": [
+   3.5,
+   10.1
+  ],
+  "nota": "Flexion fuera del plano de la placa, mismo material. factor_punta toma la placa como voladizo libre (I/L^3). Con la tapa puesta el anillo sujeta ademas el extremo."
+ },
+ "altura": {
+  "total_mm": 150.61,
+  "v2_mm": 106.91,
+  "de_mas_frente_a_v2_mm": 43.7,
+  "reparto_sobre_carrier_mm": {
+   "sma_carrier": 11.0,
+   "clavijas_rectas": 32.0,
+   "tramo_libre": 12.0,
+   "sma_antena_bajo_tapa": 5.0
+  },
+  "estimacion_antena_enroscada_al_carrier_mm": 105.6,
+  "nota_estimacion": "Si la antena trae SMA macho y se enrosca directamente en el SMA del carrier: carrier arriba + SMA 11 + tapa 5 + ~4 de tuerca. Exige que el carrier vaya con la tapa (no con el trineo de la base). No esta modelado."
+ },
+ "cabe_todo": true,
+ "fallos": []
+}
