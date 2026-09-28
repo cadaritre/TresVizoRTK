@@ -123,6 +123,9 @@ def cmd_run(args) -> int:
     options.select_ble_source = args.select_ble_source
     options.inert = args.inert
     options.rtcm_file = Path(args.rtcm_file) if args.rtcm_file else None
+    if options.rtcm_file is not None and not options.rtcm_file.is_file():
+        print(f"no existe la captura RTCM {options.rtcm_file}", file=sys.stderr)
+        return 2
 
     stamp = time.strftime("%Y%m%d-%H%M%S")
     out = Path(args.out) if args.out else DEFAULT_SESSIONS_DIR / f"{stamp}-{args.scenario}"
