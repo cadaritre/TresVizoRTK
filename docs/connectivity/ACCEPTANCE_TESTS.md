@@ -8,11 +8,11 @@ caché de un firmware viejo (ver KNOWN_LIMITATIONS.md). Cómo correr cada prueba
 
 | # | Prueba | Se espera | Resultado de hoy | Estado |
 | --- | --- | --- | --- | --- |
-| 1 | Conexión en frío | Descubre, MTU 247, suscripciones, lista para órdenes | Conecta en ~1 s tras el escaneo; MTU 247; intervalo 30 ms; `GET /api/ble` en 60–93 ms | **Pasa** (Mac). Falta un teléfono sin caché |
+| 1 | Conexión en frío | Descubre, MTU 247, suscripciones, lista para órdenes | Conecta en ~1 s tras el escaneo; MTU 247; intervalo 30 ms; `GET /api/ble` en 40–93 ms. Con una dirección de prueba (sin caché): **5 características**, `a04c0005` con `write` + `write no response` | **Pasa** (Mac) |
 | 2 | Ciclos de conexión/desconexión | Sin suscripciones duplicadas ni estado viejo | 4 conexiones seguidas de la Mac sin fallos; el equipo vuelve a anunciarse cada vez | Parcial (sin apps) |
-| 3 | RTCM continuo | Cuadran bytes enviados, aceptados y escritos | Con respuesta: 55 410 B en 20 s (**≈2.8 kB/s**, tope del carril); 215 tramas enviadas, 214 válidas en el equipo (la última se cortó al parar) | Medido. Sin respuesta: **pendiente** (la Mac no ve la propiedad) |
-| 4 | RTCM + telemetría | La telemetría no se atrasa | Sin fix no hay solución que medir; `telemetry_skipped` = 0 | Pendiente con fix |
-| 5 | Orden durante RTCM | La orden no espera detrás del RTCM | 75–93 ms sin RTCM → 90–153 ms con RTCM con respuesta (una escritura RTCM en vuelo) | Medido; repetir con las apps nuevas y sin respuesta |
+| 3 | RTCM continuo | Cuadran bytes enviados, aceptados y escritos | Con respuesta: 55 410 B en 20 s (**≈2.8 kB/s**, tope del carril). **Sin respuesta: 24.3 kB/s** saturando (1 423 tramas válidas de 1 424, la última cortada al parar; 0 CRC) y **5 kB/s en ráfagas de una época por segundo sin una sola pérdida** (160/160) | **Pasa** hasta el UART del equipo (la fuente activa era NTRIP: el router las rechazó por fuente, a propósito, y nada llegó al UM980) |
+| 4 | RTCM + telemetría | La telemetría no se atrasa | **Salud a 1 Hz exacto sin fix** (intervalos 0.96–1.05 s) durante RTCM saturado y en ráfagas; `telemetry_skipped` = 0. Sin fix no hay solución que medir | Salud: **pasa**. Solución: pendiente con fix |
+| 5 | Orden durante RTCM | La orden no espera detrás del RTCM | Con respuesta: 75–93 ms → 90–153 ms. **Sin respuesta, 5 kB/s en ráfagas: mediana 67 ms, p90 126 ms, máx. 221 ms** (61 órdenes, una cada 250 ms). Sin respuesta y enlace saturado a propósito (24 kB/s): 270–510 ms | **Pasa** con tráfico real; saturar el enlace no es uso real |
 | 6 | Reinicio del receptor | La app detecta, reconecta y no repite órdenes | — | Pendiente (apps) |
 | 7 | Bluetooth del teléfono apagado/encendido | Reconexión con backoff, sin bucles | — | Pendiente (teléfono) |
 | 8 | Fuera de alcance y vuelta | Degradado → reconexión; sin RTCM viejo | — | Pendiente (campo) |
@@ -27,7 +27,7 @@ caché de un firmware viejo (ver KNOWN_LIMITATIONS.md). Cómo correr cada prueba
 
 ## Cifras del equipo en la prueba (firmware 0.7.11)
 
-- Heap interno libre tras arrancar ≈ 97 KB (mínimo visto 91.5 KB); 0.7.10 daba ≈ 106 KB.
+- Heap interno libre tras arrancar ≈ 97 KB; 0.7.10 daba ≈ 106 KB. Tras las pruebas de estrés (≈ 800 KB de RTCM por BLE sin respuesta), libre 92.9 KB y **mínimo 84.9 KB**: la biblioteca BLE reserva memoria en cada escritura; vigilarlo en la sesión larga.
 - Pila libre mínima: `gnss_rx` 4.7 KB, `loopTask` 5.1 KB, `ntrip_rx` 3.9 KB, `rtcm_out` 2.9 KB.
 - UART del UM980: 5 GGA/s aceptadas, 0 rechazadas, 0 errores (el cable RX está bien).
 - `max_loop_gap_ms` ≤ 6 y `max_request_dispatch_ms` ≤ 2 durante las pruebas.

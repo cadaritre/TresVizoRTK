@@ -63,7 +63,7 @@ Apple). El teléfono decide; el estado BLE dice el que quedó (`conn_interval_ms
 | --- | --- | --- |
 | 16 | uint8 banderas | bit 0 precisión mostrada, bit 1 sigma cruda, **bit 2 (`0x04`) contadores RTCM en 17-19** |
 | 17 | uint8 | Tramas RTCM **tiradas camino del UM980** (desalojadas por falta de sitio o caducadas). Contador módulo 256: la app mira la diferencia |
-| 18 | uint8 | Tramas RTCM **rechazadas al llegar** (CRC o formato, en el router o en el rearmado BLE). Módulo 256 |
+| 18 | uint8 | Tramas RTCM **rechazadas al llegar**: CRC o formato (router o rearmado BLE) **o fuente no seleccionada** (llegan por BLE con NTRIP activo en el equipo). Módulo 256 |
 | 19 | uint8 | Ocupación de la cola hacia el UM980, % (0–100, redondeo hacia arriba); 255 = no se sabe |
 
 Sin el bit 2, los bytes 17–19 no significan nada. Código: `lib/protocol/src/health_packet.h`,

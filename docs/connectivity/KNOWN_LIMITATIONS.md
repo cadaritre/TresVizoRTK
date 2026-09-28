@@ -19,6 +19,11 @@ igual**: sin salud y sin RTCM sin respuesta, aunque el equipo los tenga.
   `BluetoothGatt.refresh()` si faltan características.
 - Para confirmarlo mañana: un teléfono que **nunca** se haya conectado al equipo (o nRF Connect
   recién instalado) debe ver 5 características y `a04c0005` con `write` + `write no response`.
+- **Prueba hecha**: con el equipo anunciándose, solo para la prueba, con otra dirección (aleatoria
+  estática), la misma Mac vio al instante las 5 características y la escritura sin respuesta.
+  Una dirección nueva y fija (derivada de la MAC) arreglaría las tablas viejas de todos los
+  clientes de una vez, a cambio de que cada app vuelva a elegir el equipo una vez (el
+  identificador que guardan iOS y Android cambia). **Lo decide el propietario.**
 - Arreglo de fondo, pendiente: «servicios cambiados» enviado **después** de que el cliente
   active su indicación, o caché robusta (Database Hash, ESP-IDF `BT_GATTS_ROBUST_CACHING`), que
   el Arduino precompilado no trae activada.
