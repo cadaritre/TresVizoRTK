@@ -5,6 +5,10 @@
 // promediar solo ("MODE BASE ... TIME"), pero no distingue con qué calidad de
 // solución lo hace ni avisa si esa calidad se pierde a mitad. Promediar cien
 // épocas autónomas da una coordenada muy repetible y igual de equivocada.
+//
+// La media es la posición de la antena y se declara tal cual; la altura de
+// antena del operador solo sirve para informar la cota de la marca
+// (base_plan.h). Las reglas de épocas y de cierre están en base_average.h.
 namespace base_survey {
 void begin();
 // Consume una época nueva si cumple la calidad exigida; la llama el bucle.

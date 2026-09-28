@@ -1,4 +1,5 @@
 #include "base_survey.h"
+#include "base_average.h"
 #include "base_plan.h"
 #include "gnss_receiver.h"
 #include "gnss_control.h"
@@ -11,8 +12,7 @@
 
 namespace base_survey {
 namespace {
-// Calidad mínima exigida a cada época. Los códigos son los de GGA.
-enum class Quality : uint8_t { Any = 0, Single = 1, Float = 5, Fixed = 4 };
+using base_average::Quality;
 
 std::atomic<const char*> state{"idle"};
 std::atomic<const char*> reason{""};
@@ -28,19 +28,15 @@ bool antennaKnown = false;
 // Sumas en doble precisión. A un metro de escala y unas miles de épocas no hay
 // pérdida apreciable, y evita el coste de un acumulador compensado.
 double sumLat = 0, sumLon = 0, sumHeight = 0;
+// Llegada de la última época aceptada, en el reloj monotónico del ESP32. Es el
+// instante de llegada, no el de medición: lo que se comprueba al cerrar es si
+// el receptor seguía entregando, y eso lo dice el reloj de quien recibe.
+uint64_t lastSampleArrivalUs = 0;
 // El motivo del fallo vive fuera del atomic: este guarda el puntero y necesita
 // que la cadena siga existiendo.
 String failureText;
 uint32_t lastEpoch = UINT32_MAX;
 
-bool matches(unsigned quality) {
-    switch (required) {
-        case Quality::Fixed: return quality == 4;
-        case Quality::Float: return quality == 5;
-        case Quality::Single: return quality == 1;
-        default: return quality != 0;
-    }
-}
 const char* qualityName(Quality value) {
     switch (value) {
         case Quality::Fixed: return "rtk_fixed";
@@ -52,6 +48,52 @@ const char* qualityName(Quality value) {
 void stop(const char* nextState, const char* why) {
     state = nextState;
     reason = why;
+}
+
+// Tiempo cumplido y época ya vista: declarar la media o cancelar.
+void close(uint32_t now, uint64_t nowUs) {
+    const uint32_t lastSampleAgeMs = samples ? uint32_t((nowUs - lastSampleArrivalUs) / 1000) : UINT32_MAX;
+    switch (base_average::closeVerdict(now - startedAt, wantedSeconds, samples, lastSampleAgeMs)) {
+        case base_average::Close::Wait:
+            return;
+        case base_average::Close::StaleLastSample:
+            stop("cancelled", "La última época válida quedó vieja antes de terminar: el receptor dejó de dar la solución exigida al final del promedio. La coordenada no describiría los últimos segundos.");
+            return;
+        case base_average::Close::TooFewSamples:
+            stop("cancelled", "Muy pocas épocas válidas para el tiempo pedido: el receptor entregó la solución a saltos. La coordenada no sería un promedio de ese tiempo.");
+            return;
+        case base_average::Close::Apply:
+            break;
+    }
+    // Tiempo cumplido: aplicar la media como coordenada de la base.
+    const auto heights = base_plan::surveyHeights(sumHeight / samples, antennaVertical);
+    JsonDocument plan;
+    plan["method"] = "known";
+    plan["station_id"] = stationId;
+    plan["latitude_deg"] = sumLat / samples;
+    plan["longitude_deg"] = sumLon / samples;
+    // La media es la posición de la antena y se declara tal cual; ver
+    // `base_plan::surveyHeights`. La altura de antena no se suma aquí.
+    plan["arp_ellipsoid_height_m"] = heights.declaredEllipsoidHeightM;
+    // Una base no consume correcciones, y tenerlas activas bloquea la
+    // aplicación del modo. Se cierran aquí en vez de fallar al final de
+    // un promedio de varios minutos por algo que sabíamos de antemano.
+    ntrip_input::releaseForBase();
+    correction_router::select("none");
+    JsonDocument out;
+    const int code = gnss_control::applyBase(plan.as<JsonVariantConst>(), out);
+    if (code == 202) {
+        // Lanzado no es aplicado: el receptor todavía no ha contestado.
+        // Decir "applied" aquí era la misma mentira de siempre.
+        stop("applying", "Enviando la coordenada al receptor…");
+    } else {
+        // El motivo real, no uno inventado: antes decía que lo rechazaba
+        // el receptor cuando el receptor no había llegado a verlo.
+        failureText = out["message"].is<const char*>()
+            ? String(out["message"].as<const char*>())
+            : String("No se pudo aplicar la coordenada promediada.");
+        stop("failed", failureText.c_str());
+    }
 }
 }
 
@@ -78,63 +120,42 @@ void tick() {
     const auto snapshot = gnss_receiver::snapshot();
     const auto& s = snapshot.solution;
     const uint32_t now = millis();
+    const uint64_t nowUs = esp_timer_get_time();
 
     // Sin épocas frescas no se promedia y, pasados unos segundos, se cancela:
     // seguir contando el tiempo sin datos daría un promedio de nada.
-    if (!snapshot.enabled || !snapshot.accepted ||
-        esp_timer_get_time() - s.arrival_us > 3000000) {
-        if (now - startedAt > 5000) {
+    if (!snapshot.enabled || !snapshot.accepted || nowUs - s.arrival_us > base_average::kEpochStaleUs) {
+        if (now - startedAt > base_average::kSilenceGraceMs) {
             stop("cancelled", "El receptor dejó de entregar posiciones durante el promedio.");
         }
         return;
     }
     if (s.utc_ms == lastEpoch) {
-        if (now - startedAt >= wantedSeconds * 1000UL && samples) {
-            // Tiempo cumplido: aplicar la media como coordenada de la base.
-            const auto heights = base_plan::surveyHeights(sumHeight / samples, antennaVertical);
-            JsonDocument plan;
-            plan["method"] = "known";
-            plan["station_id"] = stationId;
-            plan["latitude_deg"] = sumLat / samples;
-            plan["longitude_deg"] = sumLon / samples;
-            // La media es la posición de la antena y se declara tal cual; ver
-            // `base_plan::surveyHeights`. La altura de antena no se suma aquí.
-            plan["arp_ellipsoid_height_m"] = heights.declaredEllipsoidHeightM;
-            // Una base no consume correcciones, y tenerlas activas bloquea la
-            // aplicación del modo. Se cierran aquí en vez de fallar al final de
-            // un promedio de varios minutos por algo que sabíamos de antemano.
-            ntrip_input::releaseForBase();
-            correction_router::select("none");
-            JsonDocument out;
-            const int code = gnss_control::applyBase(plan.as<JsonVariantConst>(), out);
-            if (code == 202) {
-                // Lanzado no es aplicado: el receptor todavía no ha contestado.
-                // Decir "applied" aquí era la misma mentira de siempre.
-                stop("applying", "Enviando la coordenada al receptor…");
-            } else {
-                // El motivo real, no uno inventado: antes decía que lo rechazaba
-                // el receptor cuando el receptor no había llegado a verlo.
-                failureText = out["message"].is<const char*>()
-                    ? String(out["message"].as<const char*>())
-                    : String("No se pudo aplicar la coordenada promediada.");
-                stop("failed", failureText.c_str());
-            }
-        }
+        close(now, nowUs);
         return;
     }
     lastEpoch = s.utc_ms;
-    if (!s.has_position || !std::isfinite(s.altitude_msl_m)) return;
-    if (!matches(s.quality)) {
-        // Esto es lo que pidió el propietario: si la calidad exigida se pierde a
-        // mitad del promedio, se cancela y se dice por qué, en vez de terminar
-        // con una media contaminada que nadie sabría que lo está.
-        stop("cancelled", "Se perdió la calidad de solución exigida durante el promedio. La coordenada habría quedado contaminada.");
-        return;
+    switch (base_average::classify(required, s.quality, s.has_position,
+                                   s.latitude_deg, s.longitude_deg, s.altitude_msl_m)) {
+        case base_average::Epoch::NoPosition:
+            // Antes esta época se saltaba y el promedio seguía: al cumplirse el
+            // tiempo se declaraba la base con las muestras de antes del corte.
+            stop("cancelled", "El receptor entregó una época sin posición o sin altura: se perdió la solución durante el promedio. La coordenada habría quedado con muestras de antes del corte.");
+            return;
+        case base_average::Epoch::LostQuality:
+            // Esto es lo que pidió el propietario: si la calidad exigida se pierde a
+            // mitad del promedio, se cancela y se dice por qué, en vez de terminar
+            // con una media contaminada que nadie sabría que lo está.
+            stop("cancelled", "Se perdió la calidad de solución exigida durante el promedio. La coordenada habría quedado contaminada.");
+            return;
+        case base_average::Epoch::Accept:
+            break;
     }
     sumLat += s.latitude_deg;
     sumLon += s.longitude_deg;
     // GGA entrega altura sobre el geoide; la base se declara en elipsoidal.
     sumHeight += base_plan::ggaEllipsoidHeightM(s.altitude_msl_m, s.geoid_separation_m);
+    lastSampleArrivalUs = s.arrival_us;
     ++samples;
 }
 
@@ -187,8 +208,9 @@ int request(const String& method, JsonVariantConst body, JsonDocument& out) {
     if (action != "start") return 400;
     if (active()) { out["message"] = "Ya hay un promedio en curso."; return 409; }
     if (gnss_control::busy()) { out["message"] = "Espera a que termine la operación del GPS."; return 409; }
-    // Dos segundos son 20 épocas a 10 Hz: con solución fija es un promedio
-    // legítimo, y exigir más era una regla inventada.
+    // Dos segundos son 10 épocas a 5 Hz: con solución fija es un promedio
+    // legítimo, y exigir más era una regla inventada. El mínimo de épocas que
+    // se exige al cerrar lo fija `base_average::minSamples`.
     if (!body["seconds"].is<unsigned>() || body["seconds"].as<unsigned>() < 2 ||
         body["seconds"].as<unsigned>() > 900) {
         out["message"] = "El tiempo de promedio va de 2 a 900 segundos."; return 400;
@@ -208,7 +230,7 @@ int request(const String& method, JsonVariantConst body, JsonDocument& out) {
     else { out["message"] = "Calidad admitida: rtk_fixed, rtk_float, standalone o any."; return 400; }
 
     const auto snapshot = gnss_receiver::snapshot();
-    if (!matches(snapshot.solution.quality)) {
+    if (!base_average::matches(required, snapshot.solution.quality)) {
         out["message"] = "La solución actual no cumple la calidad exigida. Espera a alcanzarla o elige otra.";
         return 409;
     }
@@ -218,6 +240,7 @@ int request(const String& method, JsonVariantConst body, JsonDocument& out) {
     antennaKnown = true;
     sumLat = sumLon = sumHeight = 0;
     samples = 0;
+    lastSampleArrivalUs = 0;
     lastEpoch = UINT32_MAX;
     startedAt = millis();
     stop("averaging", "");
