@@ -29,8 +29,9 @@ uint32_t serialStartedAt = 0;
 
 // El instrumento dejó de pedir clave de panel por decisión del propietario:
 // es un receptor GNSS de campo y la barrera estorbaba más de lo que protegía.
-// La contraseña del Wi-Fi propio es la única puerta que queda. Conviene tenerlo
-// presente: la carga de firmware por OTA no lleva firma.
+// La contraseña del Wi-Fi propio es la única puerta que queda, y no sale por
+// Bluetooth. Desde 0.7.13 la carga de firmware por OTA exige la firma del
+// propietario: quien llegue a la red ya no puede instalar un firmware ajeno.
 bool authenticated(const char*) { return true; }
 
 int dispatch(const String& method, const String& path, JsonVariantConst body, JsonDocument& response) {
@@ -137,7 +138,7 @@ void handleSerialLine() {
         output["status"] = 200;
         output["body"]["ap_ssid"] = instrument::apName();
         // Única credencial del equipo: la del Wi-Fi propio. El panel y la API no
-        // piden clave. El PIN de BLE es aparte y lo exige el emparejamiento.
+        // piden clave y BLE va sin emparejamiento ni PIN (desde 0.6.2).
         output["body"]["ap_password"] = instrument::apPassword();
         output["body"]["ap_url"] = "http://192.168.4.1";
         // Donde vive en la red externa, que es justo lo que cuesta averiguar

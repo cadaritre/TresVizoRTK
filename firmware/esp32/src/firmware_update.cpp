@@ -1,18 +1,37 @@
 #include "firmware_update.h"
 #include "instrument.h"
 #include "correction_router.h"
+#include "firmware_signing_key.h"
+#include "signed_firmware.h"
 #include <esp_ota_ops.h>
 #include <esp_app_format.h>
+#include <esp_image_format.h>
 #include <mbedtls/base64.h>
 #include <mbedtls/sha256.h>
+#include <mbedtls/ecdsa.h>
 
 namespace firmware_update {
 namespace {
 constexpr char hardware[] = "tresvizo-esp32s3-4m-v1";
 constexpr size_t chunkLimit = 576;
+
+// Identidad de esta imagen, en la seccion que ESP-IDF deja justo detras del
+// descriptor de aplicacion (byte 288 de la imagen). Asi, la version que corra
+// despues puede leer la de esta particion y decidir si se puede volver a ella
+// (`/api/update/rollback`). Motivo y formato en `signed_firmware.h`.
+static_assert(signed_firmware::fitsIdentity(instrument::kVersion), "kVersion no cabe en la identidad de la imagen");
+static_assert(sizeof(esp_image_header_t) + sizeof(esp_image_segment_header_t) + sizeof(esp_app_desc_t) ==
+              signed_firmware::kIdentityImageOffset, "la identidad va justo detras de esp_app_desc_t");
+// Referenciada desde status(): si nadie la usa, el enlazador la descarta.
+const signed_firmware::FirmwareIdentity identity __attribute__((section(".rodata_custom_desc"), used)) =
+    signed_firmware::makeIdentity(instrument::kVersion);
+
 esp_ota_handle_t handle = 0;
 const esp_partition_t* target = nullptr;
-mbedtls_sha256_context hash;
+// Dos resumenes: el del archivo completo (integridad del transporte, contra el
+// `sha256` del manifiesto) y el de la imagen sola, que es lo firmado.
+mbedtls_sha256_context fileHash, imageHash;
+signed_firmware::Splitter splitter;
 uint32_t total = 0, received = 0, touched = 0, lastOffset = 0;
 size_t lastLength = 0;
 uint8_t previous[chunkLimit];
@@ -28,24 +47,50 @@ void invalidateTarget() {
     targetTouched = false;
 }
 void abortTransfer(const char* reason) {
-    if (active) { esp_ota_abort(handle); mbedtls_sha256_free(&hash); }
+    if (active) { esp_ota_abort(handle); mbedtls_sha256_free(&fileHash); mbedtls_sha256_free(&imageHash); }
     invalidateTarget();
     active = false; state = reason;
 }
 bool matches(JsonVariantConst body) {
     return body["session"].is<const char*>() && session == body["session"].as<const char*>();
 }
+// Firma ECDSA P-256 `r||s` sobre `digest` (SHA-256 de la imagen), con la clave
+// publica embebida. Cualquier fallo de mbedtls cuenta como firma no valida.
+bool signatureValid(const uint8_t* digest, const uint8_t* signature) {
+    constexpr size_t half = signed_firmware::kSignatureBytes / 2;
+    mbedtls_ecp_group group; mbedtls_ecp_point key; mbedtls_mpi r, s;
+    mbedtls_ecp_group_init(&group); mbedtls_ecp_point_init(&key);
+    mbedtls_mpi_init(&r); mbedtls_mpi_init(&s);
+    const bool valid =
+        mbedtls_ecp_group_load(&group, MBEDTLS_ECP_DP_SECP256R1) == 0 &&
+        mbedtls_ecp_point_read_binary(&group, &key, firmware_signing::kPublicKey, sizeof(firmware_signing::kPublicKey)) == 0 &&
+        mbedtls_ecp_check_pubkey(&group, &key) == 0 &&
+        mbedtls_mpi_read_binary(&r, signature, half) == 0 &&
+        mbedtls_mpi_read_binary(&s, signature + half, half) == 0 &&
+        mbedtls_ecdsa_verify(&group, digest, signed_firmware::kDigestBytes, &key, &r, &s) == 0;
+    mbedtls_mpi_free(&s); mbedtls_mpi_free(&r);
+    mbedtls_ecp_point_free(&key); mbedtls_ecp_group_free(&group);
+    return valid;
+}
+// ¿La imagen de `partition` exige firma? Solo entonces se puede volver a ella:
+// una anterior a 0.7.13 aceptaria despues cualquier firmware por la red.
+bool requiresSignature(const esp_partition_t* partition) {
+    uint8_t raw[sizeof(signed_firmware::FirmwareIdentity)];
+    return partition && esp_partition_read(partition, signed_firmware::kIdentityImageOffset, raw, sizeof(raw)) == ESP_OK &&
+           signed_firmware::requiresSignature(raw, sizeof(raw));
+}
 void status(JsonDocument& out) {
     const auto running = esp_ota_get_running_partition();
     const auto next = esp_ota_get_next_update_partition(nullptr);
     out["state"] = state; out["hardware_id"] = hardware;
-    out["firmware_version"] = instrument::kVersion;
+    out["firmware_version"] = static_cast<const char*>(identity.version);
     out["active_slot"] = running ? running->label : "unknown";
     out["max_image_bytes"] = next ? next->size : 0;
     out["chunk_bytes"] = chunkLimit;
     out["received_bytes"] = received; out["total_bytes"] = total;
     out["transport"] = "wifi_or_usb";
-    out["image_authenticity"] = "owner_supplied_unsigned";
+    out["image_authenticity"] = "owner_signed_ecdsa_p256";
+    out["signature_required"] = true;
 #ifdef CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE
     out["automatic_boot_rollback"] = true;
 #else
@@ -54,7 +99,10 @@ void status(JsonDocument& out) {
     esp_ota_img_states_t imageState;
     out["boot_confirmed"] = running && esp_ota_get_state_partition(running, &imageState) == ESP_OK && imageState == ESP_OTA_IMG_VALID;
     esp_app_desc_t previousImage;
-    out["previous_image_present"] = next && esp_ota_get_partition_description(next, &previousImage) == ESP_OK;
+    const bool previousPresent = next && esp_ota_get_partition_description(next, &previousImage) == ESP_OK;
+    out["previous_image_present"] = previousPresent;
+    // Si es falso, `/api/update/rollback` contesta 409: el panel apaga el botón.
+    out["previous_image_signature_required"] = previousPresent && requiresSignature(next);
 }
 }
 bool busy() { return active || restart; }
@@ -70,11 +118,15 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         if (body["sha256"].as<JsonString>().size() != 64 || digest.length() != 64) return fail(out,400,"SHA-256 inválido.");
         for (char c : digest) if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'))) return fail(out,400,"SHA-256 inválido.");
         target = esp_ota_get_next_update_partition(nullptr);
+        // `size` es el del archivo firmado: imagen más los 72 bytes de la firma.
         const uint32_t size = body["size"];
-        if (!target || size < 1024 || size > target->size) return fail(out,400,"Tamaño de imagen fuera de la partición OTA.");
+        if (size < signed_firmware::kMinFileBytes) return fail(out,400,"El archivo es demasiado pequeño para ser un firmware firmado. Usa el archivo firmware-signed.bin.");
+        if (!target || size - signed_firmware::kTrailerBytes > target->size) return fail(out,400,"Tamaño de imagen fuera de la partición OTA.");
         if (esp_ota_begin(target,OTA_WITH_SEQUENTIAL_WRITES,&handle) != ESP_OK) return fail(out,503,"No se pudo preparar la partición inactiva.");
         correction_router::select("none");
-        mbedtls_sha256_init(&hash); mbedtls_sha256_starts_ret(&hash,0);
+        mbedtls_sha256_init(&fileHash); mbedtls_sha256_starts_ret(&fileHash,0);
+        mbedtls_sha256_init(&imageHash); mbedtls_sha256_starts_ret(&imageHash,0);
+        splitter.begin(size);
         char token[25]; snprintf(token,sizeof(token),"%08lx%08lx%08lx",(unsigned long)esp_random(),(unsigned long)esp_random(),(unsigned long)esp_random());
         targetTouched = false; session = token; expectedHash = digest; total = size; received = 0; lastLength = 0;
         touched = millis(); active = true; state = "receiving";
@@ -84,7 +136,11 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         if (busy()) return fail(out,409,"Actualización en curso.");
         const auto next = esp_ota_get_next_update_partition(nullptr);
         esp_app_desc_t descriptor;
-        if (!next || esp_ota_get_partition_description(next,&descriptor) != ESP_OK || esp_ota_set_boot_partition(next) != ESP_OK)
+        if (!next || esp_ota_get_partition_description(next,&descriptor) != ESP_OK)
+            return fail(out,409,"No hay una imagen anterior válida para restaurar.");
+        if (!requiresSignature(next))
+            return fail(out,409,"La imagen anterior no exige firma; no se restaura por la API. Usa el cable USB.");
+        if (esp_ota_set_boot_partition(next) != ESP_OK)
             return fail(out,409,"No hay una imagen anterior válida para restaurar.");
         state = "rollback_scheduled"; restart = true; restartAt = millis(); status(out); return 202;
     }
@@ -109,19 +165,39 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
             decoded[32] != 0x32 || decoded[33] != 0x54 || decoded[34] != 0xcd || decoded[35] != 0xab)) {
             abortTransfer("invalid_image"); return fail(out,400,"Se requiere firmware.bin de aplicación ESP32-S3.");
         }
+        // A la flash solo va la imagen; los bytes del trailer (la firma) se
+        // quedan en memoria. Un bloque puede cruzar la frontera.
+        size_t imagePart = 0;
+        if (!splitter.accept(decoded,count,imagePart)) return fail(out,409,"Offset inesperado. Consulta el progreso antes de continuar.");
         targetTouched = true;
-        if (esp_ota_write(handle,decoded,count) != ESP_OK) { abortTransfer("write_failed"); return fail(out,503,"Falló la escritura de flash; se conserva el arranque actual."); }
-        mbedtls_sha256_update_ret(&hash,decoded,count);
+        if (imagePart && esp_ota_write(handle,decoded,imagePart) != ESP_OK) { abortTransfer("write_failed"); return fail(out,503,"Falló la escritura de flash; se conserva el arranque actual."); }
+        mbedtls_sha256_update_ret(&fileHash,decoded,count);
+        if (imagePart) mbedtls_sha256_update_ret(&imageHash,decoded,imagePart);
         lastOffset = offset; lastLength = count; memcpy(previous,decoded,count); received += count;
         out["received_bytes"] = received; return 200;
     }
     if (path == "/api/update/finish") {
         if (received != total) return fail(out,409,"La imagen está incompleta.");
         uint8_t digest[32]; char hex[65];
-        mbedtls_sha256_finish_ret(&hash,digest);
+        mbedtls_sha256_finish_ret(&fileHash,digest);
         for (size_t i=0;i<32;++i) snprintf(hex+i*2,3,"%02x",digest[i]);
         if (expectedHash != hex) { abortTransfer("hash_mismatch"); return fail(out,400,"SHA-256 no coincide; no se cambiará el arranque."); }
-        mbedtls_sha256_free(&hash);
+        // La firma se comprueba antes de validar la imagen y de tocar el arranque.
+        uint8_t imageDigest[signed_firmware::kDigestBytes];
+        mbedtls_sha256_finish_ret(&imageHash,imageDigest);
+        switch (signed_firmware::check(splitter,imageDigest,signatureValid)) {
+            case signed_firmware::Verdict::valid: break;
+            case signed_firmware::Verdict::missing_signature:
+                abortTransfer("signature_missing");
+                return fail(out,400,"El firmware no trae la firma del propietario. Usa el archivo firmware-signed.bin.");
+            case signed_firmware::Verdict::invalid_signature:
+                abortTransfer("signature_invalid");
+                return fail(out,400,"La firma del firmware no es válida; no se instala.");
+            default:
+                abortTransfer("incomplete");
+                return fail(out,409,"La imagen está incompleta.");
+        }
+        mbedtls_sha256_free(&fileHash); mbedtls_sha256_free(&imageHash);
         const esp_err_t validated = esp_ota_end(handle); active = false;
         if (validated != ESP_OK) { invalidateTarget(); state = "invalid_image"; return fail(out,400,"La imagen no pasó la validación de Espressif."); }
         if (esp_ota_set_boot_partition(target) != ESP_OK) { state = "activation_failed"; return fail(out,503,"No se pudo activar la imagen; se conserva el arranque actual."); }
