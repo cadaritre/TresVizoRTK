@@ -56,7 +56,8 @@ Cada `run` deja en `tools/ble_bench/sesiones-banco/<fecha>-<escenario>/` (fuera 
    recuerda la tabla de un firmware viejo: falta la salud y el RTCM irá **con respuesta**
    (tope medido ≈2.8 kB/s). Así está hoy la Mac del banco (KNOWN_LIMITATIONS.md). Las pruebas
    de RTCM sin respuesta necesitan un cliente sin esa caché (un teléfono que nunca se conectó,
-   u otra Mac); no hay forma soportada y comprobada de borrarla en macOS.
+   u otra Mac). No hay forma soportada y comprobada de borrarla en macOS; el 27-09 se esquivó
+   con un firmware de prueba que cambiaba la dirección del equipo (ya retirado).
 4. **Fuente de correcciones.** El ESP32 solo admite RTCM por BLE si la fuente activa es `ble`.
    El banco la consulta y avisa; con `--select-ble-source` la cambia él
    (`PUT /api/corrections/source`, lo único que el banco modifica en el equipo). Con NTRIP
@@ -98,12 +99,13 @@ Cada uno con su motivo.
 | Umbral | Valor | Motivo |
 | --- | --- | --- |
 | Latencia de orden sin RTCM, p95 | ≤ 150 ms | Hoy se midieron 60-93 ms con la Mac a 30 ms de intervalo: el doble deja margen para un teléfono |
-| Latencia de orden con RTCM, p95 / máximo | ≤ 250 ms / ≤ 1 s | Por encima de ¼ s el operador nota la espera; un segundo es el límite antes de pensar que no respondió |
+| Latencia de orden con RTCM, p95 / máximo | ≤ 250 ms / ≤ 1 s | Por encima de ¼ s el operador nota la espera; un segundo es el límite antes de pensar que no respondió. Referencia del 27-09 (0.7.11, sin respuesta, 5 kB/s en ráfagas de una época): mediana 67, p90 126, máx 221 ms |
+| Latencia de orden saturando el carril | sin vencidas; se anota el valor | Saturando a propósito subieron a 270-510 ms (el 27-09): lo ya entregado a la controladora no se adelanta. No es criterio de fallo, sí dato |
 | Órdenes vencidas | 0 | El plazo (5 s) es el del firmware: vencer una orden es perder una respuesta |
 | Anomalías de rearmado | 0 | ATT es fiable y ordenado en la capa de enlace; cualquier anomalía es un defecto |
 | Solución con fix | 4.8-5.0 Hz, 0 huecos de secuencia en 10 min, intervalo máx ≤ 400 ms | 5 Hz es el tope del firmware (190 ms entre envíos); 400 ms = dos épocas |
 | Salud (v3) | intervalo máx ≤ 1.5 s; nunca > 3 s | 1 Hz con la fluctuación del bucle; 3 s es el umbral de «medio muerta» del contrato |
-| RTCM hasta 6 kB/s | enviadas = válidas en el ESP32; desalojadas + caducadas = 0 | Un caster MSM7 de 4 constelaciones ronda 1-1.5 kB/s; 6 kB/s es 4× eso |
+| RTCM hasta 6 kB/s | enviadas = válidas en el ESP32; desalojadas + caducadas = 0 | Un caster MSM7 de 4 constelaciones ronda 1-1.5 kB/s; 6 kB/s es 4× eso. El 27-09 el carril sin respuesta llegó a 24.3 kB/s sin pérdidas |
 | Heap mínimo en 60 min | no baja más de 2 KB después de los 5 primeros minutos | Una fuga lenta es lo que tumba una jornada; 2 KB separa el ruido de la tendencia |
 
 ## 1. Conexión en frío
