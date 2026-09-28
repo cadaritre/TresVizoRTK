@@ -46,14 +46,26 @@ La misma carga va por el WebSocket `/ws/telemetry` como trama de tipo `0x02`.
 | Offset | Tipo | Significado |
 | --- | --- | --- |
 | 0 | uint8 | Versión del paquete: `1` |
-| 1 | uint16 | Sigma horizontal de GST en mm, **del peor eje** (N/E); 0xFFFF sin estimación. Hasta 0.7.4, combinada |
-| 3 | uint16 | Sigma vertical de GST en mm; 0xFFFF sin estimación |
+| 1 | uint16 | **Precisión horizontal mostrada por Meridian V**, mm (ver abajo); 0xFFFF sin estimación. Hasta 0.7.8, sigma cruda del peor eje |
+| 3 | uint16 | **Precisión vertical mostrada por Meridian V**, mm; 0xFFFF sin estimación. Hasta 0.7.8, sigma vertical cruda |
 | 5 | uint16 | Edad de la última corrección en s; 0xFFFF sin fuente |
 | 7 | uint8 | Fuente activa: 0 ninguna, 1 BLE, 2 NTRIP, 3 radio |
 | 8 | uint8 | Calidad GGA, espejo del paquete de solución |
 | 9 | uint8 | IMU: reservado, siempre 0 |
 | 10 | uint8 | Satélites **rastreados** (GSV); 255 sin GSV reciente. En 0.7.5 y 0.7.6, usados; antes, 0 |
-| 11–19 | — | Sin usar |
+| 11 | uint8 | Satélites **visibles** (geometría sobre la máscara del receptor, calculados en el ESP32); 255 sin órbitas o sin posición. Antes de 0.7.10, 0 |
+| 12 | uint16 | Sigma **cruda** del UM980, horizontal del peor eje (N/E), mm; 0xFFFF sin estimación. Desde 0.7.9 |
+| 14 | uint16 | Sigma **cruda** del UM980, vertical, mm; 0xFFFF sin estimación. Desde 0.7.9 |
+| 16 | uint8 | Banderas: bit 0 = bytes 1-4 son precisión mostrada; bit 1 = bytes 12-15 traen la cruda. 0 en firmware anterior |
+| 17–19 | — | Sin usar |
+
+**Precisión mostrada (desde 0.7.9).** Métrica de producto que fijó el
+propietario el 27-09-2026; **no es una sigma del receptor**. La gobierna la sigma
+horizontal cruda del UM980 (peor eje), en mm: `exceso = max(0, H − 35)`,
+horizontal mostrada `10 + exceso`, vertical mostrada `15 + exceso`. Solo la
+calcula el firmware (`lib/protocol/src/health_packet.h`, pruebas en
+`test/health_packet_test.cpp`); las apps pintan lo que llega. Las sigmas crudas
+no se modifican: van en los bytes 12-15 y en `/api/status` como `um980_raw_*`.
 
 **Desde 0.7.7 cada byte trae lo que dice su nombre.** En 0.7.5 el propietario
 pidió que la telemetría enseñara lo mismo que el panel, y se hizo cambiando el
@@ -72,9 +84,18 @@ más viejo lo distingue por `firmware_version` de `/api/status`:
 | --- | --- | --- | --- |
 | Hasta 0.7.4 | Usados | 0 | Combinada √(σN² + σE²) |
 | 0.7.5 y 0.7.6 | Rastreados | Usados | Peor eje |
-| Desde 0.7.7 | Usados | Rastreados | Peor eje |
+| 0.7.7 y 0.7.8 | Usados | Rastreados | Peor eje |
+| 0.7.9 | Usados | Rastreados | Bytes 1-4 = mostrada; cruda en 12-15 |
+| Desde 0.7.10 | Usados | Rastreados (byte 11 = visibles) | Bytes 1-4 = mostrada; cruda en 12-15 |
 
-Por HTTP no cambia nada: `solution.satellites_used` y `solution.satellites_tracked`.
+Por HTTP (`/api/status` → `solution`): `satellites_used`, `satellites_tracked` y,
+desde 0.7.10, `satellites_visible` (se omite si no se sabe). Desde 0.7.9,
+`horizontal_sigma_m`, `north_sigma_m`, `east_sigma_m` y `vertical_sigma_m` traen
+la **precisión mostrada** (los campos que la app ya pinta), más
+`display_horizontal_precision_mm` y `display_vertical_precision_mm`; las sigmas
+crudas de GST están en `um980_raw_horizontal_sigma_m` (combinada),
+`um980_raw_north_sigma_m`, `um980_raw_east_sigma_m` y `um980_raw_vertical_sigma_m`.
+`/api/gnss/sky` → `orbits` da el estado de las órbitas y los visibles por constelación.
 
 ## Correcciones
 

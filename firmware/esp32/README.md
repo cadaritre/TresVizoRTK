@@ -604,3 +604,61 @@ preferida la deja de ser.
 las demás, con la marca «preferida» y el aviso de pausa; al guardar una red
 nueva pregunta si conectar ya. Commiteado después de cargar 0.7.8: llega al
 equipo con la siguiente versión que se compile.
+
+## Versiones 0.7.9 y 0.7.10
+
+Entrega del 27-09-2026, sobre el diagnóstico de satélites y de los ~30 mm
+verticales (expediente fuera del repo, en el Escritorio del propietario).
+
+### Precisión mostrada por Meridian V (0.7.9)
+
+Decisión de producto del propietario: el equipo enseña una **precisión mostrada**,
+que no es la sigma del receptor. La gobierna la sigma horizontal cruda del UM980
+(peor eje, max(σN, σE)), en mm: `exceso = max(0, H − 35)`; horizontal `10 +
+exceso`; vertical `15 + exceso`. Se calcula en un solo sitio
+(`lib/protocol/src/health_packet.h`) y la usan el Bluetooth, el WebSocket
+(`include/health_report.h`, que sustituye al bloque que estaba copiado en los dos
+transportes) y `/api/status`.
+
+- Salud bytes 1-4 = mostrada; 12-15 = sigmas crudas del UM980; byte 16 = banderas.
+- `/api/status`: `horizontal/north/east/vertical_sigma_m` traen la mostrada, que
+  son los campos que ya pintan app y panel; las crudas pasan a `um980_raw_*`.
+- No cambia el receptor, el motor RTK, las coordenadas ni el estado de fix: es
+  solo el indicador que el equipo expone. Detalle en
+  [el protocolo BLE](../../docs/ble-protocol.md#salud-20-bytes-little-endian-1-hz).
+
+### Satélites visibles, calculados en el ESP32 (0.7.10)
+
+El UM980 no expone su almanaque en ningún log (manual N4 R1.4 y R1.6: `SATELLITE`
+y `SATECEF` solo traen lo rastreado). La tarea `orbits` (`src/gnss_visible.cpp`)
+baja cada día los TLE GNSS de CelesTrak por HTTP (`GROUP=gnss`, ~28 KB, sin TLS)
+cuando la red tiene internet, y cada 5 s cuenta los GPS, GLONASS, Galileo, BeiDou
+y QZSS que están sobre la máscara del receptor con la posición de la GGA. La hora
+sale de la cabecera `Date` de la descarga. Propagación Kepler + J2
+(`lib/gnss/src/orbit_visibility.h`): frente a SGP4, menos de 0.15° en 72 h en las
+163 órbitas GNSS; un satélite a menos de ~0.15° de la máscara puede contarse
+distinto.
+
+- Salud byte 11 = visibles (255 = desconocido); `/api/status` →
+  `solution.satellites_visible`; `/api/gnss/sky` → `orbits` con el estado.
+- El panel enseña «visibles · rastreados».
+- **Límites:** sin internet desde el arranque no hay visibles; las órbitas no se
+  guardan en NVS, así que cada reinicio vuelve a bajarlas (CelesTrak pide no
+  bajar el mismo grupo más de una vez cada dos horas; tras un fallo se reintenta
+  cada 5 min).
+
+### Verificación de esta entrega
+
+- Pruebas en la PC (MSVC /W4): `health_packet_test` con los casos del propietario
+  (0/10/30/35 → 10/15, 36 → 11/16, 39 → 14/19, 50 → 25/30, 100 → 75/80) y la cruda
+  intacta; `orbit_visibility_test` contra `tests/fixtures` (posición redondeada);
+  `sky_table_test` y el resto sin cambios. `tests/gnss_panel_test.js` con Node.
+- Compilación PlatformIO sin errores: RAM 27.9 %, flash 80.8 %.
+- En el equipo (OTA por USB, NTRIP parado para cargar y reconectado solo):
+  - 0.7.9, en FIX: `/api/status` con 0.010 / 0.015 m y crudas en `um980_raw_*`
+    (0.012 / 0.010 / 0.030 m); salud 10/15 mm, crudas 12/30 mm, banderas `0x03`.
+  - 0.7.10: 153 órbitas bajadas a los 59 s del arranque; **44 visibles** (GPS 11,
+    GLO 9, GAL 13, BDS 11), iguales en total y por constelación a SGP4 calculado
+    aparte en la PC para la misma hora y posición; byte 11 = 44.
+- **Sin probar:** el equipo sin internet desde el arranque y las apps con el
+  byte 11.
