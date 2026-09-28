@@ -34,6 +34,15 @@ caché de un firmware viejo (ver KNOWN_LIMITATIONS.md). Cómo correr cada prueba
 - Cambiar la fuente de correcciones a BLE con NTRIP activo: 409 «Detén NTRIP y espera al GPS
   antes de cambiar fuente.» Correcto; la prueba de RTCM no tocó la configuración.
 
+## Coexistencia Wi-Fi / BLE (hipótesis descartada con esta medida)
+
+Con dos redes Wi-Fi guardadas y ninguna al alcance, el equipo lanza un escaneo Wi-Fi completo
+cada 30 s (`instrument.cpp:954-957`), y el ESP32 comparte la radio entre Wi-Fi y BLE. Medido:
+220 órdenes `GET /api/ble` seguidas durante 70 s, cada 250 ms, mientras escaneaba: **mediana
+40 ms, p95 98 ms, máximo 126 ms**, sin picos cada 30 s; las latencias caen en múltiplos del
+intervalo de conexión (30 ms). El escaneo no explica tirones del Bluetooth. Falta medirlo con el
+NTRIP del propio equipo por Wi-Fi activo al mismo tiempo que RTCM por BLE.
+
 ## Lo primero para mañana
 
 1. Con un teléfono que nunca se haya conectado: ¿ve 5 características y `a04c0005` con
