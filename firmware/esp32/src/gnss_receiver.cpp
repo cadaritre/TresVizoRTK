@@ -5,8 +5,7 @@
 #include "gnss_control.h"
 #include "gnss_sky.h"
 #include "sd_recorder.h"
-#include "wire_filter.h"
-#include "rtcm3.h"
+#include "receiver_stream.h"
 #include "correction_output.h"
 #include "rtcm_queue.h"
 #ifdef TRESVIZO_TASK_WDT
@@ -56,10 +55,10 @@ void acquire(void*) {
     // cosas esta en GGA, que solo dice cuantos se usaron.
     gnss::GsvParser skyParser;
     gnss::GsaParser usedParser;
-    gnss::WireFilter filter;
-    // El receptor emite RTCM por la misma UART cuando trabaja como base. Se
-    // reconstruyen las tramas aquí para poder publicarlas o servirlas.
-    gnss::Rtcm3Parser outgoing;
+    // Texto NMEA, binario Unicore y, como base, RTCM, por la misma UART. El
+    // RTCM se reconstruye con el byte crudo para publicarlo o servirlo; el
+    // texto, sin el binario (lib/gnss/src/receiver_stream.h).
+    gnss::ReceiverStream stream;
     gnss::Gga solution;
     gnss::Gst precision;
     gnss::GsvMessage sky;
@@ -87,16 +86,15 @@ void acquire(void*) {
             const uint32_t now = millis();
             size_t textLength = 0;
             for (size_t i = 0; i < got; ++i) {
-                filter.feed(rawBlock[i], now, [&](char character) {
+                stream.feed(rawBlock[i], now, [](const uint8_t* p, size_t size) {
+                    correction_output::publish(p, size);
+                }, [&](char character) {
                     parser.feed(character, arrival, solution);
                     precisionParser.feed(character, arrival, precision);
                     // El cielo se guarda en su propio modulo: la instantanea de
                     // aqui se copia en media docena de sitios que no lo usan.
                     if (skyParser.feed(character, arrival, sky)) gnss_sky::feed(sky, now);
                     if (usedParser.feed(character, arrival, used)) gnss_sky::feed(used, now);
-                    outgoing.feed(uint8_t(character), [](const uint8_t* p, size_t size) {
-                        correction_output::publish(p, size);
-                    });
                     textBlock[textLength++] = character;
                 });
             }
@@ -134,8 +132,8 @@ void acquire(void*) {
         state.accepted = parser.accepted;
         state.rejected = parser.rejected;
         state.overflow = parser.overflow;
-        state.native_valid = filter.native_valid;
-        state.native_invalid = filter.native_invalid;
+        state.native_valid = stream.filter.native_valid;
+        state.native_invalid = stream.filter.native_invalid;
         portEXIT_CRITICAL(&lock);
         vTaskDelay(1);
     }
