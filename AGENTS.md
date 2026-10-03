@@ -48,6 +48,25 @@ Estas reglas se aplican a todo el repositorio y deben leerse junto con la docume
 - No imponer el formato UBX al UM980; verificar su formato nativo y cualquier conversión necesaria.
 - Diseñar considerando desconexiones, pérdida de correcciones, archivos incompletos y cierre seguro de la microSD.
 
+## Compatibilidad con las apps (desde el 02-10-2026)
+
+Las apps de iOS y Android dependen de lo que el firmware responde. Un cambio de firmware
+**no debe obligar a actualizar las apps** (decisión del propietario):
+
+- **La API solo crece.** Se pueden añadir rutas y claves nuevas. Nunca se quita, se renombra
+  ni se cambia el tipo o el significado de una ruta, una clave, un byte del paquete BLE ni un
+  identificador que ya exista. Lo que las apps leen está en
+  [`docs/api-contract/app-contract.json`](docs/api-contract/app-contract.json).
+- **Antes de commitear** un cambio que toque respuestas JSON, rutas o paquetes BLE, correr
+  `python3 tools/api_contract/check_contract.py`. Si falla, el cambio rompe una app: se
+  rehace de forma aditiva o, si de verdad no hay otra, se avisa al propietario **antes** y se
+  actualizan primero las dos apps.
+- **Los identificadores que dependen de la placa** (`hardware_id`, `board`, nombres,
+  versiones) se pueden cambiar con el hardware, pero el firmware siempre los informa en su
+  API para que las apps se los pregunten. Las apps nunca los escriben a mano.
+- Si hay otro agente trabajando en las apps o en este repositorio, avisar en
+  `~/Desktop/COORDINACION-AGENTES.md` antes de cambiar algo del contrato.
+
 ## Alcance de la inicialización
 
 La tarea inicial del repositorio solo permite estructura, documentación y metadatos. Esta limitación pertenece a esa tarea concreta: no impide implementar funciones en solicitudes futuras expresas, siempre que se respete el estado real y las reglas anteriores.
