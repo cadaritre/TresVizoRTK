@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Cargador de firmware por USB para los receptores TresVizo (MeridianV y Meridian3).
+"""Cargador de firmware por USB para los equipos TresVizo (hoy, el receptor MeridianV).
 
 Ventana con tkinter: se elige el modelo, la imagen (firmware.bin o firmware-signed.bin) y
 el puerto, y se carga con el mismo esptool y las mismas direcciones que usa
 `pio run -t upload`. Antes de cargar comprueba que la imagen sea del modelo elegido
-(por su hardware_id, lib/protocol/src/product.h) y, si puede leer el equipo conectado,
-avisa si se va a convertir un modelo en el otro. Después lee el equipo y confirma
+(por su hardware_id, el de firmware/esp32/src/firmware_update.cpp) y, si puede leer el
+equipo conectado, avisa si es de otro modelo. Después lee el equipo y confirma
 modelo y versión.
 
 Se abre con el Python de python.org (trae tkinter):
@@ -39,13 +39,13 @@ class Model:
     name: str          # lo que se muestra y lo que anuncia el equipo
     key: str           # `product` de /api/status
     env: str           # entorno de PlatformIO
-    hardware_id: str   # identidad de la imagen (product.h)
+    hardware_id: str   # identidad de la imagen (la que exige la OTA)
 
 
-# Mismo contenido que firmware/esp32/lib/protocol/src/product.h.
+# Los equipos que se pueden cargar. El hardware_id es el de firmware_update.cpp; un
+# equipo nuevo (p. ej. el módulo de radio con su propio ESP32) se añade aquí con el suyo.
 MODELS = (
     Model('MeridianV', 'meridianv', 'esp32s3_usb', 'tresvizo-esp32s3-4m-v1'),
-    Model('Meridian3', 'meridian3', 'meridian3', 'tresvizo-meridian3-esp32s3-4m-v1'),
 )
 
 # Formato de la imagen (firmware/esp32/lib/protocol/src/signed_firmware.h).
@@ -102,8 +102,7 @@ class ImageInfo:
 
 
 def model_by_hardware_id(data):
-    # El del Meridian3 se busca primero: el del MeridianV no es subcadena suya, pero
-    # así el orden no depende de eso.
+    # El más largo primero: si un hardware_id contuviera a otro, ganaría el exacto.
     for model in sorted(MODELS, key=lambda m: -len(m.hardware_id)):
         if model.hardware_id.encode() in data:
             return model
@@ -489,10 +488,9 @@ def run_gui():
                     target = current_model()
                     if was and was != target:
                         reply.put(messagebox.askyesno(
-                            'Cambiar de modelo',
+                            'Otro modelo',
                             f'El equipo conectado es un {was.name} y vas a cargarle firmware de {target.name}.\n\n'
-                            f'Cambiarán su nombre, su red Wi-Fi ({target.name}) y su nombre en la red local. '
-                            'Los ajustes guardados se conservan.\n\n¿Convertirlo en ' + target.name + '?'))
+                            'Los ajustes guardados se conservan. ¿Cargarlo igual?'))
                     else:
                         reply.put(True)
                 elif kind == 'done':

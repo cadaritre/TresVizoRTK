@@ -700,15 +700,9 @@ distinto.
 
 ## Versión 0.7.14
 
-Entrega del 28-09-2026: **el Meridian3** y los dos defectos de la reauditoría de 0.7.13.
+Entrega del 28-09-2026: los dos defectos de la reauditoría de 0.7.13 y un cargador por USB
+con ventana (`tools/flasher/`).
 
-- **Meridian3**, el receptor sencillo (ESP32-S3 + UM980 + power bank externo por USB-C), como
-  otro perfil del mismo firmware: `pio run -e meridian3`. Tiene su propio nombre (red Wi-Fi y
-  anuncio Bluetooth «Meridian3»), `meridian3.local` y su `hardware_id` de OTA, así que una
-  imagen de un producto no se instala en el otro. No busca microSD y las rutas de grabación
-  dan 404. Detalle en [`docs/meridian3.md`](../../docs/meridian3.md). **El MeridianV no
-  cambia**: mismos identificadores; solo gana en `/api/status` los campos `product`,
-  `product_name` y `hardware_features`, con los que las apps saben qué equipo tienen.
 - **Restaurar firmware anterior** solo vuelve a una imagen cuya firma verificó este mismo
   equipo. Antes, un corte de corriente entre escribir la imagen y comprobar la firma dejaba
   una imagen sin autenticar a la que se podía volver (R01). El registro va en la NVS por
@@ -720,9 +714,8 @@ Entrega del 28-09-2026: **el Meridian3** y los dos defectos de la reauditoría d
 - Sin cambio: la transformación de la precisión mostrada (horizontal 10 mm + exceso sobre
   35 mm, vertical 15 mm + exceso) es decisión del propietario y se conserva; las sigmas
   crudas siguen en sus campos.
-- Probado: 21 pruebas de host, los dos perfiles compilan y se firman, los binarios llevan cada
-  uno su nombre, su `hostname` y su `hardware_id`, los escenarios del arnés del modo base
-  siguen igual y el nuevo de R02 pasa. **Sin probar en el equipo** (no estaba conectado).
+- Probado: pruebas de host en verde, compila y se firma, los escenarios del arnés del modo
+  base siguen igual y el nuevo de R02 pasa. **Sin probar en el equipo** (no estaba conectado).
 
 ## Versión 0.7.13
 

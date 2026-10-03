@@ -1,6 +1,6 @@
 # Cargador de firmware por USB
 
-Ventana para cargar el firmware del **MeridianV** o del **Meridian3** por el cable USB, sin
+Ventana para cargar el firmware del **MeridianV** por el cable USB, sin
 abrir la terminal ni recordar direcciones. Por dentro hace lo mismo que
 `pio run -t upload`: el esptool de PlatformIO, las mismas direcciones y el mismo modo de
 flash.
@@ -17,7 +17,8 @@ Sin PlatformIO sirve cualquier Python con `pip install esptool pyserial`.
 
 ## Pasos
 
-1. **Modelo**: MeridianV o Meridian3.
+1. **Modelo**: hoy solo el MeridianV; la lista está pensada para añadir otros equipos (como
+   el módulo de radio con su propio ESP32) con su `hardware_id`.
 2. **Imagen**: `firmware-signed.bin` (o `firmware.bin`) de `firmware/esp32/.pio/build/<modelo>/`
    o de un paquete de `tools/firmware_package.py`. La ventana dice de qué modelo es, su
    versión y si trae la firma del propietario.
@@ -28,12 +29,12 @@ Sin PlatformIO sirve cualquier Python con `pip install esptool pyserial`.
 
 - Que la imagen sea de aplicación para ESP32-S3 (no un bootloader ni un volcado entero).
 - **Que la imagen sea del modelo elegido**, por su `hardware_id` (el de cada producto está en
-  `firmware/esp32/lib/protocol/src/product.h`). Si no coincide, no deja cargar.
+  `firmware/esp32/src/firmware_update.cpp`). Si no coincide, no deja cargar.
 - Si trae firma, que sea válida con la clave pública embebida en el firmware. Una firma
   inválida bloquea la carga. Por USB también se puede cargar una imagen sin firma (el cable
   es acceso físico); la OTA por Wi-Fi o por las apps, no.
 - Antes de cargar lee el equipo conectado. **Si es de otro modelo, pregunta antes de
-  convertirlo** (cambian su nombre, su red Wi-Fi y su nombre en la red local).
+  cargarlo.**
 - Después de cargar espera a que arranque, lo vuelve a leer y confirma modelo y versión.
 
 ## Actualización o instalación completa

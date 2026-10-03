@@ -7,7 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import meridian_flasher as mf  # noqa: E402
 
-MERIDIANV, MERIDIAN3 = mf.MODELS
+(MERIDIANV,) = mf.MODELS
 
 
 def fake_app(hardware_id=b'', version=b'0.7.14', size=4096):
@@ -40,12 +40,11 @@ class ImageTests(unittest.TestCase):
 
     def test_models_by_hardware_id(self):
         self.assertEqual(mf.model_by_hardware_id(fake_app(MERIDIANV.hardware_id.encode())), MERIDIANV)
-        self.assertEqual(mf.model_by_hardware_id(fake_app(MERIDIAN3.hardware_id.encode())), MERIDIAN3)
-        self.assertIsNone(mf.model_by_hardware_id(fake_app(b'otra-cosa')))
+        self.assertIsNone(mf.model_by_hardware_id(fake_app(b'tresvizo-otro-equipo-v1')))
 
     def test_unsigned_image(self):
-        info = mf.inspect_image(self.write(fake_app(MERIDIAN3.hardware_id.encode())))
-        self.assertEqual(info.model, MERIDIAN3)
+        info = mf.inspect_image(self.write(fake_app(MERIDIANV.hardware_id.encode())))
+        self.assertEqual(info.model, MERIDIANV)
         self.assertEqual(info.version, '0.7.14')
         self.assertFalse(info.signed)
         self.assertEqual(len(info.app), 4096)
@@ -103,15 +102,13 @@ class CommandTests(unittest.TestCase):
 
     def test_status_model(self):
         self.assertEqual(mf.status_model({}), MERIDIANV)  # firmware viejo: MeridianV
-        self.assertEqual(mf.status_model({'product': 'meridian3'}), MERIDIAN3)
         self.assertIsNone(mf.status_model({'product': 'otro'}))
 
 
-@unittest.skipUnless((mf.BUILD / 'meridian3' / 'firmware-signed.bin').is_file()
-                     and (mf.BUILD / 'esp32s3_usb' / 'firmware-signed.bin').is_file(),
-                     'faltan las compilaciones: pio run -e esp32s3_usb y -e meridian3')
+@unittest.skipUnless((mf.BUILD / 'esp32s3_usb' / 'firmware-signed.bin').is_file(),
+                     'falta la compilación: pio run')
 class RealBuildTests(unittest.TestCase):
-    """Con las imágenes que deja `pio run`: cada una se reconoce como su modelo."""
+    """Con la imagen que deja `pio run`: se reconoce como MeridianV, con su versión y su firma."""
 
     def test_real_images(self):
         for model in mf.MODELS:
