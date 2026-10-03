@@ -210,12 +210,16 @@ class DeviceTests(unittest.TestCase):
         self.assertEqual(report.errors, [])
         self.assertEqual(report.warnings, [])
 
-    def test_fixture_status_does_not_fit_ble(self):
-        # Discrepancia anotada en el contrato: con todo lo que escribe 0.8.0,
-        # /api/status pasa de 4096 bytes y por BLE el equipo contesta 413.
+    def test_fixture_status_fits_ble_only_trimmed(self):
+        # Con todo lo que escribe 0.8.0 (y el radio), /api/status completo pasa de
+        # 4096 bytes; por BLE va recortado a lo que leen las apps y sí cabe.
+        body = self.recorded["GET /api/status"]["body"]
+        self.assertGreater(cc.ble_message_bytes(200, body), 4096)
+        route = next(r for r in self.contract["routes"] if r["path"] == "/api/status" and r["method"] == "GET")
+        trimmed = cc.keep_only(body, sorted({e["path"] for e in route["response"]}))
+        self.assertLessEqual(cc.ble_message_bytes(200, trimmed), 3800)
         report = self.run_device(self.recorded, ble_size=True)
-        self.assertEqual(len(report.errors), 1, report.errors)
-        self.assertIn("GET /api/status: por BLE la respuesta mediría", report.errors[0])
+        self.assertEqual(report.errors, [])
 
     def test_smaller_status_fits_ble(self):
         recorded = copy.deepcopy(self.recorded)
@@ -328,11 +332,10 @@ class CommandLineTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2, result.stdout)
 
     def test_device_replay(self):
-        # Tal cual, la fixture solo falla por el tamaño de /api/status por BLE.
+        # Con el estado recortado por BLE, la fixture cumple entera.
         result = self.run_cli("device", "--replay", str(FIXTURE))
-        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-        self.assertIn("GET /api/status: por BLE", result.stdout)
-        self.assertEqual(result.stdout.count("ERROR"), 1, result.stdout)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(result.stdout.count("ERROR"), 0, result.stdout)
 
         recorded = load_fixture()
         status = recorded["GET /api/status"]["body"]

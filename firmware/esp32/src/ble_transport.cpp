@@ -8,6 +8,8 @@
 #include "ble_frames.h"
 #include "ble_address.h"
 #include "secret_redaction.h"
+#include "json_allowlist.h"
+#include "ble_status_keys.h"
 #include "health_report.h"
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -298,7 +300,14 @@ void dispatchNextRequest() {
             // que llegar al Wi-Fi ya no permite cargar un firmware ajeno.
             if (path == "/api/recording/read" || path == "/api/access" || (path.startsWith("/api/update/") && method != "GET") || (method != "GET" && method != "POST" && method != "PUT")) {
                 code = 400; body["error"] = "unsupported_operation";
-            } else code = dispatchRequest(method, path, input["body"].as<JsonVariantConst>(), body);
+            } else {
+                code = dispatchRequest(method, path, input["body"].as<JsonVariantConst>(), body);
+                // Por BLE el estado lleva solo lo que leen las apps (el contrato,
+                // docs/api-contract/): completo pasa de los 4096 bytes de una
+                // respuesta BLE desde el 0.8.0 y el radio. Por Wi-Fi sigue entero.
+                if (code == 200 && method == "GET" && path == "/api/status")
+                    protocol::keepOnly(body.as<JsonVariant>(), protocol::kBleStatusKeys, protocol::kBleStatusKeyCount);
+            }
         }
     }
     // BLE va sin emparejar: cualquiera al alcance lee estas respuestas. Las

@@ -625,6 +625,21 @@ def check_static(contract: dict, firmware: FirmwareIndex) -> Report:
         if "min" in item and int(match.group(1), 0) < item["min"]:
             report.errors.append(f"Binario: {item['what']} — vale {match.group(1)}, por debajo de {item['min']}.")
 
+    # La lista con que se recorta el estado por BLE tiene que salir de este contrato.
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "generate_ble_status_keys", Path(__file__).with_name("generate_ble_status_keys.py"))
+        generator = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(generator)
+        header = generator.HEADER
+        expected = generator.render(generator.status_paths(contract))
+        if not header.is_file() or header.read_text(encoding="utf-8") != expected:
+            report.errors.append("ble_status_keys.h no está al día con el contrato: corre "
+                                 "`python3 tools/api_contract/generate_ble_status_keys.py` y vuelve a compilar.")
+    except Exception as error:  # el generador es parte de la prueba: si falla, se dice
+        report.errors.append(f"No se pudo comprobar ble_status_keys.h: {error}")
+
     if contract.get("discrepancies"):
         report.notes.append(f"{len(contract['discrepancies'])} discrepancia(s) conocida(s) anotada(s) en el contrato "
                             "(`discrepancies`); no las comprueba este modo.")
@@ -718,6 +733,23 @@ def strip_ble_secrets(value):
     return value
 
 
+def keep_only(value, paths: list[str], prefix: str = ""):
+    """Lo que hace `protocol::keepOnly` (lib/protocol/src/json_allowlist.h) con el
+    estado por BLE: deja solo las claves cuyas rutas están en `paths`."""
+    def allowed(path: str) -> bool:
+        return any(p == path or p.startswith(path + ".") or p.startswith(path + "[") for p in paths)
+    if isinstance(value, dict):
+        out = {}
+        for key, child in value.items():
+            path = f"{prefix}.{key}" if prefix else key
+            if allowed(path):
+                out[key] = keep_only(child, paths, path)
+        return out
+    if isinstance(value, list):
+        return [keep_only(child, paths, prefix + "[]") for child in value]
+    return value
+
+
 def ble_message_bytes(status: int, body) -> int:
     """Bytes del JSON que el equipo mandaría por BLE: `{"id":…,"status":…,"body":…}`
     compacto, con el `id` más largo posible y sin secretos."""
@@ -738,7 +770,11 @@ def validate_body(route: dict, status: int, body, ble_limit: int | None = None) 
         return [], [f"{label}: estado {status} (se esperaba {expected}); no se pudo validar."]
     errors, warnings = [], []
     if ble_limit and "ble" in route["channels"]:
-        size = ble_message_bytes(status, body)
+        # Por BLE el estado va recortado a lo que leen las apps (ble_status_keys.h).
+        sent = body
+        if route.get("method", "GET") == "GET" and route.get("path") == "/api/status":
+            sent = keep_only(body, sorted({entry["path"] for entry in route.get("response", [])}))
+        size = ble_message_bytes(status, sent)
         if size > ble_limit:
             errors.append(f"{label}: por BLE la respuesta mediría {size} bytes y el máximo es {ble_limit}: "
                           "el equipo contestaría 413 (response_too_large) y las apps se quedan sin esta ruta "
