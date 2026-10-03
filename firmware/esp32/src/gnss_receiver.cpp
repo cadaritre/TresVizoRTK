@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <esp_timer.h>
 #include "gnss_receiver.h"
+#include "board_profile.h"
 #include "correction_router.h"
 #include "gnss_control.h"
 #include "gnss_sky.h"

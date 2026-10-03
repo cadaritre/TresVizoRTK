@@ -1,5 +1,8 @@
 # Cargador de firmware por USB
 
+**Desde 0.8.0:** el MeridianV de este cargador es la **SparkFun Thing Plus ESP32-S3 WRL-24408**, hardware `tresvizo-thingplus-s3-4m-v1`. No usar su imagen en la Tiny. El hardware se lee del campo firmado en byte 320; ya no se identifica buscando una cadena suelta dentro del binario. La placa nueva requiere **Instalación completa**. Ver [cableado y montaje](../../hardware/wiring.md).
+
+
 Ventana para cargar el firmware del **MeridianV** por el cable USB, sin
 abrir la terminal ni recordar direcciones. Por dentro hace lo mismo que
 `pio run -t upload`: el esptool de PlatformIO, las mismas direcciones y el mismo modo de

@@ -8,9 +8,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from usb_console import Instrument, detect_port
+from firmware_identity import HARDWARE_ID
 
 
-def run(port):
+def run(port, require_oled=False, require_sd=False):
     device = Instrument(port)
     checks = []
     original = None
@@ -44,10 +45,21 @@ def run(port):
 
     try:
         status = get("/api/status")
+        check(status.get("hardware_id") == HARDWARE_ID, "Firmware de Thing Plus identificado antes de modificar ajustes")
         check(status["flash_bytes"] == 4194304, "Flash de 4 MB detectada")
         check(status["wifi"]["ap_ready"], "Punto de acceso iniciado")
         check(status["solution"]["fix"] != "simulated" and (status["solution"]["fix"] not in (None,"invalid") or status["solution"]["latitude_deg"] is None), "Sin FIX simulado; sin coordenadas cuando no hay solución")
-        check(status["subsystems"]["imu"]["state"] == "not_integrated" and status["subsystems"]["microsd"]["state"] == "not_configured" and status["subsystems"]["gnss"]["state"] in ("waiting_data","receiving","stale") and status["subsystems"]["ntrip"]["available"], "UART/NTRIP disponibles, IMU y microSD pendientes explícitos")
+        subsystems = status["subsystems"]
+        check(subsystems["imu"]["state"] == "not_integrated" and subsystems["gnss"]["state"] in ("waiting_data","receiving","stale") and subsystems["ntrip"]["available"], "UART/NTRIP disponibles; IMU pendiente explícita")
+        check((subsystems["gnss"]["rx_gpio"], subsystems["gnss"]["tx_gpio"], subsystems["gnss"]["baud"]) == (44, 43, 115200), "UART configurada para Thing Plus")
+        sd, oled = subsystems["microsd"], subsystems["display"]
+        check(sd["interface"] == "sdmmc_4bit" and isinstance(sd["card_present"], bool) and isinstance(sd["closing"], bool), "microSD integrada informa detección y cierre")
+        check(not sd["available"] or sd["card_present"], "No se anuncia microSD disponible sin tarjeta")
+        check((oled["driver"], oled["width"], oled["height"], oled["sda_gpio"], oled["scl_gpio"]) == ("ssd1306", 128, 64, 8, 9), "OLED configurada para Thing Plus")
+        if require_oled:
+            check(oled["available"] and oled["state"] == "ready" and oled["i2c_address"] in (0x3c, 0x3d), "OLED responde por I2C; comprobar imagen a simple vista")
+        if require_sd:
+            check(sd["available"] and sd["card_present"] and not sd["active"] and not sd["closing"], "Tarjeta montada e inactiva antes del ensayo")
         check(status["subsystems"]["ble"]["control_available"], "Servicio de control BLE iniciado")
         original = get("/api/config")
         check("wifi_password" not in original, "Contraseña de red externa ausente de la configuración")
@@ -102,5 +114,7 @@ def run(port):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port")
+    parser.add_argument("--require-oled", action="store_true", help="Exigir respuesta de la OLED conectada")
+    parser.add_argument("--require-sd", action="store_true", help="Exigir tarjeta FAT32 insertada antes de arrancar")
     args = parser.parse_args()
-    run(args.port or detect_port())
+    run(args.port or detect_port(), args.require_oled, args.require_sd)

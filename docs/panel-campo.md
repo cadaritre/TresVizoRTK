@@ -1,5 +1,45 @@
 # Panel: reorganización para uso en campo
 
+## Adaptación a Thing Plus — 0.8.0, 02/10/2026
+
+**Nombre en el producto:** por decisión del propietario, el almacenamiento se
+presenta como **Memoria interna del dispositivo**, tanto en Registro como en
+Diagnóstico y los mensajes de error. La OLED abrevia **MEM INT.** por su ancho.
+La implementación física sigue siendo el socket microSD integrado, descrito en
+la documentación de montaje; no se confunde con la RAM del controlador.
+
+La primera grabación se habilita con el estado `idle` que publica el firmware.
+Se corrigió una incompatibilidad del panel que esperaba `ready` y dejaba el botón
+deshabilitado al arrancar con almacenamiento disponible. Las pruebas del panel
+ahora recorren inicio, parada, espera de cierre, catálogo y descarga por bloques
+con contenido binario, además de desconexiones y sesiones parciales. Son pruebas
+locales del flujo con API de prueba; la escritura física sigue pendiente.
+
+Diagnóstico muestra la placa y su identidad, el UART comunicado por el firmware,
+la OLED (estado, dirección I2C y pines) y la microSD integrada por SDIO. No se
+declara una pantalla detectada o una tarjeta montada a partir de la lista de
+materiales: se usa `/api/status` y se limpia la información al perder el enlace.
+
+Registro / PPK usa el socket integrado. Distingue tarjeta ausente, tarjeta que
+requiere reinicio para montar, error, grabación, cierre y archivo incompleto.
+Mientras `closing` sea verdadero, incluso con `state: partial`, no permite
+iniciar otra sesión ni descargar. Ante un error de comunicación deshabilita los
+controles y retira el catálogo anterior. Una descarga completa lleva `.bin`; una
+interrumpida conserva `.part`. El Soft Power Switch sigue pendiente.
+
+El puente USB sirve los mismos scripts del panel, incluidos `hardware.js` y
+`gps.js`. El cargador identifica visualmente «MeridianV · Thing Plus ESP32-S3»;
+el diagnóstico BLE toma el GPIO RX informado por el equipo, sin recomendar el
+GPIO18 histórico cuando la placa es desconocida.
+
+Verificación local: `node tests/hardware_panel_test.js`, regresiones GNSS y OTA,
+14 pruebas de análisis BLE, 21 de escenarios/regresión BLE y 12 del cargador. Inspección de Diagnóstico y Registro
+en navegador con respuestas de prueba, sin puerto serie ni datos de un receptor.
+La compilación incorpora el panel a la imagen firmada; la prueba física de la
+Thing Plus sigue pendiente.
+
+## Criterio original de 0.6.0
+
 Versión 0.6.0. Describe el criterio de diseño del panel y qué cambió respecto de
 0.5.0.
 

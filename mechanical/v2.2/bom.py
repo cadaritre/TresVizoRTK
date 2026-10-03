@@ -54,7 +54,7 @@ for clave, donde, fondo in (('seguro_base', 'Seguro de la base. Rosca en el maci
 # --- Tornillos de los dos paneles ------------------------------------------
 # El de arriba del panel principal queda 0.4 mm bajo el cuello de la tapa: su
 # punta no puede salir del engrosamiento. Mismo largo para los dos de cada tapa.
-for clave, nombre in (('panel', 'principal'), ('panel_aux', 'auxiliar')):
+for clave, nombre in (('panel', 'principal'),):
     cfg = P[clave]
     r_pad = RI - cfg['engrosamiento']
     asiento = RO - cfg.get('cabeza_profundidad', 1.6)
@@ -65,9 +65,9 @@ for clave, nombre in (('panel', 'principal'), ('panel_aux', 'auxiliar')):
                   f'Tapa del panel {nombre}. Rosca en el engrosamiento.',
                   f'rosca {largo - (asiento - RI):.1f} mm; la punta no sale del engrosamiento'))
 notas.append(
-    'Tornillos de los paneles: NO poner uno mas largo que el de la lista. El de '
-    'arriba del panel principal queda a 0.4 mm del cuello de la tapa, que gira al '
-    'cerrar la bayoneta: si asoma, la tapa no cierra.')
+    'Tornillos del panel: NO poner uno mas largo que el de la lista. El de '
+    'arriba queda a menos de 1 mm del cuello de la tapa, que gira al cerrar la '
+    'bayoneta: si asoma, la tapa no cierra.')
 
 # --- Antena ----------------------------------------------------------------
 ant = P['antena']
@@ -78,8 +78,16 @@ filas.append((f'{ant["metrica"]} cilindrica ISO 4762', largo_antena, 3,
               f'tapa {ant["espesor_tapa"]:.0f} + {largo_antena - ant["espesor_tapa"]:.0f} '
               f'de {rosca_antena:.0f} de rosca en la antena'))
 notas.append(
-    'Los tres tornillos de la antena van ANTES que la plataforma del IMU: sus '
-    'cabezas quedan dentro del cuello de la tapa.')
+    'Los tres tornillos de la antena y los tres del hombro van ANTES que la '
+    'plataforma del IMU: sus cabezas quedan dentro del cuello de la tapa.')
+
+# --- Hombro de la antena ---------------------------------------------------
+sh = P['hombro']
+largos['hombro'] = comercial_que_cabe(ant['espesor_tapa'] + sh['piloto_profundidad'],
+                                      ant['espesor_tapa'] + 3)
+filas.append((f'{ant["metrica"]} cilindrica ISO 4762', largos['hombro'], 3,
+              'Hombro de la antena. Sube desde dentro de la tapa y rosca en el hombro.',
+              f'tapa {ant["espesor_tapa"]:.0f} + piloto {sh["piloto_profundidad"]} en el hombro'))
 
 # --- IMU -------------------------------------------------------------------
 imu = P['imu']
@@ -110,15 +118,22 @@ notas.append(
     'entra justo. Si no pasa, repasar el agujero con broca de 2.2 o usar M1.6x4.')
 
 # --- Boton -----------------------------------------------------------------
+bt = P['panel']['boton']
+r_sf = bt['asiento_exterior_diametro'] / 2
+espesor_boton = math.sqrt(RO ** 2 - r_sf ** 2) - bt['asiento_tuerca_y']
 filas.append(('Tuerca M12x0.75 del boton', None, 1,
               'Viene con el boton. Asienta en el plano interior de la tapa.',
-              'panel de 4.0 mm en el eje del boton'))
+              f'panel de {espesor_boton:.1f} mm en el eje del boton'))
+notas.append(
+    'La tuerca del boton queda a unos 10 mm del marco de la pantalla: apretarla '
+    'con pinzas o con una llave de 14 delgada, antes de montar la pantalla.')
 
 # --- Accesorios ------------------------------------------------------------
 acc = P['accesorios']
-filas.append(('M4 formando rosca, o M3 con tuerca', None, 2,
-              f'Barrenos de accesorios, {acc["piloto"]} mm pasantes.',
-              'a discrecion segun lo que montes'))
+if acc.get('activo', True):
+    filas.append(('M4 formando rosca, o M3 con tuerca', None, 2,
+                  f'Barrenos de accesorios, {acc["piloto"]} mm pasantes.',
+                  'a discrecion segun lo que montes'))
 
 # --- Inserto ---------------------------------------------------------------
 filas.append(('McMaster 90611A121', None, 1, 'Rosca 5/8-11 UNC hembra del jalon.',
@@ -144,8 +159,8 @@ lineas += ['',
 
 lineas += ['## Lo de dentro', '',
            'Nada de lo de dentro se atornilla: bateria, carrier UM980, Thing Plus y',
-           'lo demas se amarran con bridas al respaldo del tubo. Varias de esas',
-           'placas no tienen patron de agujeros publicado.', '']
+           'lo demas se amarran con bridas al respaldo del tubo o a los cuatro',
+           'toalleros. Varias de esas placas no tienen patron de agujeros publicado.', '']
 
 if notas:
     lineas += ['## Advertencias', '']
@@ -158,7 +173,9 @@ lineas += ['## Consumibles',
            '| --- | ---: | --- |',
            '| Brida de 2.5 a 3.6 mm, 150-200 mm | 10-15 | Paquete contra el respaldo |',
            '| Brida de 2.5 mm, 100 mm | 2 | Placa del USB-C a su repisa |',
-           '| Lamina transparente de 1 mm (acrilico o PETG), 27 x 19.5 | 1 | Mica de la pantalla |',
+           '| Brida de 2.5 mm, 100-150 mm | 4-8 | Componentes extra en los toalleros |',
+           '| Lamina transparente de 1 mm (acrilico o PETG), 26.7 x 19.3 | 1 | Mica de la pantalla |',
+           '| Filamento TPU 95A | ~25 g | Las dos bandas de proteccion |',
            '| Cinta de espuma o fieltro adhesivo | segun bateria | Entre bateria y respaldo |',
            '| Llave Allen 2 mm | 1 | M3 cabeza boton y M2.5 cilindrica de la antena |',
            '| Llave Allen 1.5 mm o desarmador Phillips 0 | 1 | M2 de la pantalla y M2.5 avellanado del IMU |',

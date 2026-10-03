@@ -17,10 +17,10 @@
       text("update-version", `${capability.firmware_version} · ${capability.active_slot}`);
       text("update-recovery", capability.automatic_boot_rollback ? "Rollback de bootloader habilitado" : "Recuperación por USB");
       $("update-start").disabled = capability.state === "receiving";
-      // Volver a una imagen que no exige firma reabriría la carga de firmware ajeno.
+      // La imagen anterior debe exigir firma y corresponder a esta placa.
       const unsafePrevious = capability.previous_image_signature_required === false;
       $("update-rollback").disabled = !capability.previous_image_present || unsafePrevious || capability.state === "receiving";
-      $("update-rollback").title = unsafePrevious && capability.previous_image_present ? "La imagen anterior no exige firma; solo se restaura por cable USB." : "";
+      $("update-rollback").title = unsafePrevious && capability.previous_image_present ? "La imagen anterior no exige firma o corresponde a otra placa." : "";
       if (capability.signature_required && !$("update-message").textContent)
         text("update-message", "Este equipo solo instala firmware firmado: elige firmware-signed.bin y su manifest.json.");
     } catch { text("update-version", "Sin comunicación o firmware anterior sin OTA"); }
@@ -34,6 +34,12 @@
       if (!image || !file || file.size > 8192) throw new Error("Selecciona imagen y manifiesto válidos.");
       if (capability.signature_required && !(await signed(image))) throw new Error(UNSIGNED_MESSAGE);
       const manifest = JSON.parse(await file.text());
+      const identity = new Uint8Array(await image.slice(288,368).arrayBuffer());
+      const boardBytes = identity.slice(32);
+      const end = boardBytes.indexOf(0);
+      const imageBoard = end < 0 ? null : String.fromCharCode(...boardBytes.slice(0,end));
+      if (String.fromCharCode(...identity.slice(0,8)) !== "TVZFWID1" || imageBoard !== capability.hardware_id)
+        throw new Error("El firmware corresponde a otra placa. Selecciona la imagen de Thing Plus ESP32-S3.");
       if (manifest.hardware_id !== capability.hardware_id || manifest.size !== image.size || image.size > capability.max_image_bytes || !/^[0-9a-f]{64}$/.test(manifest.sha256))
         throw new Error("El manifiesto, la imagen o el modelo de equipo no coinciden.");
       running = true; window.firmwareUpdating = true;

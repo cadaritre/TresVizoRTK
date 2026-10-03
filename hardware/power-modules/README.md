@@ -1,5 +1,8 @@
 # Alimentación e interfaz con módulos comerciales
 
+> **Histórico — 02/10/2026:** esta propuesta corresponde a la Tiny. La placa definitiva es Thing Plus ESP32-S3 y el control del Soft Power Switch está implementado; la distribución portátil del UM980 sigue pendiente. No aplicar este arnés al montaje nuevo; consultar [cableado vigente](../wiring.md).
+
+
 Revisión del 20 de septiembre de 2026. Sustituye la propuesta de PCB personalizada por módulos comprables y un arnés. Se conservan la Tiny, su Tiny-Adapter y cable original, el UM980, BMI088, microSD y batería. El [receptor V2](../../mechanical/v2/README.md) integra los paneles y los soportes internos; el firmware se conserva.
 
 **Resultado: tres módulos principales, pulsador y dos ventanas de luz en el panel.** El USB-C exterior se usa para alimentación/carga y para el USB nativo del ESP32. El botón exterior acciona el encendido electrónico; el cierre de archivos antes de apagar requiere integración en firmware. No hay PCB que mandar fabricar.

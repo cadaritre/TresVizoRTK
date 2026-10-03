@@ -8,6 +8,7 @@ import hashlib
 from pathlib import Path
 import time
 from usb_console import Instrument, detect_port
+from firmware_identity import image_hardware_id
 
 
 def main():
@@ -26,8 +27,11 @@ def main():
         return result['body']
     try:
         original=call('/api/update',method='GET')
+        hardware=image_hardware_id(image)
+        if hardware is None or hardware!=original['hardware_id']:
+            raise RuntimeError('La imagen no corresponde a la placa conectada. No se inició la actualización.')
         settings=call('/api/config',method='GET')
-        start=call('/api/update/begin',{'hardware_id':original['hardware_id'],'size':len(image),'sha256':hashlib.sha256(image).hexdigest()})
+        start=call('/api/update/begin',{'hardware_id':hardware,'size':len(image),'sha256':hashlib.sha256(image).hexdigest()})
         session=start['session'];chunk_size=start['chunk_bytes'];last=time.monotonic()
         for offset in range(0,len(image),chunk_size):
             chunk=image[offset:offset+chunk_size]

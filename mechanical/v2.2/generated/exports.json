@@ -3,62 +3,82 @@
   {
    "pieza": "01-threaded-base",
    "etiqueta": "Base con rosca 5/8",
-   "triangulos": 2520,
+   "triangulos": 2532,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 60.13,
+   "volumen_cm3": 60.15,
    "stl": "01-threaded-base.stl"
   },
   {
    "pieza": "02-logo-tube",
    "etiqueta": "Tubo con logo y respaldo de amarre",
-   "triangulos": 14568,
+   "triangulos": 13100,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 114.34,
+   "volumen_cm3": 110.12,
    "stl": "02-logo-tube.stl"
   },
   {
    "pieza": "03-antenna-cap",
    "etiqueta": "Tapa de antena",
-   "triangulos": 3062,
+   "triangulos": 3408,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 37.63,
+   "volumen_cm3": 37.81,
    "stl": "03-antenna-cap.stl"
   },
   {
    "pieza": "04-imu-platform",
    "etiqueta": "Plataforma del IMU",
-   "triangulos": 1880,
+   "triangulos": 1824,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 14.22,
+   "volumen_cm3": 12.8,
    "stl": "04-imu-platform.stl"
   },
   {
    "pieza": "05-panel-cover",
    "etiqueta": "Tapa del panel principal",
-   "triangulos": 3620,
+   "triangulos": 3548,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 11.35,
+   "volumen_cm3": 10.13,
    "stl": "05-panel-cover.stl"
   },
   {
-   "pieza": "06-aux-panel-cover",
-   "etiqueta": "Tapa del panel auxiliar",
-   "triangulos": 1268,
+   "pieza": "06-antenna-shoulder",
+   "etiqueta": "Hombro de la antena",
+   "triangulos": 6916,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 2.66,
-   "stl": "06-aux-panel-cover.stl"
+   "volumen_cm3": 18.01,
+   "stl": "06-antenna-shoulder.stl"
+  },
+  {
+   "pieza": "07-bumper-bottom",
+   "etiqueta": "Banda de TPU de abajo",
+   "triangulos": 8176,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 11.63,
+   "stl": "07-bumper-bottom.stl"
+  },
+  {
+   "pieza": "08-bumper-top",
+   "etiqueta": "Banda de TPU de arriba",
+   "triangulos": 8176,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 11.63,
+   "stl": "08-bumper-top.stl"
   }
  ],
  "todas_cerradas": true,

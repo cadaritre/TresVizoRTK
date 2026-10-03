@@ -1,4 +1,7 @@
 #include "sd_recorder.h"
+#include "board_profile.h"
+#include "local_display.h"
+#include "power_manager.h"
 #include "ntrip_input.h"
 #include "gnss_control.h"
 #include "gnss_sky.h"
@@ -618,6 +621,8 @@ int wifiScan(const String& method, JsonDocument& response) {
 void status(JsonDocument& response) {
     response["api_version"] = 1;
     response["firmware_version"] = kVersion;
+    response["hardware_id"] = board_profile::kHardwareId;
+    response["board"] = board_profile::kName;
     response["device_name"] = deviceName;
     response["phase"] = "commissioning";
     response["uptime_ms"] = static_cast<uint64_t>(esp_timer_get_time() / 1000);
@@ -720,6 +725,8 @@ void status(JsonDocument& response) {
     }
     correction_output::status(response["corrections_out"].to<JsonObject>());
     sd_recorder::status(response["subsystems"]["microsd"].as<JsonObject>());
+    local_display::status(response["subsystems"]["display"].to<JsonObject>());
+    power_manager::status(response["subsystems"]["power"].to<JsonObject>());
     response["solution"]["fix"] = nullptr;
     response["solution"]["latitude_deg"] = nullptr;
     response["solution"]["longitude_deg"] = nullptr;
@@ -732,6 +739,9 @@ void status(JsonDocument& response) {
     response["solution"]["arrival_time_us"] = nullptr;
     const auto gnss = gnss_receiver::snapshot();
     JsonObject health = response["subsystems"]["gnss"].as<JsonObject>();
+    health["rx_gpio"] = TRESVIZO_GNSS_RX;
+    health["tx_gpio"] = TRESVIZO_GNSS_TX;
+    health["baud"] = TRESVIZO_GNSS_BAUD;
     health["state"] = gnss.start_failed ? "start_failed" : "not_integrated";
     health["accepted_gga"] = gnss.accepted;
     health["rejected_gga"] = gnss.rejected;
@@ -1023,6 +1033,12 @@ int previewBase(JsonVariantConst body, JsonDocument& response) {
 }
 
 int request(const String& method, const String& path, JsonVariantConst body, JsonDocument& response) {
+    if(path=="/api/power" && method=="GET"){power_manager::status(response.to<JsonObject>());return 200;}
+    if(path=="/api/power/shutdown" && method=="POST"){
+        if(!power_manager::requestShutdown()){error(response,"updating","Espera a que termine la actualización antes de apagar.");return 409;}
+        power_manager::status(response.to<JsonObject>());return 202;
+    }
+    if(power_manager::pending() && method!="GET"){error(response,"shutting_down","Apagado en curso; espera al cierre de la memoria interna.");return 409;}
     if (path == "/api/update" || path.startsWith("/api/update/")) {
         if(method!="GET" && (gnss_control::busy() || ntrip_input::active() || sd_recorder::active())) {error(response,"busy","Detén NTRIP y espera al GPS antes de actualizar.");return 409;}
         return firmware_update::request(method,path,body,response);
@@ -1091,8 +1107,9 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         response["base"]["can_apply"] = gnss_receiver::snapshot().enabled;
         JsonDocument storage;sd_recorder::status(storage.to<JsonObject>());
         response["recording"]["state"] = storage["state"];
+        response["recording"]["storage_label"] = "Memoria interna del dispositivo";
         response["recording"]["can_start"] = storage["available"].as<bool>() && !sd_recorder::active();
-        response["recording"]["can_stop"] = sd_recorder::active();
+        response["recording"]["can_stop"] = storage["active"].as<bool>() && !storage["closing"].as<bool>();
         response["recording"]["can_export"] = storage["available"].as<bool>() && !sd_recorder::active();
         response["recording"]["sessions"] = nullptr;
         for (const char* role : {"input", "publisher", "local_caster"}) {

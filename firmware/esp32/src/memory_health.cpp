@@ -26,7 +26,7 @@ void status(JsonObject out){
  // desbordada no avisa: pisa memoria ajena y el equipo se reinicia con la traza
  // corrupta. Esta cifra dice cuanto falta para eso antes de que pase.
  JsonObject stacks=out["stack_free_min_bytes"].to<JsonObject>();
- for(const char* name:{"gnss_rx","ntrip_rx","rtcm_out","httpd","loopTask"}){
+ for(const char* name:{"gnss_rx","ntrip_rx","rtcm_out","httpd","loopTask","oled","sd_writer"}){
   TaskHandle_t task=xTaskGetHandle(name);
   if(task)stacks[name]=uxTaskGetStackHighWaterMark(task);
  }

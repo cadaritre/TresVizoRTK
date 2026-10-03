@@ -1,5 +1,27 @@
 # Firmware inicial del instrumento
 
+**Alimentación — 02/10/2026:** LiPo 1S 3.7 V / 3000 mAh confirmada. Lectura MAX17048 y apagado coordinado Mk2 implementados; falta identificar el elevador de 5 V y validar físicamente el conjunto con UM980. Ver `hardware/wiring.md` desde la raíz. La carga es autónoma por hardware; USB impide el corte total de batería.
+## 0.8.0 — Thing Plus ESP32-S3 y OLED (02/10/2026)
+
+Placa seleccionada: **SparkFun WRL-24408, MINI-1-N4R2**. La definición local `boards/sparkfun_thing_plus_esp32s3.json` fija flash de 4 MB, PSRAM Quad de 2 MB, USB CDC/JTAG y el perfil de CPU. El entorno sigue llamándose `esp32s3_usb` para mantener las rutas de las herramientas. El cableado está en [hardware/wiring.md](../../hardware/wiring.md); las referencias posteriores a Tiny/18/17 son históricas.
+
+- UART del UM980: **RX44/TX43**, COM2 a 115200. Pines centrales en `include/board_profile.h`.
+- OLED SSD1306 128×64: **SDA8/SCL9**, dirección 0x3C o 0x3D, alimentación 3.3 V. Estado GNSS, satélites, RTCM, microSD e IP. Una tarea propia refresca a 1 Hz; sin GGA fresca en dos segundos deja de afirmar FIX. Sin pantalla continúa el resto del equipo. La ficha Tecneu indica SSD1306 o compatible; validar el controlador de la unidad recibida.
+- Socket microSD integrado: **SD_MMC a cuatro bits / 20 MHz**, CLK38, CMD34, D0/1/2/3=39/40/47/33 y detección48 activa alta. Insertar FAT32 antes de encender. Sin formateo automático; después de retirar/reinsertar, reiniciar para montar. Se conserva el registro `.part`/`.bin` y la cola UART. Una extracción durante grabación no permite marcar la sesión completa.
+- GPIO45 habilita únicamente el regulador de periféricos integrado. **Soft Power Switch Mk2:** PUSH=GPIO10/A0, OFF=GPIO14/A1; cierre antes del corte y lectura MAX17048.
+- `/api/status` añade `hardware_id`, `board` y `subsystems.display`; microSD informa detección e interfaz. El `hardware_id` es **`tresvizo-thingplus-s3-4m-v1`**.
+- La imagen conserva versión en byte 288 y añade identidad de placa en byte 320 (48 bytes, NUL). Ese campo pertenece a la imagen firmada: OTA y rollback rechazan otra placa aunque el manifiesto diga Thing Plus. Se conservan los registros de firma verificada introducidos en 0.7.14.
+- Empaquetador, actualizador USB y cargador gráfico reconocen esta identidad. Para la placa nueva usar **Instalación completa** o `pio run -e esp32s3_usb -t upload` con su puerto confirmado. No cargar el binario nuevo a la Tiny.
+- Panel adaptado: Diagnóstico muestra placa, UART, OLED y microSD desde la API. Registro bloquea acciones durante cierre y al perder el enlace; descargas incompletas conservan `.part`. `closing` se publica separado de `active` para reflejar el archivo aún ocupado en un cierre parcial. Puente USB y diagnóstico BLE actualizados. Detalle y pruebas de software en [panel-campo.md](../../docs/panel-campo.md).
+- El almacenamiento se presenta como **Memoria interna del dispositivo**; la OLED muestra **MEM INT.** y la API añade `storage_label` para aplicaciones. Corregido el inicio de grabación desde el estado real `idle`, que el panel anterior no reconocía. La prueba local recorre inicio, parada, espera de cierre y descarga de contenido binario por bloques; no valida la escritura física.
+
+**Verificado en esta entrega:** compilación y firma, 24 pruebas C++ host, 14 pruebas del banco GNSS, 12 pruebas del cargador (incluido el binario real), panel GNSS y preflight OTA del panel. La adaptación posterior del software añade pruebas de estados OLED/microSD, descargas y pérdida de enlace, más 14 pruebas de análisis BLE e inspección del panel en navegador con datos de prueba. La compilación final ocupa 101,024 bytes de RAM estática y 1,712,161 bytes de flash de aplicación (87.1% del slot). El paquete local está en `data/local/releases/0.8.0/`.
+
+**Sin probar físicamente:** carga/arranque en Thing Plus, respuesta de la OLED, microSD/retirada de tarjeta, transición base/rover, OTA/rollback y estabilidad del conjunto. No se flasheó ningún equipo, se rediseñó la alimentación ni se modificó la carcasa. Las cifras históricas de validación de Tiny no se trasladan a esta placa.
+
+## Historial anterior a Thing Plus
+
+
 Versión 0.6.2 para el ESP32-S3 conectado por USB. El perfil usa 4 MB de flash comprobados por esptool. La placa de referencia de PlatformIO aporta la configuración de CPU/USB; no identifica la carrier como DevKitC ni autoriza sus pines externos. PSRAM Quad de 2 MB habilitada, con prueba de integridad y métricas separadas de RAM interna.
 
 ## Funciones del primer firmware

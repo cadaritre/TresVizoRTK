@@ -142,8 +142,22 @@ class AnalyzerFacts(unittest.TestCase):
                   Event(10, "status", info={"label": "fin", "snapshot": silent}))
         self.assertTrue(a.receiver_silent())
         text = a.render()
-        self.assertIn("0 bytes de telemetría del receptor", text)
+        self.assertIn("no ha aceptado ni una trama", text)
+        self.assertNotIn("GPIO18", text)  # Un registro viejo no identifica el cableado actual.
         self.assertIn("No es un fallo de Bluetooth", text)
+
+    def test_wiring_comes_from_reported_board(self):
+        for rx, tx in ((44, 43), (18, 17)):
+            with self.subTest(rx=rx):
+                a = Analyzer()
+                snapshot = extract_status({"hardware_id": "test-board", "board": "Placa de prueba",
+                    "subsystems": {"gnss": {"accepted_gga": 0, "native_frames_valid": 0, "rx_gpio": rx, "tx_gpio": tx},
+                        "display": {"state": "not_detected"}, "microsd": {"state": "partial", "closing": True}}})
+                self.feed(a, Event(0, "status", info={"snapshot": snapshot}))
+                self.assertIn(f"RX del ESP32 (GPIO{rx})", a.render())
+                self.assertEqual(snapshot["hardware_id"], "test-board")
+                self.assertEqual(snapshot["display.state"], "not_detected")
+                self.assertTrue(snapshot["microsd.closing"])
 
     def test_rtcm_ledger_balances(self):
         a = Analyzer()

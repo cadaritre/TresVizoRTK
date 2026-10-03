@@ -1,5 +1,8 @@
 # Arnés del prototipo
 
+> **Histórico — 02/10/2026:** esta propuesta corresponde a la Tiny. La placa definitiva es Thing Plus ESP32-S3 y el control del Soft Power Switch está implementado; la distribución portátil del UM980 sigue pendiente. No aplicar este arnés al montaje nuevo; consultar [cableado vigente](../wiring.md).
+
+
 Usar con las limitaciones de [README](README.md). Es cableado entre módulos, no un nuevo esquemático de PCB. Todos los nombres siguientes son señales funcionales, no números de contactos FPC ni una asignación nueva de GPIO.
 
 ## Alimentación

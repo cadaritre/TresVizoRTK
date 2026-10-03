@@ -1,5 +1,9 @@
 # Identificación inicial de componentes
 
+**Alimentación — 02/10/2026:** LiPo 1S 3.7 V / 3000 mAh confirmada. Lectura MAX17048 y apagado coordinado Mk2 implementados; falta identificar el elevador de 5 V y validar físicamente el conjunto con UM980. Ver `hardware/wiring.md` desde la raíz. La carga es autónoma por hardware; USB impide el corte total de batería.
+**Actualización 02/10/2026:** la Thing Plus ESP32-S3 WRL-24408 sustituye a la Tiny como placa definitiva. Se añaden OLED Tecneu I2C 128×64 y SparkFun Soft Power Switch JST 2 mm; el control del interruptor ya está implementado. Selección actual en [BOM](bom.md) y [cableado](wiring.md). Las capturas y verificaciones siguientes pertenecen al hardware previo; no prueban el montaje nuevo.
+
+
 ## Corrección para Power Board P1
 
 El propietario identifica ahora la placa utilizada como **Waveshare ESP32-S3-Tiny-N8R8** y reporta serigrafía trasera `ESP32-S3-TINY`. Esta marca no distingue variante ni revisión del FPC. Los resultados USB 4 MB/2 MB de abajo se conservan como evidencia histórica, cuya correspondencia con la unidad actual está pendiente. Para P1 rige N8R8 declarada; no convertir esa declaración en verificación física ni cambiar firmware automáticamente. Ver [cableado USB vigente](power-modules/WIRING.md). La restricción histórica «No usar el perfil N8R8» de la tabla no es una decisión sobre la unidad actualmente declarada.

@@ -5,9 +5,10 @@ color viven en el ViewObject y solo existen con la interfaz cargada.
 
   FreeCAD view_v2_2.py
 
-El tubo queda semitransparente para que se vean por dentro el respaldo, la
-pantalla, el boton y la plataforma del IMU. Los objetos ref_* son componentes
-comprados: se ven para entender el montaje, no se imprimen.
+El tubo queda semitransparente para que se vean por dentro el respaldo, los
+toalleros, la pantalla, el boton y la plataforma del IMU. Las bandas de TPU van
+en gris oscuro. Los objetos ref_* son componentes comprados: se ven para
+entender el montaje, no se imprimen.
 """
 from pathlib import Path
 
@@ -26,7 +27,9 @@ VISTA = {
     '03_antenna_cap': (BLANCO, 35),
     '04_imu_platform': (AZUL, 0),
     '05_panel_cover': (GRIS, 0),
-    '06_aux_panel_cover': (GRIS, 0),
+    '06_antenna_shoulder': ((0.85, 0.87, 0.90), 0),
+    '07_bumper_bottom': ((0.20, 0.22, 0.25), 0),
+    '08_bumper_top': ((0.20, 0.22, 0.25), 0),
     'ref_imu_pcb': ((0.10, 0.28, 0.62), 0),
     'ref_imu_chip': ((0.05, 0.05, 0.05), 0),
     'ref_sma': ((0.80, 0.64, 0.15), 0),
@@ -67,5 +70,5 @@ if Gui is not None:
     except Exception:
         pass
 
-print('V2.2: tubo y tapa semitransparentes, plataforma del IMU en azul, paneles en gris; '
-      'los ref_* son componentes comprados')
+print('V2.2: tubo y tapa semitransparentes, plataforma del IMU en azul, panel en gris, '
+      'bandas de TPU en gris oscuro; los ref_* son componentes comprados')

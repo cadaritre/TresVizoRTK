@@ -2,13 +2,15 @@
 
 ## ESP32, GPS y módulos tienen firmware distinto
 
-La actualización implementada corresponde a la aplicación del **ESP32-S3 de 4 MB** y su panel embebido. No actualiza el UM980, radios ni bootloader; cada uno necesita procedimiento del fabricante y comprobación de modelo. No exponer un botón genérico que pueda enviar una imagen del ESP32 al GPS.
+La actualización implementada corresponde a la aplicación del **Thing Plus ESP32-S3 WRL-24408 de 4 MB** y su panel embebido. No actualiza el UM980, radios ni bootloader; cada uno necesita procedimiento del fabricante y comprobación de modelo. No exponer un botón genérico que pueda enviar una imagen del ESP32 al GPS.
 
 El panel ofrece selección de `firmware-signed.bin` y `manifest.json`, carga con progreso y restauración de la imagen anterior. USB JSON y HTTP comparten el controlador; el banco de la Mac lo retransmite al ESP32 real. BLE consulta estado pero no lleva imágenes.
 
 ## Particiones y validación
 
-Se conservan NVS y dos particiones OTA de `0x1e0000` (1920 KiB) cada una. Se escribe únicamente la partición inactiva. Antes de activar: ID de hardware `tresvizo-esp32s3-4m-v1`, tamaño, cabecera ESP32-S3, descriptor de aplicación, SHA-256 del archivo, **firma del propietario** y validación de imagen de Espressif. No aceptar imágenes de flash completa ni `bootloader.bin`.
+Se conservan NVS y dos particiones OTA de `0x1e0000` (1920 KiB) cada una. Se escribe únicamente la partición inactiva. Antes de activar: ID de hardware `tresvizo-thingplus-s3-4m-v1`, tamaño, cabecera ESP32-S3, descriptor de aplicación, SHA-256 del archivo, **firma del propietario** y validación de imagen de Espressif. No aceptar imágenes de flash completa ni `bootloader.bin`.
+
+**Desde 0.8.0 la identidad de placa está dentro de la imagen firmada:** byte 320, campo de 48 bytes terminado en NUL, después de la identidad de versión. Se comprueba además del manifiesto antes de activar y al restaurar. Las imágenes de Tiny no son intercambiables con Thing Plus. Primera instalación de la nueva placa por USB; el pinout vigente está en [cableado](../hardware/wiring.md).
 
 **Desde 0.7.13 la imagen va firmada.** El archivo que se sube es `firmware-signed.bin`: `firmware.bin` seguido de `TVZSIG01` y la firma ECDSA P-256 `r||s` sobre el SHA-256 de la imagen (72 bytes; `firmware/esp32/lib/protocol/src/signed_firmware.h`). A la flash solo va la imagen. En `finish`, tras el SHA-256 del archivo (integridad del transporte), el equipo comprueba la firma con la clave pública embebida (`firmware/esp32/include/firmware_signing_key.h`); sin firma o con una que no verifica, invalida la partición destino y no cambia el arranque. La clave privada es del propietario y vive fuera del repositorio; custodia, respaldo y firma en [`tools/firmware_signing/`](../tools/firmware_signing/README.md). Un actualizador por Internet seguiría necesitando decidir la distribución de las imágenes; la firma ya certifica quién las publicó. No se queman eFuses ni se activa Secure Boot: con acceso físico, el USB sigue cargando cualquier imagen.
 

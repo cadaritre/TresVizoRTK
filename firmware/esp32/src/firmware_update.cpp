@@ -1,4 +1,5 @@
 #include "firmware_update.h"
+#include "board_profile.h"
 #include "instrument.h"
 #include "correction_router.h"
 #include "firmware_signing_key.h"
@@ -15,7 +16,7 @@
 
 namespace firmware_update {
 namespace {
-constexpr char hardware[] = "tresvizo-esp32s3-4m-v1";
+constexpr char hardware[] = TRESVIZO_HARDWARE_ID;
 constexpr size_t chunkLimit = 576;
 
 // Identidad de esta imagen, en la seccion que ESP-IDF deja justo detras del
@@ -26,8 +27,9 @@ static_assert(signed_firmware::fitsIdentity(instrument::kVersion), "kVersion no 
 static_assert(sizeof(esp_image_header_t) + sizeof(esp_image_segment_header_t) + sizeof(esp_app_desc_t) ==
               signed_firmware::kIdentityImageOffset, "la identidad va justo detras de esp_app_desc_t");
 // Referenciada desde status(): si nadie la usa, el enlazador la descarta.
-const signed_firmware::FirmwareIdentity identity __attribute__((section(".rodata_custom_desc"), used)) =
-    signed_firmware::makeIdentity(instrument::kVersion);
+static_assert(sizeof(hardware)<=signed_firmware::kHardwareIdBytes,"hardware_id no cabe en la imagen");
+const signed_firmware::BoardFirmwareIdentity identity __attribute__((section(".rodata_custom_desc"), used)) =
+    {signed_firmware::makeIdentity(instrument::kVersion),TRESVIZO_HARDWARE_ID};
 
 esp_ota_handle_t handle = 0;
 const esp_partition_t* target = nullptr;
@@ -100,6 +102,11 @@ bool rememberVerified(const esp_partition_t* partition) {
     return ok;
 }
 bool requiresSignature(const esp_partition_t* partition);
+bool matchesBoard(const esp_partition_t* partition) {
+    uint8_t raw[signed_firmware::kHardwareIdBytes];
+    return partition && esp_partition_read(partition,signed_firmware::kHardwareImageOffset,raw,sizeof(raw))==ESP_OK &&
+           signed_firmware::matchesHardware(raw,sizeof(raw),hardware);
+}
 verified_image::Verdict rollbackVerdict(const esp_partition_t* partition) {
     esp_app_desc_t descriptor;
     const bool present = partition && esp_ota_get_partition_description(partition, &descriptor) == ESP_OK;
@@ -115,18 +122,18 @@ verified_image::Verdict rollbackVerdict(const esp_partition_t* partition) {
     return verified_image::rollback(present, present && requiresSignature(partition), recordPresent && digestOk,
                                     recorded, current);
 }
-// ¿La imagen de `partition` exige firma? Solo entonces se puede volver a ella:
-// una anterior a 0.7.13 aceptaria despues cualquier firmware por la red.
+// La imagen debe exigir firma y pertenecer a esta placa. La autenticidad se
+// comprueba además mediante el registro persistente de rollbackVerdict().
 bool requiresSignature(const esp_partition_t* partition) {
     uint8_t raw[sizeof(signed_firmware::FirmwareIdentity)];
-    return partition && esp_partition_read(partition, signed_firmware::kIdentityImageOffset, raw, sizeof(raw)) == ESP_OK &&
+    return matchesBoard(partition) && esp_partition_read(partition, signed_firmware::kIdentityImageOffset, raw, sizeof(raw)) == ESP_OK &&
            signed_firmware::requiresSignature(raw, sizeof(raw));
 }
 void status(JsonDocument& out) {
     const auto running = esp_ota_get_running_partition();
     const auto next = esp_ota_get_next_update_partition(nullptr);
     out["state"] = state; out["hardware_id"] = hardware;
-    out["firmware_version"] = static_cast<const char*>(identity.version);
+    out["firmware_version"] = static_cast<const char*>(identity.firmware.version);
     out["active_slot"] = running ? running->label : "unknown";
     out["max_image_bytes"] = next ? next->size : 0;
     out["chunk_bytes"] = chunkLimit;
@@ -186,7 +193,7 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
             case verified_image::Verdict::no_image:
                 return fail(out,409,"No hay una imagen anterior válida para restaurar.");
             case verified_image::Verdict::unsigned_version:
-                return fail(out,409,"La imagen anterior no exige firma; no se restaura por la API. Usa el cable USB.");
+                return fail(out,409,"La imagen anterior no exige firma o corresponde a otra placa; no se restaura por la API.");
             default:
                 return fail(out,409,"Este equipo no verificó la firma de la imagen anterior (se cargó por cable o su carga no terminó); no se restaura por la API. Usa el cable USB.");
         }
@@ -246,6 +253,12 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
             default:
                 abortTransfer("incomplete");
                 return fail(out,409,"La imagen está incompleta.");
+        }
+        // Cambiar solo el manifiesto no convierte un firmware de Tiny en uno
+        // de Thing Plus. La placa forma parte de la imagen cuya firma se comprobó.
+        if (!matchesBoard(target)) {
+            abortTransfer("hardware_mismatch");
+            return fail(out,400,"La imagen firmada es para otra placa. Se requiere firmware de Thing Plus ESP32-S3.");
         }
         mbedtls_sha256_free(&fileHash); mbedtls_sha256_free(&imageHash);
         const esp_err_t validated = esp_ota_end(handle); active = false;

@@ -1,5 +1,6 @@
 # TresVizoRTK
 
+**Alimentación — 02/10/2026:** LiPo 1S 3.7 V / 3000 mAh confirmada. Lectura MAX17048 y apagado coordinado Mk2 implementados; falta identificar el elevador de 5 V y validar físicamente el conjunto con UM980. Ver `hardware/wiring.md` desde la raíz. La carga es autónoma por hardware; USB impide el corte total de batería.
 TresVizoRTK es un proyecto personal para desarrollar un prototipo funcional de receptor GNSS RTK de triple banda con IMU y lector microSD, orientado a trabajos de topografía. El repositorio reunirá el firmware de un ESP32-S3, una aplicación móvil, la documentación electrónica, la lista de materiales y los archivos mecánicos de una carcasa imprimible en 3D. La cobertura de bandas del conjunto receptor y antena deberá verificarse con el hardware real.
 
 El objetivo es disponer de un software de instrumento robusto en el ESP32-S3, tomando la experiencia de equipos Emlid como referencia de producto. El firmware concentrará la configuración y operación del equipo; una app independiente, todavía sin iniciar, resolverá levantamientos, replanteos y trazo. Esta referencia no implica equivalencia de funciones o rendimiento validada.
@@ -8,33 +9,19 @@ El objetivo de desarrollo es alcanzar aproximadamente 2 cm de precisión en cond
 
 ## Estado actual
 
-El firmware **0.6.2** corre sobre el ESP32-S3 y el equipo se llama **MeridianV**.
-Panel web propio, sin clave de acceso: la contraseña del Wi-Fi del instrumento es
-su única credencial. Enlace UART con el UM980 verificado en ambos sentidos, GGA y
-GST a 10 Hz, precisión estimada en metros y solución RTK alcanzada con
-correcciones NTRIP reales.
+El firmware **0.8.0** está adaptado y compilado para **SparkFun Thing Plus ESP32-S3 WRL-24408**. El equipo conserva el nombre **MeridianV**, el panel, BLE, NTRIP y los servicios GNSS. La nueva placa sustituye a la Tiny; las pruebas físicas históricas de esa placa no validan este montaje.
 
-Funciona sin intervención tras un corte de corriente: el equipo recupera su red
-Wi-Fi guardada, reconecta el perfil NTRIP y vuelve a corregir solo. La
-configuración del receptor se graba en su memoria no volátil en cada cambio.
+Esta entrega añade OLED SSD1306 I2C de 128×64, microSD integrada por SDIO y una identidad de hardware independiente para las imágenes firmadas. La pantalla muestra calidad GNSS, satélites, correcciones, grabación e IP; caduca la calidad cuando dejan de llegar datos. La tarjeta no se formatea automáticamente.
 
-**Implementado pero sin probar contra hardware o servicio real:** publicación
-NTRIP hacia un caster, caster propio sirviendo a un rover, lectura de sourcetable,
-estacionamiento de base, promedio de coordenadas y los paquetes BLE de
-telemetría. Compilan y están cargados; nadie los ha ejecutado de principio a fin.
+El panel identifica la placa, muestra el estado de OLED y microSD y controla el registro según la disponibilidad real y el cierre de archivos. Las descargas incompletas conservan `.part`. Cargador USB y diagnóstico BLE actualizados para la nueva placa; [detalle del software](docs/panel-campo.md).
 
-**OTA firmada (desde 0.7.13):** el equipo solo instala por OTA `firmware-signed.bin`,
-con la firma ECDSA P-256 del propietario, y por Bluetooth ninguna respuesta lleva
-contraseñas. Compila y la firma se comprueba en la Mac; falta probar la carga en
-el equipo. Clave y procedimiento en [firma del firmware](tools/firmware_signing/README.md).
+El almacenamiento se llama **Memoria interna del dispositivo** en la interfaz y en las etiquetas de la API para aplicaciones; en la OLED, **MEM INT.**. El soporte físico sigue documentado como microSD. Grabación, cierre, catálogo y descarga implementados; comprobación física pendiente.
 
-**Sin integrar:** IMU (no hay hardware), radio UHF y la
-aplicación móvil. La microSD está preparada en código y deshabilitada hasta
-validar el cableado. La carcasa vigente es la [V2 mecánica](mechanical/v2/README.md),
-todavía sin imprimir ni ensayar.
+**Pendiente de banco:** primera carga en Thing Plus, OLED recibida, microSD, enlace UART y operación prolongada. La adaptación no cargó firmware en ningún equipo. **Encendido/apagado con el SparkFun Soft Power Switch implementado; prueba física pendiente.** Durante el banco, Thing Plus y UM980 mantienen alimentación USB separada y GND común.
 
-Detalle de cada entrega en el [README del firmware](firmware/esp32/README.md) y
-en el [estado del proyecto](docs/project-status.md).
+**Sin integrar:** IMU, radio UHF y aplicación móvil. La carcasa diseñada para Tiny requiere revisión para la Thing Plus y la OLED; no se ha dado por compatible ni se ha regenerado CAD.
+
+El [cableado vigente](hardware/wiring.md) reúne los pines y la primera instalación. Detalle de cambios y pruebas en el [README del firmware](firmware/esp32/README.md). Las imágenes OTA llevan la [firma del propietario](tools/firmware_signing/README.md).
 
 ## Alcance previsto
 
@@ -67,15 +54,16 @@ La base considerada incluye:
 
 - Unicore UM980 en una placa de desarrollo o carrier como GNSS principal.
 - u-blox ZED-F9P disponible para posibles pruebas.
-- ESP32-S3-Tiny: la captura selecciona Tiny y el chip conectado reporta 4 MB de flash y 2 MB de PSRAM; no corresponde al perfil N8R8 considerado inicialmente.
+- SparkFun Thing Plus ESP32-S3 WRL-24408, con 4 MB de flash y 2 MB de PSRAM Quad según fabricante.
 - Bosch BMI088 en breakout.
-- Lector y tarjeta microSD, con módulo o socket e interfaz por confirmar.
+- Socket microSD integrado de la Thing Plus, SDIO de cuatro bits y tarjeta FAT32.
+- OLED Tecneu 0.96 pulgadas I2C, cuatro pines y 128×64; driver SSD1306 según referencia del vendedor.
 - Antena Helix, cuya compra confirmó el propietario; modelo y bandas por verificar. La HA-901A mencionada inicialmente no está confirmada.
-- Batería LiPo de una celda, nominal 3.7 V y aproximadamente 5000 mAh, aún pendiente.
-- Módulo de interruptor biestable para estudiar el encendido, aún sin verificar ni integrar.
+- Batería LiPo de una celda, nominal 3.7 V y 3000 mAh, confirmada por el propietario.
+- SparkFun Soft Power Switch JST 2 mm comprado; integración de encendido/apagado implementado; prueba física pendiente.
 - Carcasa cilíndrica impresa en 3D y montaje sobre jalón.
 
-El enlace GNSS usa RX del ESP32 en GPIO18 y TX en GPIO17, con GND común; ambos equipos reciben alimentación USB por separado. El resto de interfaces requiere seguir la documentación de cableado y sus validaciones. La disponibilidad de PPS en la carrier UM980 concreta está pendiente de verificación. Consulta la [lista de materiales](hardware/bom.md) y las [conexiones pendientes](hardware/wiring.md).
+El enlace GNSS usa RX del ESP32 en **GPIO44** y TX en **GPIO43**, con GND común; ambos equipos reciben alimentación USB por separado. La OLED usa **SDA8/SCL9 y 3.3 V**. El pinout de la Tiny (18/17) queda como historial. La disponibilidad de PPS en la carrier UM980 concreta está pendiente de verificación. Consulta la [lista de materiales](hardware/bom.md) y el [cableado vigente](hardware/wiring.md).
 
 ## Mapa del repositorio
 

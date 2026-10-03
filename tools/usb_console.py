@@ -107,6 +107,7 @@ def serve(device, port, gps=None):
     allowed_hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
     allowed_origins = {f"http://{host}" for host in allowed_hosts}
     assets = {"/device.js": WEB / "device.js", "/update.js": WEB / "update.js", "/bench.js": WEB / "bench.js", "/": WEB / "index.html", "/app.css": WEB / "app.css", "/app.js": WEB / "app.js", "/assets/tresvizo-logo.png": WEB / "assets" / "tresvizo-logo.png"}
+    assets.update({"/hardware.js": WEB / "hardware.js", "/gps.js": WEB / "gps.js"})
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_args):

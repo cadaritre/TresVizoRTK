@@ -1,6 +1,11 @@
 # Estado del proyecto
 
-Fecha de referencia: septiembre de 2026.
+**Alimentación — 02/10/2026:** LiPo 1S 3.7 V / 3000 mAh confirmada. Lectura MAX17048 y apagado coordinado Mk2 implementados; falta identificar el elevador de 5 V y validar físicamente el conjunto con UM980. Ver `hardware/wiring.md` desde la raíz. La carga es autónoma por hardware; USB impide el corte total de batería.
+Fecha de referencia: 2 de octubre de 2026.
+
+**Hardware definitivo seleccionado:** Thing Plus ESP32-S3 WRL-24408, OLED Tecneu I2C 128×64 y SparkFun Soft Power Switch JST 2 mm. Firmware 0.8.0 adaptado y compilado, con SDIO integrado, OLED y pines UART44/43. [Cableado vigente](../hardware/wiring.md). Las pruebas físicas del conjunto siguen pendientes; encendido/apagado implementado; prueba física pendiente. Las tablas siguientes conservan el historial del proyecto y no sustituyen esta selección.
+
+**Software actualizado para ese montaje:** panel con placa/OLED/microSD reales informadas por API, estados y controles de grabación/cierre, descarga `.part` de sesiones incompletas, scripts del puente USB, nombre de placa en el cargador y cableado dinámico en el diagnóstico BLE. Pruebas locales e inspección del panel con datos de prueba; sin carga ni ensayos físicos. [Detalle del panel](panel-campo.md).
 
 **Actualización mecánica/power del 20/09:** existe CAD A5 y propuesta por módulos comerciales. La [revisión conjunta](INTEGRATION_REVIEW.md) corrige la integración local del panel, pero detecta bloqueo de montaje axial del cuerpo y pendientes de soportes power, arnés e inserto. No hay receptor completo liberado para imprimir o energizar. Las filas históricas que indican ausencia de CAD o propuesta de alimentación quedaron superadas por estos archivos; no implican validación física.
 

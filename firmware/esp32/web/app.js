@@ -105,6 +105,9 @@ function connected(ok) {
   $("export-diagnostics").disabled = !ok;
   if (!ok) {
     latestStatus = null;
+    window.latestStatusSnapshot = null;
+    renderHardwareState(null);
+    renderRecording(null);
     if (!window.benchActive) renderGnss(null);
     document.querySelectorAll("[data-live]").forEach((el) => {
       if (window.benchActive && el.id.startsWith("gnss-")) return;
@@ -230,6 +233,7 @@ function renderStatus(data) {
     ? data.refresh_ms
     : 2000;
   connected(true);
+  renderHardwareState(data);
   text("device-name", data.device_name);
   const ble = data.subsystems?.ble;
   text("ble-state", ble?.state === "advertising" ? "Disponible para emparejar" : ble?.state === "authorized" ? "App autenticada" : ble?.state === "connected" ? "Cliente conectado" : "No disponible en este firmware");

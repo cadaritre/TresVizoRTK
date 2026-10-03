@@ -1,4 +1,7 @@
 #include "sd_recorder.h"
+#include "board_profile.h"
+#include "local_display.h"
+#include "power_manager.h"
 #include "ntrip_input.h"
 #include "correction_output.h"
 #include "base_survey.h"
@@ -183,6 +186,11 @@ void pollSerial() {
 }
 
 void setup() {
+    // Alimentación de periféricos y señales del Soft Power Switch Mk2.
+    power_manager::begin();
+    digitalWrite(board_profile::kPeripheralEnable,HIGH);
+    pinMode(board_profile::kPeripheralEnable,OUTPUT);
+    delay(10);
     Serial.setRxBufferSize(2048);
     Serial.begin(115200);
     Serial.setTxTimeoutMs(50);
@@ -230,6 +238,7 @@ void setup() {
             if (httpd_register_uri_handler(server, &route) != ESP_OK) Serial.println("Error al registrar ruta HTTP.");
         }
     } else Serial.println("Error al iniciar el servidor web. Consola USB disponible.");
+    local_display::begin();
     Serial.printf("TresVizo RTK %s. Consola JSON USB disponible.\n", instrument::kVersion);
 }
 
@@ -239,6 +248,7 @@ void loop() {
         ble_transport::tick();
         telemetry_ws::tick();
         if (xSemaphoreTake(instrumentMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
+            power_manager::tick();
             instrument::tick();
             // Bajo el mutex: el promedio puede terminar aplicando modo base, y
             // eso toca el receptor igual que cualquier otra operación.

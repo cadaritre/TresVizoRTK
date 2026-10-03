@@ -167,6 +167,21 @@ struct FirmwareIdentity {
 };
 static_assert(sizeof(FirmwareIdentity) == 32, "la identidad ocupa 32 bytes en la imagen");
 
+// Desde 0.8.0 la placa también está dentro de los bytes firmados. Conservar los
+// primeros 32 bytes permite seguir leyendo la versión con herramientas previas.
+constexpr size_t kHardwareIdBytes = 48;
+constexpr size_t kHardwareImageOffset = kIdentityImageOffset + sizeof(FirmwareIdentity);
+struct BoardFirmwareIdentity {
+    FirmwareIdentity firmware;
+    char hardwareId[kHardwareIdBytes];
+};
+static_assert(offsetof(BoardFirmwareIdentity, hardwareId) == 32, "hardware_id en byte 320");
+inline bool matchesHardware(const uint8_t* raw, size_t size, const char* expected) {
+    if (!raw || !expected || size < kHardwareIdBytes) return false;
+    const size_t length = std::strlen(expected);
+    return length < kHardwareIdBytes && std::memcmp(raw,expected,length)==0 && raw[length]==0;
+}
+
 namespace detail {
 template <size_t... I> struct Indices {};
 template <size_t N, size_t... I> struct BuildIndices : BuildIndices<N - 1, N - 1, I...> {};

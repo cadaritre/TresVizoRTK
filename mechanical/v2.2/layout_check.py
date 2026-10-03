@@ -2,8 +2,9 @@
 
 Cada elemento exterior ocupa un sector. Este script los lista, detecta solapes
 y deja el logo centrado y del mayor tamano que quepa, sin pasar de
-`logo.ancho_max_mm`. Los paneles cuentan con su reborde interior: por dentro
-del tubo es el engrosamiento, no la tapa, lo que ocupa sitio.
+`logo.ancho_max_mm`, y en vertical entre las dos bandas de TPU. El panel
+cuenta con su reborde interior: por dentro del tubo es el engrosamiento, no la
+tapa, lo que ocupa sitio.
 """
 import json, math, pathlib, sys
 
@@ -30,13 +31,13 @@ def anadir(nombre, centro, medio_ancho):
                   centro, medio_ancho))
 
 
-for clave, nombre in (('panel', 'panel principal'), ('panel_aux', 'panel auxiliar')):
-    cfg = d[clave]
-    anadir(nombre, cfg['angulo'], cfg['arco_grados'] / 2 + arco_grados(cfg['reborde_arco'], RI))
+cfg = d['panel']
+anadir('panel principal', cfg['angulo'], cfg['arco_grados'] / 2 + arco_grados(cfg['reborde_arco'], RI))
 acc = d['accesorios']
-for signo in (-1, 1):
-    ang = acc['angulo'] + signo * acc['separacion_angular'] / 2
-    anadir(f'accesorio {norm(ang):.0f}', ang, arco_grados(acc['refuerzo_diametro'] / 2, RI))
+if acc.get('activo', True):
+    for signo in (-1, 1):
+        ang = acc['angulo'] + signo * acc['separacion_angular'] / 2
+        anadir(f'accesorio {norm(ang):.0f}', ang, arco_grados(acc['refuerzo_diametro'] / 2, RI))
 seg = d['seguro']
 anadir('seguro', seg['angulo'], arco_grados(seg['cabeza_diametro'] / 2))
 vert = d['tubo']['lineas_verticales']
@@ -74,17 +75,29 @@ mayor = max(huecos)
 ancho_g, ini, fin = mayor[0], mayor[1], mayor[2]
 centro = norm(ini + ancho_g / 2)
 
-lineas = sorted(d['tubo']['ranuras_decorativas_z'])
-gw = d['tubo']['ranura_decorativa_ancho'] / 2
-medio = (min(lineas) + max(lineas)) / 2
-abajo = max(z for z in lineas if z < medio) + gw
-arriba = min(z for z in lineas if z > medio) - gw
+# En vertical, el logo va entre las dos bandas de TPU.
+largo = d['cuerpo']['largo_util']
+z_top = d['inserto_jalon']['barril_altura'] + d['inserto_jalon']['brida_espesor'] + 4.0 \
+    + largo + 2.0 + d['antena']['espesor_tapa']
+abajo = d['bandas']['alto']
+arriba = z_top - d['bandas']['alto']
 
 margen = 3.0
 lg = d['logo']
 ancho_mm = min(ancho_g * math.pi * RO / 180 - 2 * margen,
                (arriba - abajo - 2 * margen) / 1.1513,
                lg.get('ancho_max_mm', 1e9))
+# Angulo preferido (la espalda, opuesta al panel) si cabe en el hueco con su
+# margen; si no, el centro del hueco.
+pref = lg.get('angulo_preferido')
+if pref is not None:
+    medio_g = math.degrees((ancho_mm / 2 + margen) / RO)
+    lo, hi = ini + medio_g, ini + ancho_g - medio_g
+    rel = norm(pref - ini)
+    if lo - ini <= rel <= hi - ini:
+        centro = norm(pref)
+    else:
+        print(f'AVISO: el logo no cabe en {pref} grados; va al centro del hueco')
 lg['ancho_mm'] = round(ancho_mm, 1)
 lg['angulo'] = round(centro, 1)
 lg['z_centro'] = round((abajo + arriba) / 2, 1)

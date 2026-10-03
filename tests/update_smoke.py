@@ -11,6 +11,7 @@ import sys
 import time
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
 from usb_console import Instrument, detect_port
+from firmware_identity import HARDWARE_ID
 ROOT=Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser();parser.add_argument('--install',action='store_true');args=parser.parse_args()
 device=Instrument(detect_port());checks=0
@@ -26,7 +27,7 @@ try:
     original=call('/api/config',method='GET')
     status=call('/api/update',method='GET')
     assert status['automatic_boot_rollback']
-    assert status['hardware_id']=='tresvizo-esp32s3-4m-v1'
+    assert status['hardware_id']==HARDWARE_ID
     assert status['signature_required'] and status['image_authenticity']=='owner_signed_ecdsa_p256',status
     image=(ROOT/'firmware/esp32/.pio/build/esp32s3_usb/firmware-signed.bin').read_bytes()
     assert image[-72:-64]==b'TVZSIG01','Se necesita firmware-signed.bin'

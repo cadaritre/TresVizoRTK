@@ -30,6 +30,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0,str(ROOT / 'tools'))
+from firmware_identity import HARDWARE_ID, image_hardware_id
 BUILD = ROOT / 'firmware' / 'esp32' / '.pio' / 'build'
 PLATFORMIO = Path(os.environ.get('PLATFORMIO_CORE_DIR', Path.home() / '.platformio'))
 
@@ -40,12 +42,13 @@ class Model:
     key: str           # `product` de /api/status
     env: str           # entorno de PlatformIO
     hardware_id: str   # identidad de la imagen (la que exige la OTA)
+    board: str        # placa física, visible aunque el producto conserve el nombre
 
 
 # Los equipos que se pueden cargar. El hardware_id es el de firmware_update.cpp; un
 # equipo nuevo (p. ej. el módulo de radio con su propio ESP32) se añade aquí con el suyo.
 MODELS = (
-    Model('MeridianV', 'meridianv', 'esp32s3_usb', 'tresvizo-esp32s3-4m-v1'),
+    Model('MeridianV', 'meridianv', 'esp32s3_usb', HARDWARE_ID, 'Thing Plus ESP32-S3'),
 )
 
 # Formato de la imagen (firmware/esp32/lib/protocol/src/signed_firmware.h).
@@ -88,7 +91,7 @@ class ImageInfo:
     app: bytes = field(repr=False)      # la imagen sin el trailer de firma: lo que va a la flash
 
     def describe(self):
-        model = self.model.name if self.model else 'modelo desconocido'
+        model = f'{self.model.name} · {self.model.board}' if self.model else 'modelo desconocido'
         version = self.version or 'versión desconocida'
         if not self.signed:
             firma = 'sin firma (por USB se puede cargar igual)'
@@ -102,9 +105,9 @@ class ImageInfo:
 
 
 def model_by_hardware_id(data):
-    # El más largo primero: si un hardware_id contuviera a otro, ganaría el exacto.
-    for model in sorted(MODELS, key=lambda m: -len(m.hardware_id)):
-        if model.hardware_id.encode() in data:
+    # Campo de posición fija, no una cadena que aparezca de casualidad en rodata.
+    for model in MODELS:
+        if image_hardware_id(data) == model.hardware_id:
             return model
     return None
 
@@ -222,7 +225,17 @@ from usb_console import Instrument
 device = Instrument(sys.argv[2])
 try:
     result = device.request("GET", "/api/status")
-    print(json.dumps(result.get("body") or {}))
+    status = result.get("body") or {}
+    # La Tiny anterior a 0.8.0 solo publicaba hardware_id en /api/update.
+    if not status.get("hardware_id"):
+        try:
+            update = device.request("GET", "/api/update")
+            hardware = (update.get("body") or {}).get("hardware_id")
+            if hardware:
+                status["hardware_id"] = hardware
+        except (TimeoutError, OSError):
+            pass
+    print(json.dumps(status))
 finally:
     device.close()
 '''
@@ -247,7 +260,9 @@ def read_status(python, port, timeout=12):
 
 
 def status_model(status):
-    """El modelo que dice el equipo; un firmware sin `product` es un MeridianV."""
+    """La placa nueva se reconoce por hardware_id; se conserva la lectura vieja."""
+    if status.get('hardware_id'):
+        return next((m for m in MODELS if m.hardware_id == status['hardware_id']),None)
     key = status.get('product') or 'meridianv'
     return next((m for m in MODELS if m.key == key), None)
 
@@ -282,7 +297,7 @@ def run_gui():
     models_row = ttk.Frame(frame)
     models_row.grid(row=1, column=0, columnspan=3, sticky='w', pady=(4, 12))
     for model in MODELS:
-        ttk.Radiobutton(models_row, text=model.name, value=model.name, variable=model_var,
+        ttk.Radiobutton(models_row, text=f'{model.name} · {model.board}', value=model.name, variable=model_var,
                         command=lambda: refresh_state()).pack(side='left', padx=(0, 16))
 
     # 2. Imagen
@@ -460,7 +475,7 @@ def run_gui():
         if mismatch() or not port:
             return
         detail = 'instalación completa' if full else 'actualización'
-        if not messagebox.askokcancel('Cargar firmware', f'Vas a cargar {model.name} {info.version or ""} en {port} ({detail}).\n\n¿Seguir?'):
+        if not messagebox.askokcancel('Cargar firmware', f'Vas a cargar {model.name} {info.version or ""} para {model.board} en {port} ({detail}).\n\n¿Seguir?'):
             return
         state['busy'] = True
         progress['value'] = 0

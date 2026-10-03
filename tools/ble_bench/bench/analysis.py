@@ -37,6 +37,13 @@ STATUS_COUNTERS = {
     "gnss.correction_frames_expired": ("subsystems", "gnss", "correction_frames_expired"),
 }
 STATUS_FIELDS = {
+    "hardware_id": ("hardware_id",),
+    "board": ("board",),
+    "gnss.rx_gpio": ("subsystems", "gnss", "rx_gpio"),
+    "gnss.tx_gpio": ("subsystems", "gnss", "tx_gpio"),
+    "display.state": ("subsystems", "display", "state"),
+    "microsd.state": ("subsystems", "microsd", "state"),
+    "microsd.closing": ("subsystems", "microsd", "closing"),
     "firmware_version": ("firmware_version",),
     "uptime_ms": ("uptime_ms",),
     "free_heap_bytes": ("free_heap_bytes",),
@@ -416,7 +423,7 @@ class Analyzer:
         return delta
 
     def receiver_silent(self) -> bool | None:
-        """True si el ESP32 no ha recibido nada del UM980 (el cable RX de GPIO18)."""
+        """True si los contadores no muestran tramas aceptadas del UM980."""
         if not self.statuses:
             return None
         last = self.statuses[-1][2]
@@ -542,12 +549,15 @@ class Analyzer:
                        + (f", y {more} más" if more > 0 else "") + ")")
         silent = self.receiver_silent()
         if silent:
-            out.append("⚠ 0 bytes de telemetría del receptor: el ESP32 no ha aceptado ni una trama del UM980 "
+            rx = self.statuses[-1][2].get("gnss.rx_gpio")
+            destination = f"RX del ESP32 (GPIO{rx})" if type(rx) is int else "RX del ESP32 según el cableado de su placa"
+            out.append("⚠ el ESP32 no ha aceptado ni una trama GGA o binaria del UM980 "
                        "(GGA 0, binario nativo 0). **No es un fallo de Bluetooth**: revisar el cable "
-                       "TTL_TXD2 → GPIO18. Sin solución el firmware tampoco manda salud (ble_transport.cpp:233).")
+                       f"TTL_TXD2 → {destination}, alimentación y salidas del receptor. "
+                       "El latido de salud BLE se evalúa por separado según la versión del protocolo.")
         elif (solution is None or not solution.count) and (health is None or not health.count) and duration > 3:
             out.append("⚠ ni solución ni salud: o el receptor no emite (ver /api/status → subsystems.gnss) "
-                       "o no hay suscripción; la salud solo sale detrás de una solución nueva (ble_transport.cpp:255)")
+                       "o no hay suscripción; desde el protocolo v3 la salud debe llegar incluso sin solución GNSS")
         if health is not None and health.count and health.max_interval_s * 1000 > p.HEALTH_SILENCE_DEGRADED_MS \
                 and (self.ble_status.get("protocol_version") or 0) >= p.PROTOCOL_VERSION_WITH_HEARTBEAT:
             out.append(f"✘ latido: {health.max_interval_s:.1f} s sin salud con el enlace arriba "

@@ -1,22 +1,28 @@
-"""V2.2: carcasa TresVizo. Es V2.1 con 10 mm mas de diametro, 20 mm mas de
-cuerpo, panel frontal grande con pantalla OLED y boton metalico de 12 mm, sin
-trineo y con el IMU en una plataforma que se incrusta en la tapa de antena.
+"""V2.2: carcasa TresVizo. Es V2.1 con 10 mm mas de diametro y 10 mm mas de
+cuerpo, panel frontal con pantalla OLED y boton metalico de 12 mm, sin trineo y
+sin panel auxiliar, con el IMU en una plataforma que se incrusta en la tapa, un
+hombro redondeado que abraza la antena y dos bandas de TPU.
 
-Seis piezas: base con rosca, tubo con logo grabado y respaldo de amarre, tapa de
-antena, plataforma del IMU y las dos tapas de panel. Todas las cotas salen de
-parameters.json; las de los componentes de referencia, de components.json.
+Ocho piezas: base con rosca, tubo con logo, respaldo de amarre y toalleros,
+tapa de antena, plataforma del IMU, tapa del panel, hombro de la antena y las
+dos bandas de TPU. Todas las cotas salen de parameters.json; las de los
+componentes de referencia, de components.json.
 
 Cambios frente a V2.1 (pedidos por el propietario el 02-10-2026):
-  - diametro 69 -> 79 y cuerpo 20 mm mas alto;
-  - panel frontal de 72 grados x 96 mm: pantalla OLED de 0.96 in en su marco,
+  - diametro 69 -> 79 y cuerpo 10 mm mas alto;
+  - panel frontal de 72 grados x 87 mm: pantalla OLED de 0.96 in en su marco,
     boton metalico de 12 mm con asiento plano por fuera y por dentro, USB-C con
-    repisa y dos LEDs;
+    repisa y dos LEDs. Sin panel auxiliar;
   - fuera el trineo: el boton, la pantalla y su cableado ocupan el frente. Todo
     se amarra con bridas a un respaldo ranurado que forma parte del tubo, en la
-    cara trasera;
+    cara trasera, o a cuatro toalleros de las paredes laterales;
   - el IMU va en una plataforma que se incrusta en el cuello de la tapa con tres
     unas, con el CHIP en el eje y no la linea de los agujeros, que es lo que
-    hacia V2.1 y dejaba el sensor unos 5 mm fuera.
+    hacia V2.1 y dejaba el sensor 5.65 mm fuera;
+  - las dos bayonetas llevan un diente mas ancho: base y tapa entran en una
+    sola posicion;
+  - hombro redondeado sobre la tapa y bandas de proteccion de TPU arriba y
+    abajo.
 
 Ejes: Z es el eje del jalon, hacia arriba. FRONT es +Y. Origen en la cara de
 apoyo del jalon (Z=0). Mirando la cara +Y con Z arriba, X apunta a la izquierda.
@@ -48,7 +54,8 @@ V = App.Vector
 TUBE, BODY, BACK = P['tubo'], P['cuerpo'], P['respaldo']
 IMU, PLAT, ANT, INS = P['imu'], P['plataforma_imu'], P['antena'], P['inserto_jalon']
 BAY, LOCK, PAN = P['bayoneta'], P['seguro'], P['panel']
-AUX, ACC = P['panel_aux'], P['accesorios']
+ACC, TOWEL = P['accesorios'], P['toalleros']
+SHOULDER, BANDS = P['hombro'], P['bandas']
 LOGO, PR = P['logo'], P['impresion']
 OLED, BTN, USB, LED = PAN['pantalla'], PAN['boton'], PAN['usb_c'], PAN['leds']
 
@@ -77,8 +84,12 @@ NECK_RI = R_SPIGOT - TUBE['pared']
 GROOVE_START = -(TOOTH_A + 4) / 2.0
 GROOVE_SPAN = TOOTH_A + TRAVEL_A + 2 * BAY_CLR
 # Giro real de cierre: 28.7 grados, no los 30 de `tope_grados`. Base y tapa se
-# dibujan CERRADAS para que los seguros coincidan con los del tubo.
+# dibujan CERRADAS para que los seguros coincidan con los del tubo. No depende
+# del ancho del diente: el diente indice cierra igual que los otros.
 GIRO_CIERRE = GROOVE_START + GROOVE_SPAN - TOOTH_A / 2.0
+# Ancho de cada diente. El primero es el indice: mas ancho que las entradas de
+# los otros, asi la pieza solo entra en una posicion.
+TOOTH_WIDTHS = [BAY.get('diente_indice_grados', TOOTH_A)] + [TOOTH_A] * (N_TEETH - 1)
 # Cuanto muerde un refuerzo dentro de la pared antes de sobresalir. Tangente,
 # OCC marca la pieza como "unorientable".
 BOSS_BITE = 0.8
@@ -200,15 +211,19 @@ def radial_tool(radius, depth, angle_deg, z, direction=1):
 # --- Bayoneta ---------------------------------------------------------------
 def bayonet_groove(z_entry, h_entry, z_groove, sign=1):
     """Canales de entrada mas sectores de ranura. `sign` = -1 da la ranura
-    simetrica, que cierra en sentido contrario."""
+    simetrica, que cierra en sentido contrario. Cada ranura se hace a la medida
+    de su diente: la del indice es mas ancha."""
     cuts = []
     for i in range(N_TEETH):
         a = i * 360.0 / N_TEETH
-        start = GROOVE_START if sign > 0 else -(GROOVE_START + GROOVE_SPAN)
+        w = TOOTH_WIDTHS[i]
+        g_start = -(w + 4) / 2.0
+        g_span = w + TRAVEL_A + 2 * BAY_CLR
+        start = g_start if sign > 0 else -(g_start + g_span)
         cuts.append(sector(R_GROOVE, R_SPIGOT - 2, z_groove,
-                           TOOTH_H + 2 * BAY_CLR, a + start, GROOVE_SPAN))
+                           TOOTH_H + 2 * BAY_CLR, a + start, g_span))
         cuts.append(sector(R_GROOVE, R_SPIGOT - 2, z_entry, h_entry,
-                           a - (TOOTH_A + 4) / 2.0, TOOTH_A + 4))
+                           a - (w + 4) / 2.0, w + 4))
     shape = cuts[0]
     for c in cuts[1:]:
         shape = shape.fuse(c)
@@ -220,8 +235,8 @@ def bayonet_teeth(z_tooth, sign=1):
     teeth = []
     for i in range(N_TEETH):
         a = i * 360.0 / N_TEETH + sign * GIRO_CIERRE
-        teeth.append(sector(R_TOOTH, R_SPIGOT - 1, z_tooth, TOOTH_H,
-                            a - TOOTH_A / 2.0, TOOTH_A))
+        w = TOOTH_WIDTHS[i]
+        teeth.append(sector(R_TOOTH, R_SPIGOT - 1, z_tooth, TOOTH_H, a - w / 2.0, w))
     shape = teeth[0]
     for t in teeth[1:]:
         shape = shape.fuse(t)
@@ -300,7 +315,8 @@ def build_backrest():
     La placa, las costillas y el piso del canal nacen de una rampa a 45 grados
     que arranca en el collar inferior, de modo que el tubo se sigue imprimiendo
     de pie sin soportes. El canal queda cerrado abajo y abierto arriba: por ahi
-    bajan el coaxial y los cables del IMU desde la tapa.
+    bajan el coaxial y los cables del IMU desde la tapa. Las costillas llevan
+    huecos grandes: bridas y cables pasan de una celda del canal a otra.
     """
     b = BACK
     yf = -b['plano_frontal']
@@ -321,8 +337,10 @@ def build_backrest():
 
     # Las rampas nacen 0.5 mm dentro del collar: si arrancaran justo en su cara
     # interior la tocarian tangentes y la malla saldria con autointersecciones.
+    # La del piso del canal nace en la pared: asi su cara superior tambien es una
+    # rampa a 45 grados y no una cornisa plana.
     ramp_lo = oblique_ramp(R_COLLAR + 0.5, z0, RI + h)
-    ramp_hi = oblique_ramp(R_COLLAR + 0.5, z0 + b['piso_canal'], RI + h)
+    ramp_hi = oblique_ramp(RI + 0.5, z0, RI + h)
     body = region.cut(channel.cut(ramp_hi)).cut(ramp_lo)
 
     s = b['ranura']
@@ -331,7 +349,72 @@ def build_backrest():
         for x in b['columnas_x']:
             body = body.cut(box(x - s / 2, x + s / 2, yb - 2, yf + 2, z - s / 2, z + s / 2))
         z += b['filas_paso']
+
+    # Huecos hexagonales en las costillas, centrados entre la placa y la pared:
+    # las puntas a 45 grados se imprimen sin puente.
+    hc = b['huecos_costillas']
+    hw, hh = hc['ancho'], hc['alto']
+    for rx in b['costillas_x']:
+        y_wall = -math.sqrt(RI ** 2 - rx ** 2)
+        yc = ((yb - 1.5) + (y_wall + 2.0)) / 2.0
+        for zc in hc['z']:
+            pts = [V(rx - 3, yc - hw / 2, zc - hh / 2 + hw / 2), V(rx - 3, yc, zc - hh / 2),
+                   V(rx - 3, yc + hw / 2, zc - hh / 2 + hw / 2), V(rx - 3, yc + hw / 2, zc + hh / 2 - hw / 2),
+                   V(rx - 3, yc, zc + hh / 2), V(rx - 3, yc - hw / 2, zc + hh / 2 - hw / 2)]
+            hexa = Part.Face(Part.makePolygon(pts + [pts[0]])).extrude(V(6, 0, 0))
+            body = body.cut(hexa)
     return body
+
+
+def build_towel_bars():
+    """Toalleros de amarre: barras separadas de la pared para rodearlas con una
+    brida. Se dibujan con la pared en +X y se giran a su angulo.
+
+    Los postes llevan escuadra a 45 grados por debajo, que nace en la pared: el
+    tubo se imprime de pie sin soportes. La barra horizontal es un puente entre
+    sus dos postes.
+    """
+    t = TOWEL
+    s, gap, p = t['seccion'], t['separacion_pared'], t['poste']
+    wall = RI + BOSS_BITE
+    clip = Part.makeCylinder(wall, 400, V(0, 0, -100))
+    shapes = []
+    for bar in t['verticales']:
+        z0, z1 = bar['z']
+        r_in = RI - gap - s
+        parts = [box(r_in, r_in + s, -s / 2, s / 2, z0, z1),
+                 box(r_in, wall, -s / 2, s / 2, z1 - p, z1)]
+        gusset = [(r_in, z0), (r_in, z0 + p), (wall, z0 + p), (wall, z0 - (wall - r_in))]
+        pts = [V(x, -s / 2, z) for x, z in gusset]
+        parts.append(Part.Face(Part.makePolygon(pts + [pts[0]])).extrude(V(0, s, 0)))
+        shape = parts[0]
+        for extra in parts[1:]:
+            shape = shape.fuse(extra)
+        shape = shape.common(clip)
+        shape.rotate(V(), V(0, 0, 1), bar['angulo'])
+        shapes.append(shape)
+    for bar in t['horizontales']:
+        zc, half = bar['z'], bar['largo'] / 2.0
+        # Barra recta: sus extremos quedan a `gap` de la pared; en el centro, a
+        # algo mas.
+        x_out = math.sqrt((RI - gap) ** 2 - half ** 2)
+        x_in = x_out - s
+        parts = [box(x_in, x_out, -half, half, zc - s / 2, zc + s / 2)]
+        for y0 in (-half, half - p):
+            gusset = [(x_in, zc - s / 2), (x_in, zc + s / 2), (wall, zc + s / 2),
+                      (wall, zc - s / 2 - (wall - x_in))]
+            pts = [V(x, y0, z) for x, z in gusset]
+            parts.append(Part.Face(Part.makePolygon(pts + [pts[0]])).extrude(V(0, p, 0)))
+        shape = parts[0]
+        for extra in parts[1:]:
+            shape = shape.fuse(extra)
+        shape = shape.common(clip)
+        shape.rotate(V(), V(0, 0, 1), bar['angulo'])
+        shapes.append(shape)
+    out = shapes[0]
+    for shape in shapes[1:]:
+        out = out.fuse(shape)
+    return out
 
 
 def build_tube(logo_shape):
@@ -343,23 +426,26 @@ def build_tube(logo_shape):
     top_collar = undercut_chamfer(top_collar, RI, COLLAR_T, Z_TUBE1 - COLLAR_H)
     body = body.fuse(top_collar)
     body = body.fuse(build_backrest())
+    body = body.fuse(build_towel_bars())
     body = body.cut(bayonet_groove(Z_TUBE0 - 1, 6.0, Z_TUBE0 + 4.0 - BAY_CLR))
     body = body.cut(bayonet_groove(Z_TUBE1 - 6.0, 7.0, Z_TUBE1 - 8.0 - BAY_CLR, SIGN_CAP))
 
-    for cfg in (PAN, AUX):
-        pad, rebate, window = panel_frame(cfg)
-        body = body.fuse(pad)
-        body = body.cut(rebate).cut(window)
-        half = cfg['tornillo_separacion_z'] / 2
-        for dz in (-half, half):
-            body = body.cut(radial_tool(cfg['tornillo_piloto'] / 2, TUBE['pared'] + 12,
-                                        cfg['angulo'], cfg['z_centro'] + dz))
+    # Un solo panel: el auxiliar se quito.
+    pad, rebate, window = panel_frame(PAN)
+    body = body.fuse(pad)
+    body = body.cut(rebate).cut(window)
+    half = PAN['tornillo_separacion_z'] / 2
+    for dz in (-half, half):
+        body = body.cut(radial_tool(PAN['tornillo_piloto'] / 2, TUBE['pared'] + 12,
+                                    PAN['angulo'], PAN['z_centro'] + dz))
 
-    # Barrenos de accesorios: pasantes, sin refuerzo interior.
-    for z in ACC['z']:
-        for sign in (-1, 1):
-            angle = ACC['angulo'] + sign * ACC['separacion_angular'] / 2.0
-            body = body.cut(radial_tool(ACC['piloto'] / 2, TUBE['pared'] + 4, angle, z))
+    # Barrenos de accesorios: pasantes, sin refuerzo interior. Desactivados
+    # mientras el de 324 grados apunte a la bateria.
+    if ACC.get('activo', True):
+        for z in ACC['z']:
+            for sign in (-1, 1):
+                angle = ACC['angulo'] + sign * ACC['separacion_angular'] / 2.0
+                body = body.cut(radial_tool(ACC['piloto'] / 2, TUBE['pared'] + 4, angle, z))
 
     # Seguros de bayoneta: el paso libre ATRAVIESA pared y collar.
     through = (RO + 2) - (R_COLLAR - 1.5)
@@ -396,12 +482,24 @@ def build_cap():
     body = Part.makeCylinder(RO, Z_TOP - Z_TUBE1, V(0, 0, Z_TUBE1))
     body = body.fuse(tube_ring(R_SPIGOT, NECK_RI, z0, Z_TUBE1 - z0))
     body = body.fuse(bayonet_teeth(Z_TUBE1 - 8.0, SIGN_CAP))
-    body = body.cut(tube_ring(RO + 1, RO - 1.2, Z_TOP - 1.2, 1.3))
+    # Chaflan a 45 grados en el canto superior: con el del hombro forma una
+    # linea en V. Impresa boca abajo, ese canto va en la cama y a 45 grados no
+    # cuelga; el escalon de V2.1 dejaba un voladizo de 1.2 en un canto visto.
+    c = 1.2
+    body = body.cut(Part.makeCylinder(RO + 1, c + 1, V(0, 0, Z_TOP - c))
+                    .cut(Part.makeCone(RO, RO - c - 1, c + 1, V(0, 0, Z_TOP - c))))
 
     # Paso libre de los tornillos de antena: roscan en la antena.
     for i in range(ANT['numero_pernos']):
         a = math.radians(ANT['angulo_inicial'] + i * 360.0 / ANT['numero_pernos'])
         r = ANT['circulo_pernos'] / 2
+        body = body.cut(Part.makeCylinder(ANT['perno_paso'] / 2, ANT['espesor_tapa'] + 2,
+                                          V(r * math.cos(a), r * math.sin(a),
+                                            Z_TOP - ANT['espesor_tapa'] - 1)))
+    # Paso libre de los tornillos del hombro: roscan en el hombro.
+    for ang in SHOULDER['tornillos_angulos']:
+        a = math.radians(ang)
+        r = SHOULDER['tornillos_radio']
         body = body.cut(Part.makeCylinder(ANT['perno_paso'] / 2, ANT['espesor_tapa'] + 2,
                                           V(r * math.cos(a), r * math.sin(a),
                                             Z_TOP - ANT['espesor_tapa'] - 1)))
@@ -412,12 +510,15 @@ def build_cap():
     if lead > 0:
         body = body.cut(Part.makeCone(NECK_RI + lead, NECK_RI, lead, V(0, 0, z0 - 0.01)))
 
-    # Refuerzo local para el seguro: en el cuello solo hay 2.5 mm de pared.
-    a = math.radians(LOCK['angulo'])
-    ux, uy = math.cos(a), math.sin(a)
-    boss = Part.makeCylinder(3.5, LOCK.get('boss_largo', 5.0),
-                             V(ux * (R_SPIGOT - BOSS_BITE), uy * (R_SPIGOT - BOSS_BITE),
-                               Z_LOCK_CAP), V(-ux, -uy, 0))
+    # Refuerzo local para el seguro: en el cuello solo hay 2.5 mm de pared. Un
+    # alma lo une a la placa: impresa boca abajo, el refuerzo solo quedaba en
+    # mensula a 1.5 mm de la placa, justo donde va el piloto del M3. El alma cae
+    # en el hueco de 181-205 grados de la falda de la plataforma.
+    boss_len = LOCK.get('boss_largo', 5.0)
+    r_boss = R_SPIGOT - BOSS_BITE
+    boss = Part.makeCylinder(3.5, boss_len, V(r_boss, 0, Z_LOCK_CAP), V(-1, 0, 0))
+    boss = boss.fuse(box(r_boss - boss_len, r_boss, -3.5, 3.5, Z_LOCK_CAP, Z_TUBE1 + 0.5))
+    boss.rotate(V(), V(0, 0, 1), LOCK['angulo'])
     body = body.fuse(boss.cut(Part.makeCylinder(ANT['paso_coaxial'] / 2 + 0.5, 60,
                                                 V(0, 0, z0 - 1))))
     body = body.cut(radial_tool(LOCK['piloto'] / 2, LOCK['profundidad_tapa'],
@@ -538,8 +639,9 @@ def display_features():
     """Marco de la pantalla por dentro de la tapa (a 90 grados).
 
     El PCB apoya por la cara del vidrio en un plano; el vidrio y la mica entran
-    en un bolsillo y la ventana, del tamano del area activa, se abre hacia fuera
-    a 45 grados. Cuatro M2 sujetan el PCB por sus agujeros.
+    en un bolsillo y la ventana, del tamano del area visible, se abre hacia
+    fuera: 45 grados arriba y abajo, 20 a los lados. Cuatro M2 sujetan el PCB
+    por sus agujeros.
     """
     d = OLED
     W, H = d['pcb_ancho'], d['pcb_alto']
@@ -557,9 +659,11 @@ def display_features():
 
     m = d['marco_margen']
     z_lo, z_hi = zt - H - m, zt + m
-    # Marco: bloque con su cara trasera plana y la de abajo a 45 grados, que
-    # nace en la cara interior de la tapa.
-    frame = yz_prism([(yf, z_lo + (RI - yf)), (yf, z_hi), (RO, z_hi), (RO, z_lo - (RO - RI))],
+    # Marco: bloque con su cara trasera plana en toda la altura del PCB y la de
+    # abajo a 45 grados hacia la tapa. Si el chaflan arrancara en la tapa, la
+    # cara plana empezaria por encima de los dos agujeros de abajo y esos M2
+    # apretarian contra el chaflan, doblando el canto del PCB.
+    frame = yz_prism([(yf, z_lo), (yf, z_hi), (RO, z_hi), (RO, z_lo - (RO - yf))],
                      -(W / 2 + m), W / 2 + m)
     adds, cuts = [frame], []
 
@@ -580,15 +684,17 @@ def display_features():
     # las fuentes. Chaflan de 45 grados arriba y abajo, porque la pantalla se
     # mira desde abajo, y menor a los lados, para no comerse el labio que sujeta
     # la mica sobre la tapa curva.
+    # Arriba sin margen: el labio que sujeta la mica por arriba queda mas ancho.
     mg = d['margen_ventana']
+    mg_top = d.get('margen_ventana_arriba', mg)
     x0, x1 = xr(d['area_visible']['u'])
     z0, z1 = zr(d['area_visible']['v'])
     y_start, y_end = yf + depth - 0.3, RO + 2.0
     gz = (y_end - y_start) * math.tan(math.radians(d['chaflan_ventana']))
     gx = (y_end - y_start) * math.tan(math.radians(d['chaflan_ventana_lados']))
-    cuts.append(Part.makeLoft([rect_y(x0 - mg, x1 + mg, z0 - mg, z1 + mg, y_start),
+    cuts.append(Part.makeLoft([rect_y(x0 - mg, x1 + mg, z0 - mg, z1 + mg_top, y_start),
                                rect_y(x0 - mg - gx, x1 + mg + gx,
-                                      z0 - mg - gz, z1 + mg + gz, y_end)], True))
+                                      z0 - mg - gz, z1 + mg_top + gz, y_end)], True))
     return adds, cuts
 
 
@@ -610,7 +716,13 @@ def button_features():
 
 def usb_features():
     """Repisa con dos costillas detras del USB-C. La placa del receptaculo
-    entra entre las costillas, apoya en la repisa y una brida rodea las dos."""
+    entra entre las costillas, apoya en la repisa y una brida rodea las dos.
+
+    Por dentro, un asiento plano para el canto de la placa: apoyada en la cara
+    interior curva, sus esquinas la dejaban 2 a 3.6 mm hundida y la clavija no
+    llegaba. Con el asiento el receptaculo queda casi a ras, y el hueco
+    exterior, del tamano del sobremolde, deja entrar la clavija.
+    """
     u = USB
     if not u.get('soporte', True):
         return [], []
@@ -625,7 +737,9 @@ def usb_features():
     profile = [(yi, z_b + (RI - yi)), (yi, z_rib), (RO, z_rib), (RO, z_b - (RO - RI))]
     for x0 in (half_in, -half_in - ct):
         adds.append(yz_prism(profile, x0, x0 + ct))
-    return adds, []
+    seat = box(-half_in, half_in, yi, u['apoyo_placa_y'],
+               z_lt, z_lt + u['placa_espesor'] + 0.3)
+    return adds, [seat]
 
 
 def build_panel(cfg, features, extra=None):
@@ -691,6 +805,69 @@ def build_panel(cfg, features, extra=None):
         body = body.cut(radial_cut(cfg['tornillo_paso_libre'] / 2, z))
         body = body.cut(radial_cut(cfg['tornillo_cabeza'] / 2, z,
                                    2.0 + cfg.get('cabeza_profundidad', 1.6)))
+    return clean(body)
+
+
+# --- Pieza 6: hombro de la antena ------------------------------------------
+def build_shoulder():
+    """Anillo redondeado sobre la tapa que abraza la base de la antena.
+
+    Perfil de cuarto de elipse: sale vertical del cuerpo (r = 39.5) y llega
+    horizontal a la antena, `alto` mm mas arriba. Es pieza aparte porque impresa
+    con la tapa (boca abajo, por su cuello) pediria soportes en la cara vista;
+    sola se imprime de pie, sobre su cara plana, sin soportes. La antena sigue
+    apoyando en la tapa como antes, asi que el SMA no cambia. Tres M2.5 desde
+    dentro de la tapa la sujetan.
+    """
+    s = SHOULDER
+    h, c = s['alto'], s['chaflan_base']
+    rc = ANT['diametro'] / 2 + s['holgura_antena']
+    z0 = Z_TOP
+    ell = Part.Ellipse(V(RO, 0, z0 + c), V(rc, 0, z0 + h), V(rc, 0, z0 + c))
+    arc = Part.ArcOfEllipse(ell, 0.0, math.pi / 2).toShape()
+    edges = [Part.LineSegment(V(rc, 0, z0), V(RO - c, 0, z0)).toShape(),
+             Part.LineSegment(V(RO - c, 0, z0), V(RO, 0, z0 + c)).toShape(),
+             arc,
+             Part.LineSegment(V(rc, 0, z0 + h), V(rc, 0, z0)).toShape()]
+    face = Part.Face(Part.Wire(edges))
+    body = face.revolve(V(), V(0, 0, 1), 360)
+    # Canto del borde que abraza la antena, redondeado.
+    rim = [e for e in body.Edges
+           if hasattr(e.Curve, 'Radius') and abs(e.Curve.Radius - rc) < 0.01
+           and abs(e.BoundBox.ZMax - (z0 + h)) < 0.01]
+    if rim and s.get('redondeo_borde', 0) > 0:
+        try:
+            body = body.makeFillet(s['redondeo_borde'], rim)
+        except Exception as error:
+            print(f'AVISO: no se redondeo el borde del hombro ({error})')
+    for ang in s['tornillos_angulos']:
+        a = math.radians(ang)
+        r = s['tornillos_radio']
+        body = body.cut(Part.makeCylinder(s['piloto'] / 2, s['piloto_profundidad'],
+                                          V(r * math.cos(a), r * math.sin(a), z0 - 0.01)))
+    return clean(body)
+
+
+# --- Piezas 7 y 8: bandas de TPU -------------------------------------------
+def build_band(z0, z_screws):
+    """Banda de proteccion para imprimir en TPU. Diametro interior menor que el
+    cuerpo: el TPU se estira y aprieta. Por dentro, una ranura corrida a la
+    altura de cada seguro de bayoneta, por si la cabeza del M3 asoma; corrida
+    para que la banda entre en cualquier giro."""
+    b = BANDS
+    ri = RO - b['apriete_diametral'] / 2
+    ro = ri + b['espesor']
+    body = tube_ring(ro, ri, z0, b['alto'])
+    edges = [e for e in body.Edges
+             if hasattr(e.Curve, 'Radius') and abs(e.Curve.Radius - ro) < 0.01]
+    if edges and b.get('redondeo', 0) > 0:
+        try:
+            body = body.makeFillet(b['redondeo'], edges)
+        except Exception as error:
+            print(f'AVISO: no se redondearon los cantos de la banda ({error})')
+    for z in z_screws:
+        body = body.cut(tube_ring(ri + b['ranura_profundidad'], ri - 1,
+                                  z - b['ranura_alto'] / 2, b['ranura_alto']))
     return clean(body)
 
 
@@ -805,19 +982,21 @@ parts = [
     ('03-antenna-cap', 'Tapa de antena', build_cap()),
     ('04-imu-platform', 'Plataforma del IMU', build_platform()),
     ('05-panel-cover', 'Tapa del panel principal', build_panel(PAN, [
-        ('box', USB['ancho'], USB['alto'], USB['z']),
+        ('box', USB['hueco_exterior'][0], USB['hueco_exterior'][1], USB['z']),
         ('pair', LED['diametro'], LED['z'], LED['separacion']),
     ], extra=(display_features, button_features, usb_features))),
-    ('06-aux-panel-cover', 'Tapa del panel auxiliar', build_panel(AUX, [
-        ('box', AUX['usbc_ancho'], AUX['usbc_alto'], AUX['usbc_z']),
-    ])),
+    ('06-antenna-shoulder', 'Hombro de la antena', build_shoulder()),
+    ('07-bumper-bottom', 'Banda de TPU de abajo', build_band(0.0, [Z_LOCK_BASE])),
+    ('08-bumper-top', 'Banda de TPU de arriba',
+     build_band(Z_TOP - BANDS['alto'], [Z_LOCK_CAP])),
 ]
 summary = []
 for name, label, shape in parts:
     obj = doc.addObject('Part::Feature', name.replace('-', '_'))
     obj.Label = label
     obj.Shape = shape
-    bb = shape.BoundBox
+    # optimalBoundingBox: la caja normal de OCC sale holgada en los redondeos.
+    bb = shape.optimalBoundingBox()
     summary.append({
         'pieza': name, 'etiqueta': label,
         'solidos': len(shape.Solids), 'valido': bool(shape.isValid()),
@@ -851,7 +1030,12 @@ resumen = {
         'pcb_imu_cara_inferior': round(Z_BOARD, 2),
         'unas': [round(Z_NAIL, 3), round(Z_NAIL_TOP, 3)],
         'ventanas_cuello': [round(Z_WIN0, 3), round(Z_WIN1, 3)],
+        'hombro_cima': round(Z_TOP + SHOULDER['alto'], 2),
+        'banda_abajo': [0.0, BANDS['alto']],
+        'banda_arriba': [round(Z_TOP - BANDS['alto'], 2), round(Z_TOP, 2)],
     },
+    'arp_sobre_asiento_jalon_mm': round(Z_TOP, 2),
+    '_nota_arp': 'Del asiento del jalon (cara inferior de la base) a la cara de la tapa donde apoya la antena.',
     'imu': {
         'chip_xy_mm': [0.0, 0.0],
         'agujeros_xy_mm': [[round(x, 3), round(y, 3)] for x, y in HOLES],

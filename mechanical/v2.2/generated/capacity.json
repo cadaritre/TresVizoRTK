@@ -29,38 +29,63 @@
   }
  },
  "respaldo": {
-  "ranuras": 36,
-  "ranuras_sin_hueco_detras": []
+  "ranuras": 32,
+  "ranuras_sin_hueco_detras": [],
+  "huecos_costillas": 8,
+  "huecos_por_los_que_no_pasa_una_brida": []
  },
- "montaje_paneles": {
-  "panel": {
-   "con": [
-    "ref_oled",
-    "ref_button"
-   ],
-   "peor_choque_mm3": 0.0,
-   "a_mm_de_su_sitio": 0.0,
-   "entra": true
+ "toalleros": [
+  {
+   "tipo": "vertical",
+   "angulo": 15.0,
+   "z_mm": 60.0,
+   "hueco_para_brida": true,
+   "distancia_al_paquete_mm": 8.95
   },
-  "panel_aux": {
-   "con": [],
-   "peor_choque_mm3": 0.0,
-   "a_mm_de_su_sitio": 0.0,
-   "entra": true
+  {
+   "tipo": "vertical",
+   "angulo": 165.0,
+   "z_mm": 60.0,
+   "hueco_para_brida": true,
+   "distancia_al_paquete_mm": 5.95
+  },
+  {
+   "tipo": "horizontal",
+   "angulo": 0.0,
+   "z_mm": 99.0,
+   "hueco_para_brida": true,
+   "distancia_al_paquete_mm": 10.76
+  },
+  {
+   "tipo": "horizontal",
+   "angulo": 180.0,
+   "z_mm": 99.0,
+   "hueco_para_brida": true,
+   "distancia_al_paquete_mm": 10.76
   }
+ ],
+ "montaje_panel": {
+  "con": [
+   "ref_oled",
+   "ref_button"
+  ],
+  "recorrido_mm": 35,
+  "peor_choque_mm3": 0.0,
+  "a_mm_de_su_sitio": 0.0,
+  "entra": true
  },
  "pantalla": {
-  "piel_sobre_bolsillo_mm": 0.85,
-  "piel_sobre_pilotos_mm": 0.9,
-  "centro_area_activa_z_mm": 85.0,
-  "centro_area_activa_x_mm": -0.0,
-  "vidrio_frente_y_mm": 36.2,
-  "fondo_ventana_en_el_centro_mm": 3.3,
-  "distancia_al_paquete_con_dupont_mm": 17.46
+  "piel_sobre_bolsillo_mm": 1.32,
+  "piel_sobre_pilotos_mm": 1.38,
+  "piel_minima_mm": 1.2,
+  "centro_area_activa_z_mm": 79.0,
+  "vidrio_frente_y_mm": 35.7,
+  "fondo_ventana_en_el_centro_mm": 3.8,
+  "distancia_al_paquete_con_dupont_mm": 14.06
  },
  "boton": {
-  "espesor_panel_en_el_eje_mm": 3.98,
-  "con_junta_mm": 4.98,
+  "espesor_panel_en_el_eje_mm": 3.58,
+  "con_junta_mm": 4.58,
   "panel_maximo_mm": 6.0,
   "distancia_al_paquete_con_cables_mm": 13.78
  },
@@ -90,24 +115,52 @@
    18.1
   ],
   "choque_sitio_plataforma_mm3": 0.0,
-  "cima_componentes_z_mm": 133.51,
+  "cima_componentes_z_mm": 123.51,
   "libre_hasta_la_tapa_mm": 18.4,
   "pide_sma_acodado_mm": 18.0,
   "confianza_posicion_chip": "render del vendedor, plano y dos fotos: +-0.15"
  },
  "plataforma": {
   "orientaciones_posibles_ademas_de_la_buena": [],
-  "flexion_lengueta": 0.0125,
-  "ventana_z_mm": [
-   137.866,
-   140.006
+  "flexion_lengueta": 0.0117,
+  "angulo_retencion": 45.0,
+  "error_ventana_admisible_mm": [
+   -0.3,
+   0.4
   ],
-  "una_z_mm": [
-   137.607,
-   139.406
-  ],
-  "una_cabe_en_la_ventana": true,
-  "interferencia_por_precarga_mm3": 0.47
+  "se_autobloquea_con_rozamiento_mayor_que": 1.0,
+  "unas": [
+   {
+    "angulo": 35.0,
+    "solape_con_la_tapa_mm3": 0.273
+   },
+   {
+    "angulo": 145.0,
+    "solape_con_la_tapa_mm3": 0.273
+   },
+   {
+    "angulo": 320.0,
+    "solape_con_la_tapa_mm3": 0.273
+   }
+  ]
+ },
+ "bayonetas": {
+  "base": {
+   "choque_en_su_entrada_mm3": 0.0,
+   "choque_girada_120_y_240_mm3": [
+    3.2,
+    3.2
+   ],
+   "una_sola_posicion": true
+  },
+  "tapa": {
+   "choque_en_su_entrada_mm3": 0.0,
+   "choque_girada_120_y_240_mm3": [
+    3.2,
+    3.2
+   ],
+   "una_sola_posicion": true
+  }
  },
  "seguros": {
   "base": {
@@ -119,7 +172,7 @@
   },
   "tapa": {
    "angulo": 193.0,
-   "z_mm": 146.91,
+   "z_mm": 136.91,
    "choque_del_nucleo_mm3": 0.0,
    "plastico_para_la_rosca_mm3": 16.1,
    "alineado": true
@@ -131,14 +184,38 @@
   "seguro_base-paso_esparrago": 16.7
  },
  "tornillos_panel": {
-  "panel": {
-   "largo_mm": 4,
-   "distancia_punta_mm": 0.75
-  },
-  "panel_aux": {
-   "largo_mm": 4,
-   "distancia_punta_mm": 6.47
-  }
+  "largo_mm": 4,
+  "distancia_punta_mm": 0.75
+ },
+ "bandas": {
+  "tapan_la_tapa_del_panel": false,
+  "tapa_del_panel_z_mm": [
+   30.8,
+   117.2
+  ],
+  "seguros": [
+   {
+    "seguro_z_mm": 13.71,
+    "banda_mm": [
+     0.0,
+     28.0
+    ],
+    "en_su_ranura": true
+   },
+   {
+    "seguro_z_mm": 136.91,
+    "banda_mm": [
+     118.91,
+     146.91
+    ],
+    "en_su_ranura": true
+   }
+  ]
+ },
+ "hombro": {
+  "choque_con_la_antena_mm3": 0.0,
+  "holgura_a_la_antena_mm": 0.5,
+  "cima_z_mm": 153.91
  },
  "cabe_todo": true,
  "fallos": []

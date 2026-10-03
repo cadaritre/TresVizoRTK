@@ -1,5 +1,10 @@
 """Pruebas del cargador sin ventana: python3 -m unittest tools/flasher/test_meridian_flasher.py"""
 import sys
+import io
+import json
+import types
+from contextlib import redirect_stdout
+from unittest.mock import patch
 import tempfile
 import unittest
 from pathlib import Path
@@ -18,7 +23,7 @@ def fake_app(hardware_id=b'', version=b'0.7.14', size=4096):
     data[32:36] = mf.APP_DESC_MAGIC
     identity = mf.IDENTITY_MAGIC + version.ljust(mf.IDENTITY_VERSION_BYTES, b'\0')
     data[mf.IDENTITY_OFFSET:mf.IDENTITY_OFFSET + len(identity)] = identity
-    data[2000:2000 + len(hardware_id)] = hardware_id
+    data[320:320 + len(hardware_id)] = hardware_id
     return bytes(data)
 
 
@@ -41,6 +46,13 @@ class ImageTests(unittest.TestCase):
     def test_models_by_hardware_id(self):
         self.assertEqual(mf.model_by_hardware_id(fake_app(MERIDIANV.hardware_id.encode())), MERIDIANV)
         self.assertIsNone(mf.model_by_hardware_id(fake_app(b'tresvizo-otro-equipo-v1')))
+
+    def test_hardware_id_in_arbitrary_text_does_not_identify_image(self):
+        data=bytearray(fake_app())
+        encoded=MERIDIANV.hardware_id.encode()
+        data[2000:2000+len(encoded)]=encoded
+        self.assertIsNone(mf.model_by_hardware_id(bytes(data)))
+        self.assertIsNone(mf.model_by_hardware_id(fake_app(b'tresvizo-esp32s3-4m-v1')))
 
     def test_unsigned_image(self):
         info = mf.inspect_image(self.write(fake_app(MERIDIANV.hardware_id.encode())))
@@ -81,6 +93,26 @@ class ImageTests(unittest.TestCase):
 
 
 class CommandTests(unittest.TestCase):
+    def test_old_board_is_read_from_update_before_flashing(self):
+        calls=[]
+        class Instrument:
+            def __init__(self,port):
+                self.port=port
+            def request(self,method,path):
+                calls.append(path)
+                body={'firmware_version':'0.7.14'} if path=='/api/status' else {'hardware_id':'tresvizo-esp32s3-4m-v1'}
+                return {'status':200,'body':body}
+            def close(self):
+                calls.append('close')
+        module=types.ModuleType('usb_console');module.Instrument=Instrument
+        output=io.StringIO()
+        with patch.dict(sys.modules,{'usb_console':module}), patch.object(sys,'argv',['read','tools','fake-port']), patch.object(sys,'path',sys.path.copy()), redirect_stdout(output):
+            exec(mf.READ_STATUS_SCRIPT,{})
+        self.assertEqual(calls,['/api/status','/api/update','close'])
+        status=json.loads(output.getvalue())
+        self.assertEqual(status['hardware_id'],'tresvizo-esp32s3-4m-v1')
+        self.assertIsNone(mf.status_model(status))
+
     def test_update_matches_platformio_addresses(self):
         command = mf.flash_command(['esptool.py'], '/dev/cu.x', 'app.bin', 'boot_app0.bin', full=False)
         self.assertEqual(command[:3], ['esptool.py', '--chip', 'esp32s3'])
@@ -103,6 +135,8 @@ class CommandTests(unittest.TestCase):
     def test_status_model(self):
         self.assertEqual(mf.status_model({}), MERIDIANV)  # firmware viejo: MeridianV
         self.assertIsNone(mf.status_model({'product': 'otro'}))
+        self.assertEqual(mf.status_model({'hardware_id':MERIDIANV.hardware_id}),MERIDIANV)
+        self.assertIsNone(mf.status_model({'hardware_id':'tresvizo-esp32s3-4m-v1'}))
 
 
 @unittest.skipUnless((mf.BUILD / 'esp32s3_usb' / 'firmware-signed.bin').is_file(),
@@ -116,6 +150,7 @@ class RealBuildTests(unittest.TestCase):
                 info = mf.inspect_image(mf.BUILD / model.env / name)
                 self.assertEqual(info.model, model, f'{model.env}/{name}')
                 self.assertIsNotNone(info.version)
+                self.assertEqual(mf.image_hardware_id(info.app),model.hardware_id)
             signed = mf.inspect_image(mf.BUILD / model.env / 'firmware-signed.bin')
             self.assertTrue(signed.signed)
             self.assertEqual(signed.app, (mf.BUILD / model.env / 'firmware.bin').read_bytes())

@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#281a39" />
     <title>TresVizo RTK · Control del instrumento</title>
     <link rel="stylesheet" href="/app.css" />
+    <script src="/hardware.js" defer></script>
     <script src="/app.js" defer></script>
     <script src="/bench.js" defer></script>
     <script src="/update.js" defer></script>
@@ -454,7 +455,21 @@
         <article class="panel lower"><h2>GPS conectado al ESP32</h2><p>Comandos por UART. La adquisición continúa durante las consultas. «Configurar rover», «Aplicar frecuencia» y «Aplicar plan de base» terminan con SAVECONFIG: el cambio queda guardado en el receptor solo si este lo confirma. «Consultar» no cambia nada.</p><div class="button-row"><button class="button secondary" id="device-query">Consultar versión y modo</button><button class="button secondary" id="device-rover">Configurar rover</button></div><label for="device-hz">Frecuencia GGA</label><select id="device-hz"><option value="1">1 Hz</option><option value="2">2 Hz</option><option value="5" selected>5 Hz</option></select><button class="button secondary" id="device-rate">Aplicar frecuencia</button><p id="device-control-state"></p><p id="device-version"></p><p id="device-control-error" role="status"></p><p id="device-control-message" role="status"></p><button class="button primary" id="device-base-apply">Aplicar plan de base al ESP32</button><p id="device-base-message" role="status"></p><p>La lectura de modo base no verifica las coordenadas. No publicar correcciones hasta comprobar coordenadas, referencia de altura y convergencia.</p></article><article class="panel bench-panel" id="bench-base" hidden><h2>Aplicar al GPS por USB de la Mac</h2><p>La base conocida requiere WGS84 y altura elipsoidal. El promedio puede guardar coordenadas en la memoria del GPS y no garantiza precisión absoluta.</p><button class="button primary" type="button" id="bench-base-apply">Aplicar el plan validado al GPS USB</button><p id="bench-base-message" role="status"></p></article></section>
         <section class="page" id="page-recording" aria-labelledby="recording-title" hidden>
           <div class="page-heading"><div><p class="eyebrow">OBSERVACIONES Y SESIONES</p><h1 id="recording-title">Registro / PPK</h1><p class="intro">Graba observaciones para procesarlas después y conserva el contexto de cada sesión.</p></div></div>
-<article class="panel"><h2>Grabación autónoma · microSD</h2><p>El lector está pendiente de cableado. Los controles se habilitan cuando el firmware detecta la tarjeta con pines verificados.</p><p>Registro del flujo original Unicore. Observaciones a 1 Hz; GGA a 5 Hz es independiente. No es un cálculo PPK ni una validación de precisión.</p><div class="button-row"><button class="button secondary" id="sd-profile" disabled>Preparar observaciones</button><button class="button primary" id="sd-start" disabled>Iniciar microSD</button><button class="button secondary" id="sd-stop" disabled>Detener y cerrar</button></div><p id="sd-state" role="status"></p><p id="sd-message" role="status"></p><p>Espera al cierre confirmado antes de apagar. Límite inicial de 64 MiB por sesión. Ante un cierre interrumpido se conserva el archivo parcial; FAT y alimentación deben validarse físicamente.</p><div id="sd-sessions"></div></article>
+          <article class="panel">
+            <h2>Memoria interna del dispositivo</h2>
+            <p>Guarda las sesiones en el dispositivo y descárgalas desde aquí. El estado indica cuándo la memoria interna está disponible para grabar.</p>
+            <p>Registro del flujo original Unicore. Observaciones a 1 Hz; GGA a 5 Hz es independiente. No es un cálculo PPK ni una validación de precisión.</p>
+            <div class="button-row">
+              <button class="button secondary" id="sd-profile" disabled>Preparar observaciones</button>
+              <button class="button primary" id="sd-start" disabled>Iniciar grabación</button>
+              <button class="button secondary" id="sd-stop" disabled>Detener y cerrar</button>
+            </div>
+            <p id="sd-state" role="status">Esperando el estado de la memoria interna</p>
+            <p id="sd-hint" class="hint"></p>
+            <p id="sd-message" role="status"></p>
+            <p>Espera al cierre confirmado antes de desconectar la alimentación. Límite de 64 MiB por sesión. Los archivos incompletos se descargan como .part. El encendido y apagado mediante el Soft Power Switch sigue pendiente.</p>
+            <div id="sd-sessions"></div>
+          </article>
         <article class="panel bench-panel" id="bench-recording" hidden>
             <div class="card-top"><h2>Grabación de banco · Mac</h2><span class="badge">Disco local</span></div>
             <p>Conserva el flujo recibido por USB. Una captura solo NMEA no sirve para PPK. RINEX requiere observaciones, efemérides y conversión validada.</p>
@@ -872,6 +887,10 @@
             <article class="panel">
               <h2>Controlador</h2>
               <dl class="detail-list">
+                <div><dt>Batería · LiPo 3000 mAh</dt><dd id="power-state">Sin comunicación</dd></div>
+                <div><dt>Alimentación</dt><dd><button id="power-off" type="button" disabled>Apagar dispositivo</button></dd></div>
+                <div><dt>Placa</dt><dd id="diag-board" data-live>—</dd></div>
+                <div><dt>Identidad de hardware</dt><dd id="diag-hardware-id" data-live>—</dd></div>
                 <div>
                   <dt>Procesador</dt>
                   <dd id="diag-chip" data-live>—</dd>
@@ -910,14 +929,16 @@
                   <span>✓</span> Configuración persistente y acceso protegido
                 </li>
                 <li><span>✓</span> Wi-Fi del equipo y conexión a hotspot</li>
-                <li>○ &nbsp; GNSS / RTK y correcciones NTRIP</li>
+                <li><span>✓</span> Enlace GNSS y correcciones NTRIP</li>
                 <li>○ &nbsp; IMU y compensación de inclinación</li>
                 <li><span>✓</span> Control BLE y actualización de firmware</li>
-                <li>○ &nbsp; Registro en microSD</li>
+                <li><span>✓</span> Grabación en la memoria interna del dispositivo</li>
+                <li><span>✓</span> Pantalla OLED de estado</li>
+                <li>○ &nbsp; Encendido / apagado con Soft Power Switch</li>
               </ul>
               <p class="hint">
-                Las capacidades topográficas siguen pendientes de integración y
-                validación.
+                La disponibilidad de la pantalla y la memoria interna se informa abajo.
+                El montaje nuevo y las capacidades topográficas requieren validación física.
               </p>
             </article>
           </div>
@@ -964,7 +985,7 @@
               ><small>Desde el último arranque</small>
             </article>
             <article class="metric">
-              <span class="metric-label">MEMORIA LIBRE <i>▥</i></span
+              <span class="metric-label">RAM LIBRE <i>▥</i></span
               ><strong id="heap" data-live>—</strong
               ><small>RAM interna del ESP32</small>
             </article>
@@ -988,9 +1009,9 @@
               <span class="component-icon" aria-hidden="true">⌖</span>
               <div>
                 <h3>Receptor GNSS</h3>
-                <p>Unicore UM980 · UART 115200</p>
+                <p id="component-gnss-detail">Unicore UM980 · UART</p>
               </div>
-              <span class="status-label">UART habilitada</span>
+              <span class="status-label" id="component-gnss-state">Esperando datos</span>
             </article>
             <article class="component">
               <span class="component-icon" aria-hidden="true">⊕</span>
@@ -1004,9 +1025,17 @@
               <span class="component-icon" aria-hidden="true">▤</span>
               <div>
                 <h3>Almacenamiento</h3>
-                <p>Lector microSD · SPI</p>
+                <p id="component-sd-detail">Memoria interna del dispositivo</p>
               </div>
-              <span class="status-label">Pendiente</span>
+              <span class="status-label" id="component-sd-state">Esperando datos</span>
+            </article>
+            <article class="component">
+              <span class="component-icon" aria-hidden="true">▣</span>
+              <div>
+                <h3>Pantalla local</h3>
+                <p id="component-display-detail">OLED · esperando información del equipo</p>
+              </div>
+              <span class="status-label" id="component-display-state">Esperando datos</span>
             </article>
           </div>
         </section>

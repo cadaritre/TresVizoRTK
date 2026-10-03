@@ -52,16 +52,21 @@ for obj in doc.Objects:
     })
 
 # Interferencias entre piezas en su posicion final. Las piezas comparten planos
-# de contacto y las unas de la plataforma entran con 0.3 mm de precarga, asi
-# que se admite un volumen comun despreciable.
+# de contacto y las unas de la plataforma entran con 0.3 mm de precarga (menos
+# de 1 mm3 en total), asi que se admite 1 mm3 por pareja: menos que una una
+# entera. Las bandas de TPU no entran en la cuenta: se dibujan con su diametro
+# de impresion y su solape con el cuerpo es el apriete.
+LIMITE_MM3 = 1.0
 overlaps = []
 names = [r['pieza'] for r in report]
 for i in range(len(shapes)):
     for j in range(i + 1, len(shapes)):
+        if 'bumper' in names[i] or 'bumper' in names[j]:
+            continue
         common = shapes[i].common(shapes[j])
-        volume = common.Volume / 1000.0 if common.Solids else 0.0
-        if volume > 0.01:
-            overlaps.append({'a': names[i], 'b': names[j], 'cm3': round(volume, 3)})
+        volume = common.Volume if common.Solids else 0.0
+        if volume > LIMITE_MM3:
+            overlaps.append({'a': names[i], 'b': names[j], 'mm3': round(volume, 2)})
 
 result = {
     'piezas': report,

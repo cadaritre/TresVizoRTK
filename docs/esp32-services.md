@@ -1,5 +1,22 @@
 # Servicios autónomos del ESP32 — 0.5.0
 
+**Actualización 0.8.0 (Thing Plus):** los apartados de GPIO18/17 y lector SPI
+sin configurar describen la placa anterior. El montaje vigente usa RX44/TX43,
+OLED I2C8/9 y microSD integrada por SDIO; ver [cableado](../hardware/wiring.md).
+`/api/status` publica `board`, `hardware_id`, `subsystems.display`, y los campos
+`rx_gpio`, `tx_gpio`, `baud` de GNSS. Tanto `subsystems.microsd` como
+`GET /api/recording` publican `card_present`, `interface` y `closing` además del
+estado previo. `active` significa recepción de bytes; `closing` indica que el
+archivo sigue ocupado aunque se haya detenido la recepción. El panel impide
+operar o descargar hasta terminar ese cierre. La validación física está pendiente.
+
+El nombre de producto es **Memoria interna del dispositivo**. Se publica como
+`storage_label` en el estado del almacenamiento y en `/api/operations.recording`
+para los clientes de la API. Los identificadores técnicos `microsd` se conservan
+por compatibilidad; no deben usarse como etiquetas de interfaz. Repetir una orden
+de parada conserva el estado parcial de un cierre fallido. La OLED abrevia
+**MEM INT.**; la RAM se identifica por separado.
+
 ## Memoria
 
 ESP32-S3FH4R2: PSRAM Quad habilitada con `BOARD_HAS_PSRAM` y `dio_qspi`, flash DIO de 4 MB sin cambiar particiones. El SDK inicializa y prueba PSRAM. Antes de iniciar servicios se reserva 1 MiB explícitamente en PSRAM, se escriben y leen tres patrones dependientes de dirección, y se libera. No es una prueba de envejecimiento ni temperatura. `/api/status.memory` distingue RAM interna libre/mínima/bloque mayor de PSRAM total utilizable/libre y resultado del ensayo. `ESP.getPsramSize()` informa capacidad del heap utilizable, ligeramente inferior a los 2097152 bytes físicos.
@@ -97,3 +114,7 @@ La entrega del RTCM al receptor deja de ser invisible: `subsystems.gnss` publica
 publica `native_frames_valid` y `native_frames_invalid`. El consumo de la UART pasa
 a hacerse por bloques en vez de byte a byte. Las correcciones de la auditoría están
 en [el estado del proyecto](project-status.md).
+
+## Alimentación Thing Plus
+
+`GET /api/power` y `subsystems.power` informan voltaje, porcentaje estimado, aviso de batería baja, capacidad nominal 3000 mAh y estado de apagado. `charging`, `battery_present` y `usb_present` son null: no se deducen de la tensión del medidor. `POST /api/power/shutdown` devuelve 202 o 409 durante OTA. Tras aceptarlo, las operaciones de escritura quedan bloqueadas y el corte espera al escritor de memoria interna. `power_still_present` significa que el procesador continúa alimentado tras OFF, no que esté apagado. Reiniciar o retirar alimentación para volver a operar.
