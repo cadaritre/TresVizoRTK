@@ -43,12 +43,23 @@ class Model:
     env: str           # entorno de PlatformIO
     hardware_id: str   # identidad de la imagen (la que exige la OTA)
     board: str        # placa física, visible aunque el producto conserve el nombre
+    project: str = 'esp32'   # carpeta del proyecto de PlatformIO dentro de firmware/
+    # El MeridianV contesta por USB con su consola JSON; el módulo de radio no tiene
+    # consola, así que no se lee antes ni después de cargarlo.
+    console: bool = True
+
+    @property
+    def build_dir(self):
+        return ROOT / 'firmware' / self.project / '.pio' / 'build' / self.env
 
 
-# Los equipos que se pueden cargar. El hardware_id es el de firmware_update.cpp; un
-# equipo nuevo (p. ej. el módulo de radio con su propio ESP32) se añade aquí con el suyo.
+# Los equipos que se pueden cargar, cada uno con el hardware_id que lleva su imagen
+# (byte 320): el del MeridianV sale de firmware_update.cpp; el del radio, de
+# firmware/radio/src/radio_config.h (docs/radio/RADIO_MODULE.md).
 MODELS = (
     Model('MeridianV', 'meridianv', 'esp32s3_usb', HARDWARE_ID, 'Thing Plus ESP32-S3'),
+    Model('Radio LoRa', 'radio', 'radio', 'tresvizo-radio-e22-esp32s3-v1', 'ESP32-S3 + E22-900M30S',
+          project='radio', console=False),
 )
 
 # Formato de la imagen (firmware/esp32/lib/protocol/src/signed_firmware.h).
@@ -166,7 +177,7 @@ def inspect_image(path, signer=None):
 
 def companion(name, image_path, model):
     """bootloader.bin o partitions.bin: junto a la imagen, o en la compilación de ese modelo."""
-    for folder in (Path(image_path).parent, BUILD / model.env):
+    for folder in (Path(image_path).parent, model.build_dir):
         candidate = folder / name
         if candidate.is_file():
             return candidate
@@ -309,7 +320,7 @@ def run_gui():
 
     def choose_image():
         model = current_model()
-        start = BUILD / model.env
+        start = model.build_dir
         path = filedialog.askopenfilename(title=f'Imagen para {model.name}', initialdir=str(start if start.is_dir() else ROOT),
                                           filetypes=[('Firmware', '*.bin'), ('Todos', '*.*')])
         if not path:
@@ -402,6 +413,8 @@ def run_gui():
         try:
             events.put(('status', 'Leyendo el equipo conectado…'))
             try:
+                if not model.console:
+                    raise FlasherError('este equipo no tiene consola USB')
                 before = read_status(tool_python, port)
                 events.put(('before', before))
                 reply = queue.Queue()
@@ -445,6 +458,9 @@ def run_gui():
                 raise FlasherError('esptool no terminó bien: mira el registro. Revisa el cable y que ningún otro programa tenga el puerto abierto.')
             events.put(('progress', 100))
             events.put(('status', 'Cargado. Esperando a que el equipo arranque…'))
+            if not model.console:
+                events.put(('done', (True, f'Listo: {model.name} {info.version or ""} cargado. Compruébalo desde la app por Bluetooth.')))
+                return
             time.sleep(BOOT_WAIT_SECONDS)
             try:
                 after = read_status(tool_python, port)

@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import meridian_flasher as mf  # noqa: E402
 
-(MERIDIANV,) = mf.MODELS
+MERIDIANV, RADIO = mf.MODELS
 
 
 def fake_app(hardware_id=b'', version=b'0.7.14', size=4096):
@@ -46,6 +46,15 @@ class ImageTests(unittest.TestCase):
     def test_models_by_hardware_id(self):
         self.assertEqual(mf.model_by_hardware_id(fake_app(MERIDIANV.hardware_id.encode())), MERIDIANV)
         self.assertIsNone(mf.model_by_hardware_id(fake_app(b'tresvizo-otro-equipo-v1')))
+
+    def test_radio_module_is_its_own_model(self):
+        info = mf.inspect_image(self.write(fake_app(RADIO.hardware_id.encode(), version=b'0.1.0')))
+        self.assertEqual(info.model, RADIO)
+        self.assertEqual(info.version, '0.1.0')
+        # Sin consola USB y con su propio proyecto de PlatformIO.
+        self.assertFalse(RADIO.console)
+        self.assertEqual(RADIO.build_dir, mf.ROOT / 'firmware' / 'radio' / '.pio' / 'build' / 'radio')
+        self.assertEqual(MERIDIANV.build_dir, mf.BUILD / MERIDIANV.env)
 
     def test_hardware_id_in_arbitrary_text_does_not_identify_image(self):
         data=bytearray(fake_app())
@@ -142,20 +151,31 @@ class CommandTests(unittest.TestCase):
 @unittest.skipUnless((mf.BUILD / 'esp32s3_usb' / 'firmware-signed.bin').is_file(),
                      'falta la compilación: pio run')
 class RealBuildTests(unittest.TestCase):
-    """Con la imagen que deja `pio run`: se reconoce como MeridianV, con su versión y su firma."""
+    """Con las imágenes que deja `pio run`: cada una se reconoce como su equipo."""
 
-    def test_real_images(self):
-        for model in mf.MODELS:
-            for name in ('firmware.bin', 'firmware-signed.bin'):
-                info = mf.inspect_image(mf.BUILD / model.env / name)
-                self.assertEqual(info.model, model, f'{model.env}/{name}')
-                self.assertIsNotNone(info.version)
-                self.assertEqual(mf.image_hardware_id(info.app),model.hardware_id)
-            signed = mf.inspect_image(mf.BUILD / model.env / 'firmware-signed.bin')
-            self.assertTrue(signed.signed)
-            self.assertEqual(signed.app, (mf.BUILD / model.env / 'firmware.bin').read_bytes())
-            # Con openssl en la Mac, la firma se comprueba de verdad.
-            self.assertIn(signed.signature_ok, (True, None), signed.signature_message)
+    def test_meridianv_images(self):
+        folder = MERIDIANV.build_dir
+        if not (folder / 'firmware-signed.bin').is_file():
+            self.skipTest('falta la compilación del MeridianV: pio run en firmware/esp32')
+        for name in ('firmware.bin', 'firmware-signed.bin'):
+            info = mf.inspect_image(folder / name)
+            self.assertEqual(info.model, MERIDIANV, name)
+            self.assertIsNotNone(info.version)
+            self.assertEqual(mf.image_hardware_id(info.app), MERIDIANV.hardware_id)
+        signed = mf.inspect_image(folder / 'firmware-signed.bin')
+        self.assertTrue(signed.signed)
+        self.assertEqual(signed.app, (folder / 'firmware.bin').read_bytes())
+        # Con openssl en la Mac, la firma se comprueba de verdad.
+        self.assertIn(signed.signature_ok, (True, None), signed.signature_message)
+
+    def test_radio_image(self):
+        image = RADIO.build_dir / 'firmware.bin'
+        if not image.is_file():
+            self.skipTest('falta la compilación del radio: pio run en firmware/radio')
+        info = mf.inspect_image(image)
+        self.assertEqual(info.model, RADIO)
+        self.assertIsNotNone(info.version)
+
 
 
 if __name__ == '__main__':

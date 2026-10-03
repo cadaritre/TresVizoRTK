@@ -7,10 +7,12 @@
 // (red Wi-Fi y contraseña del MeridianV) y, ya unido, el MeridianV por su API
 // (red, canal y potencia).
 namespace radio_config {
-constexpr const char* kVersion = "0.1.0";
-// Identidad de la imagen: con ella el cargador por USB (tools/flasher/) sabe que un
-// .bin es del módulo de radio y no de un MeridianV.
-constexpr const char* kHardwareId = "tresvizo-radio-e22-esp32s3-v1";
+// Versión e identidad de la imagen: macros porque también van, en tiempo de
+// compilación, a la identidad de la imagen (main.cpp) que lee el cargador por USB.
+#define RADIO_VERSION "0.1.0"
+#define RADIO_HARDWARE_ID "tresvizo-radio-e22-esp32s3-v1"
+constexpr const char* kVersion = RADIO_VERSION;
+constexpr const char* kHardwareId = RADIO_HARDWARE_ID;
 // Lo de fábrica del MeridianV (su red propia). Si el propietario cambia la contraseña
 // del MeridianV, la app se la vuelve a pasar al radio por Bluetooth.
 constexpr const char* kDefaultSsid = "MeridianV";

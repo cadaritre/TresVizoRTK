@@ -17,10 +17,22 @@
 #include <SPI.h>
 #include <WiFi.h>
 #include <freertos/semphr.h>
+#include <esp_app_format.h>
+#include <esp_image_format.h>
 #include "radio_air.h"
 #include "radio_config.h"
+#include "signed_firmware.h"
 #include "radio_link.h"
 #include "rtcm3.h"
+
+// Identidad de la imagen en la sección que ESP-IDF deja tras el descriptor de
+// aplicación (byte 288: versión; byte 320: placa), igual que el MeridianV. Así el
+// cargador por USB (tools/flasher/) sabe que un .bin es del módulo de radio.
+static_assert(sizeof(esp_image_header_t) + sizeof(esp_image_segment_header_t) + sizeof(esp_app_desc_t) ==
+              signed_firmware::kIdentityImageOffset, "la identidad va justo detras de esp_app_desc_t");
+static_assert(signed_firmware::fitsIdentity(RADIO_VERSION), "la versión no cabe en la identidad");
+const signed_firmware::BoardFirmwareIdentity kImageIdentity __attribute__((section(".rodata_custom_desc"), used)) =
+    {signed_firmware::makeIdentity(RADIO_VERSION), RADIO_HARDWARE_ID};
 
 namespace {
 // --- Tiempos y límites (con su motivo) ---------------------------------------------
@@ -144,7 +156,7 @@ const char* airState() {
 
 // El mismo estado para el MeridianV y para la app. La contraseña nunca sale.
 void fillStatus(JsonDocument& doc, bool forApp) {
-    doc["radio_version"] = radio_config::kVersion;
+    doc["radio_version"] = static_cast<const char*>(kImageIdentity.firmware.version);
     doc["role"] = roleName(role);
     doc["network"] = settings.network;
     doc["channel"] = settings.channel;
@@ -168,9 +180,9 @@ void fillStatus(JsonDocument& doc, bool forApp) {
 
 void sendHello() {
     JsonDocument doc;
-    doc["radio_version"] = radio_config::kVersion;
+    doc["radio_version"] = static_cast<const char*>(kImageIdentity.firmware.version);
     doc["radio_id"] = radioId();
-    doc["hardware"] = radio_config::kHardwareId;
+    doc["hardware"] = static_cast<const char*>(kImageIdentity.hardwareId);
     doc["network"] = settings.network;
     doc["channel"] = settings.channel;
     doc["power_dbm"] = settings.powerDbm;
