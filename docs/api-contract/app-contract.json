@@ -1,0 +1,1307 @@
+{
+  "schema": "tresvizo-app-contract",
+  "contract_version": 1,
+  "firmware_version": "0.8.0",
+  "date": "2026-10-02",
+  "sources": {"firmware": "firmware/esp32 (src, include, lib) en main", "ios": "TresVizoField en 67e8fa4 (arreglo de 0.8.0 en 514cabc): MeridianVCore (Model, Protocol, Telemetry, Transfers…) y TresVizo Field/Session, Data, UI", "android": "TresVizoFieldAndroid/android en fcb8e59: core/domain (model, ModelDecoding.kt…), core/network, core/bluetooth, app, feature"},
+  "rules": "Ver README.md: la API solo crece.",
+  "type_vocabulary": ["string", "number", "integer", "boolean", "object", "array"],
+  "flags": {"nullable": "La app admite null en esa clave.", "optional": "La app sigue funcionando si la clave falta (con su contenedor presente).", "unknown_values_ok": "false = un valor fuera de `values` rompe la app (enumerado estricto).", "request_exact_keys": "El firmware rechaza el cuerpo si lleva claves de más."},
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/api/status",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Por HTTP la piden las dos apps cada `refresh_ms`; por BLE, cada 30 s si hay latido. Todo es opcional para las apps salvo `firmware_version` y el interior de `alerts[]`, pero **un tipo distinto en cualquier clave declarada tumba la respuesta entera** en las dos.",
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/instrument.cpp#status"], "memory": ["src/memory_health.cpp#status"], "telemetry_stream": ["src/telemetry_ws.cpp#status"], "corrections": ["src/correction_router.cpp#status"], "corrections_out": ["src/correction_output.cpp#status"], "subsystems.ble": ["src/ble_transport.cpp#status"], "subsystems.ntrip": ["src/ntrip_input.cpp#status"], "subsystems.microsd": ["src/sd_recorder.cpp#status"]}
+      },
+      "response": [
+        {"path": "api_version", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Ninguna app la compara todavía; es la versión que sube si un cambio rompe el contrato."},
+        {"path": "firmware_version", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "El sondeo HTTP de las dos apps exige 200 y esta cadena: sin ella dan la ruta Wi-Fi por caída."},
+        {"path": "hardware_id", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Respaldo de GET /api/update para la carga de firmware. Identificador de placa: no se escribe a mano en las apps."},
+        {"path": "board", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Nombre de placa que enseñan las apps al rechazar una imagen de otra placa."},
+        {"path": "device_name", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "phase", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "uptime_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "free_heap_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "min_free_heap_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "memory", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "memory.psram_test", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["passed", "failed", "not_detected", "allocation_failed", "not_tested"], "unknown_values_ok": true},
+        {"path": "memory.tested_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "memory.internal_free_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "memory.internal_min_free_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "memory.internal_largest_block_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "memory.psram_total_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "memory.psram_free_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "chip", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "chip_revision", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "cpu_mhz", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "flash_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "psram_enabled_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "reset_reason_code", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "config_ready", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "refresh_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Ritmo del sondeo por HTTP en las dos apps; si falta, 2000."},
+        {"path": "receiver_role", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["base", "rover", "unknown"], "unknown_values_ok": false, "note": "iOS: enumerado estricto; un valor nuevo hace fallar todo /api/status."},
+        {"path": "wifi", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "wifi.ap_ready", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "wifi.ap_ssid", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "wifi.ap_ip", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Si falta, las apps enseñan 192.168.4.1."},
+        {"path": "wifi.ap_clients", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "wifi.station_state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["not_configured", "scanning", "connecting", "connected", "paused"], "unknown_values_ok": true},
+        {"path": "wifi.station_ssid", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "wifi.station_ip", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Con `station_state` = connected, las apps la adoptan como ruta HTTP."},
+        {"path": "wifi.networks_saved", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "wifi.rssi_dbm", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "telemetry_stream", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "telemetry_stream.available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Sin `true` ninguna app abre el WebSocket de telemetría."},
+        {"path": "telemetry_stream.clients", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "telemetry_stream.max_clients", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "telemetry_stream.path", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Android abre el WebSocket en esta ruta; iOS la tiene fija en /ws/telemetry."},
+        {"path": "telemetry_stream.frames_sent", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "telemetry_stream.clients_dropped", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections.active_source", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["none", "ble", "ntrip", "radio"], "unknown_values_ok": true},
+        {"path": "corrections.format", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections.generation", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections.accepted_frames", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections.rejected_frames", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections.receiver_ready", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections.age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Nula = sin conectar; nunca 0 por desconocido."},
+        {"path": "corrections_out", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.frames_from_receiver", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.last_frame_age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.ntrip_server", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.ntrip_server.enabled", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.ntrip_server.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.ntrip_server.error", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.ntrip_server.frames_sent", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.ntrip_server.frames_dropped", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.ntrip_server.reconnects", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.local_caster", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.local_caster.enabled", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.local_caster.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.local_caster.clients", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.local_caster.clients_max", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.local_caster.frames_sent", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.local_caster.port", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.local_caster.ap_address", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "corrections_out.local_caster.station_address", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "alerts", "type": "array", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "alerts[].code", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Una alerta sin `code`, `level` o `message` tumba todo /api/status en las dos apps. Códigos nuevos: se toleran (sin botón)."},
+        {"path": "alerts[].level", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "values": ["info", "warning", "error"], "unknown_values_ok": false, "note": "iOS: enumerado estricto; un nivel nuevo hace fallar todo /api/status."},
+        {"path": "alerts[].message", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "subsystems", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.gnss", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.gnss.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["not_integrated", "start_failed", "waiting_data", "receiving", "stale"], "unknown_values_ok": true, "note": "`not_integrated` y `start_failed` bloquean los trabajos del receptor en las dos apps."},
+        {"path": "subsystems.gnss.accepted_gga", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.gnss.rejected_gga", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.gnss.uart_errors", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.gnss.line_overflows", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.gnss.native_frames_valid", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.gnss.native_frames_invalid", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.gnss.correction_frames_sent", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.gnss.correction_frames_dropped", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.gnss.age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.gnss.correction_bytes_written", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "subsystems.gnss.correction_frames_evicted", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "subsystems.gnss.correction_frames_expired", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "subsystems.gnss.correction_queue_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "subsystems.gnss.correction_queue_high_water_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "subsystems.gnss.correction_queue_capacity_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "subsystems.ble", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ble.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["connected", "advertising", "disabled", "start_failed"], "unknown_values_ok": true},
+        {"path": "subsystems.ble.enabled", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ble.pairing_required", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ble.protocol_version", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Las dos apps esperan el latido de salud a 1 Hz si vale 3 o más y avisan fuera de 2…3. Sube solo con cambios del canal binario (README)."},
+        {"path": "subsystems.ble.dropped_requests", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ble.rtcm_valid_frames", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ble.rtcm_crc_errors", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ble.rtcm_dropped_frames", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ble.control_available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ble.rtcm_available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ble.file_download_available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ble.telemetry_hardware_validated", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ble.att_mtu", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ble.response_frames_forced", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ble.rtcm_write_without_response", "type": "boolean", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "subsystems.ble.health_period_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "subsystems.ble.conn_interval_ms", "type": "number", "nullable": true, "optional": true, "apps": ["android"], "note": "Nulo sin conexión. Único decimal del bloque."},
+        {"path": "subsystems.ble.telemetry_skipped", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "subsystems.ble.max_loop_gap_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "subsystems.ble.max_request_dispatch_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "subsystems.ntrip", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ntrip.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["stopped", "starting", "stopping", "connecting", "streaming", "waiting_network", "retry_wait"], "unknown_values_ok": true},
+        {"path": "subsystems.ntrip.error", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ntrip.available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ntrip.enabled", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "`true` = entrada NTRIP activa: decide compuertas y la parada de correcciones en las dos apps."},
+        {"path": "subsystems.ntrip.network_configured", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ntrip.frames_forwarded", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ntrip.frames_dropped", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ntrip.bytes_received", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ntrip.reconnects", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ntrip.rtcm_crc_errors", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ntrip.credentials_persisted", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ntrip.tls_supported", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.ntrip.gga_vrs_supported", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.microsd", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.microsd.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.microsd.available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.microsd.active", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "`true` = grabando, en las dos apps."},
+        {"path": "subsystems.microsd.bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.microsd.session_id", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.microsd.dropped_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.imu", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "subsystems.imu.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "solution", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "solution.fix", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["invalid", "standalone", "differential", "pps", "rtk_fixed", "rtk_float", "dead_reckoning", "manual", "simulated"], "unknown_values_ok": true, "note": "Valor desconocido: las apps caen a `quality_code`."},
+        {"path": "solution.quality_code", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Calidad GGA 0–8. Solo con solución vigente."},
+        {"path": "solution.latitude_deg", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Si falta o es nula (con `longitude_deg`), las apps dan la posición por caducada."},
+        {"path": "solution.longitude_deg", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "solution.height_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Altura MSL del receptor; su referencia va en `height_reference`."},
+        {"path": "solution.height_reference", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["receiver_msl", "ellipsoidal_user_configured", "ellipsoidal", "msl"], "unknown_values_ok": false, "note": "iOS la decodifica como enumerado estricto: un valor nuevo hace fallar TODA la respuesta. Añadir un valor aquí exige actualizar antes iOS."},
+        {"path": "solution.geoid_separation_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "solution.satellites_used", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "solution.satellites_tracked", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "solution.satellites_visible", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "solution.hdop", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "solution.horizontal_sigma_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Precisión MOSTRADA por Meridian V, no la sigma cruda del UM980 (esa va en `um980_raw_*`, que ninguna app lee)."},
+        {"path": "solution.north_sigma_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "solution.east_sigma_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "solution.vertical_sigma_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "solution.utc_time_of_day_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Sin ella ninguna app saca posición del sondeo. Hora del día UTC, sin fecha."},
+        {"path": "solution.arrival_time_us", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Reloj del ESP32 en la llegada de la GGA. Se decodifica; ninguna app la usa para la antigüedad (a propósito)."}
+      ],
+      "request": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/operations",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Se pide en el arranque de sesión; si no decodifica, la sesión queda degradada.",
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/instrument.cpp#request"]}
+      },
+      "response": [
+        {"path": "base", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "base.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "base.can_preview", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "base.can_apply", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "recording", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "recording.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "recording.can_start", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "recording.can_stop", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "recording.can_export", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/config",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/instrument.cpp#config"]}
+      },
+      "response": [
+        {"path": "schema_version", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "revision", "type": "integer", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Obligatoria en las dos apps: sin ella falla el decodificado de toda la configuración y no se puede guardar (PUT /api/config la exige)."},
+        {"path": "device_name", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "refresh_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "wifi_ssid", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "wifi_password_saved", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks", "type": "array", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Si falta o es nula, las apps la toman por vacía."},
+        {"path": "networks[].ssid", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Obligatoria en cada red: una red sin `ssid` tumba toda la respuesta en las dos apps."},
+        {"path": "networks[].has_password", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].ip", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].gateway", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].mask", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks_max", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Si falta, las apps suponen 5."},
+        {"path": "ap_ssid", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "ap_password", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Por BLE no llega nunca (`protocol::stripSecrets`, desde 0.7.13): las apps la releen por HTTP."},
+        {"path": "persistence_ready", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stored_config_valid", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "station_paused", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "preferred_ssid", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": []
+    },
+    {
+      "method": "PUT",
+      "path": "/api/config",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Respuesta decodificada en estricto: si falta `revision`, las apps dan error aunque el equipo haya guardado.",
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/instrument.cpp#config", "src/instrument.cpp#saveConfig"]},
+        "readers": ["src/instrument.cpp#saveConfig"]
+      },
+      "response": [
+        {"path": "schema_version", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "revision", "type": "integer", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Obligatoria en las dos apps: sin ella falla el decodificado de toda la configuración y no se puede guardar (PUT /api/config la exige)."},
+        {"path": "device_name", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "refresh_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "wifi_ssid", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "wifi_password_saved", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks", "type": "array", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Si falta o es nula, las apps la toman por vacía."},
+        {"path": "networks[].ssid", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Obligatoria en cada red: una red sin `ssid` tumba toda la respuesta en las dos apps."},
+        {"path": "networks[].has_password", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].ip", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].gateway", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].mask", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks_max", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Si falta, las apps suponen 5."},
+        {"path": "ap_ssid", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "ap_password", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Por BLE no llega nunca (`protocol::stripSecrets`, desde 0.7.13): las apps la releen por HTTP."},
+        {"path": "persistence_ready", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stored_config_valid", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "station_paused", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "preferred_ssid", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "changed", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "ap_password_saved", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "message", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Si viene, las apps enseñan el guardado como no confirmado."}
+      ],
+      "request": [
+        {"path": "revision", "type": "integer", "apps": ["ios", "android"], "optional": false, "note": "Siempre. Si no coincide, 409 `revision_conflict`."},
+        {"path": "refresh_ms", "type": "integer", "apps": ["ios", "android"], "optional": true, "note": "1000, 2000 o 5000."},
+        {"path": "ap_password", "type": "string", "apps": ["ios", "android"], "optional": true, "note": "8–63 ASCII imprimible."},
+        {"path": "forget_wifi", "type": "boolean", "apps": ["ios", "android"], "optional": true}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/wifi/networks",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Cuatro formas de cuerpo: guardar (`ssid` y opcionales), `forget`, `connect` o `disconnect`.",
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/instrument.cpp#config", "src/instrument.cpp#wifiNetworks"]},
+        "readers": ["src/instrument.cpp#wifiNetworks"]
+      },
+      "response": [
+        {"path": "schema_version", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "revision", "type": "integer", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Obligatoria en las dos apps: sin ella falla el decodificado de toda la configuración y no se puede guardar (PUT /api/config la exige)."},
+        {"path": "device_name", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "refresh_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "wifi_ssid", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "wifi_password_saved", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks", "type": "array", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Si falta o es nula, las apps la toman por vacía."},
+        {"path": "networks[].ssid", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Obligatoria en cada red: una red sin `ssid` tumba toda la respuesta en las dos apps."},
+        {"path": "networks[].has_password", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].ip", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].gateway", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].mask", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks_max", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Si falta, las apps suponen 5."},
+        {"path": "ap_ssid", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "ap_password", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Por BLE no llega nunca (`protocol::stripSecrets`, desde 0.7.13): las apps la releen por HTTP."},
+        {"path": "persistence_ready", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stored_config_valid", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "station_paused", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "preferred_ssid", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "connecting", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Solo al pedir `connect`."}
+      ],
+      "request": [
+        {"path": "ssid", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "password", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "ip", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "gateway", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "mask", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "forget", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "connect", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "disconnect", "type": "boolean", "apps": ["ios", "android"], "optional": true}
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/wifi/scan",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/instrument.cpp#wifiScan"]}
+      },
+      "response": [
+        {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["idle", "scanning", "ready", "failed"], "unknown_values_ok": true},
+        {"path": "networks", "type": "array", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].ssid", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Obligatoria en cada red encontrada: sin ella falla la respuesta entera."},
+        {"path": "networks[].rssi_dbm", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].secure", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].saved", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "truncated", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks_max", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks_saved", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "disrupts_ap", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/wifi/scan",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Sin cuerpo. Contesta 202.",
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/instrument.cpp#wifiScan"]}
+      },
+      "response": [
+        {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["idle", "scanning", "ready", "failed"], "unknown_values_ok": true},
+        {"path": "networks", "type": "array", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].ssid", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Obligatoria en cada red encontrada: sin ella falla la respuesta entera."},
+        {"path": "networks[].rssi_dbm", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].secure", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks[].saved", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "truncated", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks_max", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "networks_saved", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "disrupts_ap", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/gnss/control",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/gnss_control.cpp#status"]}
+      },
+      "response": [
+        {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["idle", "running", "confirmed", "base_mode_confirmed_coordinates_unverified", "failed", "partial_or_unknown", "unavailable"], "unknown_values_ok": true},
+        {"path": "job_id", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Correlaciona el trabajo lanzado con POST."},
+        {"path": "action", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "completed_commands", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "total_commands", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "mode", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Texto del UM980. Las dos apps comparan «MODE ROVER SURVEY» por igualdad y «MODE BASE» por prefijo para permitir NTRIP."},
+        {"path": "version", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "error", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "saved", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "base_coordinates_verified", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/gnss/control",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/gnss_control.cpp#launch"]},
+        "readers": ["src/gnss_control.cpp#start", "src/instrument.cpp#request"]
+      },
+      "response": [
+        {"path": "job_id", "type": "integer", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Si falta, las apps dan la orden por incierta y no siguen el trabajo."}
+      ],
+      "request": [
+        {"path": "action", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "query, rover, stop_outputs, config_query, raw_profile, save, telemetry, mask, constellations, outputs, rtcm_base, dgps_timeout."},
+        {"path": "confirm", "type": "boolean", "apps": ["ios", "android"], "optional": true},
+        {"path": "hz", "type": "integer", "apps": ["ios", "android"], "optional": true},
+        {"path": "elevation_deg", "type": "number", "apps": ["ios", "android"], "optional": true},
+        {"path": "gps", "type": "boolean", "apps": ["ios", "android"], "optional": true},
+        {"path": "bds", "type": "boolean", "apps": ["ios", "android"], "optional": true},
+        {"path": "glo", "type": "boolean", "apps": ["ios", "android"], "optional": true},
+        {"path": "gal", "type": "boolean", "apps": ["ios", "android"], "optional": true},
+        {"path": "qzss", "type": "boolean", "apps": ["ios", "android"], "optional": true},
+        {"path": "messages", "type": "array", "apps": ["ios", "android"], "optional": true},
+        {"path": "messages[].name", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "messages[].hz", "type": "integer", "apps": ["ios", "android"], "optional": true},
+        {"path": "seconds", "type": "integer", "apps": ["ios", "android"], "optional": true}
+      ],
+      "request_exact_keys": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/gnss/profile",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/gnss_control.cpp#profile"]}
+      },
+      "response": [
+        {"path": "available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "elevation_mask_deg", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "elevation_mask_applied", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "constellations", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Si viene, sus cinco booleanos son obligatorios en las dos apps."},
+        {"path": "constellations.gps", "type": "boolean", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "constellations.bds", "type": "boolean", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "constellations.glo", "type": "boolean", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "constellations.gal", "type": "boolean", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "constellations.qzss", "type": "boolean", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "constellations_applied", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "nmea_outputs", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "rtcm_profile", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "dgps_timeout_s", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "height_reference", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["receiver_msl", "ellipsoidal_user_configured", "ellipsoidal", "msl"], "unknown_values_ok": false, "note": "iOS la decodifica como enumerado estricto: un valor nuevo hace fallar TODA la respuesta. Añadir un valor aquí exige actualizar antes iOS."},
+        {"path": "mask_readback", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "persisted_to_receiver", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/gnss/sky",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Por BLE la respuesta entera no puede pasar de 4096 bytes (si no, 413): por eso el firmware publica como mucho 40 satélites (`kPublished`).",
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/gnss_sky.cpp#publish"]}
+      },
+      "response": [
+        {"path": "satellites", "type": "array", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "satellites[].sys", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Talker NMEA (GP, GL, GA, GB, GQ, GI…); los desconocidos se enseñan tal cual."},
+        {"path": "satellites[].prn", "type": "integer", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "satellites[].el", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Grados ENTEROS: un decimal tumba todo el cielo en las dos apps. Nulo si se desconoce."},
+        {"path": "satellites[].az", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Grados enteros; nulo si se desconoce."},
+        {"path": "satellites[].cno", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "dB-Hz enteros; nulo sin rastrear."},
+        {"path": "satellites[].use", "type": "boolean", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Obligatoria en iOS."},
+        {"path": "satellites[].sig", "type": "array", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Arreglo de pares [id de señal entero, C/N0 entero o nulo]."},
+        {"path": "in_view", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "used", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "published", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "omitted", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "dropped", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Más de 3000 o nula: cielo caducado (iOS)."},
+        {"path": "fix_type", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "pdop", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "hdop", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "vdop", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "dop_age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/base/plan",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "El firmware rechaza cualquier clave de plan que no conozca («Campo de plan desconocido»).",
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/instrument.cpp#previewBase"]},
+        "readers": ["src/instrument.cpp#previewBase"]
+      },
+      "response": [
+        {"path": "applied", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "persisted", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "plan", "type": "object", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "plan.station_id", "type": "integer", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "plan.method", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "values": ["known", "average"], "unknown_values_ok": true},
+        {"path": "plan.latitude_deg", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "plan.longitude_deg", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "plan.ellipsoid_height_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "plan.antenna_vertical_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "plan.arp_ellipsoid_height_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "plan.case_offset_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "plan.height_reference", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["receiver_msl", "ellipsoidal_user_configured", "ellipsoidal", "msl"], "unknown_values_ok": false, "note": "iOS la decodifica como enumerado estricto: un valor nuevo hace fallar TODA la respuesta. Añadir un valor aquí exige actualizar antes iOS."},
+        {"path": "plan.datum", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "plan.average_seconds", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "plan.reuse_distance_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "message", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": [
+        {"path": "method", "type": "string", "apps": ["ios", "android"], "optional": true, "note": "`known` o `average`."},
+        {"path": "station_id", "type": "integer", "apps": ["ios", "android"], "optional": false},
+        {"path": "latitude_deg", "type": "number", "apps": ["ios", "android"], "optional": true},
+        {"path": "longitude_deg", "type": "number", "apps": ["ios", "android"], "optional": true},
+        {"path": "ellipsoid_height_m", "type": "number", "apps": ["ios", "android"], "optional": true},
+        {"path": "antenna_vertical_m", "type": "number", "apps": ["ios", "android"], "optional": true},
+        {"path": "average_seconds", "type": "integer", "apps": ["ios", "android"], "optional": true},
+        {"path": "reuse_distance_m", "type": "number", "apps": ["ios", "android"], "optional": true}
+      ],
+      "request_exact_keys": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/base/apply",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/gnss_control.cpp#launch"]},
+        "readers": ["src/instrument.cpp#previewBase"]
+      },
+      "response": [
+        {"path": "job_id", "type": "integer", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Las apps siguen el trabajo con GET /api/gnss/control."}
+      ],
+      "request": [
+        {"path": "method", "type": "string", "apps": ["ios", "android"], "optional": true, "note": "`known` o `average`."},
+        {"path": "station_id", "type": "integer", "apps": ["ios", "android"], "optional": false},
+        {"path": "latitude_deg", "type": "number", "apps": ["ios", "android"], "optional": true},
+        {"path": "longitude_deg", "type": "number", "apps": ["ios", "android"], "optional": true},
+        {"path": "ellipsoid_height_m", "type": "number", "apps": ["ios", "android"], "optional": true},
+        {"path": "antenna_vertical_m", "type": "number", "apps": ["ios", "android"], "optional": true},
+        {"path": "average_seconds", "type": "integer", "apps": ["ios", "android"], "optional": true},
+        {"path": "reuse_distance_m", "type": "number", "apps": ["ios", "android"], "optional": true}
+      ],
+      "request_exact_keys": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/base/survey",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/base_survey.cpp#status"]}
+      },
+      "response": [
+        {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["idle", "averaging", "applying", "applied", "cancelled", "failed"], "unknown_values_ok": true},
+        {"path": "reason", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "samples", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "required_quality", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "seconds_requested", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "seconds_elapsed", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "case_offset_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "latitude_deg", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "longitude_deg", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "height_to_set_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "mark_ellipsoid_height_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "geoid_separation_known", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/base/survey",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/base_survey.cpp#status"]},
+        "readers": ["src/base_survey.cpp#request"]
+      },
+      "response": [
+        {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["idle", "averaging", "applying", "applied", "cancelled", "failed"], "unknown_values_ok": true},
+        {"path": "reason", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "samples", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "required_quality", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "seconds_requested", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "seconds_elapsed", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "case_offset_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "latitude_deg", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "longitude_deg", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "height_to_set_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "mark_ellipsoid_height_m", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "geoid_separation_known", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": [
+        {"path": "action", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "`start` o `cancel`."},
+        {"path": "seconds", "type": "integer", "apps": ["ios", "android"], "optional": true},
+        {"path": "station_id", "type": "integer", "apps": ["ios", "android"], "optional": true},
+        {"path": "antenna_vertical_m", "type": "number", "apps": ["ios", "android"], "optional": true},
+        {"path": "quality", "type": "string", "apps": ["ios", "android"], "optional": true, "note": "rtk_fixed, rtk_float, standalone o any."}
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/corrections/source",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Las apps solo miran el código de estado.",
+      "firmware": {"dispatch": ["src/instrument.cpp"], "readers": ["src/instrument.cpp#request"]},
+      "response": [],
+      "request": [
+        {"path": "source", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "none, ble o ntrip."}
+      ],
+      "request_exact_keys": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/ntrip/input",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/ntrip_input.cpp#status"]},
+        "readers": ["src/ntrip_input.cpp#request"]
+      },
+      "response": [
+        {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["stopped", "starting", "stopping", "connecting", "streaming", "waiting_network", "retry_wait"], "unknown_values_ok": true},
+        {"path": "error", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "enabled", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "`true` = entrada NTRIP activa: decide compuertas y la parada de correcciones en las dos apps."},
+        {"path": "network_configured", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "frames_forwarded", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "frames_dropped", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "bytes_received", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "reconnects", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "rtcm_crc_errors", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": [
+        {"path": "action", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "`start` (seis claves exactas) o `stop` (solo `action`)."},
+        {"path": "host", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "port", "type": "integer", "apps": ["ios", "android"], "optional": true},
+        {"path": "mountpoint", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "username", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "password", "type": "string", "apps": ["ios", "android"], "optional": true}
+      ],
+      "request_exact_keys": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/ntrip/profiles",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/ntrip_input.cpp#profilesJson", "src/ntrip_input.cpp#profileRequest"], "stream": ["src/ntrip_input.cpp#status"]}
+      },
+      "response": [
+        {"path": "profiles", "type": "array", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "profiles[].name", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Todo el perfil es obligatorio en las dos apps: falta uno y cae la lista entera."},
+        {"path": "profiles[].host", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "profiles[].port", "type": "integer", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "profiles[].mountpoint", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "profiles[].username", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "profiles[].has_password", "type": "boolean", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "profiles_max", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "selected", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "autoconnect", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "storage_ready", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Solo en la respuesta de `connect`."},
+        {"path": "stream.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["stopped", "starting", "stopping", "connecting", "streaming", "waiting_network", "retry_wait"], "unknown_values_ok": true},
+        {"path": "stream.error", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.enabled", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "`true` = entrada NTRIP activa: decide compuertas y la parada de correcciones en las dos apps."},
+        {"path": "stream.network_configured", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.frames_forwarded", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.frames_dropped", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.bytes_received", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.reconnects", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.rtcm_crc_errors", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/ntrip/profiles",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/ntrip_input.cpp#profilesJson", "src/ntrip_input.cpp#profileRequest"], "stream": ["src/ntrip_input.cpp#status"]},
+        "readers": ["src/ntrip_input.cpp#profileRequest"]
+      },
+      "response": [
+        {"path": "profiles", "type": "array", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "profiles[].name", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Todo el perfil es obligatorio en las dos apps: falta uno y cae la lista entera."},
+        {"path": "profiles[].host", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "profiles[].port", "type": "integer", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "profiles[].mountpoint", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "profiles[].username", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "profiles[].has_password", "type": "boolean", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "profiles_max", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "selected", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "autoconnect", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "storage_ready", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Solo en la respuesta de `connect`."},
+        {"path": "stream.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["stopped", "starting", "stopping", "connecting", "streaming", "waiting_network", "retry_wait"], "unknown_values_ok": true},
+        {"path": "stream.error", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.enabled", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "`true` = entrada NTRIP activa: decide compuertas y la parada de correcciones en las dos apps."},
+        {"path": "stream.network_configured", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.frames_forwarded", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.frames_dropped", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.bytes_received", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.reconnects", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "stream.rtcm_crc_errors", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": [
+        {"path": "action", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "save, delete, select o connect."},
+        {"path": "name", "type": "string", "apps": ["ios", "android"], "optional": true, "note": "En `select` las apps mandan `null` explícito para no elegir ninguno."},
+        {"path": "host", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "port", "type": "integer", "apps": ["ios", "android"], "optional": true},
+        {"path": "mountpoint", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "username", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "password", "type": "string", "apps": ["ios", "android"], "optional": true}
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/ntrip/sourcetable",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/ntrip_input.cpp#sourcetableRequest"]}
+      },
+      "response": [
+        {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["idle", "loading", "waiting_network", "ready", "empty", "failed"], "unknown_values_ok": true, "note": "`loading` y `waiting_network` hacen seguir sondeando a las dos apps."},
+        {"path": "host", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "mountpoints", "type": "array", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "mountpoints[].mountpoint", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Todo el punto es obligatorio en las dos apps."},
+        {"path": "mountpoints[].format", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "mountpoints[].country", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "mountpoints[].requires_gga", "type": "boolean", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "truncated", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/ntrip/sourcetable",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/ntrip_input.cpp#sourcetableRequest"]},
+        "readers": ["src/ntrip_input.cpp#sourcetableRequest"]
+      },
+      "response": [
+        {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["idle", "loading", "waiting_network", "ready", "empty", "failed"], "unknown_values_ok": true, "note": "`loading` y `waiting_network` hacen seguir sondeando a las dos apps."},
+        {"path": "host", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "mountpoints", "type": "array", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "mountpoints[].mountpoint", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Todo el punto es obligatorio en las dos apps."},
+        {"path": "mountpoints[].format", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "mountpoints[].country", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "mountpoints[].requires_gga", "type": "boolean", "nullable": false, "optional": false, "apps": ["ios", "android"]},
+        {"path": "truncated", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": [
+        {"path": "host", "type": "string", "apps": ["ios", "android"], "optional": false},
+        {"path": "port", "type": "integer", "apps": ["ios", "android"], "optional": false}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/ntrip/server",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Las apps ignoran la respuesta.",
+      "firmware": {"dispatch": ["src/instrument.cpp"], "readers": ["src/correction_output.cpp#serverRequest"]},
+      "response": [],
+      "request": [
+        {"path": "action", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "`start` (cinco claves exactas) o `stop`."},
+        {"path": "host", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "port", "type": "integer", "apps": ["ios", "android"], "optional": true},
+        {"path": "mountpoint", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "password", "type": "string", "apps": ["ios", "android"], "optional": true}
+      ],
+      "request_exact_keys": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/ntrip/caster",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Las apps ignoran la respuesta.",
+      "firmware": {"dispatch": ["src/instrument.cpp"], "readers": ["src/correction_output.cpp#casterRequest"]},
+      "response": [],
+      "request": [
+        {"path": "action", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "`start` (cuatro claves exactas) o `stop`."},
+        {"path": "mountpoint", "type": "string", "apps": ["ios", "android"], "optional": true},
+        {"path": "port", "type": "integer", "apps": ["ios", "android"], "optional": true, "note": "Nunca 80: lo usa el panel."},
+        {"path": "password", "type": "string", "apps": ["ios", "android"], "optional": true}
+      ],
+      "request_exact_keys": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/ble",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Sonda de latido por BLE cuando falta la salud: las apps solo miran que conteste.",
+      "firmware": {"dispatch": ["src/instrument.cpp"]},
+      "response": [],
+      "request": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/ble",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp"],
+        "writers": {"": ["src/ble_transport.cpp#status", "src/ble_transport.cpp#request"]},
+        "readers": ["src/ble_transport.cpp#request"]
+      },
+      "response": [
+        {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["connected", "advertising", "disabled", "start_failed"], "unknown_values_ok": true},
+        {"path": "enabled", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "pairing_required", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "protocol_version", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Las dos apps esperan el latido de salud a 1 Hz si vale 3 o más y avisan fuera de 2…3. Sube solo con cambios del canal binario (README)."},
+        {"path": "dropped_requests", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "rtcm_valid_frames", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "rtcm_crc_errors", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "rtcm_dropped_frames", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "control_available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "rtcm_available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "file_download_available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "telemetry_hardware_validated", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "att_mtu", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "response_frames_forced", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "rtcm_write_without_response", "type": "boolean", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "health_period_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "conn_interval_ms", "type": "number", "nullable": true, "optional": true, "apps": ["android"], "note": "Nulo sin conexión. Único decimal del bloque."},
+        {"path": "telemetry_skipped", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "max_loop_gap_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "max_request_dispatch_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "message", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Aviso de que no se pudo guardar el ajuste."}
+      ],
+      "request": [
+        {"path": "enabled", "type": "boolean", "apps": ["ios", "android"], "optional": false}
+      ],
+      "request_exact_keys": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/restart",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Sin cuerpo; las apps ignoran la respuesta (202).",
+      "firmware": {"dispatch": ["src/instrument.cpp"]},
+      "response": [],
+      "request": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/recording",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/instrument.cpp", "src/sd_recorder.cpp"],
+        "writers": {"": ["src/sd_recorder.cpp#status"]}
+      },
+      "response": [
+        {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "active", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "session_id", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "dropped_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "max_session_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "rinex_available", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]}
+      ],
+      "request": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/recording/sessions",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Contesta 503 si la memoria interna no está disponible.",
+      "firmware": {
+        "dispatch": ["src/sd_recorder.cpp"],
+        "writers": {"": ["src/sd_recorder.cpp#request"]}
+      },
+      "device": {"expect_status": [200]},
+      "response": [
+        {"path": "sessions", "type": "array", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Si falta, las apps la toman por vacía."},
+        {"path": "sessions[].session_id", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Sin ella la app descarta la fila: la grabación no se puede descargar."},
+        {"path": "sessions[].bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "sessions[].state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["closed", "interrupted", "recording"], "unknown_values_ok": true}
+      ],
+      "request": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/recording/read",
+      "channels": ["http", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Solo HTTP (y USB): por BLE el firmware la rechaza.",
+      "firmware": {
+        "dispatch": ["src/sd_recorder.cpp"],
+        "writers": {"": ["src/sd_recorder.cpp#request"]},
+        "readers": ["src/sd_recorder.cpp#request"]
+      },
+      "response": [
+        {"path": "data", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Base64 del trozo; cadena vacía = fin del archivo."}
+      ],
+      "request": [
+        {"path": "session_id", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "24 caracteres hexadecimales en minúscula: las apps lo validan así."},
+        {"path": "offset", "type": "integer", "apps": ["ios", "android"], "optional": false}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/recording/start",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["android"],
+      "note": "Sin cuerpo; la respuesta se ignora.",
+      "firmware": {"dispatch": ["src/sd_recorder.cpp"]},
+      "response": [],
+      "request": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/recording/stop",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["android"],
+      "note": "Sin cuerpo; la respuesta se ignora.",
+      "firmware": {"dispatch": ["src/sd_recorder.cpp"]},
+      "response": [],
+      "request": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/update",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "firmware": {
+        "dispatch": ["src/firmware_update.cpp"],
+        "writers": {"": ["src/firmware_update.cpp#status"]}
+      },
+      "response": [
+        {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Android solo reanuda una carga si vale `receiving`."},
+        {"path": "hardware_id", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "De aquí sacan las dos apps la placa que mandan en /api/update/begin. Si falta aquí y en /api/status, caen al identificador de la placa anterior a 0.8.0 y el equipo rechaza la carga."},
+        {"path": "firmware_version", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "active_slot", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "max_image_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Las apps lo decodifican pero tienen fijo 1 966 080 (ver `identifiers`)."},
+        {"path": "chunk_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Las apps lo decodifican pero tienen fijo 576 (ver `identifiers`)."},
+        {"path": "image_authenticity", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "signature_required", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "automatic_boot_rollback", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "boot_confirmed", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "previous_image_present", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "received_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["android"], "note": "Android reanuda una carga interrumpida desde aquí; sin ella empieza de cero."},
+        {"path": "total_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["android"], "note": "Android solo reanuda si coincide con el tamaño del archivo."}
+      ],
+      "request": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/update/begin",
+      "channels": ["http", "usb"],
+      "apps": ["ios", "android"],
+      "note": "El firmware exige exactamente estas tres claves.",
+      "firmware": {
+        "dispatch": ["src/firmware_update.cpp"],
+        "writers": {"": ["src/firmware_update.cpp#request"]},
+        "readers": ["src/firmware_update.cpp#request"]
+      },
+      "response": [
+        {"path": "session", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Sin ella no hay carga."}
+      ],
+      "request": [
+        {"path": "hardware_id", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "El que dice el equipo (GET /api/update), nunca un literal: tiene que ser igual al de la placa."},
+        {"path": "size", "type": "integer", "apps": ["ios", "android"], "optional": false, "note": "Bytes del archivo firmado (imagen + 72 de firma)."},
+        {"path": "sha256", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "64 hexadecimales en minúscula del archivo completo."}
+      ],
+      "request_exact_keys": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/update/chunk",
+      "channels": ["http", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Las apps ignoran la respuesta.",
+      "firmware": {"dispatch": ["src/firmware_update.cpp"], "readers": ["src/firmware_update.cpp#request", "src/firmware_update.cpp#matches"]},
+      "response": [],
+      "request": [
+        {"path": "session", "type": "string", "apps": ["ios", "android"], "optional": false},
+        {"path": "offset", "type": "integer", "apps": ["ios", "android"], "optional": false},
+        {"path": "data", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "Base64 de hasta 576 bytes."}
+      ],
+      "request_exact_keys": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/update/finish",
+      "channels": ["http", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Las apps ignoran la respuesta y releen GET /api/update a los 6 s.",
+      "firmware": {"dispatch": ["src/firmware_update.cpp"], "readers": ["src/firmware_update.cpp#matches"]},
+      "response": [],
+      "request": [
+        {"path": "session", "type": "string", "apps": ["ios", "android"], "optional": false}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/update/abort",
+      "channels": ["http", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Las apps ignoran la respuesta.",
+      "firmware": {"dispatch": ["src/firmware_update.cpp"], "readers": ["src/firmware_update.cpp#matches"]},
+      "response": [],
+      "request": [
+        {"path": "session", "type": "string", "apps": ["ios", "android"], "optional": false}
+      ]
+    }
+  ],
+  "command_envelope": {
+    "note": "Canal de órdenes por BLE (a04c0002/a04c0003): las mismas rutas que HTTP, envueltas en JSON. Las apps no usan la consola USB, que tiene la misma envoltura.",
+    "firmware": {"files": ["src/ble_transport.cpp#dispatchNextRequest"]},
+    "request": [
+      {"path": "id", "type": "integer", "apps": ["ios", "android"], "optional": false, "note": "uint32; correlaciona la respuesta."},
+      {"path": "method", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "GET, POST o PUT."},
+      {"path": "path", "type": "string", "apps": ["ios", "android"], "optional": false},
+      {"path": "key", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "Siempre vacía: el equipo ya no pide clave."},
+      {"path": "body", "type": "object", "apps": ["ios", "android"], "optional": true, "note": "Solo si hay cuerpo."}
+    ],
+    "response": [
+      {"path": "id", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Si falta, las apps solo la aceptan sin lecturas pendientes abandonadas."},
+      {"path": "status", "type": "integer", "nullable": false, "optional": false, "apps": ["ios", "android"], "note": "Sin él la respuesta es inválida en las dos apps."},
+      {"path": "body", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Puede ser cualquier JSON; si falta, nulo."}
+    ],
+    "blocked_paths": ["/api/recording/read", "/api/access", "/api/update/* (salvo GET /api/update)"]
+  },
+  "error_response": {
+    "note": "Cualquier estado fuera de 2xx. 202 es éxito. 400/413 → error de la app; 404 → función ausente (o recurso inexistente en /api/wifi/networks, /api/ntrip/profiles y /api/recording/read); 409 → bloqueado; 503 → subsistema no disponible.",
+    "response": [
+      {"path": "error", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Si falta, las apps usan «unknown_error»."},
+      {"path": "message", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Se enseña al usuario."}
+    ],
+    "codes_used_by_apps": [
+      {"code": "busy", "apps": ["ios", "android"], "note": "409 con botón de reintento."},
+      {"code": "revision_conflict", "apps": ["ios", "android"], "note": "409 de PUT /api/config: las apps releen la configuración."},
+      {"code": "networks_full", "apps": ["ios", "android"], "note": "409 de POST /api/wifi/networks."},
+      {"code": "receiver_is_base", "apps": ["ios", "android"], "note": "Ver `discrepancies`: ninguna respuesta 409 lo lleva en `error`."}
+    ]
+  },
+  "binary": {
+    "ble": {
+      "service_uuid": "a04c0001-8f24-4adb-a350-77ef6339c320",
+      "advertised": "El servicio va en el anuncio: las dos apps escanean filtrando por este UUID, no por nombre.",
+      "characteristics": [
+        {"uuid": "a04c0002-8f24-4adb-a350-77ef6339c320", "role": "command_write", "apps_require": true, "note": "Peticiones JSON terminadas en LF, troceadas a MTU−3, escritura con respuesta."},
+        {"uuid": "a04c0003-8f24-4adb-a350-77ef6339c320", "role": "command_response_notify", "apps_require": true, "note": "Respuestas JSON en tramas (ver `response_frame`)."},
+        {"uuid": "a04c0004-8f24-4adb-a350-77ef6339c320", "role": "solution_notify", "apps_require": false},
+        {"uuid": "a04c0005-8f24-4adb-a350-77ef6339c320", "role": "rtcm_write", "apps_require": false, "note": "Tramas RTCM3 de hasta 1029 bytes; sin respuesta si la característica lo anuncia."},
+        {"uuid": "a04c0006-8f24-4adb-a350-77ef6339c320", "role": "health_notify", "apps_require": false, "note": "Latido a 1 Hz con `protocol_version` ≥ 3."}
+      ],
+      "response_frame": {"header_bytes": 5, "layout": "uint16 LE id de mensaje, uint16 LE desplazamiento, uint8 banderas (bit0 primera, bit1 última), y el trozo de JSON.", "max_message_bytes": 4096, "note": "Las apps reensamblan por desplazamiento y descartan el mensaje con un hueco o a los 5 s."},
+      "solution_packet": {
+        "characteristic": "a04c0004",
+        "length_bytes": 20,
+        "apps_accept": "20 o más; ignoran lo que sobra",
+        "endianness": "little",
+        "fields": [
+          {"offset": 0, "bytes": 2, "type": "uint16", "name": "sequence", "note": "Vuelve a 0 tras 65535."},
+          {"offset": 2, "bytes": 1, "type": "uint8", "name": "gga_quality", "note": "0–8; desconocida → invalid."},
+          {"offset": 3, "bytes": 1, "type": "uint8", "name": "satellites_used", "unknown": 255, "note": "USADOS (GGA), no rastreados."},
+          {"offset": 4, "bytes": 4, "type": "uint32", "name": "utc_time_of_day_ms", "note": "Hora UTC del día, sin fecha."},
+          {"offset": 8, "bytes": 4, "type": "int32", "name": "latitude_e7_deg", "scale": 1e-07, "unknown": "INT32_MIN"},
+          {"offset": 12, "bytes": 4, "type": "int32", "name": "longitude_e7_deg", "scale": 1e-07, "unknown": "INT32_MIN"},
+          {"offset": 16, "bytes": 4, "type": "int32", "name": "height_msl_mm", "scale": 0.001, "unknown": "INT32_MIN", "note": "Altura MSL del receptor en mm."}
+        ]
+      },
+      "health_packet": {
+        "characteristic": "a04c0006",
+        "length_bytes": 20,
+        "apps_accept": "20 o más",
+        "endianness": "little",
+        "fields": [
+          {"offset": 0, "bytes": 1, "type": "uint8", "name": "packet_version", "note": "Tiene que valer 1: las dos apps descartan el paquete con otra versión (igualdad, no «al menos»)."},
+          {"offset": 1, "bytes": 2, "type": "uint16", "name": "display_horizontal_precision_mm", "unknown": "0xFFFF", "note": "Precisión MOSTRADA por Meridian V (bandera 0x01 del byte 16)."},
+          {"offset": 3, "bytes": 2, "type": "uint16", "name": "display_vertical_precision_mm", "unknown": "0xFFFF"},
+          {"offset": 5, "bytes": 2, "type": "uint16", "name": "correction_age_s", "unknown": "0xFFFF"},
+          {"offset": 7, "bytes": 1, "type": "uint8", "name": "correction_source", "note": "0 ninguna, 1 BLE, 2 NTRIP, 3 radio; desconocida → ninguna."},
+          {"offset": 8, "bytes": 1, "type": "uint8", "name": "gga_quality", "note": "0 si la última GGA tiene más de 2 s."},
+          {"offset": 9, "bytes": 1, "type": "uint8", "name": "imu_reserved", "note": "Reservado, 0."},
+          {"offset": 10, "bytes": 1, "type": "uint8", "name": "satellites_tracked", "unknown": 255},
+          {"offset": 11, "bytes": 1, "type": "uint8", "name": "satellites_visible", "unknown": 255, "note": "Las apps tratan también 0 como desconocido."},
+          {"offset": 16, "bytes": 1, "type": "uint8", "name": "flags", "note": "Bit 0x04: valen los bytes 17–19."},
+          {"offset": 17, "bytes": 1, "type": "uint8", "name": "rtcm_frames_discarded_mod256"},
+          {"offset": 18, "bytes": 1, "type": "uint8", "name": "rtcm_frames_rejected_mod256"},
+          {"offset": 19, "bytes": 1, "type": "uint8", "name": "rtcm_queue_percent", "unknown": 255}
+        ],
+        "unread_bytes": "12–15 (sigma cruda del UM980): ninguna app los lee."
+      }
+    },
+    "websocket": {"path": "/ws/telemetry", "frame_bytes": 21, "frames": "Binarios: byte 0 = tipo (0x01 solución, 0x02 salud) y bytes 1–20 = el mismo paquete de BLE.", "note": "Las apps descartan una trama que no mida 21 bytes y CIERRAN el flujo si llega una trama de texto."},
+    "firmware_image": {"note": "Las apps leen la imagen firmada antes de subirla para no mandar un firmware de otra placa.", "identity_magic": "TVZFWID1", "identity_offset": 288, "version_bytes": 24, "hardware_id_offset": 320, "hardware_id_bytes": 48, "signature_trailer_bytes": 72, "esp_image_checks": "byte 0 = 0xE9, bytes 12–13 = id de chip 9 (ESP32-S3), bytes 32–35 = 0xABCD5432"},
+    "firmware_evidence": [
+      {"what": "UUID del servicio", "file": "src/ble_transport.cpp", "pattern": "\"a04c0001-8f24-4adb-a350-77ef6339c320\""},
+      {"what": "UUID de peticiones", "file": "src/ble_transport.cpp", "pattern": "\"a04c0002-8f24-4adb-a350-77ef6339c320\""},
+      {"what": "UUID de respuestas", "file": "src/ble_transport.cpp", "pattern": "\"a04c0003-8f24-4adb-a350-77ef6339c320\""},
+      {"what": "UUID de solución", "file": "src/ble_transport.cpp", "pattern": "\"a04c0004-8f24-4adb-a350-77ef6339c320\""},
+      {"what": "UUID de correcciones", "file": "src/ble_transport.cpp", "pattern": "\"a04c0005-8f24-4adb-a350-77ef6339c320\""},
+      {"what": "UUID de salud", "file": "src/ble_transport.cpp", "pattern": "\"a04c0006-8f24-4adb-a350-77ef6339c320\""},
+      {"what": "El servicio se anuncia", "file": "src/ble_transport.cpp", "pattern": "addServiceUUID\\(\\s*serviceId\\s*\\)"},
+      {"what": "protocol_version de BLE ≥ 3", "file": "src/ble_transport.cpp", "pattern": "\\[\"protocol_version\"\\]\\s*=\\s*(\\d+)", "min": 3},
+      {"what": "api_version ≥ 1", "file": "src/instrument.cpp", "pattern": "\\[\"api_version\"\\]\\s*=\\s*(\\d+)", "min": 1},
+      {"what": "Respuestas BLE de hasta 4096 bytes", "file": "src/ble_transport.cpp", "pattern": "pending\\.length\\(\\)\\s*>\\s*4096"},
+      {"what": "Cabecera de trama de respuesta de 5 bytes", "file": "lib/protocol/src/ble_frames.h", "pattern": "kResponseHeaderBytes\\s*=\\s*5\\s*;"},
+      {"what": "Trama: id de mensaje en bytes 0–1", "file": "lib/protocol/src/ble_frames.h", "pattern": "frame\\[0\\]\\s*=\\s*uint8_t\\(messageId\\);\\s*frame\\[1\\]\\s*=\\s*uint8_t\\(messageId\\s*>>\\s*8\\);"},
+      {"what": "Trama: desplazamiento en bytes 2–3", "file": "lib/protocol/src/ble_frames.h", "pattern": "frame\\[2\\]\\s*=\\s*uint8_t\\(offset\\);\\s*frame\\[3\\]\\s*=\\s*uint8_t\\(offset\\s*>>\\s*8\\);"},
+      {"what": "Trama: banderas en byte 4", "file": "lib/protocol/src/ble_frames.h", "pattern": "frame\\[4\\]\\s*=\\s*uint8_t\\(\\(offset == 0 \\? 1 : 0\\) \\| \\(offset \\+ count == total \\? 2 : 0\\)\\)"},
+      {"what": "Solución BLE de 20 bytes", "file": "src/ble_transport.cpp", "pattern": "uint8_t sample\\[20\\]"},
+      {"what": "Solución BLE: secuencia en 0–1", "file": "src/ble_transport.cpp", "pattern": "sample\\[0\\]\\s*=\\s*sampleSequence;\\s*sample\\[1\\]\\s*=\\s*sampleSequence\\s*>>\\s*8;"},
+      {"what": "Solución BLE: calidad en 2", "file": "src/ble_transport.cpp", "pattern": "sample\\[2\\]\\s*=\\s*s\\.quality;"},
+      {"what": "Solución BLE: usados en 3", "file": "src/ble_transport.cpp", "pattern": "sample\\[3\\]\\s*=\\s*s\\.has_satellites"},
+      {"what": "Solución BLE: UTC en 4", "file": "src/ble_transport.cpp", "pattern": "put32\\(sample \\+ 4,\\s*s\\.utc_ms\\)"},
+      {"what": "Solución BLE: latitud ×1e7 en 8", "file": "src/ble_transport.cpp", "pattern": "put32\\(sample \\+ 8,[^;]*latitude_deg \\* 1e7"},
+      {"what": "Solución BLE: longitud ×1e7 en 12", "file": "src/ble_transport.cpp", "pattern": "put32\\(sample \\+ 12,[^;]*longitude_deg \\* 1e7"},
+      {"what": "Solución BLE: altura MSL en mm en 16", "file": "src/ble_transport.cpp", "pattern": "put32\\(sample \\+ 16,[^;]*altitude_msl_m \\* 1000"},
+      {"what": "put32 little-endian (BLE)", "file": "src/ble_transport.cpp", "pattern": "p\\[i\\]\\s*=\\s*encoded\\s*>>\\s*\\(8\\*i\\)"},
+      {"what": "Salud BLE de 20 bytes", "file": "src/ble_transport.cpp", "pattern": "uint8_t report\\[20\\]"},
+      {"what": "Salud: versión 1 en byte 0", "file": "lib/protocol/src/health_packet.h", "pattern": "report\\[0\\]\\s*=\\s*1\\s*;"},
+      {"what": "Salud: horizontal mostrada en 1", "file": "lib/protocol/src/health_packet.h", "pattern": "put16\\(report \\+ 1,\\s*in\\.meridianDisplay\\.horizontal\\)"},
+      {"what": "Salud: vertical mostrada en 3", "file": "lib/protocol/src/health_packet.h", "pattern": "put16\\(report \\+ 3,\\s*in\\.meridianDisplay\\.vertical\\)"},
+      {"what": "Salud: edad de correcciones en 5", "file": "lib/protocol/src/health_packet.h", "pattern": "put16\\(report \\+ 5,\\s*in\\.correctionAgeSeconds\\)"},
+      {"what": "Salud: fuente en 7", "file": "lib/protocol/src/health_packet.h", "pattern": "report\\[7\\]\\s*=\\s*in\\.source;"},
+      {"what": "Salud: calidad en 8", "file": "lib/protocol/src/health_packet.h", "pattern": "report\\[8\\]\\s*=\\s*in\\.quality;"},
+      {"what": "Salud: rastreados en 10", "file": "lib/protocol/src/health_packet.h", "pattern": "report\\[10\\]\\s*=\\s*in\\.tracked;"},
+      {"what": "Salud: visibles en 11", "file": "lib/protocol/src/health_packet.h", "pattern": "report\\[11\\]\\s*=\\s*in\\.visible;"},
+      {"what": "Salud: banderas en 16", "file": "lib/protocol/src/health_packet.h", "pattern": "report\\[16\\]\\s*="},
+      {"what": "Salud: bandera 0x04 de contadores RTCM", "file": "lib/protocol/src/health_packet.h", "pattern": "kFlagRtcmCounters\\s*=\\s*0x04\\s*;"},
+      {"what": "Salud: descartadas en 17", "file": "lib/protocol/src/health_packet.h", "pattern": "report\\[17\\]\\s*=\\s*in\\.rtcmFramesDiscarded;"},
+      {"what": "Salud: rechazadas en 18", "file": "lib/protocol/src/health_packet.h", "pattern": "report\\[18\\]\\s*=\\s*in\\.rtcmFramesRejected;"},
+      {"what": "Salud: cola en % en 19", "file": "lib/protocol/src/health_packet.h", "pattern": "report\\[19\\]\\s*=\\s*in\\.rtcmQueuePercent;"},
+      {"what": "Salud: put16 little-endian", "file": "lib/protocol/src/health_packet.h", "pattern": "target\\[0\\]\\s*=\\s*uint8_t\\(value\\);\\s*target\\[1\\]\\s*=\\s*uint8_t\\(value\\s*>>\\s*8\\);"},
+      {"what": "Desconocido = 0xFFFF", "file": "lib/protocol/src/health_packet.h", "pattern": "kUnknownMm\\s*=\\s*0xFFFF\\s*;"},
+      {"what": "Código de fuente BLE = 1", "file": "src/correction_router.cpp", "pattern": "case Source::Ble:\\s*return 1;"},
+      {"what": "Código de fuente NTRIP = 2", "file": "src/correction_router.cpp", "pattern": "case Source::Ntrip:\\s*return 2;"},
+      {"what": "Código de fuente radio = 3", "file": "src/correction_router.cpp", "pattern": "case Source::Radio:\\s*return 3;"},
+      {"what": "WebSocket en /ws/telemetry", "file": "src/telemetry_ws.cpp", "pattern": "route\\.uri\\s*=\\s*\"/ws/telemetry\""},
+      {"what": "WebSocket: tipo 0x01 = solución", "file": "src/telemetry_ws.cpp", "pattern": "kSolution\\s*=\\s*0x01\\s*;"},
+      {"what": "WebSocket: tipo 0x02 = salud", "file": "src/telemetry_ws.cpp", "pattern": "kHealth\\s*=\\s*0x02\\s*;"},
+      {"what": "WebSocket: 20 bytes de carga", "file": "src/telemetry_ws.cpp", "pattern": "kPayloadBytes\\s*=\\s*20\\s*;"},
+      {"what": "WebSocket: trama de 1 + 20 bytes", "file": "src/telemetry_ws.cpp", "pattern": "kFrameBytes\\s*=\\s*1\\s*\\+\\s*kPayloadBytes\\s*;"},
+      {"what": "WebSocket: tramas binarias", "file": "src/telemetry_ws.cpp", "pattern": "packet\\.type\\s*=\\s*HTTPD_WS_TYPE_BINARY\\s*;"},
+      {"what": "WebSocket: solución con la misma disposición", "file": "src/telemetry_ws.cpp", "pattern": "put32\\(sample \\+ 16,[^;]*altitude_msl_m \\* 1000"},
+      {"what": "WebSocket: misma salud que BLE", "file": "src/telemetry_ws.cpp", "pattern": "health_report::build\\(frame \\+ 1,"},
+      {"what": "Imagen: marca TVZFWID1", "file": "lib/protocol/src/signed_firmware.h", "pattern": "kIdentityMagic\\[\\]\\s*=\\s*\"TVZFWID1\""},
+      {"what": "Imagen: identidad en el byte 288", "file": "lib/protocol/src/signed_firmware.h", "pattern": "kIdentityImageOffset\\s*=\\s*24\\s*\\+\\s*8\\s*\\+\\s*256\\s*;"},
+      {"what": "Imagen: versión de 24 bytes", "file": "lib/protocol/src/signed_firmware.h", "pattern": "kIdentityVersionBytes\\s*=\\s*24\\s*;"},
+      {"what": "Imagen: hardware_id de 48 bytes", "file": "lib/protocol/src/signed_firmware.h", "pattern": "kHardwareIdBytes\\s*=\\s*48\\s*;"},
+      {"what": "Imagen: hardware_id en el byte 320", "file": "lib/protocol/src/signed_firmware.h", "pattern": "offsetof\\(BoardFirmwareIdentity, hardwareId\\)\\s*==\\s*32"},
+      {"what": "Imagen: firma de 72 bytes al final", "file": "lib/protocol/src/signed_firmware.h", "pattern": "kTrailerBytes\\s*==\\s*72"},
+      {"what": "Imagen: cabecera ESP32-S3 que también miran las apps", "file": "src/firmware_update.cpp", "pattern": "decoded\\[0\\]\\s*!=\\s*0xe9\\s*\\|\\|\\s*decoded\\[12\\]\\s*!=\\s*9"},
+      {"what": "Bloques de carga de 576 bytes (fijo en las apps)", "file": "src/firmware_update.cpp", "pattern": "chunkLimit\\s*=\\s*576\\s*;"},
+      {"what": "Petición de hasta 1024 bytes", "file": "include/config_rules.h", "pattern": "kMaxRequestBytes\\s*=\\s*1024\\s*;"}
+    ]
+  },
+  "identifiers": [
+    {
+      "name": "hardware_id",
+      "why": "Identifica la placa. Cambió en 0.8.0 (Tiny → Thing Plus) y el firmware rechaza `/api/update/begin` si no coincide.",
+      "current_value": "tresvizo-thingplus-s3-4m-v1",
+      "firmware_source": "include/board_profile.h (TRESVIZO_HARDWARE_ID) y byte 320 de la imagen firmada",
+      "exposed_in": [
+        {"route": "GET /api/update", "path": "hardware_id"},
+        {"route": "GET /api/status", "path": "hardware_id"}
+      ],
+      "known_hardcodes": [
+        {"app": "ios", "where": "MeridianVCore/Transfers/FirmwareUpdate.swift:41 (`legacyHardwareIdentifier`)", "severity": "baja", "note": "Solo de último recurso si el equipo no da `hardware_id` ni en /api/update ni en /api/status (desde 514cabc)."},
+        {"app": "android", "where": "core/domain/.../transfers/FirmwareUpdate.kt:48 (`LEGACY_HARDWARE_IDENTIFIER`)", "severity": "baja", "note": "Solo de último recurso, igual que iOS (desde 17febfa)."}
+      ]
+    },
+    {
+      "name": "board",
+      "why": "Nombre legible de la placa; cambia con ella.",
+      "current_value": "SparkFun Thing Plus ESP32-S3 WRL-24408",
+      "firmware_source": "include/board_profile.h (kName)",
+      "exposed_in": [
+        {"route": "GET /api/status", "path": "board"}
+      ]
+    },
+    {
+      "name": "firmware_version",
+      "why": "Cambia en cada versión. Ninguna app la compara con un literal.",
+      "current_value": "0.8.0",
+      "firmware_source": "include/instrument.h (kVersion) y byte 288 de la imagen",
+      "exposed_in": [
+        {"route": "GET /api/status", "path": "firmware_version"},
+        {"route": "GET /api/update", "path": "firmware_version"}
+      ]
+    },
+    {
+      "name": "device_name",
+      "why": "Lo puede cambiar el usuario (PUT /api/config).",
+      "current_value": "MeridianV (por omisión)",
+      "firmware_source": "src/instrument.cpp (kDeviceName)",
+      "exposed_in": [
+        {"route": "GET /api/status", "path": "device_name"},
+        {"route": "GET /api/config", "path": "device_name"}
+      ]
+    },
+    {
+      "name": "ap_ssid",
+      "why": "Nombre del Wi-Fi propio del equipo. Hoy es kDeviceName; depende del producto, no de la app.",
+      "current_value": "MeridianV",
+      "firmware_source": "src/instrument.cpp (networkName = kDeviceName)",
+      "exposed_in": [
+        {"route": "GET /api/status", "path": "wifi.ap_ssid"},
+        {"route": "GET /api/config", "path": "ap_ssid"}
+      ],
+      "known_hardcodes": [
+        {"app": "android", "where": "core/network/.../binding/DeviceWifiJoiner.kt:141 y app/.../discovery/UnifiedDeviceScanner.kt:108", "severity": "media", "note": "Se une al AP comparando el SSID con «MeridianV» por igualdad: un equipo con otro SSID no se encontraría por Wi-Fi."}
+      ]
+    },
+    {
+      "name": "ap_ip",
+      "why": "Dirección del AP propio; la pone ESP-IDF.",
+      "current_value": "192.168.4.1",
+      "firmware_source": "src/instrument.cpp (WiFi.softAPIP())",
+      "exposed_in": [
+        {"route": "GET /api/status", "path": "wifi.ap_ip"}
+      ],
+      "known_hardcodes": [
+        {"app": "ios", "where": "Data/LocalNetworkDiscovery.swift:38", "severity": "baja", "note": "Candidato que se verifica con GET /api/status antes de usarlo."},
+        {"app": "android", "where": "core/network/.../DeviceAddress.kt:34", "severity": "baja", "note": "Ídem."}
+      ]
+    },
+    {
+      "name": "mdns_instance",
+      "why": "Nombre mDNS del servicio _http._tcp. Depende del producto.",
+      "current_value": "meridianv",
+      "firmware_source": "src/instrument.cpp (MDNS.begin(\"meridianv\"))",
+      "exposed_in": [],
+      "known_hardcodes": [
+        {"app": "ios", "where": "Data/LocalNetworkDiscovery.swift:35-36", "severity": "media", "note": "Filtra por prefijo «meridianv»."},
+        {"app": "android", "where": "core/network/.../discovery/LocalNetworkDiscovery.kt:78", "severity": "media", "note": "Ídem; se puede escribir la dirección a mano."}
+      ]
+    },
+    {"name": "ble_name", "why": "Nombre anunciado por BLE (= ap_ssid). Las apps escanean por UUID de servicio; el nombre solo se enseña.", "current_value": "MeridianV", "firmware_source": "src/ble_transport.cpp (BLEDevice::init(instrument::apName()))", "exposed_in": []},
+    {
+      "name": "max_image_bytes",
+      "why": "Tamaño de la partición OTA: depende de la tabla de particiones de la placa.",
+      "current_value": 1966080,
+      "firmware_source": "partitions.csv (app0/app1 = 0x1e0000)",
+      "exposed_in": [
+        {"route": "GET /api/update", "path": "max_image_bytes"}
+      ],
+      "known_hardcodes": [
+        {"app": "ios", "where": "MeridianVCore/Transfers/FirmwareUpdate.swift:26 (maximumImageBytes)", "severity": "media", "note": "Ignora el valor del equipo: con una partición distinta rechazaría imágenes válidas o dejaría pasar una que el equipo rechaza en begin."},
+        {"app": "android", "where": "core/domain/.../transfers/FirmwareUpdate.kt:40 (MAXIMUM_IMAGE_BYTES)", "severity": "media", "note": "Ídem."}
+      ]
+    },
+    {
+      "name": "chunk_bytes",
+      "why": "Tamaño de bloque de carga que acepta el firmware.",
+      "current_value": 576,
+      "firmware_source": "src/firmware_update.cpp (chunkLimit)",
+      "exposed_in": [
+        {"route": "GET /api/update", "path": "chunk_bytes"}
+      ],
+      "known_hardcodes": [
+        {"app": "ios", "where": "MeridianVCore/Transfers/FirmwareUpdate.swift:24 (chunkBytes)", "severity": "media", "note": "Ignora el valor del equipo."},
+        {"app": "android", "where": "core/domain/.../transfers/FirmwareUpdate.kt:37 (CHUNK_BYTES)", "severity": "media", "note": "Ignora el valor del equipo."}
+      ]
+    },
+    {
+      "name": "chip",
+      "why": "Familia del microcontrolador. Las apps comprueban la cabecera de imagen ESP32-S3 (id de chip 9).",
+      "current_value": "ESP32-S3",
+      "firmware_source": "ESP.getChipModel()",
+      "exposed_in": [
+        {"route": "GET /api/status", "path": "chip"}
+      ],
+      "known_hardcodes": [
+        {"app": "ios", "where": "MeridianVCore/Transfers/FirmwareUpdate.swift:145-154 (hasESP32S3Header)", "severity": "baja", "note": "Razonable mientras todas las placas sean S3."},
+        {"app": "android", "where": "core/domain/.../transfers/FirmwareUpdate.kt:204-213", "severity": "baja", "note": "Ídem."}
+      ]
+    }
+  ],
+  "discrepancies": [
+    {"route": "GET /api/status por BLE", "apps": ["ios", "android"], "severity": "alta (a confirmar con equipo)", "summary": "Con todo lo que escribe hoy `status()` —incluido `subsystems.radio`, nuevo en 7c07995—, la respuesta pasa de los 4096 bytes que admite el canal de órdenes BLE y el equipo contesta 413 `response_too_large` en lugar del estado. Las dos apps piden /api/status por BLE cuando no hay Wi-Fi (cada 30 s con latido) y, si falla, la sesión queda degradada sin estado. Estimado con el código, no medido: solo la estructura (todas las claves con valores vacíos o cero, sin fix ni alertas) ya ocupa unos 3950 bytes; con valores plausibles, 4500–5100 (fixtures/device_0.8.0_from_source.json).", "firmware_source": "src/ble_transport.cpp:311 (corte en 4096) y src/instrument.cpp#status", "verdict": "Defecto probable del firmware, no del contrato. `check_contract.py device --port …` mide cada respuesta como saldría por BLE y lo marca como error. No se corrige en esta tarea."},
+    {"route": "salud byte 11 y solution.satellites_visible", "apps": ["ios", "android"], "summary": "Las apps toman 0 satélites visibles por desconocido (Android solo usa `satellites_visible` si es > 0); el firmware manda 0 si el cálculo da cero y 255 (o no manda la clave) si no lo sabe.", "firmware_source": "include/health_report.h (in.visible), src/instrument.cpp#status", "verdict": "Menor: con cielo abierto no hay cero visibles. Se anota para que el firmware no mande 0 por «no sé»."},
+    {"route": "errores 409 de /api/ntrip/input y /api/ntrip/profiles", "apps": ["ios", "android"], "summary": "Las dos apps tratan aparte un 409 con `error` = `receiver_is_base`, pero el firmware contesta esos 409 solo con `message` (sin `error`), así que las apps ven «unknown_error». `receiver_is_base` solo aparece como `subsystems.ntrip.error` cuando una conexión ya abierta se corta por ser base.", "firmware_source": "src/ntrip_input.cpp:303, :372 (409 sin `error`); :264 (`failure=\"receiver_is_base\"`)", "verdict": "Menor: el usuario ve el `message` del firmware igual. No se cambia aquí."},
+    {"route": "WebSocket /ws/telemetry", "apps": ["ios"], "summary": "iOS decodifica `telemetry_stream.path` pero abre siempre /ws/telemetry; Android usa la ruta que manda el equipo.", "firmware_source": "src/telemetry_ws.cpp:220, :329", "verdict": "Sin efecto hoy (la ruta es la misma). Si la ruta cambiara, iOS se rompería: no cambiarla."}
+  ]
+}
