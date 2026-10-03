@@ -1,3 +1,4 @@
+#include "radio_module.h"
 #include "correction_output.h"
 #include "instrument.h"
 #include "firmware_update.h"
@@ -233,6 +234,8 @@ void begin(){
 }
 
 void publish(const uint8_t* frame,size_t length){
+ // Al módulo de radio, si hay uno transmitiendo como base: no depende del caster.
+ radio_module::publish(frame,length);
  if(!ready||!length||length>sizeof(Frame::bytes))return;
  captured.fetch_add(1);lastCapture=millis();
  if(!serverWanted&&!casterWanted)return; // nadie escucha: no llenar la cola

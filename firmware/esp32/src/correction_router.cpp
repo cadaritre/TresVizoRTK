@@ -3,6 +3,7 @@
 #include "gnss_receiver.h"
 #include "firmware_update.h"
 #include "rtcm3.h"
+#include "radio_module.h"
 #include <Preferences.h>
 #include <atomic>
 #include <cstring>
@@ -25,6 +26,8 @@ void begin() {
     // guardado, y "ninguna" es el estado de partida.
     if (saved == uint8_t(Source::Ble)) { chosen = Source::Ble; select("ble"); }
     else if (saved == uint8_t(Source::Ntrip)) chosen = Source::Ntrip;
+    // El radio se selecciona ya: sus tramas solo llegan cuando hay un módulo conectado.
+    else if (saved == uint8_t(Source::Radio)) { chosen = Source::Radio; select("radio"); }
 }
 bool choose(const char* name) {
     if (!select(name)) return false;
@@ -33,11 +36,16 @@ bool choose(const char* name) {
     return true;
 }
 bool bleChosen() { return chosen == Source::Ble; }
+bool radioChosen() { return chosen == Source::Radio; }
+void adoptRadio() {
+    if (chosen == Source::Radio || (chosen == Source::None && selected == Source::None)) select("radio");
+}
 bool select(const char* name) {
     Source next;
     if (!strcmp(name,"none")) next = Source::None;
     else if (!strcmp(name,"ble")) next = Source::Ble;
     else if (!strcmp(name,"ntrip")) next = Source::Ntrip;
+    else if (!strcmp(name,"radio")) next = Source::Radio;
     else return false;
     if (selected.exchange(next) != next) ++revision;
     return true;
@@ -67,13 +75,16 @@ uint8_t sourceCode() {
     }
 }
 void status(JsonObject out) {
-    out["active_source"] = selected == Source::Ble ? "ble" : selected == Source::Ntrip ? "ntrip" : "none";
+    auto name = [](Source source) {
+        return source == Source::Ble ? "ble" : source == Source::Ntrip ? "ntrip" : source == Source::Radio ? "radio" : "none";
+    };
+    out["active_source"] = name(selected.load());
     // La que se restaura al encender. Puede diferir de la activa: una base, por
     // ejemplo, deja la activa en "none" sin cambiar lo que eligio el usuario.
-    out["chosen_source"] = chosen == Source::Ble ? "ble" : chosen == Source::Ntrip ? "ntrip" : "none";
+    out["chosen_source"] = name(chosen.load());
     out["format"] = "rtcm3"; out["generation"] = revision.load();
     out["accepted_frames"] = accepted.load(); out["rejected_frames"] = rejected.load();
-    out["drivers"]["ble"] = true; out["drivers"]["ntrip"] = true; out["drivers"]["radio"] = false;
+    out["drivers"]["ble"] = true; out["drivers"]["ntrip"] = true; out["drivers"]["radio"] = radio_module::connected();
     out["receiver_ready"] = gnss_receiver::snapshot().enabled;
     out["hot_load_modules"] = false;
     // Nulo mientras no haya fuente o no haya llegado nada: el panel debe poder

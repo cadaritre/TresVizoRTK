@@ -1,3 +1,4 @@
+#include "radio_module.h"
 #include "sd_recorder.h"
 #include "board_profile.h"
 #include "local_display.h"
@@ -209,6 +210,8 @@ void setup() {
     correction_router::begin();
     ntrip_input::begin();
     correction_output::begin();
+    // El radio LoRa externo: servidor en la red propia, en su propia tarea.
+    radio_module::begin();
     base_survey::begin();
     gnss_visible::begin();
     ble_transport::begin(dispatch, authenticated);

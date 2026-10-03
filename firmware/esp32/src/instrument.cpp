@@ -1,3 +1,4 @@
+#include "radio_module.h"
 #include "sd_recorder.h"
 #include "board_profile.h"
 #include "local_display.h"
@@ -659,6 +660,7 @@ void status(JsonDocument& response) {
         response["subsystems"][subsystem]["state"] = "not_integrated";
     }
     ble_transport::status(response["subsystems"]["ble"].as<JsonObject>());
+    radio_module::status(response["subsystems"]["radio"].to<JsonObject>());
     ntrip_input::status(response["subsystems"]["ntrip"].as<JsonObject>());
     // Fuente y antigüedad de correcciones en el estado general: la vista de
     // campo las necesita en cada refresco y no debe pedir una segunda ruta.
@@ -1066,7 +1068,8 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
                 // recupera aquí, igual que NTRIP se reconecta solo después: sin
                 // esto, pasar a móvil dejaba BLE sin fuente hasta repetir la
                 // elección desde la app.
-                correction_router::select(action=="rover" && correction_router::bleChosen() ? "ble" : "none");
+                correction_router::select(action!="rover" ? "none" : correction_router::bleChosen() ? "ble"
+                                          : correction_router::radioChosen() ? "radio" : "none");
             }
             return gnss_control::start(body,response);
         }
@@ -1091,6 +1094,8 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         correction_router::select("none");
         return gnss_control::applyBase(preview["plan"],response);
     }
+    // El módulo de radio LoRa externo (docs/radio/RADIO_MODULE.md).
+    if (path == "/api/radio") return radio_module::request(method, body, response);
     if (path == "/api/corrections/source") {
         if(method=="PUT" && (ntrip_input::active() || gnss_control::busy())) {error(response,"busy","Detén NTRIP y espera al GPS antes de cambiar fuente.");return 409;}
         if (method == "PUT") {

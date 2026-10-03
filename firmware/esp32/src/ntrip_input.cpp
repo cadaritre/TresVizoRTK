@@ -188,7 +188,7 @@ void worker(void*) {
   // el perfil sigue elegido y el equipo ya no es base. Solo se respeta el
   // silencio si fue el usuario quien detuvo la conexion.
   if(!wanted && autoConnect && !userStopped && lastUsed>=0 && ready &&
-     !gnss_control::isBase() && gnss_control::isRover() && !correction_router::bleChosen()){
+     !gnss_control::isBase() && gnss_control::isRover() && !correction_router::bleChosen() && !correction_router::radioChosen()){
    applyProfile(profiles[lastUsed]);
    correction_router::select("ntrip");++generation;wanted=true;state="starting";
    continue;
@@ -276,7 +276,7 @@ void begin(){
  // mismo de correcciones que no necesita y bloquearía configurar el receptor.
  // Tampoco si la última elección del usuario fue BLE: el perfil sigue guardado,
  // pero reconectarlo le quitaría la fuente que eligió.
- if(ready && autoConnect && lastUsed>=0 && !gnss_control::isBase() && !correction_router::bleChosen()){
+ if(ready && autoConnect && lastUsed>=0 && !gnss_control::isBase() && !correction_router::bleChosen() && !correction_router::radioChosen()){
   applyProfile(profiles[lastUsed]);
   correction_router::select("ntrip");
   ++generation;wanted=true;state="starting";

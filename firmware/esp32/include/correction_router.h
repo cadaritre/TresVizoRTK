@@ -14,6 +14,10 @@ bool select(const char* source);
 void begin();                      // lee la elección y, si era BLE, la aplica
 bool choose(const char* source);   // elección explícita: selecciona y guarda
 bool bleChosen();                  // la última elección explícita fue BLE
+bool radioChosen();                // la última elección explícita fue el radio
+// Un módulo de radio se conectó como rover: si el usuario eligió el radio, o no
+// eligió nada y no hay otra fuente activa, se selecciona sin guardarlo como elección.
+void adoptRadio();
 bool submit(Source source, const uint8_t* frame, size_t length);
 void status(JsonObject out);
 uint32_t generation();
