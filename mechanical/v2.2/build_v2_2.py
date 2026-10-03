@@ -1,28 +1,27 @@
-"""V2.2: carcasa TresVizo. Es V2.1 con 10 mm mas de diametro y 10 mm mas de
-cuerpo, panel frontal con pantalla OLED y boton metalico de 12 mm, sin trineo y
-sin panel auxiliar, con el IMU en una plataforma que se incrusta en la tapa, un
-hombro redondeado que abraza la antena y dos bandas de TPU.
+"""V2.2: carcasa TresVizo de 64 mm de diametro y 130 de alto, con panel frontal
+de pantalla OLED y boton metalico de 12 mm, sin trineo y sin panel auxiliar,
+con el IMU en una plataforma que se incrusta en la tapa y dos bandas de TPU.
 
-Ocho piezas: base con rosca, tubo con logo, respaldo de amarre y toalleros,
-tapa de antena, plataforma del IMU, tapa del panel, hombro de la antena y las
-dos bandas de TPU. Todas las cotas salen de parameters.json; las de los
-componentes de referencia, de components.json.
+Siete piezas: base con rosca, tubo con logo, respaldo de amarre y toalleros,
+tapa de antena, plataforma del IMU, tapa del panel y las dos bandas de TPU.
+Todas las cotas salen de parameters.json; las de los componentes de
+referencia, de components.json.
 
 Cambios frente a V2.1 (pedidos por el propietario el 02-10-2026):
-  - diametro 69 -> 79 y cuerpo 10 mm mas alto;
-  - panel frontal de 72 grados x 87 mm: pantalla OLED de 0.96 in en su marco,
+  - diametro 69 -> 64, el maximo que fijo; la bateria es una 18650 y ya no
+    hace falta el ancho que pedia la 955565;
+  - panel frontal de 86 grados x 83 mm: pantalla OLED de 0.96 in en su marco,
     boton metalico de 12 mm con asiento plano por fuera y por dentro, USB-C con
-    repisa y dos LEDs. Sin panel auxiliar;
-  - fuera el trineo: el boton, la pantalla y su cableado ocupan el frente. Todo
-    se amarra con bridas a un respaldo ranurado que forma parte del tubo, en la
-    cara trasera, o a cuatro toalleros de las paredes laterales;
+    asiento y repisa, dos LEDs. Sin panel auxiliar;
+  - fuera el trineo: todo se amarra con bridas a un respaldo ranurado que forma
+    parte del tubo, con la 18650 detras y las placas delante, o a cuatro
+    toalleros de las paredes laterales;
   - el IMU va en una plataforma que se incrusta en el cuello de la tapa con tres
     unas, con el CHIP en el eje y no la linea de los agujeros, que es lo que
     hacia V2.1 y dejaba el sensor 5.65 mm fuera;
   - las dos bayonetas llevan un diente mas ancho: base y tapa entran en una
     sola posicion;
-  - hombro redondeado sobre la tapa y bandas de proteccion de TPU arriba y
-    abajo.
+  - tapa plana, como V2.1, y bandas de proteccion de TPU arriba y abajo.
 
 Ejes: Z es el eje del jalon, hacia arriba. FRONT es +Y. Origen en la cara de
 apoyo del jalon (Z=0). Mirando la cara +Y con Z arriba, X apunta a la izquierda.
@@ -55,7 +54,7 @@ TUBE, BODY, BACK = P['tubo'], P['cuerpo'], P['respaldo']
 IMU, PLAT, ANT, INS = P['imu'], P['plataforma_imu'], P['antena'], P['inserto_jalon']
 BAY, LOCK, PAN = P['bayoneta'], P['seguro'], P['panel']
 ACC, TOWEL = P['accesorios'], P['toalleros']
-SHOULDER, BANDS = P['hombro'], P['bandas']
+BANDS, FINISH = P['bandas'], P.get('acabados', {})
 LOGO, PR = P['logo'], P['impresion']
 OLED, BTN, USB, LED = PAN['pantalla'], PAN['boton'], PAN['usb_c'], PAN['leds']
 
@@ -314,9 +313,10 @@ def build_backrest():
 
     La placa, las costillas y el piso del canal nacen de una rampa a 45 grados
     que arranca en el collar inferior, de modo que el tubo se sigue imprimiendo
-    de pie sin soportes. El canal queda cerrado abajo y abierto arriba: por ahi
-    bajan el coaxial y los cables del IMU desde la tapa. Las costillas llevan
-    huecos grandes: bridas y cables pasan de una celda del canal a otra.
+    de pie sin soportes. Por el canal bajan el coaxial y los cables del IMU
+    desde la tapa; sin piso (`piso_canal` = 0) queda abierto tambien abajo y
+    aloja la 18650. Las costillas llevan huecos grandes: bridas y cables pasan
+    de una celda del canal a otra.
     """
     b = BACK
     yf = -b['plano_frontal']
@@ -340,8 +340,10 @@ def build_backrest():
     # La del piso del canal nace en la pared: asi su cara superior tambien es una
     # rampa a 45 grados y no una cornisa plana.
     ramp_lo = oblique_ramp(R_COLLAR + 0.5, z0, RI + h)
-    ramp_hi = oblique_ramp(RI + 0.5, z0, RI + h)
-    body = region.cut(channel.cut(ramp_hi)).cut(ramp_lo)
+    if b.get('piso_canal', 0) > 0:
+        ramp_hi = oblique_ramp(RI + 0.5, z0, RI + h)
+        channel = channel.cut(ramp_hi)
+    body = region.cut(channel).cut(ramp_lo)
 
     s = b['ranura']
     z = b['filas_inicio']
@@ -482,9 +484,9 @@ def build_cap():
     body = Part.makeCylinder(RO, Z_TOP - Z_TUBE1, V(0, 0, Z_TUBE1))
     body = body.fuse(tube_ring(R_SPIGOT, NECK_RI, z0, Z_TUBE1 - z0))
     body = body.fuse(bayonet_teeth(Z_TUBE1 - 8.0, SIGN_CAP))
-    # Chaflan a 45 grados en el canto superior: con el del hombro forma una
-    # linea en V. Impresa boca abajo, ese canto va en la cama y a 45 grados no
-    # cuelga; el escalon de V2.1 dejaba un voladizo de 1.2 en un canto visto.
+    # Chaflan a 45 grados en el canto superior. Impresa boca abajo, ese canto
+    # va en la cama y a 45 grados no cuelga; el escalon de V2.1 dejaba un
+    # voladizo de 1.2 en un canto visto.
     c = 1.2
     body = body.cut(Part.makeCylinder(RO + 1, c + 1, V(0, 0, Z_TOP - c))
                     .cut(Part.makeCone(RO, RO - c - 1, c + 1, V(0, 0, Z_TOP - c))))
@@ -496,13 +498,13 @@ def build_cap():
         body = body.cut(Part.makeCylinder(ANT['perno_paso'] / 2, ANT['espesor_tapa'] + 2,
                                           V(r * math.cos(a), r * math.sin(a),
                                             Z_TOP - ANT['espesor_tapa'] - 1)))
-    # Paso libre de los tornillos del hombro: roscan en el hombro.
-    for ang in SHOULDER['tornillos_angulos']:
-        a = math.radians(ang)
-        r = SHOULDER['tornillos_radio']
-        body = body.cut(Part.makeCylinder(ANT['perno_paso'] / 2, ANT['espesor_tapa'] + 2,
-                                          V(r * math.cos(a), r * math.sin(a),
-                                            Z_TOP - ANT['espesor_tapa'] - 1)))
+    # Ranura fina alrededor de la antena: enmarca su base. Impresa boca abajo
+    # es un puente de 0.8 en la primera capa.
+    ring = FINISH.get('anillo_antena')
+    if ring:
+        r_mid = ring['diametro'] / 2
+        body = body.cut(tube_ring(r_mid + ring['ancho'] / 2, r_mid - ring['ancho'] / 2,
+                                  Z_TOP - ring['profundidad'], ring['profundidad'] + 1))
     body = body.cut(Part.makeCylinder(ANT['paso_coaxial'] / 2, Z_TOP - z0 + 2,
                                       V(0, 0, z0 - 1)))
     # Chaflan de entrada al pie del cuello: guia la plataforma al meterla.
@@ -750,6 +752,16 @@ def build_panel(cfg, features, extra=None):
     sweep = cfg['arco_grados'] - 2 * math.degrees(gap / RO)
     z0 = cfg['z_centro'] - cfg['alto'] / 2.0 + gap
     body = sector(RO, RO - cfg['espesor'], z0, cfg['alto'] - 2 * gap, a0, sweep)
+    # Chaflan leve en el canto exterior: la junta con el tubo queda como una
+    # linea en V intencionada y no como una rendija.
+    ch = FINISH.get('chaflan_canto_tapa_panel', 0.0)
+    if ch > 0:
+        outer = [e for e in body.Edges
+                 if all(abs(math.hypot(v.X, v.Y) - RO) < 0.01 for v in e.Vertexes)]
+        try:
+            body = body.makeChamfer(ch, outer)
+        except Exception as error:
+            print(f'AVISO: no se achaflano el canto de la tapa del panel ({error})')
 
     a = math.radians(cfg['angulo'])
     ux, uy = math.cos(a), math.sin(a)
@@ -808,52 +820,13 @@ def build_panel(cfg, features, extra=None):
     return clean(body)
 
 
-# --- Pieza 6: hombro de la antena ------------------------------------------
-def build_shoulder():
-    """Anillo redondeado sobre la tapa que abraza la base de la antena.
-
-    Perfil de cuarto de elipse: sale vertical del cuerpo (r = 39.5) y llega
-    horizontal a la antena, `alto` mm mas arriba. Es pieza aparte porque impresa
-    con la tapa (boca abajo, por su cuello) pediria soportes en la cara vista;
-    sola se imprime de pie, sobre su cara plana, sin soportes. La antena sigue
-    apoyando en la tapa como antes, asi que el SMA no cambia. Tres M2.5 desde
-    dentro de la tapa la sujetan.
-    """
-    s = SHOULDER
-    h, c = s['alto'], s['chaflan_base']
-    rc = ANT['diametro'] / 2 + s['holgura_antena']
-    z0 = Z_TOP
-    ell = Part.Ellipse(V(RO, 0, z0 + c), V(rc, 0, z0 + h), V(rc, 0, z0 + c))
-    arc = Part.ArcOfEllipse(ell, 0.0, math.pi / 2).toShape()
-    edges = [Part.LineSegment(V(rc, 0, z0), V(RO - c, 0, z0)).toShape(),
-             Part.LineSegment(V(RO - c, 0, z0), V(RO, 0, z0 + c)).toShape(),
-             arc,
-             Part.LineSegment(V(rc, 0, z0 + h), V(rc, 0, z0)).toShape()]
-    face = Part.Face(Part.Wire(edges))
-    body = face.revolve(V(), V(0, 0, 1), 360)
-    # Canto del borde que abraza la antena, redondeado.
-    rim = [e for e in body.Edges
-           if hasattr(e.Curve, 'Radius') and abs(e.Curve.Radius - rc) < 0.01
-           and abs(e.BoundBox.ZMax - (z0 + h)) < 0.01]
-    if rim and s.get('redondeo_borde', 0) > 0:
-        try:
-            body = body.makeFillet(s['redondeo_borde'], rim)
-        except Exception as error:
-            print(f'AVISO: no se redondeo el borde del hombro ({error})')
-    for ang in s['tornillos_angulos']:
-        a = math.radians(ang)
-        r = s['tornillos_radio']
-        body = body.cut(Part.makeCylinder(s['piloto'] / 2, s['piloto_profundidad'],
-                                          V(r * math.cos(a), r * math.sin(a), z0 - 0.01)))
-    return clean(body)
-
-
-# --- Piezas 7 y 8: bandas de TPU -------------------------------------------
+# --- Piezas 6 y 7: bandas de TPU -------------------------------------------
 def build_band(z0, z_screws):
     """Banda de proteccion para imprimir en TPU. Diametro interior menor que el
     cuerpo: el TPU se estira y aprieta. Por dentro, una ranura corrida a la
     altura de cada seguro de bayoneta, por si la cabeza del M3 asoma; corrida
-    para que la banda entre en cualquier giro."""
+    para que la banda entre en cualquier giro. Tambien en los tornillos de la
+    tapa del panel que quedan debajo."""
     b = BANDS
     ri = RO - b['apriete_diametral'] / 2
     ro = ri + b['espesor']
@@ -935,9 +908,9 @@ def build_references():
     glass = box(-(u1 - W / 2), -(u0 - W / 2), yf, yf + d['vidrio']['espesor'],
                 zt - v1, zt - v0)
     (u0, u1), (v0, v1) = d['pines']['u'], d['pines']['v']
-    dupont = box(-(u1 - W / 2), -(u0 - W / 2), yf - d['pcb_espesor'] - C['oled']['dupont_detras'],
-                 yf - d['pcb_espesor'], zt - v1, zt - v0 + 0.5)
-    refs.append(('ref_oled', 'Ref: OLED 0.96 in con pines y Dupont', pcb.fuse(glass).fuse(dupont)))
+    wires = box(-(u1 - W / 2), -(u0 - W / 2), yf - d['pcb_espesor'] - C['oled']['cables_detras'],
+                yf - d['pcb_espesor'], zt - v1, zt - v0 + 0.5)
+    refs.append(('ref_oled', 'Ref: OLED 0.96 in con pines y cables soldados', pcb.fuse(glass).fuse(wires)))
 
     b = BTN
     r_sf = b['asiento_exterior_diametro'] / 2
@@ -960,20 +933,34 @@ def build_references():
     pk = C['paquete']
     zp = pk['z_inferior']
     yf = -BACK['plano_frontal']
-    bt, bw, bl = C['bateria']['peor_caso_documentado']
-    battery = box(-bw / 2, bw / 2, yf, yf + bt, zp, zp + bl)
-    refs.append(('ref_battery', 'Ref: bateria 955565, peor caso', battery))
+    yb = yf - BACK['espesor']
+    cell = C['bateria_18650']
+    rc = cell['diametro'] / 2
+    battery = Part.makeCylinder(rc, cell['largo_peor_caso'], V(0, yb - 0.3 - rc, zp))
+    refs.append(('ref_battery', 'Ref: 18650, peor caso, detras del respaldo', battery))
+    # UM980 y Thing Plus lado a lado sobre la cara delantera del respaldo.
     ut, uw, ul = C['carrier_um980']['publicado']
-    y1 = yf + bt
-    refs.append(('ref_um980', 'Ref: carrier UM980',
-                 box(-bw / 2, -bw / 2 + uw, y1, y1 + ut, zp, zp + ul)))
     tt, tw, tl = C['thing_plus']['publicado']
+    x0 = -(uw + 0.4 + tw) / 2
+    refs.append(('ref_um980', 'Ref: carrier UM980',
+                 box(x0, x0 + uw, yf, yf + ut, zp, zp + ul)))
     refs.append(('ref_thing_plus', 'Ref: Thing Plus ESP32-S3',
-                 box(bw / 2 - tw, bw / 2, y1, y1 + tt, zp, zp + tl)))
+                 box(x0 + uw + 0.4, x0 + uw + 0.4 + tw, yf, yf + tt, zp, zp + tl)))
     return refs
 
 
 # --- Ensamble ---------------------------------------------------------------
+def band_screws(z0):
+    """Alturas de los tornillos exteriores cuya cabeza queda bajo una banda que
+    empieza en z0: los dos seguros de bayoneta y los de la tapa del panel."""
+    half = PAN['tornillo_separacion_z'] / 2
+    heads = [(Z_LOCK_BASE, LOCK['cabeza_diametro']), (Z_LOCK_CAP, LOCK['cabeza_diametro']),
+             (PAN['z_centro'] - half, PAN['tornillo_cabeza']),
+             (PAN['z_centro'] + half, PAN['tornillo_cabeza'])]
+    z1 = z0 + BANDS['alto']
+    return [z for z, d in heads if z + d / 2 > z0 and z - d / 2 < z1]
+
+
 doc = App.newDocument('TresVizoV22')
 logo = build_logo()
 parts = [
@@ -985,10 +972,9 @@ parts = [
         ('box', USB['hueco_exterior'][0], USB['hueco_exterior'][1], USB['z']),
         ('pair', LED['diametro'], LED['z'], LED['separacion']),
     ], extra=(display_features, button_features, usb_features))),
-    ('06-antenna-shoulder', 'Hombro de la antena', build_shoulder()),
-    ('07-bumper-bottom', 'Banda de TPU de abajo', build_band(0.0, [Z_LOCK_BASE])),
-    ('08-bumper-top', 'Banda de TPU de arriba',
-     build_band(Z_TOP - BANDS['alto'], [Z_LOCK_CAP])),
+    ('06-bumper-bottom', 'Banda de TPU de abajo', build_band(0.0, band_screws(0.0))),
+    ('07-bumper-top', 'Banda de TPU de arriba',
+     build_band(Z_TOP - BANDS['alto'], band_screws(Z_TOP - BANDS['alto']))),
 ]
 summary = []
 for name, label, shape in parts:
@@ -1030,9 +1016,10 @@ resumen = {
         'pcb_imu_cara_inferior': round(Z_BOARD, 2),
         'unas': [round(Z_NAIL, 3), round(Z_NAIL_TOP, 3)],
         'ventanas_cuello': [round(Z_WIN0, 3), round(Z_WIN1, 3)],
-        'hombro_cima': round(Z_TOP + SHOULDER['alto'], 2),
         'banda_abajo': [0.0, BANDS['alto']],
         'banda_arriba': [round(Z_TOP - BANDS['alto'], 2), round(Z_TOP, 2)],
+        'ranuras_banda_abajo': [round(z, 2) for z in band_screws(0.0)],
+        'ranuras_banda_arriba': [round(z, 2) for z in band_screws(Z_TOP - BANDS['alto'])],
     },
     'arp_sobre_asiento_jalon_mm': round(Z_TOP, 2),
     '_nota_arp': 'Del asiento del jalon (cara inferior de la base) a la cara de la tapa donde apoya la antena.',

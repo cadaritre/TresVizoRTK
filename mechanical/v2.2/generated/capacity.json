@@ -1,67 +1,67 @@
 {
- "radio_collar_mm": 33.5,
- "radio_interior_mm": 37.0,
+ "radio_collar_mm": 26.0,
+ "radio_interior_mm": 29.5,
  "paquete": {
   "ref_battery": {
-   "radio_esquina_mm": 35.1,
+   "radio_esquina_mm": 28.9,
    "choque_con_tubo_mm3": 0.0,
-   "radio_esquina_centrado_mm": 28.2,
+   "radio_esquina_centrado_mm": 13.15,
    "pasa_por_el_collar": true,
    "cabe": true
   },
   "ref_um980": {
-   "radio_esquina_mm": 30.04,
+   "radio_esquina_mm": 28.65,
    "choque_con_tubo_mm3": 0.0,
    "radio_esquina_centrado_mm": 16.92,
    "pasa_por_el_collar": true,
    "cabe": true
   },
   "ref_thing_plus": {
-   "radio_esquina_mm": 30.04,
+   "radio_esquina_mm": 28.65,
    "choque_con_tubo_mm3": 0.0,
    "radio_esquina_centrado_mm": 12.13,
    "pasa_por_el_collar": true,
    "cabe": true
   },
-  "brida_en_la_esquina_de_la_bateria": {
-   "radio_mm": 36.28,
-   "holgura_a_pared_mm": 0.72
+  "18650_en_el_canal": {
+   "holgura_a_pared_mm": 0.6,
+   "holgura_a_costillas_mm": 1.45
   }
  },
  "respaldo": {
-  "ranuras": 32,
+  "ranuras": 24,
   "ranuras_sin_hueco_detras": [],
-  "huecos_costillas": 8,
+  "huecos_costillas": 6,
   "huecos_por_los_que_no_pasa_una_brida": []
  },
  "toalleros": [
   {
    "tipo": "vertical",
-   "angulo": 15.0,
+   "angulo": 30.0,
    "z_mm": 60.0,
    "hueco_para_brida": true,
-   "distancia_al_paquete_mm": 8.95
+   "distancia_al_paquete_mm": 8.27
   },
   {
    "tipo": "vertical",
-   "angulo": 165.0,
+   "angulo": 150.0,
    "z_mm": 60.0,
    "hueco_para_brida": true,
-   "distancia_al_paquete_mm": 5.95
+   "distancia_al_paquete_mm": 5.27
   },
   {
    "tipo": "horizontal",
-   "angulo": 0.0,
-   "z_mm": 99.0,
+   "angulo": 10.0,
+   "z_mm": 92.0,
    "hueco_para_brida": true,
-   "distancia_al_paquete_mm": 10.76
+   "distancia_al_paquete_mm": 9.67
   },
   {
    "tipo": "horizontal",
-   "angulo": 180.0,
-   "z_mm": 99.0,
+   "angulo": 170.0,
+   "z_mm": 92.0,
    "hueco_para_brida": true,
-   "distancia_al_paquete_mm": 10.76
+   "distancia_al_paquete_mm": 16.0
   }
  ],
  "montaje_panel": {
@@ -75,19 +75,19 @@
   "entra": true
  },
  "pantalla": {
-  "piel_sobre_bolsillo_mm": 1.32,
-  "piel_sobre_pilotos_mm": 1.38,
+  "piel_sobre_bolsillo_mm": 1.3,
+  "piel_sobre_pilotos_mm": 1.45,
   "piel_minima_mm": 1.2,
-  "centro_area_activa_z_mm": 79.0,
-  "vidrio_frente_y_mm": 35.7,
-  "fondo_ventana_en_el_centro_mm": 3.8,
-  "distancia_al_paquete_con_dupont_mm": 14.06
+  "centro_area_activa_z_mm": 71.5,
+  "vidrio_frente_y_mm": 27.55,
+  "fondo_ventana_en_el_centro_mm": 4.45,
+  "distancia_al_paquete_con_cables_mm": 11.72
  },
  "boton": {
-  "espesor_panel_en_el_eje_mm": 3.58,
-  "con_junta_mm": 4.58,
+  "espesor_panel_en_el_eje_mm": 3.41,
+  "con_junta_mm": 4.41,
   "panel_maximo_mm": 6.0,
-  "distancia_al_paquete_con_cables_mm": 13.78
+  "distancia_al_paquete_con_cables_mm": 2.11
  },
  "imu": {
   "chip_centro_xy_mm": [
@@ -115,9 +115,9 @@
    18.1
   ],
   "choque_sitio_plataforma_mm3": 0.0,
-  "cima_componentes_z_mm": 123.51,
-  "libre_hasta_la_tapa_mm": 18.4,
-  "pide_sma_acodado_mm": 18.0,
+  "cima_componentes_z_mm": 107.51,
+  "libre_hasta_la_tapa_mm": 17.4,
+  "pide_sma_acodado_mm": 17.0,
   "confianza_posicion_chip": "render del vendedor, plano y dos fotos: +-0.15"
  },
  "plataforma": {
@@ -132,15 +132,15 @@
   "unas": [
    {
     "angulo": 35.0,
-    "solape_con_la_tapa_mm3": 0.273
+    "solape_con_la_tapa_mm3": 0.274
    },
    {
     "angulo": 145.0,
-    "solape_con_la_tapa_mm3": 0.273
+    "solape_con_la_tapa_mm3": 0.274
    },
    {
     "angulo": 320.0,
-    "solape_con_la_tapa_mm3": 0.273
+    "solape_con_la_tapa_mm3": 0.274
    }
   ]
  },
@@ -148,16 +148,16 @@
   "base": {
    "choque_en_su_entrada_mm3": 0.0,
    "choque_girada_120_y_240_mm3": [
-    3.2,
-    3.2
+    2.5,
+    2.5
    ],
    "una_sola_posicion": true
   },
   "tapa": {
    "choque_en_su_entrada_mm3": 0.0,
    "choque_girada_120_y_240_mm3": [
-    3.2,
-    3.2
+    2.5,
+    2.5
    ],
    "una_sola_posicion": true
   }
@@ -167,55 +167,63 @@
    "angulo": 193.0,
    "z_mm": 13.71,
    "choque_del_nucleo_mm3": 0.0,
-   "plastico_para_la_rosca_mm3": 17.6,
+   "plastico_para_la_rosca_mm3": 11.7,
    "alineado": true
   },
   "tapa": {
    "angulo": 193.0,
-   "z_mm": 136.91,
+   "z_mm": 119.91,
    "choque_del_nucleo_mm3": 0.0,
    "plastico_para_la_rosca_mm3": 16.1,
    "alineado": true
   }
  },
  "paredes_mm": {
-  "seguro_base-alojamiento_brida": 7.35,
-  "seguro_base-barril": 16.67,
-  "seguro_base-paso_esparrago": 16.7
+  "seguro_base-alojamiento_brida": 1.85,
+  "seguro_base-barril": 11.27,
+  "seguro_base-paso_esparrago": 11.2
  },
  "tornillos_panel": {
   "largo_mm": 4,
   "distancia_punta_mm": 0.75
  },
  "bandas": {
-  "tapan_la_tapa_del_panel": false,
-  "tapa_del_panel_z_mm": [
-   30.8,
-   117.2
-  ],
-  "seguros": [
-   {
-    "seguro_z_mm": 13.71,
-    "banda_mm": [
-     0.0,
-     28.0
-    ],
-    "en_su_ranura": true
-   },
-   {
-    "seguro_z_mm": 136.91,
-    "banda_mm": [
-     118.91,
-     146.91
-    ],
-    "en_su_ranura": true
-   }
-  ]
- },
- "hombro": {
-  "choque_con_la_antena_mm3": 0.0,
-  "holgura_a_la_antena_mm": 0.5,
-  "cima_z_mm": 153.91
+  "abajo": {
+   "z_mm": [
+    0.0,
+    28.0
+   ],
+   "tornillos_debajo": [
+    {
+     "tornillo": "seguro de la base",
+     "z_mm": 13.71,
+     "en_su_ranura": true
+    },
+    {
+     "tornillo": "tapa del panel, abajo",
+     "z_mm": 29.0,
+     "en_su_ranura": true
+    }
+   ]
+  },
+  "arriba": {
+   "z_mm": [
+    101.91,
+    129.91
+   ],
+   "tornillos_debajo": [
+    {
+     "tornillo": "seguro de la tapa",
+     "z_mm": 119.91,
+     "en_su_ranura": true
+    },
+    {
+     "tornillo": "tapa del panel, arriba",
+     "z_mm": 102.9,
+     "en_su_ranura": true
+    }
+   ]
+  }
  },
  "cabe_todo": true,
  "fallos": []

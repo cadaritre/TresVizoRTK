@@ -8,25 +8,8 @@
   ],
   "paquete": {
     "_que_es": "Disposicion de referencia de lo que se amarra al respaldo. Es una propuesta para comprobar sitio, no una obligacion: el propietario decide el orden al montar.",
-    "z_inferior": 24.0,
-    "_nota_z": "Por encima del collar inferior (llega a 21): en las esquinas traseras el paquete esta a r = 35, fuera del paso del collar."
-  },
-  "bateria": {
-    "descripcion": "LiPo 1S 955565, 3.7 V 5000 mAh",
-    "publicado": [
-      9.5,
-      55.0,
-      65.0
-    ],
-    "peor_caso_documentado": [
-      10.0,
-      55.5,
-      68.0
-    ],
-    "fuente_peor_caso": "hoja Dazheng/Ciel Light del mismo codigo 955565",
-    "confianza": "publicado",
-    "sujecion": "contra el respaldo, bridas por las ranuras",
-    "nota": "Bolsa blanda: apoyarla plana en el respaldo y no apretar las bridas hasta marcarla."
+    "z_inferior": 22.0,
+    "_nota_z": "Por encima del collar inferior (llega a 21): la 18650 llega por detras a r = 28.9, fuera del paso del collar."
   },
   "carrier_um980": {
     "descripcion": "BDLX RTK_UM98_V1.0.1",
@@ -57,8 +40,8 @@
       1.6
     ],
     "confianza": "plano del vendedor (captura del propietario, 02-10-2026)",
-    "dupont_detras": 22.0,
-    "nota": "Pines largos y plastico por el dorso (7.5-8.5 tras el PCB) mas conector Dupont: se reservan 22 mm detras del PCB. Las puntas cortas asoman por el frente casi a ras del vidrio."
+    "nota": "A 64 de diametro no caben los conectores Dupont detras de la pantalla: los cuatro cables se sueldan a los pines (o a los pads, quitando los pines). Se reservan 10 mm detras del PCB para pines y cables.",
+    "cables_detras": 10.0
   },
   "boton": {
     "descripcion": "Push button metalico 12 mm momentaneo, anillo LED azul 12 V",
@@ -85,5 +68,14 @@
   "inserto_jalon": {
     "descripcion": "McMaster 90611A121, 5/8-11 UNC hembra",
     "confianza": "catalogo"
+  },
+  "bateria_18650": {
+    "descripcion": "Celda 18650 1S, 3.7 V, 3000 mAh (hardware/bom.md del 02-10-2026)",
+    "diametro": 18.6,
+    "largo_nominal": 65.0,
+    "largo_peor_caso": 69.0,
+    "confianza": "formato estandar; el largo con PCM de proteccion llega a 69-70",
+    "sujecion": "detras del respaldo, en el canal central, con bridas por las ranuras de +-5",
+    "nota": "Sin portapilas: no cabe uno de 77 mm. La celda va con su funda termoencogible, amarrada con bridas sobre una tira de fieltro o espuma."
   }
 }

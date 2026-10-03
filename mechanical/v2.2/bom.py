@@ -47,7 +47,9 @@ for clave, donde, fondo in (('seguro_base', 'Seguro de la base. Rosca en el maci
                             ('seguro_tapa', 'Seguro de la tapa. Rosca en el refuerzo del cuello.',
                              seg['profundidad_tapa'])):
     util = cabeza - ((RO + 2) - fondo)
-    largos[clave] = comercial_que_cabe(util, sin_rosca + 6)
+    # Al menos 5 mm de rosca en el macizo: a radio 32 el seguro de la base no
+    # puede pasar de un M3x10 sin acercarse a la brida del inserto.
+    largos[clave] = comercial_que_cabe(util, sin_rosca + 5)
     filas.append(('M3 cabeza boton ISO 7380', largos[clave], 1, donde,
                   f'piloto util {util:.1f} mm; rosca {largos[clave] - sin_rosca:.1f} mm'))
 
@@ -78,16 +80,8 @@ filas.append((f'{ant["metrica"]} cilindrica ISO 4762', largo_antena, 3,
               f'tapa {ant["espesor_tapa"]:.0f} + {largo_antena - ant["espesor_tapa"]:.0f} '
               f'de {rosca_antena:.0f} de rosca en la antena'))
 notas.append(
-    'Los tres tornillos de la antena y los tres del hombro van ANTES que la '
-    'plataforma del IMU: sus cabezas quedan dentro del cuello de la tapa.')
-
-# --- Hombro de la antena ---------------------------------------------------
-sh = P['hombro']
-largos['hombro'] = comercial_que_cabe(ant['espesor_tapa'] + sh['piloto_profundidad'],
-                                      ant['espesor_tapa'] + 3)
-filas.append((f'{ant["metrica"]} cilindrica ISO 4762', largos['hombro'], 3,
-              'Hombro de la antena. Sube desde dentro de la tapa y rosca en el hombro.',
-              f'tapa {ant["espesor_tapa"]:.0f} + piloto {sh["piloto_profundidad"]} en el hombro'))
+    'Los tres tornillos de la antena van ANTES que la plataforma del IMU: sus '
+    'cabezas quedan dentro del cuello de la tapa.')
 
 # --- IMU -------------------------------------------------------------------
 imu = P['imu']
@@ -158,9 +152,10 @@ lineas += ['',
            'todos roscan en el plastico o en la antena.', '']
 
 lineas += ['## Lo de dentro', '',
-           'Nada de lo de dentro se atornilla: bateria, carrier UM980, Thing Plus y',
-           'lo demas se amarran con bridas al respaldo del tubo o a los cuatro',
-           'toalleros. Varias de esas placas no tienen patron de agujeros publicado.', '']
+           'Nada de lo de dentro se atornilla: la 18650 va detras del respaldo y el',
+           'carrier UM980 y la Thing Plus delante, amarrados con bridas; lo demas,',
+           'al respaldo o a los cuatro toalleros. Varias de esas placas no tienen',
+           'patron de agujeros publicado.', '']
 
 if notas:
     lineas += ['## Advertencias', '']
@@ -171,12 +166,12 @@ lineas += ['## Consumibles',
            '',
            '| Consumible | Cantidad | Uso |',
            '| --- | ---: | --- |',
-           '| Brida de 2.5 a 3.6 mm, 150-200 mm | 10-15 | Paquete contra el respaldo |',
+           '| Brida de 2.5 a 3.6 mm, 150-200 mm | 10-15 | Placas y 18650 al respaldo |',
            '| Brida de 2.5 mm, 100 mm | 2 | Placa del USB-C a su repisa |',
            '| Brida de 2.5 mm, 100-150 mm | 4-8 | Componentes extra en los toalleros |',
            '| Lamina transparente de 1 mm (acrilico o PETG), 26.7 x 19.3 | 1 | Mica de la pantalla |',
            '| Filamento TPU 95A | ~25 g | Las dos bandas de proteccion |',
-           '| Cinta de espuma o fieltro adhesivo | segun bateria | Entre bateria y respaldo |',
+           '| Cinta de espuma o fieltro adhesivo | 1 tira | Entre la 18650 y el respaldo |',
            '| Llave Allen 2 mm | 1 | M3 cabeza boton y M2.5 cilindrica de la antena |',
            '| Llave Allen 1.5 mm o desarmador Phillips 0 | 1 | M2 de la pantalla y M2.5 avellanado del IMU |',
            '| Llave de 14 mm o pinzas | 1 | Tuerca del boton |',

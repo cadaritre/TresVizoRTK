@@ -1,19 +1,21 @@
 """Comprueba lo que la geometria de V2.2 promete.
 
-1. Paquete: bateria del peor caso, carrier UM980 y Thing Plus contra el
-   respaldo, sin tocar el tubo; la brida que rodea la bateria no llega a la
-   pared, y cada componente pasa por el collar al meterlo centrado.
+1. Paquete: la 18650 del peor caso detras del respaldo, y el carrier UM980 y
+   la Thing Plus delante, sin tocar el tubo; la 18650 deja holgura a la pared
+   y a las costillas, y cada componente pasa por el collar al meterlo
+   centrado.
 2. Respaldo: detras de cada ranura hay hueco para la brida, y por cada hueco
    de las costillas pasa una brida de una celda del canal a la otra.
 3. Toalleros: detras de cada barra hay sitio para una brida y quedan a mas de
    2 mm del paquete.
-4. Montaje del panel: la tapa, con la pantalla y sus Dupont y el boton con su
-   tuerca y cables, entra radialmente por su ventana sin tocar el tubo en los
-   35 mm de recorrido que pide la Dupont.
+4. Montaje del panel: la tapa, con la pantalla y sus cables y el boton con su
+   tuerca y cables, entra radialmente por su ventana sin tocar el tubo en 35 mm
+   de recorrido.
 5. Pantalla: piel minima de la tapa sobre el bolsillo del vidrio y sobre los
    pilotos.
 6. Boton: espesor del panel en su eje, con junta, frente al maximo que admite
-   el boton mas restrictivo, y distancia de su parte trasera al paquete.
+   el boton mas restrictivo; y el boton y la pantalla, con sus cables, a mas de
+   HOLGURA_CABLES del paquete.
 7. IMU: los pilotos estan a 9.0 del eje hacia -X y a 9.5 hacia +X, el lado del
    selector, sobre la recta y = 5.65. Se comprueba con las distancias de las
    fuentes y no con la formula del generador, para que un signo cambiado falle.
@@ -30,9 +32,8 @@
     menos PARED_MIN.
 12. Tornillos del panel: la punta no llega a menos de 0.5 mm del cuello de la
     tapa, de la plataforma ni del paquete.
-13. Bandas de TPU: no tapan la tapa del panel, y la cabeza de cada seguro cae
-    dentro de su ranura.
-14. Hombro: no toca la antena y deja su holgura alrededor.
+13. Bandas de TPU: la cabeza de cada tornillo exterior que queda debajo de una
+    banda cae dentro de una de sus ranuras.
 
 Sale con codigo distinto de cero si algo falla.
 
@@ -56,6 +57,7 @@ BRIDA_ANCHO = 3.6        # mm de la brida mas ancha que se usa
 PIEL_MIN = P['impresion']['pared_minima']   # mm de tapa sobre un bolsillo o un piloto ciego
 FLEXION_MAX = 0.02       # deformacion maxima de la lengueta al entrar
 PASO_TORNILLO = 0.5      # mm minimos de la punta de un tornillo a lo que tenga detras
+HOLGURA_CABLES = 2.0     # mm entre los cables flexibles del boton o la pantalla y una placa
 RECORRIDO_PANEL = 35     # mm que recorre la tapa del panel al meterla; la Dupont pide 29.6
 MARGEN_VENTANA = 0.3     # mm de error en la altura de la ventana que debe absorber la una
 MU_MAX = 0.8             # rozamiento por debajo del cual la una no debe autobloquearse
@@ -75,12 +77,13 @@ tube = OBJ['02_logo_tube']
 cap = OBJ['03_antenna_cap']
 plat = OBJ['04_imu_platform']
 cover = OBJ['05_panel_cover']
-shoulder = OBJ['06_antenna_shoulder']
 
 
-def corner_radius(shape):
-    bb = shape.BoundBox
-    return max(math.hypot(x, y) for x in (bb.XMin, bb.XMax) for y in (bb.YMin, bb.YMax))
+def max_radius(shape):
+    pts = []
+    for e in shape.Edges:
+        pts += e.discretize(Deflection=0.02)
+    return max(math.hypot(p.x, p.y) for p in pts)
 
 
 def common_mm3(a, b):
@@ -102,7 +105,7 @@ res['paquete'] = {}
 for nombre in ('ref_battery', 'ref_um980', 'ref_thing_plus'):
     shape = OBJ[nombre]
     choque = common_mm3(shape, tube)
-    r = corner_radius(shape)
+    r = max_radius(shape)
     bb = shape.BoundBox
     centrado = math.hypot(bb.XLength / 2, bb.YLength / 2)
     ok = choque < 0.01 and r < RI and centrado < R_COLLAR
@@ -113,12 +116,18 @@ for nombre in ('ref_battery', 'ref_um980', 'ref_thing_plus'):
                               'cabe': ok}
     if not ok:
         fallos.append(f'{nombre} no cabe o no pasa por el collar')
-bat = OBJ['ref_battery'].BoundBox
-r_brida = math.hypot(bat.XMax + BRIDA_ESPESOR, -P['respaldo']['plano_frontal'] - 0.5)
-res['paquete']['brida_en_la_esquina_de_la_bateria'] = {
-    'radio_mm': round(r_brida, 2), 'holgura_a_pared_mm': round(RI - r_brida, 2)}
-if RI - r_brida < 0.3:
-    fallos.append('la brida que rodea la bateria toca la pared')
+# La 18650 en el canal: holgura a la pared, por donde pasa la brida que la
+# rodea, y a las costillas.
+bat = OBJ['ref_battery']
+a_pared = RI - max_radius(bat)
+costillas = [Part.makeBox(P['respaldo']['costilla_espesor'], 40, 200,
+                          V(rx - P['respaldo']['costilla_espesor'] / 2, -RI - 5, -50))
+             for rx in P['respaldo']['costillas_x']]
+a_costilla = min(bat.distToShape(c)[0] for c in costillas)
+res['paquete']['18650_en_el_canal'] = {'holgura_a_pared_mm': round(a_pared, 2),
+                                       'holgura_a_costillas_mm': round(a_costilla, 2)}
+if a_pared < 0.3 or a_costilla < 0.5:
+    fallos.append('la 18650 no cabe holgada en el canal del respaldo')
 paquete = OBJ['ref_battery'].fuse(OBJ['ref_um980']).fuse(OBJ['ref_thing_plus'])
 
 # --- 2. Respaldo -------------------------------------------------------------------
@@ -233,11 +242,11 @@ res['boton'] = {'espesor_panel_en_el_eje_mm': round(espesor, 2),
                 'con_junta_mm': round(espesor + bt['junta'], 2),
                 'panel_maximo_mm': bt['panel_maximo'],
                 'distancia_al_paquete_con_cables_mm': round(dist_boton, 2)}
-res['pantalla']['distancia_al_paquete_con_dupont_mm'] = round(dist_oled, 2)
+res['pantalla']['distancia_al_paquete_con_cables_mm'] = round(dist_oled, 2)
 if espesor + bt['junta'] > bt['panel_maximo']:
     fallos.append('el panel es demasiado grueso para la rosca del boton')
-if min(dist_boton, dist_oled) < 3.0:
-    fallos.append('el boton o la pantalla quedan a menos de 3 mm del paquete')
+if min(dist_boton, dist_oled) < HOLGURA_CABLES:
+    fallos.append(f'el boton o la pantalla quedan a menos de {HOLGURA_CABLES} mm del paquete')
 
 # --- 7. IMU ------------------------------------------------------------------------
 imu = P['imu']
@@ -410,31 +419,25 @@ if peor < PASO_TORNILLO:
 
 # --- 13. Bandas de TPU ------------------------------------------------------------------------
 bd = P['bandas']
-bandas = [tuple(H['banda_abajo']), tuple(H['banda_arriba'])]
-cz0, cz1 = cover.BoundBox.ZMin, cover.BoundBox.ZMax
-tapan_panel = any(z0 < cz1 and cz0 < z1 for z0, z1 in bandas)
-cabezas = []
-for z_seg, (z0, z1) in ((H['seguro_base'], bandas[0]), (H['seguro_tapa'], bandas[1])):
-    r_cab = seg['cabeza_diametro'] / 2
-    dentro = (z0 <= z_seg - bd['ranura_alto'] / 2 and z_seg + bd['ranura_alto'] / 2 <= z1
-              and bd['ranura_alto'] / 2 >= r_cab + 0.5)
-    cabezas.append({'seguro_z_mm': z_seg, 'banda_mm': [z0, z1], 'en_su_ranura': dentro})
-    if not dentro:
-        fallos.append(f'la cabeza del seguro de z = {z_seg} no cae en la ranura de su banda')
-res['bandas'] = {'tapan_la_tapa_del_panel': tapan_panel, 'tapa_del_panel_z_mm': [round(cz0, 2), round(cz1, 2)],
-                 'seguros': cabezas}
-if tapan_panel:
-    fallos.append('una banda de TPU tapa la tapa del panel')
-
-# --- 14. Hombro ----------------------------------------------------------------------------
-ant = OBJ['ref_antenna']
-choque_ant = common_mm3(shoulder, ant)
-holgura_ant = shoulder.distToShape(ant)[0]
-res['hombro'] = {'choque_con_la_antena_mm3': round(choque_ant, 3),
-                 'holgura_a_la_antena_mm': round(holgura_ant, 2),
-                 'cima_z_mm': H['hombro_cima']}
-if choque_ant > 0.01 or holgura_ant < 0.2:
-    fallos.append('el hombro toca la antena')
+bandas = {'abajo': (tuple(H['banda_abajo']), H['ranuras_banda_abajo']),
+          'arriba': (tuple(H['banda_arriba']), H['ranuras_banda_arriba'])}
+half = cfg['tornillo_separacion_z'] / 2
+cabezas = [('seguro de la base', H['seguro_base'], seg['cabeza_diametro']),
+           ('seguro de la tapa', H['seguro_tapa'], seg['cabeza_diametro']),
+           ('tapa del panel, abajo', cfg['z_centro'] - half, cfg['tornillo_cabeza']),
+           ('tapa del panel, arriba', cfg['z_centro'] + half, cfg['tornillo_cabeza'])]
+res['bandas'] = {}
+for nombre_b, ((z0, z1), ranuras) in bandas.items():
+    debajo = []
+    for nombre, z, dia in cabezas:
+        if z + dia / 2 <= z0 or z - dia / 2 >= z1:
+            continue
+        en_ranura = any(r - bd['ranura_alto'] / 2 <= z - dia / 2 - 0.5 and
+                        z + dia / 2 + 0.5 <= r + bd['ranura_alto'] / 2 for r in ranuras)
+        debajo.append({'tornillo': nombre, 'z_mm': round(z, 2), 'en_su_ranura': en_ranura})
+        if not en_ranura:
+            fallos.append(f'la cabeza del {nombre} queda bajo la banda de {nombre_b} sin ranura')
+    res['bandas'][nombre_b] = {'z_mm': [z0, z1], 'tornillos_debajo': debajo}
 
 res['cabe_todo'] = not fallos
 res['fallos'] = fallos

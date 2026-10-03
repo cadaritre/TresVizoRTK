@@ -1,8 +1,7 @@
 {
- "seguro_base": 12,
+ "seguro_base": 10,
  "seguro_tapa": 12,
  "panel": 4,
- "hombro": 10,
  "imu": 6,
  "pantalla": 4
 }

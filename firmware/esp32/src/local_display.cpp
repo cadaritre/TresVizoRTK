@@ -1,4 +1,5 @@
 #include "local_display.h"
+#include "boot_logo.h"
 #include "power_manager.h"
 #include "board_profile.h"
 #include "display_status.h"
@@ -16,6 +17,7 @@ constexpr uint32_t kBusHz = 400000;
 Adafruit_SSD1306 display(128,64,&Wire,-1,kBusHz,kBusHz);
 std::atomic<const char*> phase{"not_started"};
 std::atomic<uint8_t> address{0};
+std::atomic<const char*> screen{"none"};
 bool responds(uint8_t candidate) {
     Wire.beginTransmission(candidate);
     return Wire.endTransmission() == 0;
@@ -31,8 +33,12 @@ void worker(void*) {
         return;
     }
     Wire.setTimeOut(20);
+    bool logoShown=false, gaugeSampled=false;
+    uint32_t logoStarted=0, gaugeAt=0;
     for (;;) {
-        power_manager::sampleGauge();
+        if(!gaugeSampled || uint32_t(millis()-gaugeAt)>=1000) {
+            power_manager::sampleGauge();gaugeAt=millis();gaugeSampled=true;
+        }
         if (!address.load()) {
             uint8_t found = responds(0x3c) ? 0x3c : responds(0x3d) ? 0x3d : 0;
             // El ACK detecta la dirección; el controlador SSD1306 procede de
@@ -51,6 +57,20 @@ void worker(void*) {
             address=0;phase="disconnected";
             vTaskDelay(pdMS_TO_TICKS(1000));continue;
         }
+        // Sólo una vez por arranque, desde que la OLED recibió el cuadro.
+        // Esperar en esta tarea deja funcionando UART, USB, BLE y el apagado.
+        if(!logoShown && !power_manager::pending()) {
+            display.clearDisplay();
+            display.drawBitmap(0,0,boot_logo::kBitmap,boot_logo::kWidth,
+                               boot_logo::kHeight,SSD1306_WHITE);
+            display.display();logoStarted=millis();logoShown=true;
+        }
+        if(logoShown && uint32_t(millis()-logoStarted)<boot_logo::kDurationMs
+           && !power_manager::pending()) {
+            screen="logo";
+            vTaskDelay(pdMS_TO_TICKS(50));continue;
+        }
+        screen=power_manager::pending()?"shutdown":"main";
         const auto gnss=gnss_receiver::snapshot();
         const uint64_t nowUs=esp_timer_get_time();
         JsonDocument sd;
@@ -97,6 +117,8 @@ void begin() {
 }
 void status(JsonObject out) {
     out["state"]=phase.load();
+    out["screen"]=address.load()?screen.load():"none";
+    out["boot_logo_ms"]=boot_logo::kDurationMs;
     out["available"]=address.load()!=0;
     out["driver"]="ssd1306";
     out["width"]=128;out["height"]=64;

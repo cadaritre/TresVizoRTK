@@ -2,41 +2,48 @@
  "posicion": "cerrada: dientes de base y tapa contra el fondo de su ranura",
  "giro_cierre_grados": 28.7,
  "tapa_cierra_horario": true,
- "altura_total_mm": 146.91,
- "diametro_exterior_mm": 79.0,
+ "altura_total_mm": 129.91,
+ "diametro_exterior_mm": 64.0,
  "plano_alturas": {
   "piso_interior": 15.91,
-  "techo_interior": 139.91,
-  "largo_util_mm": 124.0,
-  "cara_montaje_antena": 146.91,
-  "borde_superior_tubo": 141.91,
-  "fondo_cuello_tapa": 113.91,
+  "techo_interior": 122.91,
+  "largo_util_mm": 107.0,
+  "cara_montaje_antena": 129.91,
+  "borde_superior_tubo": 124.91,
+  "fondo_cuello_tapa": 99.41,
   "seguro_base": 13.71,
-  "seguro_tapa": 136.91,
+  "seguro_tapa": 119.91,
   "plataforma_disco": [
-   114.41,
-   117.41
+   99.91,
+   102.41
   ],
-  "pcb_imu_cara_inferior": 119.91,
+  "pcb_imu_cara_inferior": 103.91,
   "unas": [
-   127.226,
-   129.406
+   112.226,
+   114.406
   ],
   "ventanas_cuello": [
-   127.726,
-   130.006
+   112.726,
+   115.006
   ],
-  "hombro_cima": 153.91,
   "banda_abajo": [
    0.0,
    28.0
   ],
   "banda_arriba": [
-   118.91,
-   146.91
+   101.91,
+   129.91
+  ],
+  "ranuras_banda_abajo": [
+   13.71,
+   29.0
+  ],
+  "ranuras_banda_arriba": [
+   119.91,
+   102.9
   ]
  },
- "arp_sobre_asiento_jalon_mm": 146.91,
+ "arp_sobre_asiento_jalon_mm": 129.91,
  "_nota_arp": "Del asiento del jalon (cara inferior de la base) a la cara de la tapa donde apoya la antena.",
  "imu": {
   "chip_xy_mm": [
@@ -68,10 +75,10 @@
    "etiqueta": "Base con rosca 5/8",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 60.15,
+   "volumen_cm3": 35.77,
    "caja": [
-    79.0,
-    79.0,
+    64.0,
+    64.0,
     15.91
    ],
    "z": [
@@ -84,15 +91,15 @@
    "etiqueta": "Tubo con logo y respaldo de amarre",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 110.12,
+   "volumen_cm3": 79.92,
    "caja": [
-    79.0,
-    79.0,
-    133.91
+    64.0,
+    64.0,
+    116.91
    ],
    "z": [
     8.0,
-    141.91
+    124.91
    ]
   },
   {
@@ -100,15 +107,15 @@
    "etiqueta": "Tapa de antena",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 37.81,
+   "volumen_cm3": 25.21,
    "caja": [
-    79.0,
-    79.0,
-    33.0
+    64.0,
+    64.0,
+    30.5
    ],
    "z": [
-    113.91,
-    146.91
+    99.41,
+    129.91
    ]
   },
   {
@@ -116,15 +123,15 @@
    "etiqueta": "Plataforma del IMU",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 12.8,
+   "volumen_cm3": 7.23,
    "caja": [
-    60.9,
-    55.39,
-    27.5
+    45.9,
+    41.75,
+    25.0
    ],
    "z": [
-    114.41,
-    141.91
+    99.91,
+    124.91
    ]
   },
   {
@@ -132,65 +139,49 @@
    "etiqueta": "Tapa del panel principal",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 10.13,
+   "volumen_cm3": 8.98,
    "caja": [
-    45.95,
-    10.5,
-    86.4
+    42.53,
+    10.24,
+    82.3
    ],
    "z": [
-    30.8,
-    117.2
+    24.8,
+    107.1
    ]
   },
   {
-   "pieza": "06-antenna-shoulder",
-   "etiqueta": "Hombro de la antena",
-   "solidos": 1,
-   "valido": true,
-   "volumen_cm3": 18.01,
-   "caja": [
-    79.0,
-    79.0,
-    7.0
-   ],
-   "z": [
-    146.91,
-    153.9
-   ]
-  },
-  {
-   "pieza": "07-bumper-bottom",
+   "pieza": "06-bumper-bottom",
    "etiqueta": "Banda de TPU de abajo",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 11.63,
+   "volumen_cm3": 8.74,
    "caja": [
-    82.4,
-    82.4,
-    28.0
+    67.4,
+    67.4,
+    27.98
    ],
    "z": [
     0.0,
-    28.0
+    27.98
    ]
   },
   {
-   "pieza": "08-bumper-top",
+   "pieza": "07-bumper-top",
    "etiqueta": "Banda de TPU de arriba",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 11.63,
+   "volumen_cm3": 8.25,
    "caja": [
-    82.4,
-    82.4,
-    28.0
+    67.4,
+    67.4,
+    27.98
    ],
    "z": [
-    118.91,
-    146.91
+    101.93,
+    129.91
    ]
   }
  ],
- "volumen_total_cm3": 272.28
+ "volumen_total_cm3": 174.1
 }

@@ -1,28 +1,29 @@
 {
  "units": "mm",
  "criterio": [
-  "V2.2 = V2.1 con 10 mm mas de diametro (79), panel frontal con pantalla OLED de",
-  "0.96 in y boton metalico de 12 mm, SIN trineo y SIN panel auxiliar, con el IMU",
-  "en una plataforma que se incrusta en el cuello de la tapa, un hombro redondeado",
-  "que abraza la antena y dos bandas de TPU arriba y abajo.",
+  "V2.2 = carcasa de 64 mm de diametro y 130 de alto, con panel frontal de pantalla",
+  "OLED de 0.96 in, boton metalico de 12 mm, USB-C y dos LEDs; sin trineo y sin",
+  "panel auxiliar; IMU en una plataforma que se incrusta en el cuello de la tapa;",
+  "tapa plana; dos bandas de TPU arriba y abajo. Bateria 18650.",
   "El interior no lleva alojamientos con forma de componente: todo se amarra con",
-  "bridas al respaldo ranurado de la cara trasera o a cuatro toalleros de amarre.",
+  "bridas al respaldo ranurado o a cuatro toalleros. La 18650 va detras del",
+  "respaldo; el UM980 y la Thing Plus, delante.",
   "Tienen posicion definida la antena, la rosca 5/8, el IMU (su CHIP en el eje),",
   "la pantalla, el boton y el USB-C del panel."
  ],
  "tubo": {
-  "diametro_exterior": 79.0,
+  "diametro_exterior": 64.0,
   "pared": 2.5,
-  "_nota_diametro": "V2.2: 69 -> 79 mm por peticion del propietario (1 cm mas ancho). El paso libre del collar de bayoneta queda en radio 33.5.",
+  "_nota_diametro": "64 mm, el maximo que fijo el propietario (sin contar las bandas de TPU, que suman 3.4). V2.1 tenia 69 porque la bateria 955565 de 55 mm de ancho tenia que pasar por la bayoneta; con la 18650 (diametro 18.6) sobra. Paso libre de la bayoneta: radio 26.",
   "chaflan_inferior": 2.0,
   "ranuras_decorativas_z": [
    18.0,
    20.5,
    23.0,
-   126.0,
-   128.5,
-   131.0,
-   133.5
+   109.0,
+   111.5,
+   114.0,
+   116.5
   ],
   "ranura_decorativa_ancho": 1.4,
   "ranura_decorativa_profundidad": 0.5,
@@ -46,58 +47,58 @@
    ],
    "z": [
     31.0,
-    116.0
+    99.0
    ],
    "ancho": 1.3,
    "profundidad": 0.5,
-   "_nota": "Entre las dos bandas de TPU, en los sectores libres entre el panel principal (54-126, su engrosamiento llega a 131), el seguro (193) y el logo."
+   "_nota": "Entre las dos bandas de TPU, en los sectores libres entre el panel principal (47-133, su engrosamiento llega a 140), el seguro (193) y el logo."
   },
   "chaflan_voladizos": true,
   "_nota_chaflan": "Chaflan a 45 grados en la cara inferior de los salientes interiores: collar superior de bayoneta y engrosamiento de los paneles. Imprimiendo el tubo de pie esas caras cuelgan."
  },
  "cuerpo": {
-  "largo_util": 124.0,
-  "_nota": "Del piso de la base al techo interior. V2.1: 114. La primera V2.2 llevaba 134 (los 20 mm pedidos); el propietario la vio alta y se acorta 10 mm. El hombro redondeado y las bandas hacen que se vea mas compacto."
+  "largo_util": 107.0,
+  "_nota": "Del piso de la base al techo interior. Altura total 129.9: el propietario fijo 64 de diametro y pidio conservar el USB-C y los LEDs en el panel, que con la pantalla y el boton piden unos 130."
  },
  "respaldo": {
   "_que_es": "Placa ranurada vertical en la cara trasera del tubo (-Y), unida a la pared por dos costillas. Todo lo de dentro se amarra a ella con bridas. Sustituye al trineo: deja libre el frente, donde van el boton, la pantalla y su cableado.",
-  "plano_frontal": 21.5,
-  "_nota_plano": "Cara de apoyo en y = -21.5. Con la bateria del peor caso (55.5 de ancho) apoyada ahi, su esquina trasera queda en r = 35.1 y la brida que la rodea en r = 36.3: 0.7 mm hasta la pared. A y = -23 la brida tocaba la pared.",
+  "plano_frontal": 7.5,
+  "_nota_plano": "Cara de apoyo en y = -7.5, casi en el centro: delante van el UM980 y la Thing Plus lado a lado (55 de ancho, 11 de grueso); detras, en el canal, la 18650. El frente queda libre para el boton, la pantalla y sus cables.",
   "espesor": 2.5,
-  "ancho": 50.0,
-  "_nota_ancho": "Extremos libres en x = +-25, a 3.3 mm de la pared: la bateria (55.5) solo sobresale 2.75 por lado y una brida pasa por detras del extremo.",
+  "ancho": 49.0,
+  "_nota_ancho": "Extremos libres en x = +-24.5, a 3.2 mm de la pared: una brida pasa por detras del extremo.",
   "costillas_x": [
-   -11.5,
-   11.5
+   -12.0,
+   12.0
   ],
   "costilla_espesor": 2.5,
   "arranque_sobre_piso": 1.0,
   "margen_cuello": 2.0,
   "_nota_alturas": "Empieza 1 mm sobre el piso de la base y termina 2 mm bajo el cuello de la tapa, que baja hasta r = 33.15 y lleva dentro la plataforma del IMU.",
-  "piso_canal": 3.0,
-  "_nota_voladizos": "La placa, las costillas y el piso del canal arrancan con una rampa a 45 grados desde el collar inferior: se imprimen de pie sin soportes. El canal trasero queda cerrado abajo y abierto arriba, por donde bajan el coaxial y los cables del IMU.",
+  "piso_canal": 0.0,
+  "_nota_voladizos": "La placa y las costillas arrancan con una rampa a 45 grados desde el collar inferior. El canal queda abierto abajo y arriba, sin piso: ahi va la 18650, que arranca a z = 21.5, y por arriba bajan el coaxial y los cables del IMU. El canto inferior de la placa es un puente de unos 22 mm entre las costillas.",
   "ranura": 4.5,
   "_nota_ranura": "Cuadradas de 4.5: admiten bridas de 2.5 y de 3.6 mm en horizontal o en vertical.",
   "columnas_x": [
-   -17.0,
-   -6.0,
-   6.0,
-   17.0
+   -18.5,
+   -5.0,
+   5.0,
+   18.5
   ],
-  "_nota_columnas": "+-6 dentro del canal central: una brida entra por una y sale por la otra. +-17 entre costilla y extremo libre. Cualquier par de la misma columna en filas vecinas sirve para amarrar a lo largo.",
+  "_nota_columnas": "+-5 dentro del canal central, donde va la 18650: una brida entra por una, rodea la bateria por detras de la placa y sale por la otra. +-18.5 entre costilla y extremo libre.",
   "filas_inicio": 33.0,
   "filas_paso": 10.0,
   "huecos_costillas": {
-   "ancho": 7.0,
-   "alto": 14.0,
+   "ancho": 10.0,
+   "alto": 16.0,
    "z": [
-    42.0,
-    62.0,
-    82.0,
-    102.0
+    40.0,
+    60.0,
+    80.0
    ]
   },
-  "_nota_huecos": "Huecos hexagonales de 7 x 14 en cada costilla: por ahi pasan bridas y cables de una celda del canal a otra. Las puntas a 45 grados se imprimen sin puente."
+  "_nota_huecos": "Huecos hexagonales de 10 x 16 en cada costilla: por ahi pasan bridas y cables de una celda del canal a otra. Las puntas a 45 grados se imprimen sin puente.",
+  "_nota_costillas": "A +-12: entre ellas cabe la 18650 (diametro 18.6) con 1.4 mm por lado."
  },
  "imu": {
   "_que_es": "Breakout azul BMI088V1.0 (AliExpress 1005009596235318). Plano del vendedor en referencias/BMI088-V1-dimensions.webp.",
@@ -131,16 +132,17 @@
   "cabeza_sobre_placa": 1.0,
   "_nota_tornillo": "Avellanado a proposito: el cono de la cabeza asienta en el canto del agujero de 3.0 y centra la placa sobre el tornillo. Con cabeza cilindrica quedarian 0.25 mm de juego por lado. La cabeza queda 1.0 mm sobre la placa.",
   "piloto": 2.1,
-  "piloto_profundidad": 5.0,
+  "piloto_profundidad": 4.0,
   "_nota_orientacion": "Cara de componentes arriba, agujeros al frente (+Y), pines atras (-Y), selector a +X. Asi los ejes serigrafiados de la placa (+X hacia el selector, +Y hacia los agujeros, +Z fuera de la cara de componentes) coinciden con los del equipo.",
-  "selector_lado": "+X"
+  "selector_lado": "+X",
+  "_nota_piloto": "Pasante: separador de 1.5 mas disco de 2.5. Un M2.5x6 avellanado muerde 3.4 mm y no asoma por debajo."
  },
  "plataforma_imu": {
   "_que_es": "Cuarta pieza. Disco con falda que se incrusta en el cuello de la tapa de antena con tres unas. Sustituye a la repisa del trineo.",
   "holgura_radial": 0.2,
-  "espesor_disco": 3.0,
-  "altura_total": 27.5,
-  "_nota_altura": "Del fondo del disco al tope de la falda, que asienta contra la cara inferior de la tapa. Deja 18.4 mm entre los componentes del IMU y la tapa, para el SMA acodado del coaxial.",
+  "espesor_disco": 2.5,
+  "altura_total": 25.0,
+  "_nota_altura": "Del fondo del disco al tope de la falda, que asienta contra la cara inferior de la tapa. Deja 17.4 mm entre los componentes del IMU y la tapa para el SMA acodado (15 mas margen). Separadores de 1.5: el dorso de la placa no lleva componentes.",
   "falda_espesor": 1.6,
   "unas": {
    "angulos": [
@@ -176,7 +178,7 @@
    "radio_interior": 15.0,
    "_nota": "Atras, encima del canal central del respaldo. 70 grados y desde r = 15 (antes 40 y r = 21): el coaxial con su conector pasa holgado."
   },
-  "separadores_alto": 2.5,
+  "separadores_alto": 1.5,
   "separadores_diametro": 6.0,
   "apoyos_traseros": true,
   "cruz": {
@@ -184,7 +186,7 @@
    "profundidad": 0.4
   },
   "sma_alto": 15.0,
-  "sma_libre_minimo": 18.0,
+  "sma_libre_minimo": 17.0,
   "apoyos_desde_linea_agujeros": 10.0,
   "_nota_apoyos": "Dos apoyos de 2.5 x 2.5 bajo la placa, a 10.3 de la recta de agujeros: entre el chip y la hilera de pines, bajo cada agujero. El dorso de la placa no lleva componentes.",
   "ranura_pines": {
@@ -237,8 +239,8 @@
   "collar_espesor": 3.5,
   "collar_altura": 13.0,
   "chaflan_entrada_cuello": 1.5,
-  "cuello_extra": 15.0,
-  "_nota_cuello_extra": "El cuello de la tapa baja 15 mm por debajo del collar del tubo. En V2.1 era para rodear la repisa del trineo; en V2.2 aloja la plataforma del IMU.",
+  "cuello_extra": 12.5,
+  "_nota_cuello_extra": "El cuello de la tapa baja 12.5 mm por debajo del collar del tubo y aloja la plataforma del IMU, de 25 mm.",
   "tapa_cierra_horario": true,
   "_nota_cierre": "El modelo se dibuja CERRADO. El giro real de cierre es 28.7 grados. Base y tapa cierran las dos girando la pieza de arriba en sentido horario visto desde arriba.",
   "diente_indice_grados": 28.0,
@@ -251,28 +253,28 @@
   "cabeza_diametro": 6.0,
   "cabeza_profundidad": 1.8,
   "angulo": 193.0,
-  "_nota_angulo": "Sector libre: las ranuras de bayoneta barren 347-40, 107-160 y 227-280 abajo y 320-13, 80-133 y 200-253 arriba; el panel principal ocupa 54-126.",
-  "profundidad_base": 17.0,
+  "_nota_angulo": "Sector libre: las ranuras de bayoneta barren 344-43, 107-160 y 227-280 abajo y 317-16, 80-133 y 200-253 arriba; el panel principal ocupa 47-133.",
+  "profundidad_base": 14.3,
   "profundidad_tapa": 16.3,
   "altura_sobre_brida": 1.8,
   "boss_largo": 7.5,
-  "_nota_profundidad": "Medidas desde 2 mm fuera de la pared. Al crecer el radio todo se desplaza 5 mm y las relaciones de V2.1 se conservan: M3x12 con 7.4 mm de rosca en la base y en la tapa."
+  "_nota_profundidad": "Medidas desde 2 mm fuera de la pared. En la base, 14.3: a radio 32 el piloto de 17 llegaba sobre el alojamiento de la brida del inserto y dejaba 0.2 mm de pared; con 14.3 entra un M3x10 con 5.4 mm de rosca y quedan 1.8 mm. En la tapa, 16.3 y M3x12 como en V2.1."
  },
  "panel": {
   "_que_es": "Panel frontal (+Y): pantalla OLED, boton de 12 mm, USB-C y dos LEDs. Ventana pasante en el tubo, pared engrosada por dentro y tapa a ras con todo montado en ella.",
   "angulo": 90.0,
-  "arco_grados": 72.0,
-  "z_centro": 74.0,
-  "alto": 87.0,
-  "_nota_tamano": "72 grados x 87 mm, entre las dos bandas de TPU. La ventana del tubo deja pasar el PCB de la pantalla (27.5 +-0.5) con 3 mm por lado.",
+  "arco_grados": 86.0,
+  "z_centro": 65.95,
+  "alto": 82.9,
+  "_nota_tamano": "86 grados x 82.9 mm a radio 32. La ventana del tubo deja pasar el marco de la pantalla (29.5 de ancho). Los rebordes de arriba y abajo quedan en parte bajo las bandas de TPU, que llevan ranura en sus tornillos.",
   "espesor": 2.5,
   "holgura": 0.3,
-  "tornillo_separacion_z": 78.0,
+  "tornillo_separacion_z": 73.9,
   "tornillo_paso_libre": 3.3,
   "tornillo_piloto": 2.5,
   "tornillo_cabeza": 6.0,
   "cabeza_profundidad": 1.6,
-  "_nota_tornillos": "En el centro de cada reborde, a z = 35 y 113. El de arriba queda 0.9 mm bajo el cuello de la tapa: su punta no puede pasar del engrosamiento, de ahi el M3x4.",
+  "_nota_tornillos": "En el centro de cada reborde, a z = 29.0 y 102.9. El de arriba queda bajo el cuello de la tapa: su punta no puede pasar del engrosamiento, de ahi el M3x4.",
   "engrosamiento": 3.3,
   "postes": false,
   "reborde_arco": 3.5,
@@ -347,9 +349,9 @@
     "relieve": 1.0
    },
    "_nota_relieves": "Hueco para las soldaduras de los 4 pines por la cara del vidrio y para la cinta flexible, que baja por la muesca del borde inferior.",
-   "z_borde_superior": 90.8,
-   "plano_apoyo_y": 33.0,
-   "_nota_plano": "La cara del PCB del lado del vidrio apoya en el plano y = 33.0 del marco. Asi queda 1.3 mm de tapa sobre el bolsillo del vidrio y sobre los pilotos; en 33.5 eran 0.85.",
+   "z_borde_superior": 83.3,
+   "plano_apoyo_y": 24.85,
+   "_nota_plano": "La cara del PCB del lado del vidrio apoya en el plano y = 24.85 del marco: a radio 32 la tapa curva pide meter la pantalla para dejar 1.3 mm de piel sobre el bolsillo.",
    "holgura_vidrio": 0.2,
    "mica_espesor": 1.0,
    "_nota_mica": "Lamina transparente de 1 mm (acrilico o PETG) recortada a 26.7 x 19.3, delante del vidrio y en el mismo bolsillo de 27.1 x 19.7. Sella la ventana. Sin mica la pantalla queda 1 mm mas atras y funciona igual.",
@@ -360,7 +362,7 @@
    "piloto": 1.6,
    "piloto_profundidad": 3.0,
    "_nota_tornillo": "Los agujeros de la pantalla son de 2.0 segun el plano: el M2 entra justo. Si no pasa, repasar el agujero con broca de 2.2 o usar M1.6.",
-   "marco_margen": 1.0,
+   "marco_margen": 0.5,
    "_nota_piloto": "3.0 de piloto desde el plano de apoyo: deja 0.9 mm de piel hasta la cara exterior curva. Un M2x4 muerde 2.4 mm.",
    "area_visible": {
     "u": [
@@ -384,7 +386,7 @@
   "boton": {
    "_que_es": "Push button metalico de 12 mm, momentaneo, anillo LED azul de 12 V (Mercado Libre MLM-1715951825, compra del 24-09-2026).",
    "_plano_vendedor": "Cabeza 13.9, ceja 1.5, rosca M12x0.75, 21.8 total, 19.5 detras de la cara de apoyo, terminales 3.7.",
-   "z": 50.5,
+   "z": 43.5,
    "barreno": 12.3,
    "cabeza_diametro": 13.9,
    "asiento_exterior_diametro": 15.0,
@@ -394,16 +396,16 @@
    "tuerca_entre_caras": 14.0,
    "tuerca_espesor": 2.7,
    "_nota_tuerca": "El plano del vendedor no la acota. Planos de fabricante (Daier, ONPOW) y de vendedor: 13.5-14 entre caras, 15.6-16.2 entre vertices, 2.0-2.7 de espesor. El asiento interior es plano en 24 mm.",
-   "boss_diametro": 20.0,
-   "asiento_tuerca_y": 35.2,
-   "_nota_asientos": "Por fuera, rebaje plano de 15 para la ceja; por dentro, asiento plano de 20 para la tuerca (14 entre caras, 16.2 entre vertices). Panel de 3.6 mm en el eje del boton, 4.6 con la junta.",
+   "boss_diametro": 18.0,
+   "asiento_tuerca_y": 27.7,
+   "_nota_asientos": "Por fuera, rebaje plano de 15 para la ceja; por dentro, asiento plano de 18 para la tuerca (14 entre caras, 16.2 entre vertices). Panel de 3.4 mm en el eje del boton, 4.4 con la junta.",
    "panel_maximo": 6.0,
    "junta": 1.0,
    "_nota_panel_maximo": "El fabricante mas restrictivo (ONPOW GQ12) admite panel de hasta 6 mm. Con 4.0 de tapa y una junta de 1.0 bajo la ceja quedan 5.0.",
    "variante": "momentaneo, anillo LED azul (captura del propietario)"
   },
   "usb_c": {
-   "z": 106.2,
+   "z": 96.0,
    "ancho": 9.6,
    "alto": 4.0,
    "_nota": "El receptaculo tiene que quedar casi a ras: con la placa apoyada en la cara interior curva quedaba 2 a 3.6 mm hundido y el plastico de la clavija no entraba por el hueco de 9.6 x 4. Ahora el hueco exterior es del tamano del sobremolde de un cable comun (12.5 x 7) y por dentro hay un asiento plano en y = 37.6 para el canto de la placa: el receptaculo queda 0.4 a 1.4 mm bajo la cara exterior, segun cuanto sobresalga de su placa. Detras, repisa con dos costillas; una brida rodea placa y repisa.",
@@ -413,21 +415,21 @@
    "placa_ancho": 18.0,
    "placa_espesor": 1.6,
    "holgura_lateral": 0.3,
-   "repisa_fondo_y": 29.0,
+   "repisa_fondo_y": 23.5,
    "repisa_espesor": 2.0,
    "costilla_espesor": 2.0,
-   "costilla_bajada": 10.0,
+   "costilla_bajada": 8.0,
    "hueco_exterior": [
     12.5,
     7.0
    ],
-   "apoyo_placa_y": 37.6
+   "apoyo_placa_y": 29.4
   },
   "leds": {
    "diametro": 3.2,
-   "z": 106.2,
-   "separacion": 29.0,
-   "_nota": "Uno a cada lado del USB-C: los indicadores de carga junto al puerto."
+   "z": 96.0,
+   "separacion": 27.0,
+   "_nota": "Uno a cada lado del USB-C, a +-13.5: los indicadores de carga junto al puerto."
   }
  },
  "accesorios": {
@@ -448,14 +450,14 @@
   "_nota_activo": "Desactivados: flanqueaban el panel auxiliar, que se quito, y el de 324 grados a z = 51.5 apuntaba a la esquina trasera de la bateria (un M4 que asomara 1.9 mm ya la tocaba). Con activo = true vuelven, pero hay que subirlos por encima del paquete."
  },
  "logo": {
-  "ancho_mm": 40.0,
-  "ancho_max_mm": 40.0,
-  "_nota_max": "Tope de ancho: el logo es una proyeccion plana y a mas de +-30 grados se estira. 40 mm a radio 39.5 es la misma proporcion que 35.5 a radio 34.5 en V2.1.",
+  "ancho_mm": 32.0,
+  "ancho_max_mm": 32.0,
+  "_nota_max": "Tope de ancho: el logo es una proyeccion plana y a mas de +-30 grados se estira. 32 mm a radio 32 es la misma proporcion que 35.5 a radio 34.5 en V2.1.",
   "profundidad_grabado": 0.8,
-  "z_centro": 73.5,
+  "z_centro": 65.0,
   "angulo": 276.5,
   "_nota": "GRABADO, no en relieve. Lo coloca layout_check.py en el mayor hueco libre.",
-  "_nota_posicion": "Colocado por layout_check.py en el mayor hueco libre: 242 a 49 grados y 28 a 119 mm, con 3.0 mm de margen por lado.",
+  "_nota_posicion": "Colocado por layout_check.py en el mayor hueco libre: 242 a 40 grados y 28 a 102 mm, con 3.0 mm de margen por lado.",
   "angulo_preferido": 276.5,
   "_nota_preferido": "En la espalda, opuesta al panel, como en V2.1. Sin el panel auxiliar el hueco libre va de 242 a 49 grados y su centro caeria en una esquina trasera."
  },
@@ -473,14 +475,14 @@
   "poste": 4.0,
   "verticales": [
    {
-    "angulo": 15.0,
+    "angulo": 30.0,
     "z": [
      40.0,
      80.0
     ]
    },
    {
-    "angulo": 165.0,
+    "angulo": 150.0,
     "z": [
      40.0,
      80.0
@@ -489,34 +491,17 @@
   ],
   "horizontales": [
    {
-    "angulo": 0.0,
-    "z": 99.0,
-    "largo": 26.0
+    "angulo": 10.0,
+    "z": 92.0,
+    "largo": 14.0
    },
    {
-    "angulo": 180.0,
-    "z": 99.0,
-    "largo": 26.0
+    "angulo": 170.0,
+    "z": 92.0,
+    "largo": 14.0
    }
   ],
-  "_nota": "En las paredes laterales, por delante del paquete: las verticales a 15 y 165 grados y las horizontales a z = 99, encima del paquete: a 95 su escuadra tocaba la esquina de la bateria. Barra de 4 x 4 a 4.5 mm de la pared (las horizontales son rectas: en el centro quedan a 7.2). Postes con escuadra a 45 grados por debajo: se imprimen de pie sin soportes; la barra horizontal es un puente de 18 mm."
- },
- "hombro": {
-  "_que_es": "Sexta pieza. Anillo redondeado que asienta sobre la tapa y abraza la base de la antena: la transicion del cuerpo de 79 a la antena de 43.5 deja de ser un escalon.",
-  "alto": 7.0,
-  "holgura_antena": 0.5,
-  "chaflan_base": 0.6,
-  "redondeo_borde": 0.5,
-  "tornillos_radio": 24.5,
-  "tornillos_angulos": [
-   30.0,
-   150.0,
-   270.0
-  ],
-  "piloto": 2.1,
-  "piloto_profundidad": 5.5,
-  "_nota": "Perfil de cuarto de elipse: sale vertical del cuerpo y llega horizontal a la antena, 7 mm mas arriba. Pieza aparte porque impresa con la tapa (boca abajo) pediria soportes en la cara vista; sola se imprime de pie, sin soportes. La antena sigue apoyando en la tapa, como antes: el SMA no cambia. Se sujeta con tres M2.5 desde dentro de la tapa, entre los de la antena y por dentro de la falda de la plataforma.",
-  "_nota_tornillos": "Tres M2.5x10 desde dentro de la tapa a r = 24.5, entre los de la antena: cabeza entre r 22.3 y 26.8, por dentro de la falda de la plataforma (28.8). En el hombro roscan 5 mm y dejan 1.4 de piel."
+  "_nota": "En las paredes laterales, por delante del respaldo: las verticales a 30 y 150 grados y las horizontales a 10 y 170, encima de las placas. Barra de 4 x 4 a 4.5 mm de la pared. Postes con escuadra a 45 grados por debajo: se imprimen de pie sin soportes; la barra horizontal es un puente."
  },
  "bandas": {
   "_que_es": "Piezas 7 y 8: dos bandas de proteccion de TPU, abajo y arriba.",
@@ -526,6 +511,17 @@
   "redondeo": 1.0,
   "ranura_alto": 8.0,
   "ranura_profundidad": 1.2,
-  "_nota": "Diametro interior 0.6 menor que el cuerpo: el TPU se estira y aprieta. La de abajo cubre la base y el arranque del tubo (z 0-28); la de arriba, el final del tubo y la tapa (hasta la cara de la antena). Por dentro, una ranura corrida de 8 x 1.2 a la altura de cada seguro de bayoneta, por si la cabeza del M3 asoma; corrida para que la banda entre en cualquier giro. El modelo las dibuja con su diametro de impresion: el solape de 0.3 con el cuerpo es el apriete."
+  "_nota": "Diametro interior 0.6 menor que el cuerpo: el TPU se estira y aprieta. La de abajo cubre la base y el arranque del tubo (z 0-28); la de arriba, el final del tubo y la tapa. Por dentro, una ranura corrida de 8 x 1.2 a la altura de cada tornillo que queda debajo (los seguros de bayoneta y los de la tapa del panel), por si su cabeza asoma; corrida para que la banda entre en cualquier giro. El modelo las dibuja con su diametro de impresion: el solape de 0.3 con el cuerpo es el apriete."
+ },
+ "acabados": {
+  "_que_es": "Detalles esteticos leves.",
+  "chaflan_canto_tapa_panel": 0.5,
+  "_nota_canto": "Chaflan de 0.5 en el canto exterior de la tapa del panel: la junta con el tubo queda como una linea en V intencionada.",
+  "anillo_antena": {
+   "diametro": 48.0,
+   "ancho": 0.8,
+   "profundidad": 0.4
+  },
+  "_nota_anillo": "Ranura fina en la cara de la tapa alrededor de la antena: enmarca la base de la antena. Impresa boca abajo es un puente de 0.8 en la primera capa."
  }
 }

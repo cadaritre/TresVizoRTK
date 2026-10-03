@@ -839,3 +839,9 @@ aditivo: una app que solo sabe la versión 2 del protocolo funciona igual.
 - **Sin probar:** RTCM sin respuesta de punta a punta (la Mac tiene la tabla GATT del
   equipo en caché de un firmware viejo: no ve la característica de salud, que existe, ni
   la escritura sin respuesta), fix, NTRIP real, sesión larga y las apps.
+
+## Logo de inicio OLED
+
+Al detectar la OLED se muestra el logo TresVizo monocromo durante 3000 ms y después la pantalla principal. UART, USB, BLE y lectura de batería siguen funcionando; una solicitud de apagado interrumpe el logo. Se presenta una vez por arranque. `subsystems.display.screen` informa `logo`, `main`, `shutdown` o `none`.
+
+El vector está en `assets/tresvizo-logo.svg`; la imagen final es `assets/tresvizo-oled.png` (128×64, 1 bit). `tools/oled_logo.py` desde la raíz regenera contornos SVG y `include/boot_logo.h` a partir del logo original del panel, con Pillow. El bitmap ocupa 1024 bytes en flash y no depende de la memoria interna del dispositivo.
