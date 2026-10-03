@@ -1,0 +1,145 @@
+{
+ "radio_collar_mm": 33.5,
+ "radio_interior_mm": 37.0,
+ "paquete": {
+  "ref_battery": {
+   "radio_esquina_mm": 35.1,
+   "choque_con_tubo_mm3": 0.0,
+   "radio_esquina_centrado_mm": 28.2,
+   "pasa_por_el_collar": true,
+   "cabe": true
+  },
+  "ref_um980": {
+   "radio_esquina_mm": 30.04,
+   "choque_con_tubo_mm3": 0.0,
+   "radio_esquina_centrado_mm": 16.92,
+   "pasa_por_el_collar": true,
+   "cabe": true
+  },
+  "ref_thing_plus": {
+   "radio_esquina_mm": 30.04,
+   "choque_con_tubo_mm3": 0.0,
+   "radio_esquina_centrado_mm": 12.13,
+   "pasa_por_el_collar": true,
+   "cabe": true
+  },
+  "brida_en_la_esquina_de_la_bateria": {
+   "radio_mm": 36.28,
+   "holgura_a_pared_mm": 0.72
+  }
+ },
+ "respaldo": {
+  "ranuras": 36,
+  "ranuras_sin_hueco_detras": []
+ },
+ "montaje_paneles": {
+  "panel": {
+   "con": [
+    "ref_oled",
+    "ref_button"
+   ],
+   "peor_choque_mm3": 0.0,
+   "a_mm_de_su_sitio": 0.0,
+   "entra": true
+  },
+  "panel_aux": {
+   "con": [],
+   "peor_choque_mm3": 0.0,
+   "a_mm_de_su_sitio": 0.0,
+   "entra": true
+  }
+ },
+ "pantalla": {
+  "piel_sobre_bolsillo_mm": 0.85,
+  "piel_sobre_pilotos_mm": 0.9,
+  "centro_area_activa_z_mm": 85.0,
+  "centro_area_activa_x_mm": -0.0,
+  "vidrio_frente_y_mm": 36.2,
+  "fondo_ventana_en_el_centro_mm": 3.3,
+  "distancia_al_paquete_con_dupont_mm": 17.46
+ },
+ "boton": {
+  "espesor_panel_en_el_eje_mm": 3.98,
+  "con_junta_mm": 4.98,
+  "panel_maximo_mm": 6.0,
+  "distancia_al_paquete_con_cables_mm": 13.78
+ },
+ "imu": {
+  "chip_centro_xy_mm": [
+   0.0,
+   -0.0
+  ],
+  "pilotos": [
+   {
+    "xy_mm": [
+     -9.0,
+     5.65
+    ],
+    "piloto_en_su_sitio": true
+   },
+   {
+    "xy_mm": [
+     9.5,
+     5.65
+    ],
+    "piloto_en_su_sitio": true
+   }
+  ],
+  "sitio_placa_mm": [
+   24.900000000000002,
+   18.1
+  ],
+  "choque_sitio_plataforma_mm3": 0.0,
+  "cima_componentes_z_mm": 133.51,
+  "libre_hasta_la_tapa_mm": 18.4,
+  "pide_sma_acodado_mm": 18.0,
+  "confianza_posicion_chip": "render del vendedor, plano y dos fotos: +-0.15"
+ },
+ "plataforma": {
+  "orientaciones_posibles_ademas_de_la_buena": [],
+  "flexion_lengueta": 0.0125,
+  "ventana_z_mm": [
+   137.866,
+   140.006
+  ],
+  "una_z_mm": [
+   137.607,
+   139.406
+  ],
+  "una_cabe_en_la_ventana": true,
+  "interferencia_por_precarga_mm3": 0.47
+ },
+ "seguros": {
+  "base": {
+   "angulo": 193.0,
+   "z_mm": 13.71,
+   "choque_del_nucleo_mm3": 0.0,
+   "plastico_para_la_rosca_mm3": 17.6,
+   "alineado": true
+  },
+  "tapa": {
+   "angulo": 193.0,
+   "z_mm": 146.91,
+   "choque_del_nucleo_mm3": 0.0,
+   "plastico_para_la_rosca_mm3": 16.1,
+   "alineado": true
+  }
+ },
+ "paredes_mm": {
+  "seguro_base-alojamiento_brida": 7.35,
+  "seguro_base-barril": 16.67,
+  "seguro_base-paso_esparrago": 16.7
+ },
+ "tornillos_panel": {
+  "panel": {
+   "largo_mm": 4,
+   "distancia_punta_mm": 0.75
+  },
+  "panel_aux": {
+   "largo_mm": 4,
+   "distancia_punta_mm": 6.47
+  }
+ },
+ "cabe_todo": true,
+ "fallos": []
+}

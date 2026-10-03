@@ -1,0 +1,153 @@
+{
+ "posicion": "cerrada: dientes de base y tapa contra el fondo de su ranura",
+ "giro_cierre_grados": 28.7,
+ "tapa_cierra_horario": true,
+ "altura_total_mm": 156.91,
+ "diametro_exterior_mm": 79.0,
+ "plano_alturas": {
+  "piso_interior": 15.91,
+  "techo_interior": 149.91,
+  "largo_util_mm": 134.0,
+  "cara_montaje_antena": 156.91,
+  "borde_superior_tubo": 151.91,
+  "fondo_cuello_tapa": 123.91,
+  "seguro_base": 13.71,
+  "seguro_tapa": 146.91,
+  "plataforma_disco": [
+   124.41,
+   127.41
+  ],
+  "pcb_imu_cara_inferior": 129.91,
+  "unas": [
+   137.607,
+   139.406
+  ],
+  "ventanas_cuello": [
+   137.866,
+   140.006
+  ]
+ },
+ "imu": {
+  "chip_xy_mm": [
+   0.0,
+   0.0
+  ],
+  "agujeros_xy_mm": [
+   [
+    -9.0,
+    5.65
+   ],
+   [
+    9.5,
+    5.65
+   ]
+  ],
+  "placa_x_mm": [
+   -11.5,
+   12.0
+  ],
+  "placa_y_mm": [
+   -9.85,
+   8.15
+  ]
+ },
+ "piezas": [
+  {
+   "pieza": "01-threaded-base",
+   "etiqueta": "Base con rosca 5/8",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 60.13,
+   "caja": [
+    79.0,
+    79.0,
+    15.91
+   ],
+   "z": [
+    0.0,
+    15.91
+   ]
+  },
+  {
+   "pieza": "02-logo-tube",
+   "etiqueta": "Tubo con logo y respaldo de amarre",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 114.34,
+   "caja": [
+    79.0,
+    79.0,
+    143.91
+   ],
+   "z": [
+    8.0,
+    151.91
+   ]
+  },
+  {
+   "pieza": "03-antenna-cap",
+   "etiqueta": "Tapa de antena",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 37.63,
+   "caja": [
+    79.0,
+    79.0,
+    33.0
+   ],
+   "z": [
+    123.91,
+    156.91
+   ]
+  },
+  {
+   "pieza": "04-imu-platform",
+   "etiqueta": "Plataforma del IMU",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 14.22,
+   "caja": [
+    61.0,
+    59.16,
+    27.5
+   ],
+   "z": [
+    124.41,
+    151.91
+   ]
+  },
+  {
+   "pieza": "05-panel-cover",
+   "etiqueta": "Tapa del panel principal",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 11.35,
+   "caja": [
+    45.95,
+    14.5,
+    95.4
+   ],
+   "z": [
+    32.3,
+    127.7
+   ]
+  },
+  {
+   "pieza": "06-aux-panel-cover",
+   "etiqueta": "Tapa del panel auxiliar",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 2.66,
+   "caja": [
+    5.09,
+    29.04,
+    39.4
+   ],
+   "z": [
+    60.3,
+    99.7
+   ]
+  }
+ ],
+ "volumen_total_cm3": 240.33
+}

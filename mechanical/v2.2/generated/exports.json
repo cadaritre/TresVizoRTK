@@ -1,0 +1,68 @@
+{
+ "piezas": [
+  {
+   "pieza": "01-threaded-base",
+   "etiqueta": "Base con rosca 5/8",
+   "triangulos": 2520,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 60.13,
+   "stl": "01-threaded-base.stl"
+  },
+  {
+   "pieza": "02-logo-tube",
+   "etiqueta": "Tubo con logo y respaldo de amarre",
+   "triangulos": 14568,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 114.34,
+   "stl": "02-logo-tube.stl"
+  },
+  {
+   "pieza": "03-antenna-cap",
+   "etiqueta": "Tapa de antena",
+   "triangulos": 3062,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 37.63,
+   "stl": "03-antenna-cap.stl"
+  },
+  {
+   "pieza": "04-imu-platform",
+   "etiqueta": "Plataforma del IMU",
+   "triangulos": 1880,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 14.22,
+   "stl": "04-imu-platform.stl"
+  },
+  {
+   "pieza": "05-panel-cover",
+   "etiqueta": "Tapa del panel principal",
+   "triangulos": 3620,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 11.35,
+   "stl": "05-panel-cover.stl"
+  },
+  {
+   "pieza": "06-aux-panel-cover",
+   "etiqueta": "Tapa del panel auxiliar",
+   "triangulos": 1268,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 2.66,
+   "stl": "06-aux-panel-cover.stl"
+  }
+ ],
+ "todas_cerradas": true,
+ "interferencias": [],
+ "sin_interferencias": true,
+ "deflexion_lineal": 0.05
+}

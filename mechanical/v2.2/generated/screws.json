@@ -1,0 +1,8 @@
+{
+ "seguro_base": 12,
+ "seguro_tapa": 12,
+ "panel": 4,
+ "panel_aux": 4,
+ "imu": 6,
+ "pantalla": 4
+}

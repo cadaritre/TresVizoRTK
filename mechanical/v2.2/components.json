@@ -1,0 +1,89 @@
+{
+  "units": "mm",
+  "criterio": [
+    "Esta tabla NO genera geometria de la carcasa. Dibuja las piezas de",
+    "referencia del modelo (objetos ref_*, que no se exportan) y sirve para",
+    "COMPROBAR que lo que hoy se piensa meter cabe y no choca.",
+    "'confianza' dice de donde sale el dato."
+  ],
+  "paquete": {
+    "_que_es": "Disposicion de referencia de lo que se amarra al respaldo. Es una propuesta para comprobar sitio, no una obligacion: el propietario decide el orden al montar.",
+    "z_inferior": 24.0,
+    "_nota_z": "Por encima del collar inferior (llega a 21): en las esquinas traseras el paquete esta a r = 35, fuera del paso del collar."
+  },
+  "bateria": {
+    "descripcion": "LiPo 1S 955565, 3.7 V 5000 mAh",
+    "publicado": [
+      9.5,
+      55.0,
+      65.0
+    ],
+    "peor_caso_documentado": [
+      10.0,
+      55.5,
+      68.0
+    ],
+    "fuente_peor_caso": "hoja Dazheng/Ciel Light del mismo codigo 955565",
+    "confianza": "publicado",
+    "sujecion": "contra el respaldo, bridas por las ranuras",
+    "nota": "Bolsa blanda: apoyarla plana en el respaldo y no apretar las bridas hasta marcarla."
+  },
+  "carrier_um980": {
+    "descripcion": "BDLX RTK_UM98_V1.0.1",
+    "publicado": [
+      11.0,
+      32.0,
+      52.0
+    ],
+    "confianza": "publicado",
+    "sujecion": "brida, sobre la cara delantera de la bateria",
+    "nota": "Sin plano de agujeros publicado: no se atornilla."
+  },
+  "thing_plus": {
+    "descripcion": "SparkFun Thing Plus ESP32-S3 WRL-24408",
+    "publicado": [
+      8.0,
+      22.9,
+      58.4
+    ],
+    "confianza": "publicado (2.3 x 0.9 in); el espesor incluye USB-C y socket microSD",
+    "sujecion": "brida, junto al UM980"
+  },
+  "oled": {
+    "descripcion": "OLED 0.96 in 128x64 I2C SSD1306, 4 pines (ANPOMNHBUK)",
+    "pcb": [
+      27.5,
+      27.8,
+      1.6
+    ],
+    "confianza": "plano del vendedor (captura del propietario, 02-10-2026)",
+    "dupont_detras": 22.0,
+    "nota": "Pines largos y plastico por el dorso (7.5-8.5 tras el PCB) mas conector Dupont: se reservan 22 mm detras del PCB. Las puntas cortas asoman por el frente casi a ras del vidrio."
+  },
+  "boton": {
+    "descripcion": "Push button metalico 12 mm momentaneo, anillo LED azul 12 V",
+    "confianza": "plano del vendedor (captura del propietario, 02-10-2026)",
+    "cables_detras": 6.0,
+    "nota": "El LED es de 12 V. A 3.3-5 V enciende poco o nada: hay que alimentarlo aparte o cambiar su resistencia."
+  },
+  "bmi088": {
+    "descripcion": "Breakout BMI088 V1.0 azul",
+    "confianza": "render del vendedor, plano y dos fotos (02-10-2026)",
+    "nota": "Ver parameters.json, imu. Contorno real 23.1 x 17.4-17.7 segun render y fotos; el plano dice 23.5 x 18."
+  },
+  "antena": {
+    "descripcion": "Helix externa HA-901A",
+    "publicado": {
+      "diametro": 43.5,
+      "altura": 40.8,
+      "tornillos": 3,
+      "metrica": "M2.5",
+      "circulo_pernos": 26.6
+    },
+    "confianza": "etiqueta"
+  },
+  "inserto_jalon": {
+    "descripcion": "McMaster 90611A121, 5/8-11 UNC hembra",
+    "confianza": "catalogo"
+  }
+}
