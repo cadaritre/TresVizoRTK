@@ -99,6 +99,13 @@ Proyecto de PlatformIO aparte (ESP32-S3, Arduino, RadioLib). Pines de la E22 en
 `platformio.ini`, **por confirmar con el cableado real**. Se carga por USB con el mismo
 cargador (`tools/flasher/`). Estado en un LED.
 
+## Estado (02-10-2026)
+
+- **Hecho y compilando**: el firmware del radio (`firmware/radio/`) y su integración en el
+  MeridianV (`src/radio_module.cpp`, fuente `radio` en el router, `/api/radio`,
+  `subsystems.radio`, el RTCM de la base hacia el radio). Pruebas de host del aire y del enlace.
+- **Sin probar con hardware**: no hay radios todavía.
+
 ## Lo que falta
 
 - Probarlo con dos radios en campo: alcance, pérdidas, latencia de la corrección.
