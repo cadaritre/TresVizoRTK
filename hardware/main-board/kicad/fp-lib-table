@@ -1,0 +1,5 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "tresvizo")(type "KiCad")(uri "${KIPRJMOD}/lib/tresvizo.pretty")(options "")(descr "Huellas propias"))
+  (lib (name "tresvizo_lcsc")(type "KiCad")(uri "${KIPRJMOD}/lib/lcsc.pretty")(options "")(descr "Huellas de LCSC/EasyEDA (orientación de JLCPCB)"))
+)

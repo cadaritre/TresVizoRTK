@@ -1,0 +1,224 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "9a83bcba-5afe-57b6-aafc-7b297421890f")
+	(paper "A4")
+	(title_block
+		(title "TresVizo MeridianV — placa principal")
+		(date "2026-10-04")
+		(rev "0.1")
+		(company "TresVizo")
+		(comment 1 "Exploratorio: no fabricado ni probado")
+		(comment 2 "UM980 + ESP32-S3-MINI-1-N4R2 + BMI088 + BQ25798 (1S; 2S por variante)")
+		(comment 3 "JLCPCB 4 capas JLC04161H-7628, 50 x 76 mm")
+	)
+	(lib_symbols)
+	(sheet
+		(at 30.48 50.8)
+		(size 101.6 38.1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "e680a61f-2584-5531-b79e-1aca3f5bfe2f")
+		(property "Sheetname" "Alimentación, carga y batería"
+			(at 30.48 50.1 0)
+			(effects
+				(font
+					(size 1.8 1.8)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "power.kicad_sch"
+			(at 30.48 89.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "tresvizo-main"
+				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 157.48 50.8)
+		(size 101.6 38.1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "e9e785da-599d-5483-8195-25e4e46f5dcf")
+		(property "Sheetname" "ESP32-S3"
+			(at 157.48 50.1 0)
+			(effects
+				(font
+					(size 1.8 1.8)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "mcu.kicad_sch"
+			(at 157.48 89.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "tresvizo-main"
+				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f"
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 30.48 114.3)
+		(size 101.6 38.1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "d66974e5-67a3-580f-8405-709d7dedbada")
+		(property "Sheetname" "GNSS UM980 y antena"
+			(at 30.48 113.6 0)
+			(effects
+				(font
+					(size 1.8 1.8)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "gnss.kicad_sch"
+			(at 30.48 153 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "tresvizo-main"
+				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 157.48 114.3)
+		(size 101.6 38.1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "befe428c-d30b-5a76-ab51-0453c74e9d6b")
+		(property "Sheetname" "microSD, IMU y panel"
+			(at 157.48 113.6 0)
+			(effects
+				(font
+					(size 1.8 1.8)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "io.kicad_sch"
+			(at 157.48 153 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "tresvizo-main"
+				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f"
+					(page "5")
+				)
+			)
+		)
+	)
+	(text "Placa principal exploratoria de TresVizo MeridianV. Nada de esto se ha fabricado ni probado."
+		(exclude_from_sim no)
+		(at 30.48 182.8 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left top)
+		)
+		(uuid "ea0621e8-3770-5b49-8c0d-de5d067fb41f")
+	)
+	(text "Variante 1S por defecto. Variante 2S: R105 = 8.2k (PROG), U103 = MAX17049G+T10, R115 sin montar,"
+		(exclude_from_sim no)
+		(at 30.48 188.8 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left top)
+		)
+		(uuid "40cb071f-98c4-50bf-85fa-662f00cd3325")
+	)
+	(text "R117 montado (VDD del medidor desde +3V3) y R119 (EN del buck, abajo) = 3.9k."
+		(exclude_from_sim no)
+		(at 30.48 194.8 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left top)
+		)
+		(uuid "404eea8e-d524-5dd0-88e6-be123f9cb891")
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)
