@@ -3,7 +3,7 @@
 
 // Logo monocromo de assets/tresvizo-logo.svg; regenerar con tools/oled_logo.py.
 namespace boot_logo {
-constexpr uint32_t kDurationMs = 3000;
+constexpr uint32_t kDurationMs = 10000;
 constexpr uint8_t kWidth = 128, kHeight = 64;
 const uint8_t kBitmap[] PROGMEM = {
     0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,

@@ -1,6 +1,14 @@
 # Firmware inicial del instrumento
 
 **Alimentación — 02/10/2026:** LiPo 1S 3.7 V / 3000 mAh confirmada. Lectura MAX17048 y apagado coordinado Mk2 implementados; falta identificar el elevador de 5 V y validar físicamente el conjunto con UM980. Ver `hardware/wiring.md` desde la raíz. La carga es autónoma por hardware; USB impide el corte total de batería.
+## 0.8.2 — Transporte con las apps (04/10/2026)
+
+BLE conserva cada fragmento hasta que la pila lo acepta, respeta congestión y cierra una respuesta atascada a los 4.5 s. Las líneas vencidas, desbordadas o con NUL se consumen hasta LF; la sesión nueva empieza con un acumulador vacío. Un error 413 conserva el `id` de la orden. La salud sólo actualiza su reloj de envío al aceptarse; las órdenes siguen antes que la telemetría.
+
+WebSocket comprueba la edad de llegada de la posición al enviar, además del tiempo en cola: máximo 500 ms. Las sesiones tienen envío sin bloqueo verificado. OTA permite continuar y abortar la sesión aunque una tarea del arranque se active después; GNSS y autoconexión NTRIP esperan durante la actualización.
+
+UUID, formatos binarios, límites, rutas y campos existentes de las apps se conservan. Informe y alcance de las pruebas: [auditoría del transporte](../../docs/connectivity/TRANSPORT_AUDIT_0.8.2.md). Banco repetible: `~/.platformio/penv/bin/python tests/protocol_transport_bench.py --stall` desde la raíz; `--fragment-bytes 0` usa el MTU negociado en todas las órdenes. El banco no guarda credenciales ni coordenadas. La comprobación visual de OLED sigue pendiente como indica `docs/firmware-validation.md`.
+
 ## 0.8.0 — Thing Plus ESP32-S3 y OLED (02/10/2026)
 
 Placa seleccionada: **SparkFun WRL-24408, MINI-1-N4R2**. La definición local `boards/sparkfun_thing_plus_esp32s3.json` fija flash de 4 MB, PSRAM Quad de 2 MB, USB CDC/JTAG y el perfil de CPU. El entorno sigue llamándose `esp32s3_usb` para mantener las rutas de las herramientas. El cableado está en [hardware/wiring.md](../../hardware/wiring.md); las referencias posteriores a Tiny/18/17 son históricas.
@@ -842,6 +850,12 @@ aditivo: una app que solo sabe la versión 2 del protocolo funciona igual.
 
 ## Logo de inicio OLED
 
-Al detectar la OLED se muestra el logo TresVizo monocromo durante 3000 ms y después la pantalla principal. UART, USB, BLE y lectura de batería siguen funcionando; una solicitud de apagado interrumpe el logo. Se presenta una vez por arranque. `subsystems.display.screen` informa `logo`, `main`, `shutdown` o `none`.
+El logo TresVizo monocromo tiene un plazo de 10000 ms desde el inicio del subsistema de pantalla, al principio de `setup`, antes de Wi-Fi, memoria y BLE. Los reintentos de I2C no reinician ese plazo. Al vencer se oculta primero el logo y se dibuja la pantalla principal; si los servicios todavía no están listos, se muestra «INICIANDO». UART, USB, BLE y lectura de batería siguen funcionando; una solicitud de apagado interrumpe el logo. `subsystems.display.screen` conserva `logo`, `main`, `shutdown` y `none`, y añade `starting` para esa espera explícita. El refresco y la planificación de tareas añaden una tolerancia pequeña al plazo; un bus físicamente bloqueado no permite garantizar cuándo cambia el panel.
+
+Desde 0.8.1 se conserva estable la alimentación de Qwiic y se usa I2C a 100 kHz, suficiente para el refresco de 1 Hz y con más margen de señal en el arnés. Se reinicializa el controlador mediante comandos completos: apagado, offset y geometría 128×64 explícitos. Se enciende sólo tras enviar los 1024 bytes y comprobar cada transacción. Un NACK o escritura corta deja `state: i2c_error` y provoca reinicialización y reenvío completo. Adafruit GFX conserva el dibujo en un framebuffer; el transporte SSD1306 comprobado está en `include/oled_transport.h`.
+
+La OLED consulta el estado de almacenamiento sin esperar por archivos ni bloqueos de SD; cuando está ocupado muestra «MEM INT. OCUPADA». El reinicio solicitado por la app/USB y el posterior a OTA esperan a que la tarea I2C apague la pantalla y cierre el bus, con límite de 300 ms para no quedar atrapados por una avería. Repetir `POST /api/restart` no retrasa el reinicio; durante esa espera se rechazan nuevas operaciones de escritura.
+
+Regresiones nativas: `test/display_boot_test.cpp` (plazo, detección tardía, reintentos, apagado y rollover), `test/oled_transport_test.cpp` (8192 píxeles, NACK y escritura corta en cada paquete, recuperación completa) y `test/display_status_test.cpp`. La prueba de placa `tests/display_boot_bench.py` solicita reinicios sin cambiar configuración y mide la transición `logo` → `main`; la imagen física necesita comprobación visual.
 
 El vector está en `assets/tresvizo-logo.svg`; la imagen final es `assets/tresvizo-oled.png` (128×64, 1 bit). `tools/oled_logo.py` desde la raíz regenera contornos SVG y `include/boot_logo.h` a partir del logo original del panel, con Pillow. El bitmap ocupa 1024 bytes en flash y no depende de la memoria interna del dispositivo.

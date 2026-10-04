@@ -11,6 +11,8 @@ int main() {
     assert(!std::strcmp(text.storage,"MEM INT. NO DISP."));
     text=display_status::build(receiver,10000000,0,UINT32_MAX,"idle");
     assert(!std::strcmp(text.storage,"MEM INT. LISTA"));
+    text=display_status::build(receiver,10000000,0,UINT32_MAX,"busy");
+    assert(!std::strcmp(text.storage,"MEM INT. OCUPADA"));
     receiver.enabled=true;receiver.accepted=1;
     receiver.solution.arrival_us=10000000;
     receiver.solution.has_position=true;receiver.solution.quality=4;

@@ -1,6 +1,7 @@
 #include "telemetry_ws.h"
 #include "gnss_receiver.h"
 #include "ble_frames.h"
+#include "telemetry_freshness.h"
 #include "health_report.h"
 #include "health_timing.h"
 #include <Arduino.h>
@@ -48,7 +49,7 @@ std::atomic<uint32_t> connectedClients{0};  // reflejo de clientCount para las d
 // `protocol::kHealthPeriodMs`.
 constexpr uint32_t kSamplePeriodMs = 20;
 
-uint32_t lastSample = 0, lastHealth = 0, lastEpoch = 0, lastSolution = 0;  // solo loopTask
+uint32_t lastSample = 0, lastHealth = 0, lastEpoch = UINT32_MAX, lastSolution = 0;  // solo loopTask
 uint16_t sampleSequence = 0;                                              // solo loopTask
 
 // Contadores para `/api/status` → `telemetry_stream`.
@@ -56,6 +57,7 @@ std::atomic<uint32_t> framesSent{0};     // tramas escritas, sumando clientes
 std::atomic<uint32_t> clientsDropped{0}; // clientes olvidados: envío fallido o sesión ya cerrada
 std::atomic<uint32_t> sendsDeferred{0};  // pasadas con algo que mandar y el envío anterior aún en httpd
 std::atomic<uint32_t> sendsExpired{0};   // tandas que esperaron demasiado en httpd y no salieron
+std::atomic<uint32_t> staleSolutions{0}; // posiciones vencidas al salir, contando también su edad antes de encolar
 
 // Tipo de trama. El BLE distingue posición de salud por característica; aquí
 // va todo por la misma tubería, así que el primer byte lo dice. Los 20 que
@@ -71,6 +73,7 @@ constexpr size_t kMaxFramesPerBatch = 2;  // la solución y la salud de una mism
 struct Batch {
     httpd_handle_t server;
     uint64_t builtAtUs;
+    uint64_t solutionArrivalUs;
     size_t count;
     uint8_t frames[kMaxFramesPerBatch][kFrameBytes];
 };
@@ -147,6 +150,11 @@ void sendWork(void* argument) {
                 continue;
             }
             for (size_t f = 0; f < batch->count; ++f) {
+                if (!protocol::telemetryFresh(esp_timer_get_time(), batch->builtAtUs,
+                                             batch->solutionArrivalUs, batch->frames[f][0] == kSolution)) {
+                    if (batch->frames[f][0] == kSolution) ++staleSolutions;
+                    continue;
+                }
                 httpd_ws_frame_t packet = {};
                 packet.type = HTTPD_WS_TYPE_BINARY;
                 packet.payload = batch->frames[f];
@@ -177,6 +185,9 @@ esp_err_t handler(httpd_req_t* request) {
         // nada todavía.
         const int descriptor = httpd_req_to_sockfd(request);
         forget(descriptor);
+        // No admitir un cliente si sus envíos pudieran bloquear toda la API.
+        if (httpd_sess_set_send_override(request->handle, descriptor, sendWithoutWaiting) != ESP_OK)
+            return ESP_FAIL;
         if (clientCount >= kMaxClients) {
             // Se echa al más antiguo en vez de rechazar al nuevo: el que acaba
             // de llegar es el que tiene a alguien mirando la pantalla.
@@ -186,9 +197,6 @@ esp_err_t handler(httpd_req_t* request) {
         }
         clients[clientCount++] = descriptor;
         publishClientCount();
-        // Si no se pudiera cambiar, la sesión sigue con el envío por defecto,
-        // que funciona igual salvo por la espera.
-        httpd_sess_set_send_override(request->handle, descriptor, sendWithoutWaiting);
         return ESP_OK;
     }
 
@@ -276,6 +284,7 @@ void tick() {
     }
     batch->server = server;
     batch->builtAtUs = nowUs;
+    batch->solutionArrivalUs = s.arrival_us;
     batch->count = 0;
 
     const uint16_t sequence = uint16_t(sampleSequence + 1);
@@ -334,6 +343,7 @@ void status(JsonObject out) {
     // que esperaron más de medio segundo en httpd y se tiraron.
     out["sends_deferred"] = sendsDeferred.load(std::memory_order_relaxed);
     out["sends_expired"] = sendsExpired.load(std::memory_order_relaxed);
+    out["stale_solutions_dropped"] = staleSolutions.load(std::memory_order_relaxed);
 }
 
 }  // namespace telemetry_ws

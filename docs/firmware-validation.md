@@ -92,3 +92,35 @@ El panel prioriza UART del ESP32 sobre el banco USB de la Mac. Pasaron las prueb
 - Controlador SD de flujo original, cola, cierre, catálogo y lectura por bloques preparado. Perfil con SD compilado, pero nunca cargado; pines de esa compilación son solo para verificar código. El propietario confirma lector desconectado. Perfil instalado mantiene SD not_configured, sin conducir pines supuestos.
 - Pruebas: 24 comprobaciones API de servicios; 27 de operaciones; 29 de hardware; 14 Python GNSS y 3 NTRIP de banco. Parser de binario con sanitizadores y render GNSS JS superados. Primera prueba corta de frecuencia capturó transición; se añadió estabilización y cálculo por tiempo real del ESP32: 4.96 y 10.12 Hz en ventanas de unos 5 s. Pruebas históricas se actualizaron para UART activo y respuesta 503 de SD ausente.
 - Firmware instalado por OTA, arranque confirmado y ajustes conservados. Detalles y límites: [servicios del ESP32](esp32-services.md).
+
+## 0.8.1 — 2026-10-04: arranque y reinicio de la OLED
+
+Cambios implementados:
+
+- La tarea de pantalla arranca antes de la inicialización de red, almacenamiento y BLE. El plazo único del logo es 10000 ms; no se reinicia al recuperar I2C. Si setup sigue ocupado al vencer, se muestra «INICIANDO».
+- SSD1306 inicializado apagado, offset y geometría completos, framebuffer comprobado por transacción y encendido sólo al terminar los 1024 bytes. Se conserva alimentación estable de Qwiic y se usa I2C a 100 kHz.
+- Consulta de almacenamiento sin espera desde la OLED. Reinicio de API y OTA coordinado con cierre de I2C, con límite de 300 ms. Peticiones de reinicio repetidas no prolongan el plazo y las nuevas escrituras se rechazan mientras se reinicia.
+
+Comprobado:
+
+- Compilación PlatformIO y firma verificadas. Carga directa por USB finalizada con verificación de hashes; lectura posterior confirma versión 0.8.1. SHA-256 de firmware-signed.bin: `a8dc81b5910d9d3b1f3bde26690baa958604d28f368124d2674176bb276805f1`.
+- Configuración idéntica antes y después de la carga, comparada mediante SHA-256 del JSON canónico sin guardar sus credenciales en el informe.
+- Pruebas nativas `display_boot`, `oled_transport`, `display_status` y `power_sequence` completadas con `-Wall -Wextra -Werror`. Las dos nuevas también pasaron con UndefinedBehaviorSanitizer. AddressSanitizer se bloqueó dentro de su inicialización en macOS, antes de entrar al programa; se terminó ese proceso y no se cuenta como prueba superada.
+- 643 comprobaciones estáticas del contrato de apps superadas; permanecen las cuatro discrepancias previas documentadas en el contrato.
+
+Limitaciones de la prueba física:
+
+- El primer intento de OTA fue rechazado por el firmware anterior al activarse la reconciliación GNSS durante la transferencia. Se utilizó carga USB directa sin borrar NVS.
+- Antes de la carga, 0.8.0 detectaba la OLED en 0x3C. Tras una primera variante que pulsaba la alimentación Qwiic, la OLED dejó de responder; esa maniobra fue retirada. No está confirmada la causa física ni se atribuye el fallo al cableado.
+- En la última consulta con la versión final 0.8.1, el medidor MAX17048 responde, pero la OLED sigue en `not_detected`. No se pudo ejecutar la secuencia de tres reinicios ni confirmar visualmente el logo. Se solicitó retirar USB y batería durante cinco segundos y reconectar para comprobar un arranque desde cero.
+- La prueba repetible está en `tests/display_boot_bench.py`. No se afirma resuelto en hardware el recorte ni medida la duración física del logo hasta completar ese ensayo y la comprobación visual.
+
+## 0.8.2 — 2026-10-04: transporte con las apps
+
+Se corrigieron avance de offset ante rechazo BLE, líneas vencidas interpretadas como otra orden, pérdida del `id` en errores 413, caducidad de posición al salir del WebSocket y bloqueo de OTA por tareas del arranque. También se verifican resultados de notificación, se coordina la respuesta antes de desactivar BLE y se añaden códigos NTRIP que las apps ya reconocen. Contrato y formatos conservados.
+
+Compilado, firmado y cargado por USB con verificación de hashes. 32 suites C++ con UBSan, 86 pruebas del banco BLE, 35 del comprobador de contrato, 644 comprobaciones estáticas y 320 sobre el equipo por USB. El listado de sesiones no se validó: devolvió 503 sin tarjeta instalada.
+
+Banco físico BLE: 246 respuestas completas en dos series de tres conexiones, cero errores de reensamblado. Con MTU 247: mediana 64.7 ms, P95 210.1 ms; recuperación de respuesta bloqueada en 4.54 s. Los descartes y timeouts provocados coincidieron con lo inyectado; sin fallos GATT ni envíos forzados. Configuración conservada. OTA parcial cruzó el umbral de arranque, aceptó un bloque duplicado y se canceló sin cambiar el slot activo; la partición inactiva de prueba se borró.
+
+Wi-Fi físico no accesible desde la Mac y STA sin configurar; iPhone/Android, RTCM sostenido y OLED visual siguen pendientes. Detalles, reproducción y SHA-256 del binario final: [auditoría 0.8.2](connectivity/TRANSPORT_AUDIT_0.8.2.md).

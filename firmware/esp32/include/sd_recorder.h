@@ -10,4 +10,5 @@ bool active();
 bool prepareShutdown();
 int request(const String& method,const String& path,JsonVariantConst body,JsonDocument& out);
 void status(JsonObject out);
+const char* displayState(); // Consulta sin espera; nunca detiene el refresco OLED.
 }

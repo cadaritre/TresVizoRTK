@@ -117,3 +117,11 @@ desalojadas + caducadas + las que queden en cola.
 - El RTCM va **sin envoltorio**: los bytes nativos RTCM3, que ya traen longitud y CRC-24Q. No
   hace falta secuencia propia: el enlace ATT es ordenado y fiable en capa de enlace; lo que se
   pierde en el equipo se cuenta en la salud.
+
+## Endurecimiento compatible de 0.8.2 (04-10-2026)
+
+No cambia la tabla GATT ni los bytes de las tramas. El firmware no fuerza envíos cuando la controladora está llena. Conserva el offset ante rechazo local; ante fallo GATT tardío o plazo total de respuesta de 4.5 s cierra el enlace y vuelve a anunciarse. No repite una mutación. Las entradas de más de 1024 bytes, con NUL o vencidas se consumen hasta LF: un sufijo no se interpreta como otra orden.
+
+El 413 `response_too_large` conserva el `id`. `GET /api/ble` añade `response_frames_deferred`, `notification_failures` y `response_timeouts`; `response_frames_forced` conserva su significado y permanece en cero. Salud y solución sólo avanzan su cadencia cuando la pila acepta la notificación. `POST /api/ble` con `enabled:false` deja salir su respuesta antes del cierre, con un margen de 150 ms para la pila; esto no equivale a una confirmación de lectura de la app.
+
+Los descartes de entradas malformadas y de cola llena siguen en `dropped_requests`. La regla continúa siendo una orden en vuelo por cliente, con máximo dos en la cola del firmware. Pruebas, hallazgos y límites en [la auditoría 0.8.2](TRANSPORT_AUDIT_0.8.2.md).

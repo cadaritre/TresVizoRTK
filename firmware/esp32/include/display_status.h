@@ -38,6 +38,7 @@ inline Lines build(const gnss_receiver::Snapshot& gnss, uint64_t nowUs,
                        (unsigned long)(correctionAgeMs / 1000),(unsigned long)((correctionAgeMs % 1000) / 100));
     const char* state = !std::strcmp(sdState,"recording") ? "GRABANDO"
         : !std::strcmp(sdState,"closing") ? "CERRANDO"
+        : !std::strcmp(sdState,"busy") ? "OCUPADA"
         : (!std::strcmp(sdState,"idle") || !std::strcmp(sdState,"closed")) ? "LISTA"
         : !std::strcmp(sdState,"card_missing") ? "NO DISP." : "REVISAR";
     std::snprintf(result.storage,sizeof(result.storage),"MEM INT. %s",state);

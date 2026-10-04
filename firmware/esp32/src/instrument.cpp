@@ -930,7 +930,8 @@ void begin() {
 
 void tick() {
     const uint32_t now = millis();
-    if (pendingRestart && config_rules::elapsed(now, restartRequestedAt, 1000)) ESP.restart();
+    if (pendingRestart && config_rules::elapsed(now, restartRequestedAt, 1000) &&
+        local_display::prepareRestart()) ESP.restart();
     if (pendingNetwork && config_rules::elapsed(now, networkChangedAt, 1000)) {
         pendingNetwork = false;
         joinRequested = networkCount > 0;
@@ -1041,8 +1042,16 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         power_manager::status(response.to<JsonObject>());return 202;
     }
     if(power_manager::pending() && method!="GET"){error(response,"shutting_down","Apagado en curso; espera al cierre de la memoria interna.");return 409;}
+    if(pendingRestart && method!="GET" && path!="/api/restart"){
+        error(response,"restarting","Reinicio en curso; espera a que vuelva a iniciar el equipo.");return 409;
+    }
     if (path == "/api/update" || path.startsWith("/api/update/")) {
-        if(method!="GET" && (gnss_control::busy() || ntrip_input::active() || sd_recorder::active())) {error(response,"busy","Detén NTRIP y espera al GPS antes de actualizar.");return 409;}
+        // Solo impedir iniciar/cambiar imagen. Una sesión ya abierta debe poder
+        // continuar y abortarse aunque una tarea del arranque se active después.
+        if(method=="POST" && (path=="/api/update/begin" || path=="/api/update/rollback") &&
+           (gnss_control::busy() || ntrip_input::active() || sd_recorder::active())) {
+            error(response,"busy","Detén NTRIP y espera al GPS antes de actualizar.");return 409;
+        }
         return firmware_update::request(method,path,body,response);
     }
     if (firmware_update::busy() && method != "GET") { error(response,"updating","Actualización en curso. Espera antes de modificar el equipo."); return 409; }
@@ -1136,8 +1145,10 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
     }
     if (method == "POST" && path == "/api/restart") {
         if(sd_recorder::active()||gnss_control::busy()){error(response,"busy","Cierra grabación y espera al GPS antes de reiniciar.");return 409;}
-        pendingRestart = true;
-        restartRequestedAt = millis();
+        if (!pendingRestart) {
+            pendingRestart = true;
+            restartRequestedAt = millis();
+        }
         response["restarting"] = true;
         return 202;
     }

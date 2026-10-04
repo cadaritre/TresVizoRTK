@@ -1,6 +1,7 @@
 #include "firmware_update.h"
 #include "board_profile.h"
 #include "instrument.h"
+#include "local_display.h"
 #include "correction_router.h"
 #include "firmware_signing_key.h"
 #include "signed_firmware.h"
@@ -13,6 +14,7 @@
 #include <mbedtls/base64.h>
 #include <mbedtls/sha256.h>
 #include <mbedtls/ecdsa.h>
+#include <atomic>
 
 namespace firmware_update {
 namespace {
@@ -41,7 +43,9 @@ uint32_t total = 0, received = 0, touched = 0, lastOffset = 0;
 size_t lastLength = 0;
 uint8_t previous[chunkLimit];
 String expectedHash, session;
-bool active = false, restart = false, bootChecked = false, targetTouched = false;
+// busy() se consulta también desde las tareas NTRIP y GNSS.
+std::atomic<bool> active{false}, restart{false};
+bool bootChecked = false, targetTouched = false;
 uint32_t restartAt = 0;
 const char* state = "idle";
 int fail(JsonDocument& out, int code, const char* message) {
@@ -261,18 +265,20 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
             return fail(out,400,"La imagen firmada es para otra placa. Se requiere firmware de Thing Plus ESP32-S3.");
         }
         mbedtls_sha256_free(&fileHash); mbedtls_sha256_free(&imageHash);
-        const esp_err_t validated = esp_ota_end(handle); active = false;
-        if (validated != ESP_OK) { invalidateTarget(); state = "invalid_image"; return fail(out,400,"La imagen no pasó la validación de Espressif."); }
+        const esp_err_t validated = esp_ota_end(handle);
+        if (validated != ESP_OK) { invalidateTarget(); active = false; state = "invalid_image"; return fail(out,400,"La imagen no pasó la validación de Espressif."); }
         // Firma verificada e imagen válida: desde ahora se puede volver a ella.
         rememberVerified(target);
-        if (esp_ota_set_boot_partition(target) != ESP_OK) { state = "activation_failed"; return fail(out,503,"No se pudo activar la imagen; se conserva el arranque actual."); }
-        state = "restart_scheduled"; restart = true; restartAt = millis(); status(out); return 202;
+        if (esp_ota_set_boot_partition(target) != ESP_OK) { active = false; state = "activation_failed"; return fail(out,503,"No se pudo activar la imagen; se conserva el arranque actual."); }
+        // busy() permanece cierto entre recibir y programar el reinicio:
+        // NTRIP/GNSS no deben arrancar durante la activación de la imagen.
+        state = "restart_scheduled"; restart = true; active = false; restartAt = millis(); status(out); return 202;
     }
     return fail(out,404,"Operación de actualización desconocida.");
 }
 void tick(bool servicesReady) {
     if (active && millis() - touched > 30000) abortTransfer("timed_out");
-    if (restart && millis() - restartAt > 1500) ESP.restart();
+    if (restart && millis() - restartAt > 1500 && local_display::prepareRestart()) ESP.restart();
     if (!bootChecked && servicesReady && millis() > 5000) {
         esp_ota_img_states_t imageState;
         const auto running = esp_ota_get_running_partition();

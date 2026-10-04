@@ -189,9 +189,7 @@ void pollSerial() {
 void setup() {
     // Alimentación de periféricos y señales del Soft Power Switch Mk2.
     power_manager::begin();
-    digitalWrite(board_profile::kPeripheralEnable,HIGH);
-    pinMode(board_profile::kPeripheralEnable,OUTPUT);
-    delay(10);
+    local_display::begin();
     Serial.setRxBufferSize(2048);
     Serial.begin(115200);
     Serial.setTxTimeoutMs(50);
@@ -241,7 +239,7 @@ void setup() {
             if (httpd_register_uri_handler(server, &route) != ESP_OK) Serial.println("Error al registrar ruta HTTP.");
         }
     } else Serial.println("Error al iniciar el servidor web. Consola USB disponible.");
-    local_display::begin();
+    local_display::servicesReady();
     Serial.printf("TresVizo RTK %s. Consola JSON USB disponible.\n", instrument::kVersion);
 }
 

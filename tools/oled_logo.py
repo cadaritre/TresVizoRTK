@@ -62,7 +62,7 @@ def generate():
     rows=['    '+','.join(f'0x{b:02x}' for b in data[i:i+16])+',' for i in range(0,len(data),16)]
     (ROOT/'firmware/esp32/include/boot_logo.h').write_text(
         '#pragma once\n#include <Arduino.h>\n\n// Logo monocromo de assets/tresvizo-logo.svg; regenerar con tools/oled_logo.py.\n'
-        'namespace boot_logo {\nconstexpr uint32_t kDurationMs = 3000;\n'
+        'namespace boot_logo {\nconstexpr uint32_t kDurationMs = 10000;\n'
         'constexpr uint8_t kWidth = 128, kHeight = 64;\n'
         'const uint8_t kBitmap[] PROGMEM = {\n'+'\n'.join(rows)+'\n};\n}\n')
 if __name__=='__main__':generate()

@@ -1,3 +1,4 @@
+#include "firmware_update.h"
 #include "sd_recorder.h"
 #include "receiver_baseline.h"
 #include "gnss_control.h"
@@ -399,7 +400,7 @@ void tick(HardwareSerial& uart) {
     // Preguntar el modo al arrancar, sin que nadie pulse nada. Sin esto el
     // equipo no sabe si es base hasta que alguien lo consulta, y mientras tanto
     // el cliente NTRIP se reconecta a una base que no necesita correcciones.
-    if(!bootQueried && !running && millis()>5000 && gnss_receiver::snapshot().enabled) {
+    if(!bootQueried && !running && millis()>5000 && !firmware_update::busy() && gnss_receiver::snapshot().enabled) {
         bootQueried=true;
         count=index=0;sent=ack=readback=false;overflowed=false;failure="";expectedMode="";
         // **Al arrancar se reconcilia, no solo se pregunta.**

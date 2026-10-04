@@ -187,7 +187,7 @@ void worker(void*) {
   // Volver a rover devuelve las correcciones sin que nadie las pida otra vez:
   // el perfil sigue elegido y el equipo ya no es base. Solo se respeta el
   // silencio si fue el usuario quien detuvo la conexion.
-  if(!wanted && autoConnect && !userStopped && lastUsed>=0 && ready &&
+  if(!wanted && autoConnect && !userStopped && lastUsed>=0 && ready && !firmware_update::busy() &&
      !gnss_control::isBase() && gnss_control::isRover() && !correction_router::bleChosen() && !correction_router::radioChosen()){
    applyProfile(profiles[lastUsed]);
    correction_router::select("ntrip");++generation;wanted=true;state="starting";
@@ -300,7 +300,7 @@ int request(const String& method,JsonVariantConst body,JsonDocument& out){
  if(!instrument::stationConfigured()){out["message"]="No hay red Wi-Fi configurada. Añade tu hotspot de 2.4 GHz en Configuración antes de conectar NTRIP.";return 409;}
  if(WiFi.status()!=WL_CONNECTED){out["message"]="El equipo no está conectado a ninguna red ahora mismo. Enciende tu hotspot y espera a que aparezca como conectado en Conexiones.";return 409;}
  // Una base produce correcciones; consumirlas a la vez no significa nada.
- if(gnss_control::isBase()){out["message"]="El receptor está configurado como base. Una base emite correcciones, no las recibe. Pásalo a rover antes de conectar NTRIP.";return 409;}
+ if(gnss_control::isBase()){out["error"]="receiver_is_base";out["message"]="El receptor está configurado como base. Una base emite correcciones, no las recibe. Pásalo a rover antes de conectar NTRIP.";return 409;}
  if(active() || strcmp(state.load(),"stopped")!=0){out["message"]="Hay una conexión NTRIP activa. Pulsa «Detener» en este mismo apartado y vuelve a intentarlo.";return 409;}
  if(!gnss_control::roverReady()){out["message"]="Consulta y confirma el modo rover del receptor antes de conectar.";return 409;}
  xSemaphoreTake(lock,portMAX_DELAY);config.host=host;config.mount=mount;config.user=user;config.password=body["password"].as<const char*>();config.port=body["port"];xSemaphoreGive(lock);
@@ -369,7 +369,7 @@ int profileRequest(const String& method,JsonVariantConst body,JsonDocument& out)
   if(index<0){out["message"]="Ese perfil no está guardado.";return 404;}
   if(!ready)return 503;
   if(!instrument::stationConfigured()){out["message"]="No hay red Wi-Fi configurada. Añade tu hotspot de 2.4 GHz en Configuración antes de conectar NTRIP.";return 409;}
-  if(gnss_control::isBase()){out["message"]="El receptor está configurado como base. Pásalo a rover antes de conectar un perfil NTRIP.";return 409;}
+  if(gnss_control::isBase()){out["error"]="receiver_is_base";out["message"]="El receptor está configurado como base. Pásalo a rover antes de conectar un perfil NTRIP.";return 409;}
   // Tener una red guardada no es tenerla al alcance. Arrancar sin enlace deja
   // el enrutador fijado en "ntrip", y eso bloquea configurar el GPS hasta que
   // alguien pulse Detener: parece que el panel se averió.

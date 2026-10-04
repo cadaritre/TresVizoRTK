@@ -52,6 +52,15 @@ void worker(void*){
 #endif
 }
 bool active(){return recording||closing;}
+const char* displayState(){
+ if(!mutex)return "not_configured";
+ if(digitalRead(board_profile::kSdDetect)!=HIGH)return "card_missing";
+ if(closing)return "closing";
+ if(recording)return "recording";
+ if(xSemaphoreTake(mutex,0)!=pdTRUE)return "busy";
+ const char* result=phase; // phase siempre apunta a literales, nunca al archivo.
+ xSemaphoreGive(mutex);return result;
+}
 bool prepareShutdown(){
  shutdownRequested=true;
  if(!mutex)return true;
