@@ -2,6 +2,9 @@
 #include <ArduinoJson.h>
 namespace ntrip_input {
 void begin();
+// Llamar bajo el mismo mutex del instrumento que request/profileRequest.
+void tick();
+void stopForUser();
 bool active();
 int request(const String& method,JsonVariantConst body,JsonDocument& out);
 // Perfiles guardados en NVS y autoconexión al último elegido. "Ninguno" también

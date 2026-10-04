@@ -254,6 +254,7 @@ void loop() {
             // Bajo el mutex: el promedio puede terminar aplicando modo base, y
             // eso toca el receptor igual que cualquier otra operación.
             base_survey::tick();
+            ntrip_input::tick();
             firmware_update::tick(server != nullptr);
             xSemaphoreGive(instrumentMutex);
         }

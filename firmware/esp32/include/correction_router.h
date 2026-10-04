@@ -13,6 +13,8 @@ bool select(const char* source);
 // porque la autoconexión del perfil lo seleccionaba al arrancar.
 void begin();                      // lee la elección y, si era BLE, la aplica
 bool choose(const char* source);   // elección explícita: selecciona y guarda
+// Una elección explícita «none» también impide la autoconexión NTRIP.
+bool ntripAllowed();
 bool bleChosen();                  // la última elección explícita fue BLE
 bool radioChosen();                // la última elección explícita fue el radio
 // Un módulo de radio se conectó como rover: si el usuario eligió el radio, o no

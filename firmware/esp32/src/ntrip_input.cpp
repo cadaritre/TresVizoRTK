@@ -1,4 +1,5 @@
 #include "ntrip_input.h"
+#include "cancellable_connection.h"
 #include "gnss_control.h"
 #include "instrument.h"
 #include "correction_router.h"
@@ -17,7 +18,7 @@ struct Config {String host,mount,user,password;uint16_t port=2101;};
 Config config;
 SemaphoreHandle_t lock;bool ready=false;
 // Cuanto lleva la tarea esperando enlace de red, para no esperar sin fin.
-uint32_t waitingSince=0;
+uint32_t waitingSince=0; // solo worker; se reinicia al cambiar de generación
 
 // Perfiles guardados. Hasta ahora las credenciales vivían solo en memoria y se
 // perdían en cada arranque: en campo eso obliga a teclear un caster completo
@@ -42,6 +43,7 @@ struct Mount {String name,format,country;bool needsGga=false;};
 Mount mounts[kMaxMounts];
 size_t mountCount=0;
 std::atomic<bool> tableWanted{false};
+std::atomic<uint32_t> tableGeneration{0};
 std::atomic<const char*> tableState{"idle"};
 String tableHost;uint16_t tablePort=2101;
 std::atomic<bool> wanted{false};std::atomic<uint32_t> generation{0},frames{0},rejected{0},bytes{0},reconnects{0},crcErrors{0};
@@ -98,10 +100,8 @@ void loadProfiles(){
  lastUsed=(last>=0&&size_t(last)<profileCount)?last:-1;
  if(lastUsed<0)autoConnect=false;
 }
-void applyProfile(const Profile& p){
- xSemaphoreTake(lock,portMAX_DELAY);
+void applyProfile(const Profile& p){ // llamar con lock tomado
  config.host=p.host;config.mount=p.mount;config.user=p.user;config.password=p.password;config.port=p.port;
- xSemaphoreGive(lock);
 }
 void profilesJson(JsonObject out){
  JsonArray list=out["profiles"].to<JsonArray>();
@@ -146,79 +146,91 @@ void parseStr(const char* line){
  ++mountCount;
 }
 
+// Cambios de estado y datos del socket pertenecen a la misma generación.
+void publishState(uint32_t id,const char* next,const char* error="") {
+ xSemaphoreTake(lock,portMAX_DELAY);
+ if(current(id)){state=next;failure=error;}
+ xSemaphoreGive(lock);
+}
+bool currentTable(uint32_t id){return tableWanted && !wanted && tableGeneration==id;}
 void fetchSourcetable(WiFiClient& client){
- if(WiFi.status()!=WL_CONNECTED){tableState="waiting_network";vTaskDelay(pdMS_TO_TICKS(200));return;}
- String host;uint16_t port;
- xSemaphoreTake(lock,portMAX_DELAY);host=tableHost;port=tablePort;xSemaphoreGive(lock);
+ String host;uint16_t port;uint32_t id;
+ xSemaphoreTake(lock,portMAX_DELAY);
+ if(!tableWanted || wanted){xSemaphoreGive(lock);return;}
+ host=tableHost;port=tablePort;id=tableGeneration;
+ if(WiFi.status()!=WL_CONNECTED){tableState="waiting_network";xSemaphoreGive(lock);vTaskDelay(pdMS_TO_TICKS(100));return;}
  tableState="loading";mountCount=0;
+ xSemaphoreGive(lock);
  client.setTimeout(2000);
- if(!client.connect(host.c_str(),port,3000)){client.stop();tableState="failed";tableWanted=false;return;}
- client.print("GET / HTTP/1.0\r\nHost: "+host+"\r\nUser-Agent: NTRIP TresVizo/0.6\r\nConnection: close\r\n\r\n");
- size_t len=0;const uint32_t start=millis();
- while(millis()-start<8000 && (client.connected()||client.available())){
-  const int b=client.read();
-  if(b<0){vTaskDelay(1);continue;}
-  if(b=='\n'){
-   tableLine[len]=0;
-   if(!strncmp(tableLine,"STR;",4))parseStr(tableLine);
-   len=0;
-   if(!strncmp(tableLine,"ENDSOURCETABLE",14))break;
-   continue;
+ const bool connected=cancellable_connection::connect(client,host,port,[id](){return currentTable(id);});
+ if(connected && currentTable(id)) {
+  const String request="GET / HTTP/1.0\r\nHost: "+host+"\r\nUser-Agent: NTRIP TresVizo/0.6\r\nConnection: close\r\n\r\n";
+  cancellable_connection::write(client,reinterpret_cast<const uint8_t*>(request.c_str()),request.length(),[id](){return currentTable(id);});
+  size_t len=0;const uint32_t start=millis();
+  while(currentTable(id) && millis()-start<8000 && (client.connected()||client.available())){
+   const int byte=client.read();
+   if(byte<0){vTaskDelay(1);continue;}
+   if(byte=='\n'){
+    tableLine[len]=0;
+    xSemaphoreTake(lock,portMAX_DELAY);
+    if(currentTable(id) && !strncmp(tableLine,"STR;",4))parseStr(tableLine);
+    xSemaphoreGive(lock);
+    len=0;if(!strncmp(tableLine,"ENDSOURCETABLE",14))break;
+   } else if(byte!='\r' && len<sizeof(tableLine)-1)tableLine[len++]=char(byte);
   }
-  if(b=='\r')continue;
-  if(len<sizeof(tableLine)-1)tableLine[len++]=char(b);
  }
  client.stop();
- tableState=mountCount?"ready":"empty";
- tableWanted=false;
+ xSemaphoreTake(lock,portMAX_DELAY);
+ if(currentTable(id)){tableState=connected?(mountCount?"ready":"empty"):"failed";tableWanted=false;}
+ xSemaphoreGive(lock);
+}
+// Handler y tick llaman con lock tomado. No se espera al socket anterior.
+void startConnection(bool explicitChoice) {
+ ++generation;tableWanted=false;++tableGeneration;tableState="idle";
+ // Incluso NTRIP -> NTRIP invalida las correcciones encoladas del caster viejo.
+ correction_router::select("none");
+ if(explicitChoice)correction_router::choose("ntrip");else correction_router::select("ntrip");
+ userStopped=false;failure="";state="starting";wanted=true;
 }
 void worker(void*) {
- WiFiClient client;gnss::Rtcm3Parser parser;unsigned backoff=1000;
+ WiFiClient client;gnss::Rtcm3Parser parser;unsigned backoff=1000;uint32_t lastGeneration=UINT32_MAX;
  for(;;){
   // La sourcetable solo se pide cuando no hay flujo: comparten socket y radio.
   if(tableWanted && !wanted){fetchSourcetable(client);continue;}
-  // La autoconexion se decide al arrancar, cuando el modo del receptor todavia
-  // no se conoce. En cuanto se sabe que es base, se suelta: una base produce
-  // correcciones, no las consume, y ademas tenerlas activas bloquea configurarla.
-  if(wanted && gnss_control::isBase()){
-   releaseForBase();
-   continue;
+  if(!wanted){
+   xSemaphoreTake(lock,portMAX_DELAY);if(!wanted)state="stopped";xSemaphoreGive(lock);
+   vTaskDelay(pdMS_TO_TICKS(25));continue;
   }
-  // Volver a rover devuelve las correcciones sin que nadie las pida otra vez:
-  // el perfil sigue elegido y el equipo ya no es base. Solo se respeta el
-  // silencio si fue el usuario quien detuvo la conexion.
-  if(!wanted && autoConnect && !userStopped && lastUsed>=0 && ready && !firmware_update::busy() &&
-     !gnss_control::isBase() && gnss_control::isRover() && !correction_router::bleChosen() && !correction_router::radioChosen()){
-   applyProfile(profiles[lastUsed]);
-   correction_router::select("ntrip");++generation;wanted=true;state="starting";
-   continue;
-  }
-  if(!wanted){state="stopped";vTaskDelay(pdMS_TO_TICKS(100));continue;}
+  Config c;uint32_t id;
+  xSemaphoreTake(lock,portMAX_DELAY);c=config;id=generation;xSemaphoreGive(lock);
+  if(id!=lastGeneration){backoff=1000;waitingSince=0;lastGeneration=id;}
   if(firmware_update::busy() || WiFi.status()!=WL_CONNECTED){
    // Esperar red es normal unos segundos tras encender. Un minuto entero ya no
    // lo es: sin enlace el enrutador queda fijado en "ntrip" y eso bloquea
    // configurar el GPS. Se suelta solo y se explica por qué.
    if(!waitingSince)waitingSince=millis();
    else if(millis()-waitingSince>60000){
-    wanted=false;++generation;correction_router::select("none");
-    failure="no_network_timeout";state="stopped";waitingSince=0;
+    xSemaphoreTake(lock,portMAX_DELAY);
+    if(current(id)){wanted=false;++generation;correction_router::select("none");failure="no_network_timeout";state="stopped";}
+    xSemaphoreGive(lock);waitingSince=0;
     continue;
    }
-   state="waiting_network";vTaskDelay(pdMS_TO_TICKS(100));continue;
+   publishState(id,"waiting_network");vTaskDelay(pdMS_TO_TICKS(25));continue;
   }
   waitingSince=0;
-  Config c;xSemaphoreTake(lock,portMAX_DELAY);c=config;xSemaphoreGive(lock);const uint32_t id=generation;
-  state="connecting";failure="";client.setTimeout(2000);
-  if(client.connect(c.host.c_str(),c.port,2000) && current(id)) {
+  if(!current(id))continue;
+  publishState(id,"connecting");client.setTimeout(2000);
+  if(cancellable_connection::connect(client,c.host,c.port,[id](){return current(id);}) && current(id)) {
    String credentials=c.user+":"+c.password;unsigned char encoded[264];size_t encodedSize=0;
    const int encodeError=mbedtls_base64_encode(encoded,sizeof(encoded),&encodedSize,reinterpret_cast<const uint8_t*>(credentials.c_str()),credentials.length());
    credentials="";
    if(encodeError||!encodedSize){
-    memset(encoded,0,sizeof(encoded));client.stop();failure="credentials_encode_failed";
-    state="retry_wait";vTaskDelay(pdMS_TO_TICKS(1000));continue;
+    memset(encoded,0,sizeof(encoded));client.stop();publishState(id,"retry_wait","credentials_encode_failed");
+    const uint32_t since=millis();while(current(id)&&millis()-since<1000)vTaskDelay(pdMS_TO_TICKS(25));continue;
    }
    String request="GET /"+c.mount+" HTTP/1.0\r\nHost: "+c.host+"\r\nUser-Agent: NTRIP TresVizo/0.5\r\nAuthorization: Basic "+String(reinterpret_cast<char*>(encoded),encodedSize)+"\r\nConnection: close\r\n\r\n";
-   client.print(request);request="";memset(encoded,0,sizeof(encoded));
+   cancellable_connection::write(client,reinterpret_cast<const uint8_t*>(request.c_str()),request.length(),[id](){return current(id);});
+   request="";memset(encoded,0,sizeof(encoded));
    // Lectura byte a byte deliberada: un bloque se tragaria RTCM del flujo. Se
    // acumula en un buffer fijo porque concatenar String por byte era cuadratico.
    size_t headerLength=0;uint32_t start=millis();bool accepted=false,headersDone=false;
@@ -235,59 +247,77 @@ void worker(void*) {
     }
    }
    if(accepted && headersDone && current(id)){
-    state="streaming";parser.reset();uint32_t last=millis();backoff=1000;
+    publishState(id,"streaming");parser.reset();uint32_t last=millis();backoff=1000;
     while(current(id) && WiFi.status()==WL_CONNECTED && (client.connected()||client.available()) && millis()-last<10000){
      const auto badBefore=parser.rejected;
-     for(int n=0;n<2048 && client.available();++n){
+     for(int n=0;n<2048 && current(id) && client.available();++n){
       int b=client.read();if(b<0)break;++bytes;
       parser.feed(uint8_t(b),[&](const uint8_t* p,size_t size){
-       last=millis();if(correction_router::submit(correction_router::Source::Ntrip,p,size))++frames;else ++rejected;
+       xSemaphoreTake(lock,portMAX_DELAY);
+       if(current(id)) {last=millis();if(correction_router::submit(correction_router::Source::Ntrip,p,size))++frames;else ++rejected;}
+       xSemaphoreGive(lock);
       });
      }
      crcErrors+=parser.rejected-badBefore;
      vTaskDelay(1);
     }
-    failure="stream_ended_or_no_valid_rtcm";
-   } else failure="caster_response_rejected";
-  } else failure="connect_failed";
+    publishState(id,"retry_wait","stream_ended_or_no_valid_rtcm");
+   } else publishState(id,"retry_wait","caster_response_rejected");
+  } else publishState(id,"retry_wait","connect_failed");
   client.stop();c.password="";
   if(!current(id))continue;
-  ++reconnects;state="retry_wait";uint32_t since=millis();
-  while(current(id)&&millis()-since<backoff)vTaskDelay(pdMS_TO_TICKS(50));
+  ++reconnects;uint32_t since=millis();
+  while(current(id)&&millis()-since<backoff)vTaskDelay(pdMS_TO_TICKS(25));
   backoff=std::min(backoff*2,30000U);
  }
 }
 }
+void stopForUser(){
+ if(!lock)return;
+ xSemaphoreTake(lock,portMAX_DELAY);
+ userStopped=true;wanted=false;++generation;
+ tableWanted=false;++tableGeneration;tableState="idle";
+ correction_router::select("none");config.password="";failure="";state="stopped";
+ xSemaphoreGive(lock);
+}
 void releaseForBase(){
- if(!wanted)return;
- wanted=false;++generation;correction_router::select("none");
- failure="receiver_is_base";state="stopped";
+ if(!lock)return;
+ xSemaphoreTake(lock,portMAX_DELAY);
+ wanted=false;++generation;tableWanted=false;++tableGeneration;tableState="idle";
+ correction_router::select("none");failure=(gnss_control::isBase() || gnss_control::baseRequested())?"receiver_is_base":"";state="stopped";
+ xSemaphoreGive(lock);
+}
+void tick(){
+ // Misma exclusión del instrumento que los handlers: ningún perfil String se
+ // lee mientras la app lo edita, ni una reconexión pisa la elección del usuario.
+ if(!ready)return;
+ if(gnss_control::isBase() || gnss_control::baseRequested()){
+  if(wanted)releaseForBase();
+  return;
+ }
+ if(!wanted && !tableWanted && autoConnect && !userStopped && lastUsed>=0 &&
+    !firmware_update::busy() && !gnss_control::busy() && gnss_control::isRover() &&
+    correction_router::ntripAllowed()){
+  xSemaphoreTake(lock,portMAX_DELAY);applyProfile(profiles[lastUsed]);startConnection(false);xSemaphoreGive(lock);
+ }
 }
 void begin(){
  lock=xSemaphoreCreateMutex();
- if(lock)ready=xTaskCreate(worker,"ntrip_rx",6144,nullptr,1,nullptr)==pdPASS;
- storeReady=store.begin("ntrip",false);
- loadProfiles();
- // Autoconexión al encender. No se exige confirmar modo rover como en el
- // arranque manual: ese control es una guía para quien configura a mano, y
- // pedirlo aquí obligaría a tocar el panel tras cada corte de corriente, que
- // es justo lo que esta función existe para evitar.
- // No reanudar en un equipo que quedó como base: volvería a alimentarse a sí
- // mismo de correcciones que no necesita y bloquearía configurar el receptor.
- // Tampoco si la última elección del usuario fue BLE: el perfil sigue guardado,
- // pero reconectarlo le quitaría la fuente que eligió.
- if(ready && autoConnect && lastUsed>=0 && !gnss_control::isBase() && !correction_router::bleChosen() && !correction_router::radioChosen()){
-  applyProfile(profiles[lastUsed]);
-  correction_router::select("ntrip");
-  ++generation;wanted=true;state="starting";
+ storeReady=store.begin("ntrip",false);loadProfiles();
+ // Publicar la configuración completa antes de poner en marcha el worker.
+ if(lock && autoConnect && lastUsed>=0 && !gnss_control::isBase() &&
+    correction_router::ntripAllowed()){
+  applyProfile(profiles[lastUsed]);startConnection(false);
  }
+ if(lock)ready=xTaskCreate(worker,"ntrip_rx",6144,nullptr,1,nullptr)==pdPASS;
+ if(!ready){wanted=false;state="stopped";correction_router::select("none");}
 }
 bool active(){return wanted;}
 void status(JsonObject out){out["state"]=state.load();out["error"]=failure.load();out["available"]=ready;out["enabled"]=wanted.load();out["network_configured"]=instrument::stationConfigured();out["frames_forwarded"]=frames.load();out["frames_dropped"]=rejected.load();out["bytes_received"]=bytes.load();out["reconnects"]=reconnects.load();out["rtcm_crc_errors"]=crcErrors.load();out["tls_supported"]=false;out["gga_vrs_supported"]=false;out["credentials_persisted"]=false;}
 int request(const String& method,JsonVariantConst body,JsonDocument& out){
  if(method=="GET"){status(out.to<JsonObject>());return 200;}
  if(method!="POST"||!body.is<JsonObjectConst>())return 400;
- if(body["action"]=="stop" && body.size()==1){userStopped=true;wanted=false;++generation;correction_router::select("none");xSemaphoreTake(lock,portMAX_DELAY);config.password="";xSemaphoreGive(lock);state="stopping";status(out.to<JsonObject>());return 200;}
+ if(body["action"]=="stop" && body.size()==1){stopForUser();status(out.to<JsonObject>());return 200;}
  if(body["action"]!="start"||body.size()!=6||!valid(body["host"],128)||!valid(body["mountpoint"],96)||!valid(body["username"],64,true)||!valid(body["password"],128,true)||!body["port"].is<unsigned>()||body["port"].as<unsigned>()<1||body["port"].as<unsigned>()>65535)return 400;
  String host=body["host"].as<const char*>(),mount=body["mountpoint"].as<const char*>(),user=body["username"].as<const char*>();
  // Cast explicito: isalnum() con char con signo es comportamiento indefinido.
@@ -298,15 +328,13 @@ int request(const String& method,JsonVariantConst body,JsonDocument& out){
  // Sin red externa configurada la tarea se quedaría en waiting_network para
  // siempre, que parece un problema pasajero y no lo es.
  if(!instrument::stationConfigured()){out["message"]="No hay red Wi-Fi configurada. Añade tu hotspot de 2.4 GHz en Configuración antes de conectar NTRIP.";return 409;}
- if(WiFi.status()!=WL_CONNECTED){out["message"]="El equipo no está conectado a ninguna red ahora mismo. Enciende tu hotspot y espera a que aparezca como conectado en Conexiones.";return 409;}
  // Una base produce correcciones; consumirlas a la vez no significa nada.
- if(gnss_control::isBase()){out["error"]="receiver_is_base";out["message"]="El receptor está configurado como base. Una base emite correcciones, no las recibe. Pásalo a rover antes de conectar NTRIP.";return 409;}
- if(active() || strcmp(state.load(),"stopped")!=0){out["message"]="Hay una conexión NTRIP activa. Pulsa «Detener» en este mismo apartado y vuelve a intentarlo.";return 409;}
- if(!gnss_control::roverReady()){out["message"]="Consulta y confirma el modo rover del receptor antes de conectar.";return 409;}
- xSemaphoreTake(lock,portMAX_DELAY);config.host=host;config.mount=mount;config.user=user;config.password=body["password"].as<const char*>();config.port=body["port"];xSemaphoreGive(lock);
+ if(gnss_control::isBase() || gnss_control::baseRequested()){out["error"]="receiver_is_base";out["message"]="El receptor está configurado como base. Una base emite correcciones, no las recibe. Pásalo a rover antes de conectar NTRIP.";return 409;}
+ xSemaphoreTake(lock,portMAX_DELAY);config.host=host;config.mount=mount;config.user=user;config.password=body["password"].as<const char*>();config.port=body["port"];
+ startConnection(true);xSemaphoreGive(lock);
  // Arrancar NTRIP a mano es elegirlo: queda guardado frente a una elección
  // anterior de BLE.
- correction_router::choose("ntrip");++generation;wanted=true;state="starting";status(out.to<JsonObject>());return 202;
+ status(out.to<JsonObject>());return 202;
 }
 
 int profileRequest(const String& method,JsonVariantConst body,JsonDocument& out){
@@ -369,15 +397,13 @@ int profileRequest(const String& method,JsonVariantConst body,JsonDocument& out)
   if(index<0){out["message"]="Ese perfil no está guardado.";return 404;}
   if(!ready)return 503;
   if(!instrument::stationConfigured()){out["message"]="No hay red Wi-Fi configurada. Añade tu hotspot de 2.4 GHz en Configuración antes de conectar NTRIP.";return 409;}
-  if(gnss_control::isBase()){out["error"]="receiver_is_base";out["message"]="El receptor está configurado como base. Pásalo a rover antes de conectar un perfil NTRIP.";return 409;}
-  // Tener una red guardada no es tenerla al alcance. Arrancar sin enlace deja
-  // el enrutador fijado en "ntrip", y eso bloquea configurar el GPS hasta que
-  // alguien pulse Detener: parece que el panel se averió.
-  if(WiFi.status()!=WL_CONNECTED){out["message"]="El equipo no está conectado a ninguna red ahora mismo. Enciende tu hotspot y espera a que aparezca como conectado en Conexiones.";return 409;}
-  if(active()||strcmp(state.load(),"stopped")!=0){out["message"]="Hay una conexión NTRIP activa. Pulsa «Detener» antes de cambiar de perfil.";return 409;}
-  lastUsed=index;autoConnect=true;userStopped=false;persistProfiles();
-  applyProfile(profiles[index]);
-  correction_router::choose("ntrip");++generation;wanted=true;state="starting";
+  if(gnss_control::isBase() || gnss_control::baseRequested()){out["error"]="receiver_is_base";out["message"]="El receptor está configurado como base. Pásalo a rover antes de conectar un perfil NTRIP.";return 409;}
+  // Aceptar el perfil incluso mientras Wi-Fi se reconecta. El worker publica
+  // waiting_network sin bloquear cambios posteriores.
+  const int previous=lastUsed;const bool previousAuto=autoConnect;
+  lastUsed=index;autoConnect=true;
+  if(!persistProfiles()){lastUsed=previous;autoConnect=previousAuto;out["message"]="No se pudo guardar la selección; la conexión anterior se conserva.";return 503;}
+  xSemaphoreTake(lock,portMAX_DELAY);applyProfile(profiles[index]);startConnection(true);xSemaphoreGive(lock);
   // Devolver siempre la lista: el panel la repinta con esta respuesta y si solo
   // recibiera el estado del flujo se quedaría creyendo que no hay perfiles.
   profilesJson(out.to<JsonObject>());
@@ -395,10 +421,12 @@ int sourcetableRequest(const String& method,JsonVariantConst body,JsonDocument& 
   for(char c:host)if(!isalnum(static_cast<unsigned char>(c))&&c!='.'&&c!='-')return 400;
   if(!ready)return 503;
   if(!instrument::stationConfigured()){out["message"]="No hay red Wi-Fi configurada. El equipo no puede consultar el caster.";return 409;}
-  if(wanted){out["message"]="Detén la conexión NTRIP antes de pedir la lista de puntos de montaje: comparten la misma radio.";return 409;}
-  xSemaphoreTake(lock,portMAX_DELAY);tableHost=host;tablePort=uint16_t(body["port"].as<unsigned>());xSemaphoreGive(lock);
-  mountCount=0;tableState="loading";tableWanted=true;
+  stopForUser();
+  xSemaphoreTake(lock,portMAX_DELAY);tableHost=host;tablePort=uint16_t(body["port"].as<unsigned>());
+  mountCount=0;tableState="loading";++tableGeneration;tableWanted=true;xSemaphoreGive(lock);
  }
+ if(!lock)return 503;
+ xSemaphoreTake(lock,portMAX_DELAY);
  out["state"]=tableState.load();
  out["host"]=tableHost;
  JsonArray list=out["mountpoints"].to<JsonArray>();
@@ -409,6 +437,7 @@ int sourcetableRequest(const String& method,JsonVariantConst body,JsonDocument& 
   o["requires_gga"]=mounts[i].needsGga;
  }
  out["truncated"]=mountCount==kMaxMounts;
+ xSemaphoreGive(lock);
  return method=="POST"?202:200;
 }
 }

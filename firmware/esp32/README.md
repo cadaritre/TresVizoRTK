@@ -1,6 +1,12 @@
 # Firmware inicial del instrumento
 
 **Alimentación — 02/10/2026:** LiPo 1S 3.7 V / 3000 mAh confirmada. Lectura MAX17048 y apagado coordinado Mk2 implementados; falta identificar el elevador de 5 V y validar físicamente el conjunto con UM980. Ver `hardware/wiring.md` desde la raíz. La carga es autónoma por hardware; USB impide el corte total de batería.
+## 0.8.3 — Prioridad del operador (04/10/2026)
+
+Las órdenes GNSS sustituyen el trabajo anterior; NTRIP, publicación y caster local aceptan cambios sin «detener primero». DNS, conexión y envío TCP son cancelables por una nueva decisión. Se descartan las respuestas y tramas de sesiones sustituidas, y un promedio cancelado no aplica después una base. La elección explícita de ninguna fuente también se respeta tras reiniciar.
+
+La aceptación es inmediata y la confirmación sigue dependiendo del receptor. Se conserva la protección de archivos abiertos y de una actualización activa. Detalles y límites: [prioridad del operador](../../docs/connectivity/OPERATOR_PRIORITY_0.8.3.md). Pruebas nativas: `python3 tools/firmware_tests/run_native.py` desde la raíz.
+
 ## 0.8.2 — Transporte con las apps (04/10/2026)
 
 BLE conserva cada fragmento hasta que la pila lo acepta, respeta congestión y cierra una respuesta atascada a los 4.5 s. Las líneas vencidas, desbordadas o con NUL se consumen hasta LF; la sesión nueva empieza con un acumulador vacío. Un error 413 conserva el `id` de la orden. La salud sólo actualiza su reloj de envío al aceptarse; las órdenes siguen antes que la telemetría.

@@ -5,6 +5,7 @@
 #include "gnss_receiver.h"
 #include "correction_router.h"
 #include <atomic>
+#include "command_handoff.h"
 namespace gnss_control {
 namespace {
 constexpr unsigned kMaxCommands = 20;
@@ -22,7 +23,9 @@ unsigned count=0, index=0;
 bool sent=false, ack=false, readback=false, overflowed=false;
 uint32_t started=0, launched=0, job=0;
 std::atomic<uint32_t> modeAt{0};
-std::atomic<bool> running{false}, rover{false};
+std::atomic<bool> running{false}, rover{false}, base{false}, wantsBase{false}, draining{false};
+protocol::CommandHandoff handoff;
+uint32_t supersededJobs=0, supersededJob=0;
 // Referencia de la altura que entrega el receptor. **Sin confirmar al arrancar**
 // (reauditoría de 0.7.13, R02): antes arrancaba en «MSL del receptor» y solo
 // cambiaba con el OK de un `CONFIG UNDULATION` enviado; un receptor que ya tenía
@@ -163,6 +166,7 @@ void acceptLine() {
     else {for(char* p=line+1;p<star;++p) {sum^=uint8_t(*p);for(int bit=0;bit<8;++bit)sum=(sum>>1)^((sum&1)?0xedb88320U:0);}}
     if(sum!=expected) return;
     *star=0;
+    if(handoff.active()) { handoff.consume(line); return; }
     if(!running || !sent) return;
     const String prefix="$command,"+commands[index]+",response: ";
     if(String(line).startsWith(prefix)) {
@@ -187,7 +191,7 @@ void acceptLine() {
     if(commands[index]=="MODE" && !strncmp(line,"#MODE,",6)) {
         char* p=strchr(line,';'); if(!p)return;
         mode=p+1;while(mode.endsWith(","))mode.remove(mode.length()-1);
-        rover=mode=="MODE ROVER SURVEY";modeAt=millis();readback=true;
+        rover=mode=="MODE ROVER SURVEY";base=mode.startsWith("MODE BASE");wantsBase=base.load();modeAt=millis();readback=true;
     }
     if(commands[index]=="VERSIONA" && !strncmp(line,"#VERSIONA,",10)) {
         char* p=strchr(line,';');if(!p)return;
@@ -209,10 +213,24 @@ void acceptLine() {
         readback=true;
     }
 }
+void supersede() {
+    if(running) {
+        supersededJob=job;++supersededJobs;
+        if(sent) {
+            if(commands[index].startsWith("CONFIG UNDULATION "))undulation=static_cast<uint8_t>(Undulation::unknown);
+            handoff.begin(commands[index].c_str(),ack,readback,started);
+            draining=handoff.active();
+        }
+    }
+    // Una reconciliación cancelada no añade correcciones al finalizar otro trabajo.
+    reconciliation.reading=false;
+    bootQueried=true;
+    length=0;
+}
 int prepare(const String& name, JsonDocument& out) {
     if(!gnss_receiver::snapshot().enabled) {out["message"]="UART no disponible.";return 503;}
     if(sd_recorder::active()){out["message"]="Cierra la grabación antes de configurar el GPS.";return 409;}
-    if(running) {out["message"]="Operación GNSS en curso.";return 409;}
+    supersede();
     // **Configurar el GPS con las correcciones encendidas esta permitido.**
     //
     // Aqui habia un 409 que lo prohibia, con este motivo: «configurar el GPS con
@@ -241,7 +259,8 @@ int launch(JsonDocument& out) {
     // ya: si se corta a mitad, lo que quede en el receptor no esta guardado.
     for(unsigned i=0;i<count;++i) if(!isQuery(commands[i])) {profileState.saved=false;break;}
     phase="running";running=true;++job;launched=millis();
-    out["job_id"]=job;out["state"]=phase;out["saved"]=profileState.saved;return 202;
+    out["job_id"]=job;out["state"]=phase;out["saved"]=profileState.saved;
+    out["superseded_job_id"]=supersededJob;out["waiting_command_reply"]=draining.load();return 202;
 }
 
 // Aplica al perfil conocido lo que el trabajo recien confirmado pidio.
@@ -260,10 +279,20 @@ bool boolField(JsonVariantConst body,const char* name,bool& target){
 }
 }
 void begin(){mutex=xSemaphoreCreateMutex();}
-bool busy(){return running;}
+bool busy(){return running || draining;}
+bool baseRequested(){return wantsBase;}
+void cancel(uint32_t expectedJob) {
+    if(!mutex)return;
+    xSemaphoreTake(mutex,portMAX_DELAY);
+    if(running && (!expectedJob || expectedJob==job)) {
+        supersede();
+        finish("partial_or_unknown","Trabajo sustituido por una decisión del operador; los comandos pendientes no se enviaron.");
+    }
+    xSemaphoreGive(mutex);
+}
 bool roverReady(){return rover && !running && millis()-modeAt.load()<30000;}
-bool isBase(){return mode.startsWith("MODE BASE");}
-bool isRover(){return mode=="MODE ROVER SURVEY";}
+bool isBase(){return base;}
+bool isRover(){return rover;}
 // nullptr = sin confirmar: se publica como null y las apps y el panel lo dicen
 // («Referencia no confirmada»), nunca como MSL por defecto.
 const char* heightReference(){
@@ -397,6 +426,13 @@ void applyReconciliation(bool userPreferences) {
 
 void tick(HardwareSerial& uart) {
     if(!mutex || xSemaphoreTake(mutex,portMAX_DELAY)!=pdTRUE)return;
+    const auto transition=handoff.poll(millis());
+    draining=handoff.active();
+    if(transition!=protocol::CommandHandoff::Result::Ready) {
+        if(transition==protocol::CommandHandoff::Result::TimedOut && running)
+            finish("partial_or_unknown","El receptor no respondió al comando anterior; la nueva secuencia no se envió.");
+        xSemaphoreGive(mutex);return;
+    }
     // Preguntar el modo al arrancar, sin que nadie pulse nada. Sin esto el
     // equipo no sabe si es base hasta que alguien lo consulta, y mientras tanto
     // el cliente NTRIP se reconecta a una base que no necesita correcciones.
@@ -584,7 +620,7 @@ int start(JsonVariantConst body,JsonDocument& out) {
         // ESP32 no aplico ninguna) y GST, GSV y GSA a 1 Hz: lo mismo que
         // `telemetry`. Son 9 ordenes, por debajo de las 20 de un trabajo.
         if(name=="rover") {
-            rover=false;mode="";
+            rover=false;base=false;wantsBase=false;mode="";
             add("UNLOG COM2");add("MODE ROVER SURVEY");add("CONFIG UNDULATION 0.0000");add("MODE");
             expectedMode="MODE ROVER SURVEY";
             addPositionOutputs(profileState.gga_rate_hz);
@@ -596,12 +632,13 @@ int start(JsonVariantConst body,JsonDocument& out) {
         if(name=="stop_outputs") add("UNLOG COM2");
         if(name=="mask") {
             add("MASK "+String(elevation,2));
-            profileState.elevation_deg=elevation;
+            profileState.elevation_deg=elevation;profileState.elevation_known=false;
         }
         if(name=="constellations") {
             const char* names[5]={"GPS","BDS","GLO","GAL","QZSS"};
             const bool wanted[5]={wantGps,wantBds,wantGlo,wantGal,wantQzss};
             for(int i=0;i<5;++i)add(String(wanted[i]?"UNMASK ":"MASK ")+names[i]);
+            profileState.constellations_known=false;
             profileState.gps=wantGps;profileState.bds=wantBds;profileState.glo=wantGlo;
             profileState.gal=wantGal;profileState.qzss=wantQzss;
         }
@@ -645,7 +682,7 @@ int applyBase(JsonVariantConst plan,JsonDocument& out) {
     // usuario que declare un datum que no tendría efecto.
     xSemaphoreTake(mutex,portMAX_DELAY);int code=prepare("base",out);
     if(!code){
-        rover=false;mode="";
+        rover=false;base=false;wantsBase=true;mode="";
         String command="MODE BASE "+String(plan["station_id"].as<unsigned>())+" ";
         // UNDULATION 0.0000 en los dos metodos, no solo con coordenada
         // conocida: el SAVECONFIG de abajo la guarda, y tiene que quedar
@@ -679,6 +716,8 @@ void status(JsonObject out){
     xSemaphoreTake(mutex,portMAX_DELAY);
     out["state"]=phase;out["job_id"]=job;out["action"]=action;out["completed_commands"]=index;
     out["total_commands"]=count;
+    out["superseded_jobs"]=supersededJobs;out["superseded_job_id"]=supersededJob;
+    out["waiting_command_reply"]=draining.load();
     out["mode"]=mode;out["version"]=version;out["error"]=failure;out["saved"]=profileState.saved;
     out["base_coordinates_verified"]=false;out["source"]="esp32_uart";
     xSemaphoreGive(mutex);

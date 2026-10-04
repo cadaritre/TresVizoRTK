@@ -124,3 +124,9 @@ Compilado, firmado y cargado por USB con verificación de hashes. 32 suites C++ 
 Banco físico BLE: 246 respuestas completas en dos series de tres conexiones, cero errores de reensamblado. Con MTU 247: mediana 64.7 ms, P95 210.1 ms; recuperación de respuesta bloqueada en 4.54 s. Los descartes y timeouts provocados coincidieron con lo inyectado; sin fallos GATT ni envíos forzados. Configuración conservada. OTA parcial cruzó el umbral de arranque, aceptó un bloque duplicado y se canceló sin cambiar el slot activo; la partición inactiva de prueba se borró.
 
 Wi-Fi físico no accesible desde la Mac y STA sin configurar; iPhone/Android, RTCM sostenido y OLED visual siguen pendientes. Detalles, reproducción y SHA-256 del binario final: [auditoría 0.8.2](connectivity/TRANSPORT_AUDIT_0.8.2.md).
+
+## 0.8.3 — 2026-10-04: prioridad del operador
+
+38 suites C++ con UBSan, 644 comprobaciones estáticas y 320 sobre el equipo. Cinco órdenes consecutivas aceptadas por USB en 6.0 ms de mediana; reinicio durante consulta aceptado en 4.7 ms. BLE: 123 respuestas, cero errores de reensamblado y P95 de 209.3 ms. Compilación, firma y carga USB terminadas. Configuración conservada.
+
+NTRIP con caster real, RTCM sostenido, cambios de base con GNSS y OLED visual siguen pendientes. Informe, límites y reproducción: [prioridad 0.8.3](connectivity/OPERATOR_PRIORITY_0.8.3.md).

@@ -583,12 +583,8 @@ int wifiScan(const String& method, JsonDocument& response) {
             error(response, "busy", "Hay una carga de firmware en curso. Espera a que termine antes de escanear.");
             return 409;
         }
-        // Escanear obliga a la radio a recorrer los canales: una sesión NTRIP en
-        // marcha perdería la conexión con el caster a media corrección.
-        if (ntrip_input::active()) {
-            error(response, "busy", "Hay correcciones NTRIP activas. Detenlas antes de buscar redes: el escaneo interrumpe la radio.");
-            return 409;
-        }
+        // El operador pidió buscar: el escaneo es asíncrono. Si interrumpe
+        // NTRIP, su worker recupera el enlace sin exigir detenerlo a mano.
         if (scanState != ScanState::running) startScan();
     }
     response["state"] = scanState == ScanState::running ? "scanning"
@@ -1049,8 +1045,8 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         // Solo impedir iniciar/cambiar imagen. Una sesión ya abierta debe poder
         // continuar y abortarse aunque una tarea del arranque se active después.
         if(method=="POST" && (path=="/api/update/begin" || path=="/api/update/rollback") &&
-           (gnss_control::busy() || ntrip_input::active() || sd_recorder::active())) {
-            error(response,"busy","Detén NTRIP y espera al GPS antes de actualizar.");return 409;
+           sd_recorder::active()) {
+            error(response,"busy","Cierra la grabación antes de actualizar.");return 409;
         }
         return firmware_update::request(method,path,body,response);
     }
@@ -1066,21 +1062,17 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
     if(path=="/api/gnss/control") {
         if(method=="GET"){gnss_control::status(response.to<JsonObject>());return 200;}
         if(method=="POST"){
-            // Cambiar de papel cierra la entrada de correcciones por su cuenta:
-            // pedirle al usuario que vaya a otra pestaña a detener algo que él
-            // no inició, para poder hacer lo que acaba de pedir, es trasladarle
-            // nuestro problema de orden interno.
             const String action = body["action"] | "";
-            if(action=="rover" || action=="base"){
-                ntrip_input::releaseForBase();
-                // Una base no consume correcciones. Un móvil que eligió BLE las
-                // recupera aquí, igual que NTRIP se reconecta solo después: sin
-                // esto, pasar a móvil dejaba BLE sin fuente hasta repetir la
-                // elección desde la app.
-                correction_router::select(action!="rover" ? "none" : correction_router::bleChosen() ? "ble"
-                                          : correction_router::radioChosen() ? "radio" : "none");
+            const int code=gnss_control::start(body,response);
+            if(code==202) {
+                // Validar/admitir primero: un 400/503 nunca interrumpe lo vigente.
+                base_survey::cancel("Sustituido por una operación del GPS.");
+                if(action=="rover") {
+                    ntrip_input::releaseForBase();
+                    correction_router::select(correction_router::bleChosen()?"ble":correction_router::radioChosen()?"radio":"none");
+                }
             }
-            return gnss_control::start(body,response);
+            return code;
         }
         return 400;
     }
@@ -1099,18 +1091,24 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         // entrada de correcciones abierta es contradictorio, y hacer que el
         // usuario vaya a cerrarla a otra pestaña es trasladarle nuestro orden
         // interno. Se cierra aquí.
-        ntrip_input::releaseForBase();
-        correction_router::select("none");
-        return gnss_control::applyBase(preview["plan"],response);
+        const int result=gnss_control::applyBase(preview["plan"],response);
+        if(result==202) {
+            base_survey::cancel("Sustituido por otra coordenada de base.");
+            ntrip_input::releaseForBase();
+            correction_router::select("none");
+        }
+        return result;
     }
     // El módulo de radio LoRa externo (docs/radio/RADIO_MODULE.md).
     if (path == "/api/radio") return radio_module::request(method, body, response);
     if (path == "/api/corrections/source") {
-        if(method=="PUT" && (ntrip_input::active() || gnss_control::busy())) {error(response,"busy","Detén NTRIP y espera al GPS antes de cambiar fuente.");return 409;}
         if (method == "PUT") {
-            if (!body.is<JsonObjectConst>() || body.size() != 1 || !validString(body["source"], config_rules::deviceName) || !correction_router::choose(body["source"])) {
-                error(response,"unsupported_source","Fuente no instalada. Disponibles: none, ble, ntrip."); return 400;
+            if (!body.is<JsonObjectConst>() || body.size() != 1 || !validString(body["source"], config_rules::deviceName) ||
+                (body["source"]!="none" && body["source"]!="ble" && body["source"]!="ntrip" && body["source"]!="radio")) {
+                error(response,"unsupported_source","Fuente no instalada. Disponibles: none, ble, ntrip, radio."); return 400;
             }
+            ntrip_input::stopForUser();
+            correction_router::choose(body["source"]);
         } else if (method != "GET") { error(response,"invalid_method","Usa GET o PUT."); return 400; }
         correction_router::status(response.to<JsonObject>()); return 200;
     }
@@ -1144,8 +1142,9 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         return wifiScan(method, response);
     }
     if (method == "POST" && path == "/api/restart") {
-        if(sd_recorder::active()||gnss_control::busy()){error(response,"busy","Cierra grabación y espera al GPS antes de reiniciar.");return 409;}
+        if(sd_recorder::active()){error(response,"busy","Cierra la grabación antes de reiniciar.");return 409;}
         if (!pendingRestart) {
+            base_survey::cancel("Cancelado por reinicio.");gnss_control::cancel();ntrip_input::stopForUser();
             pendingRestart = true;
             restartRequestedAt = millis();
         }

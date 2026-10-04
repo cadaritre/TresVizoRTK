@@ -1,3 +1,6 @@
+#include "gnss_control.h"
+#include "base_survey.h"
+#include "ntrip_input.h"
 #include "firmware_update.h"
 #include "board_profile.h"
 #include "instrument.h"
@@ -179,6 +182,7 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         if (!target || size - signed_firmware::kTrailerBytes > target->size) return fail(out,400,"Tamaño de imagen fuera de la partición OTA.");
         // Antes de tocar la partición: que deje de contar como verificada (R01).
         if (!forgetVerified(target)) return fail(out,503,"No se pudo preparar la partición inactiva.");
+        base_survey::cancel("Cancelado por actualización.");gnss_control::cancel();ntrip_input::stopForUser();
         if (esp_ota_begin(target,OTA_WITH_SEQUENTIAL_WRITES,&handle) != ESP_OK) return fail(out,503,"No se pudo preparar la partición inactiva.");
         correction_router::select("none");
         mbedtls_sha256_init(&fileHash); mbedtls_sha256_starts_ret(&fileHash,0);
@@ -203,6 +207,7 @@ int request(const String& method, const String& path, JsonVariantConst body, Jso
         }
         if (esp_ota_set_boot_partition(next) != ESP_OK)
             return fail(out,409,"No hay una imagen anterior válida para restaurar.");
+        base_survey::cancel("Cancelado por actualización.");gnss_control::cancel();ntrip_input::stopForUser();
         state = "rollback_scheduled"; restart = true; restartAt = millis(); status(out); return 202;
     }
     if (!active || !matches(body)) return fail(out,409,"Sesión de actualización inválida o vencida.");

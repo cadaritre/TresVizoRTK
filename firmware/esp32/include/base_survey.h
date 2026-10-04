@@ -14,6 +14,7 @@ void begin();
 // Consume una época nueva si cumple la calidad exigida; la llama el bucle.
 void tick();
 bool active();
+void cancel(const char* reason);
 // start: segundos y calidad mínima. cancel: aborta. GET: estado y progreso.
 int request(const String& method, JsonVariantConst body, JsonDocument& out);
 void status(JsonObject out);

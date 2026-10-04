@@ -32,6 +32,13 @@ Estas reglas se aplican a todo el repositorio y deben leerse junto con la docume
 - Indicar las pruebas realizadas y las que quedaron pendientes.
 - No subir credenciales, registros privados ni datos de clientes.
 
+## Prioridad del operador
+
+- La última decisión válida del usuario tiene prioridad sobre inicialización, reconciliación, reconexión y operaciones sustituidas. No exigir «detener primero» ni rechazar por una tarea automática ocupada si el firmware puede hacer la transición.
+- Validar antes de interrumpir el trabajo vigente. Aceptar la orden sin bloquear la interfaz y publicar su progreso real; aceptada no significa confirmada por el receptor.
+- Cancelar el trabajo obsoleto y descartar sus respuestas y paquetes pendientes. Una automatización nunca debe restaurar un ajuste que el usuario acaba de cambiar.
+- Respetar el comando ya transmitido, el cierre de archivos y la integridad de una actualización; resolver esos límites dentro del firmware y explicar fallos reales, sin trasladar pasos de coordinación al usuario.
+
 ## Reglas técnicas
 
 - Verificar manuales del fabricante antes de fijar comandos, interfaces, niveles eléctricos, pinouts o tasas.

@@ -36,6 +36,7 @@ uint64_t lastSampleArrivalUs = 0;
 // que la cadena siga existiendo.
 String failureText;
 uint32_t lastEpoch = UINT32_MAX;
+uint32_t applyingJob = 0;
 
 const char* qualityName(Quality value) {
     switch (value) {
@@ -78,11 +79,12 @@ void close(uint32_t now, uint64_t nowUs) {
     // Una base no consume correcciones, y tenerlas activas bloquea la
     // aplicación del modo. Se cierran aquí en vez de fallar al final de
     // un promedio de varios minutos por algo que sabíamos de antemano.
-    ntrip_input::releaseForBase();
-    correction_router::select("none");
     JsonDocument out;
     const int code = gnss_control::applyBase(plan.as<JsonVariantConst>(), out);
     if (code == 202) {
+        applyingJob=out["job_id"];
+        ntrip_input::releaseForBase();
+        correction_router::select("none");
         // Lanzado no es aplicado: el receptor todavía no ha contestado.
         // Decir "applied" aquí era la misma mentira de siempre.
         stop("applying", "Enviando la coordenada al receptor…");
@@ -100,10 +102,18 @@ void close(uint32_t now, uint64_t nowUs) {
 void begin() { state = "idle"; }
 
 bool active() { return !strcmp(state.load(), "averaging"); }
+void cancel(const char* why) {
+    if(!strcmp(state.load(),"applying"))gnss_control::cancel(applyingJob);
+    if(active() || !strcmp(state.load(),"applying"))stop("cancelled",why);
+}
 
 void tick() {
     // Esperando la confirmación del receptor tras enviar la coordenada.
     if (!strcmp(state.load(), "applying")) {
+        JsonDocument control;gnss_control::status(control.to<JsonObject>());
+        if(control["job_id"].as<uint32_t>()!=applyingJob) {
+            stop("cancelled","Sustituido por otra operación del GPS.");return;
+        }
         if (gnss_control::busy()) return;
         if (!gnss_control::isBase()) {
             stop("failed", "El receptor no confirmó el modo base. Consulta su estado en GPS avanzado.");
@@ -201,13 +211,12 @@ int request(const String& method, JsonVariantConst body, JsonDocument& out) {
     if (method != "POST" || !body.is<JsonObjectConst>()) return 400;
     const String action = body["action"] | "";
     if (action == "cancel") {
-        stop("cancelled", "Cancelado desde el panel.");
+        cancel("Cancelado desde el panel; los comandos ya transmitidos pueden haber cambiado el receptor.");
+        stop("cancelled", "Cancelado desde el panel; los comandos pendientes no se enviarán.");
         status(out.to<JsonObject>());
         return 200;
     }
     if (action != "start") return 400;
-    if (active()) { out["message"] = "Ya hay un promedio en curso."; return 409; }
-    if (gnss_control::busy()) { out["message"] = "Espera a que termine la operación del GPS."; return 409; }
     // Dos segundos son 10 épocas a 5 Hz: con solución fija es un promedio
     // legítimo, y exigir más era una regla inventada. El mínimo de épocas que
     // se exige al cerrar lo fija `base_average::minSamples`.
@@ -222,18 +231,21 @@ int request(const String& method, JsonVariantConst body, JsonDocument& out) {
         body["antenna_vertical_m"].as<double>() < 0 || body["antenna_vertical_m"].as<double>() > 100) {
         out["message"] = "Altura de antena: 0 a 100 m."; return 400;
     }
+    Quality requestedQuality=Quality::Fixed;
     const String quality = body["quality"] | "rtk_fixed";
-    if (quality == "rtk_fixed") required = Quality::Fixed;
-    else if (quality == "rtk_float") required = Quality::Float;
-    else if (quality == "standalone") required = Quality::Single;
-    else if (quality == "any") required = Quality::Any;
+    if (quality == "rtk_fixed") requestedQuality = Quality::Fixed;
+    else if (quality == "rtk_float") requestedQuality = Quality::Float;
+    else if (quality == "standalone") requestedQuality = Quality::Single;
+    else if (quality == "any") requestedQuality = Quality::Any;
     else { out["message"] = "Calidad admitida: rtk_fixed, rtk_float, standalone o any."; return 400; }
 
     const auto snapshot = gnss_receiver::snapshot();
-    if (!base_average::matches(required, snapshot.solution.quality)) {
+    if (!base_average::matches(requestedQuality, snapshot.solution.quality)) {
         out["message"] = "La solución actual no cumple la calidad exigida. Espera a alcanzarla o elige otra.";
         return 409;
     }
+    gnss_control::cancel();
+    required=requestedQuality;
     wantedSeconds = body["seconds"];
     stationId = body["station_id"];
     antennaVertical = body["antenna_vertical_m"];

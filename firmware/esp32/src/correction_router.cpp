@@ -12,6 +12,7 @@ namespace {
 std::atomic<Source> selected{Source::None};
 // Lo que eligio el usuario, no lo que esta seleccionado ahora.
 std::atomic<Source> chosen{Source::None};
+std::atomic<bool> choiceKnown{false};
 Preferences store;
 bool storeReady = false;
 std::atomic<uint32_t> revision{0}, accepted{0}, rejected{0};
@@ -21,6 +22,7 @@ std::atomic<uint32_t> lastAccepted{0};
 void begin() {
     storeReady = store.begin("corrections", false);
     if (!storeReady) return;
+    choiceKnown=store.isKey("chosen");
     const uint8_t saved = store.getUChar("chosen", uint8_t(Source::None));
     // Solo BLE se aplica aqui. NTRIP lo arranca su propio modulo con el perfil
     // guardado, y "ninguna" es el estado de partida.
@@ -32,9 +34,12 @@ void begin() {
 bool choose(const char* name) {
     if (!select(name)) return false;
     const Source next = selected.load();
-    if (chosen.exchange(next) != next && storeReady) store.putUChar("chosen", uint8_t(next));
+    const bool changed=chosen.exchange(next)!=next;
+    const bool first=!choiceKnown.exchange(true);
+    if ((changed || first) && storeReady) store.putUChar("chosen", uint8_t(next));
     return true;
 }
+bool ntripAllowed(){return !choiceKnown || chosen==Source::Ntrip;}
 bool bleChosen() { return chosen == Source::Ble; }
 bool radioChosen() { return chosen == Source::Radio; }
 void adoptRadio() {
@@ -47,7 +52,7 @@ bool select(const char* name) {
     else if (!strcmp(name,"ntrip")) next = Source::Ntrip;
     else if (!strcmp(name,"radio")) next = Source::Radio;
     else return false;
-    if (selected.exchange(next) != next) ++revision;
+    if (selected.exchange(next) != next) {++revision;lastAccepted=0;}
     return true;
 }
 bool submit(Source source, const uint8_t* frame, size_t length) {

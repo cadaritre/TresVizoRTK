@@ -8,6 +8,9 @@ void begin();
 void feed(const char* data, size_t length);
 void tick(HardwareSerial& uart);
 bool busy();
+// Cancela solo ese trabajo (0: el vigente), sin cortar un comando UART a medias.
+void cancel(uint32_t expectedJob = 0);
+bool baseRequested();
 bool roverReady();
 // El receptor trabaja como base. Un equipo base no consume correcciones: las
 // produce. Sin esta distincion el panel puede decir a la vez que es base y
