@@ -47,8 +47,7 @@ for clave, donde, fondo in (('seguro_base', 'Seguro de la base. Rosca en el maci
                             ('seguro_tapa', 'Seguro de la tapa. Rosca en el refuerzo del cuello.',
                              seg['profundidad_tapa'])):
     util = cabeza - ((RO + 2) - fondo)
-    # Al menos 5 mm de rosca en el macizo: a radio 32 el seguro de la base no
-    # puede pasar de un M3x10 sin acercarse a la brida del inserto.
+    # Al menos 5 mm de rosca en el macizo.
     largos[clave] = comercial_que_cabe(util, sin_rosca + 5)
     filas.append(('M3 cabeza boton ISO 7380', largos[clave], 1, donde,
                   f'piloto util {util:.1f} mm; rosca {largos[clave] - sin_rosca:.1f} mm'))
@@ -129,9 +128,29 @@ if acc.get('activo', True):
                   f'Barrenos de accesorios, {acc["piloto"]} mm pasantes.',
                   'a discrecion segun lo que montes'))
 
-# --- Inserto ---------------------------------------------------------------
-filas.append(('McMaster 90611A121', None, 1, 'Rosca 5/8-11 UNC hembra del jalon.',
-              'capturado en la base; ver el pendiente del README'))
+# --- Tuerca del jalon y sus retenes -------------------------------------------
+tj = P['tuerca_jalon']
+ret = tj['retenes']
+# El M3 aprieta la arandela contra la cara de la base y rosca en el piloto.
+util = ret['arandela_espesor'] + ret['profundidad']
+largos['reten_tuerca'] = comercial_que_cabe(util, ret['arandela_espesor'] + 4.0)
+filas.append(('M3 cabeza boton ISO 7380', largos['reten_tuerca'], len(ret['angulos']),
+              'Detienen la tuerca del jalon por arriba, con arandela ancha.',
+              f'arandela {ret["arandela_espesor"]} + rosca '
+              f'{largos["reten_tuerca"] - ret["arandela_espesor"]:.1f} mm en un piloto de '
+              f'{ret["profundidad"]}'))
+filas.append(('Arandela plana ancha M3 DIN 9021 (9 x 0.8)', None, len(ret['angulos']),
+              'Bajo los dos M3: pisan 1.4 mm de la tuerca.', 'la de 7 mm (DIN 125) pisa menos de 1 mm'))
+filas.append(('Tuerca hexagonal 5/8-11 UNC de laton', None, 1,
+              'Rosca del jalon. Entra por dentro de la base, en su hexagono.',
+              f'estandar: 15/16 in entre caras, 35/64 in de alto; hueco de '
+              f'{tj["entre_caras"] + tj["holgura_caras"]:.1f} entre caras'))
+notas.append(
+    'Tuerca del jalon: hexagonal ESTANDAR de 5/8-11 UNC (5/8 NC, 11 hilos), de laton. '
+    'No sirve la pesada (1-1/16 in entre caras, no entra), ni la de rosca fina 5/8-18, ni '
+    'una de seguridad con nylon. Medirla al comprarla: hasta 24.0 entre caras y 13.9 de '
+    'alto entra en el hueco tal cual. Va con el tubo quitado: se mete por dentro de la '
+    'base hasta el anillo y se ponen los dos M3 con su arandela.')
 
 lineas = ['# Tornilleria de V2.2', '',
           'Generado por `bom.py` desde `parameters.json` (lo ejecuta `regenerate.py`). Las longitudes salen de',
@@ -148,8 +167,21 @@ for nombre, largo, cant, donde, calculo in filas:
 
 tornillos = sum(c for _, l, c, _, _ in filas if l)
 lineas += ['',
-           f'**{tornillos} tornillos con longitud definida.** Sin tuercas sueltas: '
-           'todos roscan en el plastico o en la antena.', '']
+           f'**{tornillos} tornillos con longitud definida.** Ninguno lleva tuerca: '
+           'todos roscan en el plastico o en la antena. La unica tuerca es la del jalon.', '']
+
+jx = P['panel']['jst_xh']
+lineas += ['## Conector de carga', '',
+           '| Pieza | Cant. | Donde |',
+           '| --- | ---: | --- |',
+           '| Header JST-XH de 2 pines, vertical, B2B-XH-A (o clon "XH 2.54 2P macho recto") | 1 | '
+           f'Panel, a ras, en su bolsillo de {jx["ancho"] + 2 * jx["holgura"]:.1f} x '
+           f'{jx["fondo"] + 2 * jx["holgura"]:.1f}. Cables soldados a sus patas. |',
+           '| Carcasa XHP-2 con 2 terminales SXH, o un cable XH de 2 pines ya armado | 1 | '
+           'Del lado del cargador. |',
+           '',
+           'JST lo vende como conector de placa, no para conectar y desconectar a diario.',
+           '']
 
 lineas += ['## Lo de dentro', '',
            'Nada de lo de dentro se atornilla: la 18650 va detras del respaldo y el',
@@ -167,7 +199,8 @@ lineas += ['## Consumibles',
            '| Consumible | Cantidad | Uso |',
            '| --- | ---: | --- |',
            '| Brida de 2.5 a 3.6 mm, 150-200 mm | 10-15 | Placas y 18650 al respaldo |',
-           '| Brida de 2.5 mm, 100 mm | 2 | Placa del USB-C a su repisa |',
+           '| Epoxico de 5 minutos | unas gotas | Header JST-XH en su bolsillo, por dentro |',
+           '| Termofit de 2.5 mm | 5 cm | Patas del header JST soldadas a sus cables |',
            '| Brida de 2.5 mm, 100-150 mm | 4-8 | Componentes extra en los toalleros |',
            '| Lamina transparente de 1 mm (acrilico o PETG), 26.7 x 19.3 | 1 | Mica de la pantalla |',
            '| Filamento TPU 95A | ~25 g | Las dos bandas de proteccion |',

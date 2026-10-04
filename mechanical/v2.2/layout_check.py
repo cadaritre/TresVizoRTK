@@ -77,8 +77,7 @@ centro = norm(ini + ancho_g / 2)
 
 # En vertical, el logo va entre las dos bandas de TPU.
 largo = d['cuerpo']['largo_util']
-z_top = d['inserto_jalon']['barril_altura'] + d['inserto_jalon']['brida_espesor'] + 4.0 \
-    + largo + 2.0 + d['antena']['espesor_tapa']
+z_top = d['tuerca_jalon']['piso_z'] + largo + 2.0 + d['antena']['espesor_tapa']
 abajo = d['bandas']['alto']
 arriba = z_top - d['bandas']['alto']
 

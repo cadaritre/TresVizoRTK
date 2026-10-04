@@ -2,14 +2,15 @@
  "units": "mm",
  "criterio": [
   "V2.2 = carcasa de 64 mm de diametro y 130 de alto, con panel frontal de pantalla",
-  "OLED de 0.96 in, boton metalico de 12 mm, USB-C y dos LEDs; sin trineo y sin",
-  "panel auxiliar; IMU en una plataforma que se incrusta en el cuello de la tapa;",
-  "tapa plana; dos bandas de TPU arriba y abajo. Bateria 18650.",
+  "OLED de 0.96 in, boton metalico de 12 mm, conector de carga JST-XH y dos LEDs; sin",
+  "trineo y sin panel auxiliar; IMU en una plataforma que se incrusta en el cuello de la",
+  "tapa; tapa plana; dos bandas de TPU arriba y abajo. Bateria 18650. Rosca del jalon:",
+  "tuerca hexagonal 5/8-11 de laton metida por dentro de la base.",
   "El interior no lleva alojamientos con forma de componente: todo se amarra con",
   "bridas al respaldo ranurado o a cuatro toalleros. La 18650 va detras del",
   "respaldo; el UM980 y la Thing Plus, delante.",
   "Tienen posicion definida la antena, la rosca 5/8, el IMU (su CHIP en el eje),",
-  "la pantalla, el boton y el USB-C del panel."
+  "la pantalla, el boton y el conector de carga del panel."
  ],
  "tubo": {
   "diametro_exterior": 64.0,
@@ -58,7 +59,7 @@
  },
  "cuerpo": {
   "largo_util": 107.0,
-  "_nota": "Del piso de la base al techo interior. Altura total 129.9: el propietario fijo 64 de diametro y pidio conservar el USB-C y los LEDs en el panel, que con la pantalla y el boton piden unos 130."
+  "_nota": "Del piso de la base al techo interior. Altura total 129.9: el propietario fijo 64 de diametro y pidio conservar el USB-C (hoy JST-XH) y los LEDs en el panel, que con la pantalla y el boton piden unos 130."
  },
  "respaldo": {
   "_que_es": "Placa ranurada vertical en la cara trasera del tubo (-Y), unida a la pared por dos costillas. Todo lo de dentro se amarra a ella con bridas. Sustituye al trineo: deja libre el frente, donde van el boton, la pantalla y su cableado.",
@@ -218,17 +219,33 @@
   "diametro": 43.5,
   "altura": 40.8
  },
- "inserto_jalon": {
-  "brida_diametro": 36.5125,
-  "brida_espesor": 2.38125,
-  "barril_diametro": 18.25625,
-  "barril_altura": 9.525,
-  "holgura": 0.2,
-  "radio_pilotos": 13.5,
-  "paso_libre_macho_radio": 9.0,
-  "capturar_sin_tornillos": true,
-  "piloto_diametro": 3.4,
-  "_PENDIENTE_montaje": "SIN RESOLVER desde V2: la brida de 36.5 no pasa por el barreno del barril (18.46) ni por el paso del jalon (18.0). V2.2 no cambia la base en esto. Salida posible sin tocar la geometria: pausar la impresion de la base en la capa de z = 11.9 (cara superior del alojamiento de la brida), meter el inserto con sus agujeros en los tres pilotos y seguir. Sin ensayar."
+ "tuerca_jalon": {
+  "_que_es": "Tuerca hexagonal 5/8-11 UNC de laton, estandar (ni pesada ni delgada): 15/16 in entre caras y 35/64 in de alto. Entra por dentro de la base, con el tubo quitado, en un alojamiento hexagonal que no la deja girar, y apoya en un anillo de 2 mm que es el asiento contra el baston. Dos M3 con arandela ancha la detienen por arriba. Sustituye al inserto de McMaster, que solo entraba pausando la impresion.",
+  "entre_caras": 23.8125,
+  "alto": 13.89,
+  "alto_minimo": 13.49,
+  "_nota_medidas": "ASME B18.2.2 para 5/8: 0.922 a 0.938 in entre caras y 0.531 a 0.547 in de alto. Medir la tuerca comprada: si pasa de 24.0 entre caras o de 13.9 de alto, se cambia aqui.",
+  "holgura_caras": 0.3,
+  "anillo_asiento": 2.0,
+  "_nota_anillo": "El asiento contra el baston es plastico impreso sobre la cama: plano y a escuadra con el eje. Al apretar, el perno jala la tuerca contra el anillo y el anillo contra el hombro del baston; todo trabaja a compresion.",
+  "paso_perno_diametro": 16.6,
+  "chaflan_paso": 0.6,
+  "_nota_paso": "El perno del baston mide 15.9 de diametro mayor: cruza el anillo con 0.35 por lado sin roscar en el. El chaflan lo guia y quita la pata de elefante de la primera capa.",
+  "piso_z": 15.906,
+  "_nota_piso": "Cara superior de la base, la misma de antes, para no mover la altura (129.9). Alojamiento de 13.906 sobre el anillo: una tuerca de 13.49 a 13.89 queda de 0.0 a 0.4 bajo la cara.",
+  "retenes": {
+   "angulos": [
+    90.0,
+    270.0
+   ],
+   "radio": 15.0,
+   "piloto": 2.5,
+   "profundidad": 8.5,
+   "arandela_diametro": 9.0,
+   "arandela_espesor": 0.8,
+   "cabeza_alto": 1.65,
+   "_nota": "M3 cabeza boton con arandela ancha DIN 9021 (9 x 0.8). Cada tornillo cae frente a una cara del hexagono: la arandela pisa 1.4 mm de la tuerca y la cresta de la rosca queda a 1.4 del alojamiento. Solo la detienen mientras entra el perno o con el equipo suelto: apretado al baston, el perno la jala contra el anillo."
+  }
  },
  "bayoneta": {
   "numero_dientes": 3,
@@ -256,12 +273,12 @@
   "_nota_angulo": "Sector libre: las ranuras de bayoneta barren 344-43, 107-160 y 227-280 abajo y 317-16, 80-133 y 200-253 arriba; el panel principal ocupa 47-133.",
   "profundidad_base": 14.3,
   "profundidad_tapa": 16.3,
-  "altura_sobre_brida": 1.8,
+  "bajo_piso_base": 2.2,
   "boss_largo": 7.5,
-  "_nota_profundidad": "Medidas desde 2 mm fuera de la pared. En la base, 14.3: a radio 32 el piloto de 17 llegaba sobre el alojamiento de la brida del inserto y dejaba 0.2 mm de pared; con 14.3 entra un M3x10 con 5.4 mm de rosca y quedan 1.8 mm. En la tapa, 16.3 y M3x12 como en V2.1."
+  "_nota_profundidad": "Medidas desde 2 mm fuera de la pared. En la base, 14.3: entra un M3x10 con 5.4 mm de rosca; su eje va 2.2 bajo la cara superior de la base (z = 13.7), donde estaba. En la tapa, 16.3 y M3x12 como en V2.1."
  },
  "panel": {
-  "_que_es": "Panel frontal (+Y): pantalla OLED, boton de 12 mm, USB-C y dos LEDs. Ventana pasante en el tubo, pared engrosada por dentro y tapa a ras con todo montado en ella.",
+  "_que_es": "Panel frontal (+Y): pantalla OLED, boton de 12 mm, conector de carga JST-XH de 2 pines y dos LEDs. Ventana pasante en el tubo, pared engrosada por dentro y tapa a ras con todo montado en ella.",
   "angulo": 90.0,
   "arco_grados": 86.0,
   "z_centro": 65.95,
@@ -404,32 +421,30 @@
    "_nota_panel_maximo": "El fabricante mas restrictivo (ONPOW GQ12) admite panel de hasta 6 mm. Con 4.0 de tapa y una junta de 1.0 bajo la ceja quedan 5.0.",
    "variante": "momentaneo, anillo LED azul (captura del propietario)"
   },
-  "usb_c": {
-   "z": 96.0,
-   "ancho": 9.6,
-   "alto": 4.0,
-   "_nota": "El receptaculo tiene que quedar casi a ras: con la placa apoyada en la cara interior curva quedaba 2 a 3.6 mm hundido y el plastico de la clavija no entraba por el hueco de 9.6 x 4. Ahora el hueco exterior es del tamano del sobremolde de un cable comun (12.5 x 7) y por dentro hay un asiento plano en y = 37.6 para el canto de la placa: el receptaculo queda 0.4 a 1.4 mm bajo la cara exterior, segun cuanto sobresalga de su placa. Detras, repisa con dos costillas; una brida rodea placa y repisa.",
-   "soporte": true,
-   "eje_sobre_cara_inferior_placa": 3.2,
-   "_nota_eje": "Centro del receptaculo sobre la cara inferior de su placa: 1.6 de PCB + 1.6 hasta el eje en un receptaculo de montaje superficial. Si la placa real es distinta, se cambia este numero.",
-   "placa_ancho": 18.0,
-   "placa_espesor": 1.6,
-   "holgura_lateral": 0.3,
-   "repisa_fondo_y": 23.5,
-   "repisa_espesor": 2.0,
-   "costilla_espesor": 2.0,
-   "costilla_bajada": 8.0,
-   "hueco_exterior": [
-    12.5,
-    7.0
+  "jst_xh": {
+   "_que_es": "Conector de carga JST-XH de 2 pines (paso 2.5) en lugar del USB-C: header macho vertical B2B-XH-A con los cables soldados a sus patas, metido por fuera en su bolsillo hasta el tope del fondo y fijado con una gota de epoxico por dentro. Su cara queda a ras del panel; el cargador entra con una carcasa XHP-2.",
+   "z": 93.5,
+   "_nota_z": "Bajo de 96 (el USB-C): el bolsillo del header sale 8 mm hacia dentro y tiene que pasar por la ventana del tubo, cuyo borde de arriba esta en z = 98.4; por encima empieza el engrosamiento donde apoya el reborde de la tapa. Con 93.5, el bolsillo queda 0.7 mm por debajo.",
+   "ancho": 7.4,
+   "fondo": 5.75,
+   "alto": 7.0,
+   "_nota_medidas": "Plano de JST, serie XH: el B2B-XH-A mide 7.4 de ancho (2.5 + 4.9), 5.75 de fondo y 7.0 de alto sobre la placa; sus patas, de 0.64 en cuadro, salen 3.4. La carcasa XHP-2 mide 7.3 de ancho. Si el que se compre es un clon con otras medidas, se cambian aqui.",
+   "holgura": 0.15,
+   "hundido": 0.25,
+   "_nota_hundido": "Cara del header bajo la superficie exterior en el centro del hueco: plana sobre la tapa curva, a 0.25 no sobresale en los extremos. Si la clavija no entra completa, se pone negativo y el header asoma.",
+   "pared": 1.2,
+   "ranura_cables": [
+    6.4,
+    3.0
    ],
-   "apoyo_placa_y": 29.4
+   "_nota_ranura": "Por la ranura del fondo pasan las dos patas con los cables soldados y su termofit: el header entra por fuera, cables primero.",
+   "_nota_retencion": "El fondo del bolsillo aguanta el empuje al conectar; al desconectar lo retiene el epoxico. Sin pegamento, el header sale con la clavija."
   },
   "leds": {
    "diametro": 3.2,
-   "z": 96.0,
+   "z": 93.5,
    "separacion": 27.0,
-   "_nota": "Uno a cada lado del USB-C, a +-13.5: los indicadores de carga junto al puerto."
+   "_nota": "Uno a cada lado del conector de carga, a +-13.5 y a su misma altura."
   }
  },
  "accesorios": {

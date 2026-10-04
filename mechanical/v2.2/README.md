@@ -7,12 +7,17 @@ de 2026:
    130 mm. La batería es una **18650**: no hace falta el ancho que pedía la
    955565 de V2.1.
 2. Panel frontal con la pantalla OLED y el botón metálico de 12 mm que compró,
-   cada uno con su montaje, más el USB-C y los dos LEDs. Sin panel auxiliar.
+   cada uno con su montaje, más el conector de carga y los dos LEDs. Sin panel
+   auxiliar.
 3. Fuera el trineo universal. Todo se amarra con bridas a un respaldo que forma
    parte del tubo, con huecos grandes en sus costillas, o a cuatro toalleros.
 4. El IMU va en una plataforma que se incrusta en la tapa de antena, con el
    **chip** en el eje del receptor, y con un paso amplio para el coaxial.
 5. Tapa plana, como V2.1, y dos bandas de protección de TPU, arriba y abajo.
+
+El 4 de octubre pidió dos cambios más: la rosca del jalón con una tuerca que se
+compra hecha ([Tuerca del jalón](#tuerca-del-jalón)) y, en el panel, un JST-XH
+de 2 pines en lugar del USB-C, para simplificar la carga.
 
 El primer borrador de V2.2 medía Ø79 (commit `5d196e6`). El propietario fijó
 después Ø64 como máximo. Entre medias, una revisión independiente del modelo
@@ -29,15 +34,48 @@ pasa las comprobaciones automáticas; eso no es validación.
 | Del asiento del jalón a la cara de la antena | 136.9 mm | **129.9 mm** |
 | Largo útil interior | 114 mm | **107 mm** |
 | Batería | LiPo 955565 en el trineo | **18650 detrás del respaldo** |
-| Panel frontal | 66° × 58 mm: USB-C, botón de 10.4, dos LEDs | **86° × 83 mm**: OLED 0.96" en su marco, botón de 12 mm, USB-C con asiento, dos LEDs |
+| Panel frontal | 66° × 58 mm: USB-C, botón de 10.4, dos LEDs | **86° × 83 mm**: OLED 0.96" en su marco, botón de 12 mm, JST-XH de carga a ras, dos LEDs |
 | Panel auxiliar | 50° × 40 mm con USB-C | **no hay** |
+| Rosca del jalón | inserto de McMaster con brida | **tuerca hexagonal 5/8"-11 de latón**, por dentro de la base |
 | Interior | trineo atornillado a la base | **respaldo ranurado en el tubo y cuatro toalleros** |
 | IMU | repisa del trineo, con los **agujeros** en el eje (chip 5.65 mm fuera) | **plataforma incrustada en la tapa**, con el **chip** en el eje |
 | Bayonetas | tres dientes iguales: la tapa cerraba en tres posiciones | **un diente índice**: una sola posición |
 | Protección | — | **bandas de TPU** arriba y abajo |
 | Piezas | 6 | 7 (5 rígidas y 2 de TPU) |
-| Tornillos con largo definido | 13 | 13 |
-| Material rígido | 187 cm³ | 157 cm³ |
+| Tornillos con largo definido | 13 | 15 |
+| Material rígido | 187 cm³ | 156 cm³ |
+
+## Tuerca del jalón
+
+La rosca del jalón es una **tuerca hexagonal 5/8"-11 UNC de latón**, estándar:
+15/16" entre caras y 35/64" de alto. Sustituye al inserto de McMaster que venía
+de V2, que solo entraba pausando la impresión.
+
+- Entra **por dentro** de la base, con el tubo quitado, en un alojamiento
+  hexagonal de 24.1 mm entre caras que no la deja girar.
+- Apoya en un **anillo de 2 mm**. La cara de abajo de ese anillo es el asiento
+  contra el bastón: se imprime sobre la cama, plana y a escuadra con el eje. Al
+  apretar, el perno jala la tuerca contra el anillo y el anillo contra el hombro
+  del bastón: todo trabaja a compresión.
+- El perno cruza el anillo con 0.36 mm de holgura por lado, por una entrada a
+  45°, y no rosca en el plástico.
+- Por arriba la detienen **dos M3×8 con arandela ancha DIN 9021** (9 mm),
+  frente a dos caras del hexágono. Cada arandela pisa 1.4 mm de tuerca y deja
+  2.6 mm al perno. Solo trabajan mientras entra el perno o con el equipo suelto.
+- Se imprime sin pausa, y si se daña la rosca se cambia la tuerca.
+- La altura no cambia: la cara de arriba de la base sigue en z = 15.9 y el ARP
+  en 129.9 mm.
+- En un mismo bastón el receptor queda siempre en el mismo ángulo; en otro
+  bastón, en otro. El frente es el panel: se gira el bastón para tenerlo
+  enfrente, como pide Emlid con su Reach RS3.
+
+**Qué tuerca comprar:** hexagonal estándar de 5/8"-11 UNC de latón (en ferretería,
+"5/8 NC" o "rosca estándar", 11 hilos). No sirven la pesada (1-1/16" entre
+caras), la de rosca fina 5/8"-18 ni las de seguridad con nylon. Una que se
+encontró el 04-10-2026:
+[Los Tornillos, "TUERCA HEXAGONAL NC ESTANDAR 5/8 LATÓN"](https://lostornillos.mx/products/tuerca-hexagonal-nc-laton-5-8-11),
+51.79 MXN. Al recibirla, medirla: hasta 24.0 entre caras y 13.9 de alto entra
+tal cual. Si no, se cambia `tuerca_jalon` en `parameters.json` y se regenera.
 
 ## El IMU: qué estaba mal en V2.1 y cómo queda
 
@@ -151,8 +189,8 @@ bajo las bandas de TPU.
 
 | Elemento | Altura z | Montaje |
 | --- | ---: | --- |
-| USB-C | 96 | Hueco exterior de 12.5 × 7, del tamaño del sobremolde de un cable común. Por dentro, asiento plano para el canto de la placa: el receptáculo queda casi a ras. Detrás, repisa con dos costillas; una brida rodea placa y repisa. |
-| Dos LEDs | 96, a ±13.5 | Barrenos de 3.2, uno a cada lado del USB-C. |
+| Conector de carga JST-XH, 2 pines | 93.5 | Header vertical B2B-XH-A (7.4 × 5.75 × 7.0) en un bolsillo de 7.7 × 6.05, con la cara 0.25 mm bajo la superficie. Entra por fuera, cables primero, hasta el fondo; la ranura del fondo deja pasar las patas con los cables soldados y su termofit. Una gota de epóxico por dentro lo retiene al desconectar. |
+| Dos LEDs | 93.5, a ±13.5 | Barrenos de 3.2, uno a cada lado del JST. |
 | Pantalla OLED 0.96" | área activa centrada en 71.5 | Marco por dentro: el PCB apoya por la cara del vidrio en un plano en toda su altura; vidrio y mica en un bolsillo; cuatro M2×4 a sus agujeros. Ventana del área visible, con chaflán hacia fuera de 45° arriba y abajo, porque la pantalla se mira desde abajo, y de 20° a los lados. |
 | Botón de 12 mm | 43.5 | Barreno de 12.3. Rebaje plano de 15 por fuera para la ceja y asiento plano de 18 por dentro para la tuerca: panel de 3.4 mm en el eje, 4.4 con la junta; el fabricante más restrictivo admite 6. |
 
@@ -171,6 +209,14 @@ bajo las bandas de TPU.
 - **El LED del botón es de 12 V.** Con 3.3 o 5 V encenderá poco o nada.
 - El tornillo de arriba de la tapa queda a 0.75 mm del cuello de la tapa de
   antena: es **M3×4** y no puede ser más largo.
+- **El JST y los LEDs bajaron de 96 a 93.5.** El bolsillo del header sale 8 mm
+  hacia dentro y tiene que pasar por la ventana del tubo, cuyo borde de arriba
+  está en 98.4: queda 0.67 mm por debajo. Su cara de abajo va a 45° para
+  imprimirse sin soporte.
+- JST vende el XH como conector de placa, no como puerto para conectar y
+  desconectar a diario: si se afloja, se cambia el header.
+- El cambio es solo mecánico. Qué cargador entra por el JST y su polaridad los
+  define la electrónica.
 
 ## Bandas de TPU
 
@@ -198,10 +244,12 @@ Piezas 6 y 7. Dos fundas de 28 mm de alto y 2 mm de pared, para imprimir en TPU:
 
 ## Montaje
 
-1. **Base:** inserto del jalón (ver el pendiente de abajo).
+1. **Base:** meter la tuerca de latón por dentro hasta el anillo y poner los dos
+   M3×8 con su arandela ancha.
 2. **Tapa del panel:** botón con su tuerca por dentro; pantalla con la mica, sus
-   cables soldados y cuatro M2×4; placa del USB-C en su asiento con una brida;
-   LEDs; cables con largo de sobra.
+   cables soldados y cuatro M2×4; header JST con los cables soldados a sus patas
+   y termofit, metido por fuera, cables primero, hasta el fondo, y una gota de
+   epóxico por dentro; LEDs; cables con largo de sobra.
 3. **Paquete:** 18650 detrás del respaldo, por el extremo de abajo del tubo, con
    una brida por las ranuras de ±5; UM980 y Thing Plus delante, por la ventana
    del panel y por los extremos del tubo.
@@ -214,7 +262,7 @@ Piezas 6 y 7. Dos fundas de 28 mm de alto y 2 mm de pared, para imprimir en TPU:
    respaldo, conectar por la ventana del panel, diente ancho por su entrada, girar
    en sentido horario hasta el tope (28.7°: dejar cable de sobra) y M3×12 del
    seguro.
-7. **Tapa del panel:** conectar pantalla, botón, USB-C y LEDs y cerrar con dos
+7. **Tapa del panel:** conectar pantalla, botón, JST y LEDs y cerrar con dos
    M3×4.
 8. **Bandas de TPU:** deslizarlas, una por abajo y otra por arriba.
 
@@ -224,11 +272,11 @@ La lista completa está en [SCREW-BOM.md](SCREW-BOM.md).
 
 | Pieza | Material | Orientación | Soportes |
 | --- | --- | --- | --- |
-| `01-threaded-base` | PETG o ASA | Cara del jalón en la cama. | Los mismos que V2.1. |
+| `01-threaded-base` | PETG o ASA | Cara del jalón en la cama. | Los mismos que V2.1. Sin pausa: el alojamiento de la tuerca queda abierto por arriba. |
 | `02-logo-tube` | PETG o ASA | De pie. | **Solo dentro de la ventana del panel**: su techo es una franja curva que no se puede puentear. La tapa del panel lo cubre. El respaldo, sus costillas y los toalleros se imprimen sin soporte; el canto inferior de la placa del respaldo es un puente de unos 22 mm. |
 | `03-antenna-cap` | PETG o ASA | Boca abajo, con la cara de la antena en la cama. | **Bajo los tres dientes de la bayoneta**, apoyado en la placa: son su cara de carga. El refuerzo del seguro va unido a la placa y el canto que retiene cada uña es un puente de 6.3 mm. |
 | `04-imu-platform` | PETG o ASA | Disco en la cama. | Ninguno. |
-| `05-panel-cover` | PETG o ASA | De pie, sobre su canto inferior, con **brim**. | Ninguno: el techo del bolsillo de la pantalla es un puente de 27 mm y la repisa del USB-C, un puente entre sus costillas. |
+| `05-panel-cover` | PETG o ASA | De pie, sobre su canto inferior, con **brim**. | Ninguno: el techo del bolsillo de la pantalla es un puente de 27 mm; el del bolsillo del JST, uno de 7.7, y su cara de abajo va a 45°. |
 | `06-bumper-bottom` y `07-bumper-top` | **TPU 95A** | De pie. | Ninguno. |
 
 Las uñas flexionan 1.2 % al entrar: el PETG lo aguanta de sobra; el PLA también,
@@ -252,7 +300,7 @@ Una revisión del modelo del primer borrador encontró:
 | Hallazgo | Corrección |
 | --- | --- |
 | El barreno de accesorios de 324° apuntaba a la esquina de la batería. | Barrenos de accesorios desactivados (`accesorios.activo`). Flanqueaban el panel auxiliar, que ya no está. |
-| El USB-C quedaba 2 a 3.6 mm hundido y el hueco no dejaba entrar el plástico de la clavija. | Asiento plano por dentro y hueco exterior del tamaño del sobremolde. |
+| El USB-C quedaba 2 a 3.6 mm hundido y el hueco no dejaba entrar el plástico de la clavija. | Asiento plano por dentro y hueco exterior del tamaño del sobremolde. El 04-10-2026 el USB-C se cambió por el JST-XH. |
 | La tapa cerraba también girada 120° o 240°, con el IMU y la antena girados. | Diente índice en las dos bayonetas. |
 | La uña a 30° absorbía poco error y casi se autobloqueaba. | Uña a 45°. |
 | Los dos M2 de abajo de la pantalla apretaban contra el chaflán del marco. | Cara plana del marco en toda la altura del PCB. |
@@ -263,8 +311,9 @@ Una revisión del modelo del primer borrador encontró:
 | El canto superior de la tapa era un escalón que, boca abajo, dejaba un voladizo visto. | Chaflán a 45°. |
 
 Al pasar a Ø64 apareció otro: el piloto del seguro de la base llegaba sobre el
-alojamiento de la brida del inserto y dejaba 0.2 mm de pared. Ahora es más corto
-y lleva un M3×10: quedan 1.85 mm.
+alojamiento de la brida del inserto y dejaba 0.2 mm de pared. Se acortó y lleva
+un M3×10. Con la tuerca en lugar del inserto, quedan 6.8 mm hasta su
+alojamiento.
 
 ## Pendientes
 
@@ -272,14 +321,12 @@ y lleva un M3×10: quedan 1.85 mm.
   fuentes del vendedor. Conviene medirla en la placa real (ver arriba). El
   espesor del PCB tampoco está publicado: se supone 1.6.
 - **18650:** el modelo usa el peor caso con protección (69 mm). Medir la real.
-- **Placa del USB-C:** sin referencia confirmada. Si su receptáculo no queda a
-  3.2 mm sobre la cara inferior de la placa, se cambia
-  `panel.usb_c.eje_sobre_cara_inferior_placa`.
-- **Inserto del jalón:** viene de V2 y **no se tocó**. La brida (Ø36.5) no pasa
-  por ninguna de las dos aberturas de su alojamiento (Ø18). Salida posible sin
-  cambiar la geometría: pausar la impresión de la base en la capa de z = 11.9,
-  la cara superior del alojamiento de la brida, meter el inserto con sus
-  agujeros en los tres pilotos y seguir. No se ha ensayado.
+- **Tuerca del jalón:** el alojamiento sale de la norma ASME B18.2.2. Medir la
+  tuerca comprada antes de imprimir la base (ver [arriba](#tuerca-del-jalón)).
+- **Header JST-XH:** las medidas son del plano de JST. Un clon puede variar:
+  medirlo antes de imprimir la tapa del panel y, si hace falta, cambiar
+  `panel.jst_xh`. Si la clavija no entra completa, `hundido` negativo saca el
+  header.
 - **La opción del domo** ([option-oem-dome](../option-oem-dome/README.md)) es
   para V2.1 (Ø69) y no está adaptada a V2.2.
 
@@ -287,11 +334,11 @@ y lleva un M3×10: quedan 1.85 mm.
 
 | Archivo | Qué es |
 | --- | --- |
-| `01-threaded-base.stl` | Base: inserto 5/8" y bayoneta con diente índice. |
+| `01-threaded-base.stl` | Base: alojamiento hexagonal de la tuerca 5/8" de latón, anillo de asiento y bayoneta con diente índice. |
 | `02-logo-tube.stl` | Tubo: logo grabado, respaldo de amarre, toalleros, panel frontal, líneas de diseño. |
 | `03-antenna-cap.stl` | Tapa plana: cuello con las tres ventanas de la plataforma, bayoneta con diente índice y ranura alrededor de la antena. |
 | `04-imu-platform.stl` | Plataforma del IMU: disco, falda, tres uñas, separadores con piloto, apoyos y cruz grabada. |
-| `05-panel-cover.stl` | Panel principal: pantalla, botón de 12 mm, USB-C y dos LEDs. |
+| `05-panel-cover.stl` | Panel principal: pantalla, botón de 12 mm, conector de carga JST-XH y dos LEDs. |
 | `06-bumper-bottom.stl` | Banda de TPU de abajo. |
 | `07-bumper-top.stl` | Banda de TPU de arriba. |
 
@@ -311,8 +358,9 @@ Localiza FreeCAD y funciona también en macOS. Hace, en este orden:
 5. Ejecuta `capacity_check.py`: paquete y 18650 en el respaldo, huecos de
    ranuras y costillas, toalleros, entrada de la tapa del panel con todo montado
    en 35 mm de recorrido, pieles sobre la pantalla, botón, pilotos del IMU, sitio
-   para el SMA, uñas una por una, bayonetas indexadas, seguros, tornillos del
-   panel y tornillos bajo las bandas.
+   para el SMA, uñas una por una, bayonetas indexadas, seguros, tuerca del
+   jalón con sus retenes, tornillos del panel, tornillos bajo las bandas y
+   bolsillo del JST.
 
 Si algo falla, sale con código distinto de cero. Los resultados quedan en
 [`generated/capacity.json`](generated/capacity.json).

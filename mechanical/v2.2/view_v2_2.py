@@ -38,6 +38,9 @@ VISTA = {
     'ref_battery': ((0.55, 0.30, 0.68), 30),
     'ref_um980': ((0.15, 0.62, 0.35), 30),
     'ref_thing_plus': ((0.75, 0.22, 0.17), 30),
+    'ref_nut_keepers': ((0.55, 0.57, 0.60), 0),
+    'ref_nut': ((0.80, 0.64, 0.25), 0),
+    'ref_jst': ((0.93, 0.93, 0.88), 0),
 }
 
 doc = App.openDocument(str(DOC))

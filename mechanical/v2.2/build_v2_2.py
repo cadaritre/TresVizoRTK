@@ -11,8 +11,9 @@ Cambios frente a V2.1 (pedidos por el propietario el 02-10-2026):
   - diametro 69 -> 64, el maximo que fijo; la bateria es una 18650 y ya no
     hace falta el ancho que pedia la 955565;
   - panel frontal de 86 grados x 83 mm: pantalla OLED de 0.96 in en su marco,
-    boton metalico de 12 mm con asiento plano por fuera y por dentro, USB-C con
-    asiento y repisa, dos LEDs. Sin panel auxiliar;
+    boton metalico de 12 mm con asiento plano por fuera y por dentro, conector
+    de carga JST-XH a ras (el USB-C se quito el 04-10-2026), dos LEDs. Sin
+    panel auxiliar;
   - fuera el trineo: todo se amarra con bridas a un respaldo ranurado que forma
     parte del tubo, con la 18650 detras y las placas delante, o a cuatro
     toalleros de las paredes laterales;
@@ -22,6 +23,10 @@ Cambios frente a V2.1 (pedidos por el propietario el 02-10-2026):
   - las dos bayonetas llevan un diente mas ancho: base y tapa entran en una
     sola posicion;
   - tapa plana, como V2.1, y bandas de proteccion de TPU arriba y abajo.
+
+El 04-10-2026 la rosca del jalon paso a ser una tuerca hexagonal 5/8-11 de
+laton que entra por dentro de la base: el inserto de McMaster solo entraba
+pausando la impresion.
 
 Ejes: Z es el eje del jalon, hacia arriba. FRONT es +Y. Origen en la cara de
 apoyo del jalon (Z=0). Mirando la cara +Y con Z arriba, X apunta a la izquierda.
@@ -51,20 +56,19 @@ C = json.loads((ROOT / 'components.json').read_text(encoding='utf-8'))
 V = App.Vector
 
 TUBE, BODY, BACK = P['tubo'], P['cuerpo'], P['respaldo']
-IMU, PLAT, ANT, INS = P['imu'], P['plataforma_imu'], P['antena'], P['inserto_jalon']
+IMU, PLAT, ANT, NUT = P['imu'], P['plataforma_imu'], P['antena'], P['tuerca_jalon']
 BAY, LOCK, PAN = P['bayoneta'], P['seguro'], P['panel']
 ACC, TOWEL = P['accesorios'], P['toalleros']
 BANDS, FINISH = P['bandas'], P.get('acabados', {})
 LOGO, PR = P['logo'], P['impresion']
-OLED, BTN, USB, LED = PAN['pantalla'], PAN['boton'], PAN['usb_c'], PAN['leds']
+OLED, BTN, JST, LED = PAN['pantalla'], PAN['boton'], PAN['jst_xh'], PAN['leds']
 
 RO = TUBE['diametro_exterior'] / 2.0
 RI = RO - TUBE['pared']
 CLR = PR['holgura_general']
 
 # --- Plano de alturas -------------------------------------------------------
-Z_FLANGE_TOP = INS['barril_altura'] + INS['brida_espesor']
-Z_FLOOR = Z_FLANGE_TOP + 4.0
+Z_FLOOR = NUT['piso_z']
 Z_CEIL = Z_FLOOR + BODY['largo_util']
 Z_TUBE0 = 8.0
 Z_TUBE1 = Z_CEIL + 2.0
@@ -96,7 +100,20 @@ BOSS_BITE = 0.8
 SIGN_BASE = 1
 SIGN_CAP = -1 if BAY.get('tapa_cierra_horario', False) else 1
 
-Z_LOCK_BASE = Z_FLANGE_TOP + LOCK.get('altura_sobre_brida', 1.2)
+Z_LOCK_BASE = Z_FLOOR - LOCK['bajo_piso_base']
+
+# --- Tuerca del jalon -------------------------------------------------------
+# Alojamiento hexagonal con las caras hacia 30, 90, 150... grados: los dos M3
+# que la detienen, a 90 y 270, caen frente a una cara.
+NUT_APOTHEM = (NUT['entre_caras'] + NUT['holgura_caras']) / 2.0
+# Diametro menor de la rosca interior 5/8-11 (ASME B1.1, 0.527 in). Solo dibuja
+# la tuerca de referencia.
+THREAD_MINOR_5_8 = 13.4
+# Cabeza de un M3 ISO 7380.
+M3_BUTTON_HEAD = 5.7
+# Lo que asoma detras del header JST: 3.4 de patas y unos 6 de soldadura y
+# termofit.
+JST_TAILS = 9.4
 Z_LOCK_CAP = Z_TUBE1 - 5.0
 Z_NECK_BOTTOM = Z_TUBE1 - COLLAR_H - BAY.get('cuello_extra', 0.0)
 
@@ -155,6 +172,15 @@ def tube_ring(r_out, r_in, z, h):
 
 def box(x0, x1, y0, y1, z0, z1):
     return Part.makeBox(x1 - x0, y1 - y0, z1 - z0, V(x0, y0, z0))
+
+
+def hex_prism(apothem, z0, h):
+    """Prisma hexagonal sobre el eje Z: vertices a 0, 60, 120... grados, caras
+    mirando a 30, 90, 150..."""
+    rc = apothem / math.cos(math.radians(30))
+    pts = [V(rc * math.cos(math.radians(60 * k)), rc * math.sin(math.radians(60 * k)), z0)
+           for k in range(6)]
+    return Part.Face(Part.makePolygon(pts + [pts[0]])).extrude(V(0, 0, h))
 
 
 def yz_prism(points_yz, x0, x1):
@@ -244,32 +270,35 @@ def bayonet_teeth(z_tooth, sign=1):
 
 # --- Pieza 1: base con rosca ------------------------------------------------
 def build_base():
-    """Como V2.1 sin las ranuras ni los pilotos del trineo: el piso queda liso."""
+    """Base con la tuerca 5/8-11 del jalon.
+
+    La tuerca entra por dentro, con el tubo quitado, en un alojamiento
+    hexagonal que no la deja girar, y apoya en un anillo de 2 mm cuya cara de
+    abajo es el asiento contra el baston. Al apretar, el perno jala la tuerca
+    contra el anillo y el anillo contra el hombro del baston: todo a
+    compresion. Dos M3 con arandela ancha la detienen por arriba. Se imprime
+    sin pausa: nada queda encerrado.
+    """
     ch = TUBE['chaflan_inferior']
     body = Part.makeCone(RO - ch, RO, ch, V(0, 0, 0))
     body = body.fuse(Part.makeCylinder(RO, Z_TUBE0 - ch, V(0, 0, ch)))
     body = body.fuse(Part.makeCylinder(R_SPIGOT, Z_FLOOR - Z_TUBE0, V(0, 0, Z_TUBE0)))
     body = body.fuse(bayonet_teeth(Z_TUBE0 + 4.0))
 
-    body = body.cut(Part.makeCylinder(INS['barril_diametro'] / 2 + INS['holgura'] / 2,
-                                      INS['barril_altura'] + 0.2, V(0, 0, -0.1)))
-    body = body.cut(Part.makeCylinder(INS['brida_diametro'] / 2 + INS['holgura'] / 2,
-                                      INS['brida_espesor'] + 0.1,
-                                      V(0, 0, INS['barril_altura'])))
-    body = body.cut(Part.makeCylinder(INS['paso_libre_macho_radio'], Z_FLOOR + 1,
-                                      V(0, 0, Z_FLANGE_TOP - 0.1)))
+    ring = NUT['anillo_asiento']
+    r_hole = NUT['paso_perno_diametro'] / 2.0
+    c = NUT['chaflan_paso']
+    body = body.cut(Part.makeCylinder(r_hole, ring + 0.2, V(0, 0, -0.1)))
+    # Entrada a 45 grados: guia el perno y se come la pata de elefante.
+    body = body.cut(Part.makeCone(r_hole + c + 0.1, r_hole, c + 0.1, V(0, 0, -0.1)))
+    body = body.cut(hex_prism(NUT_APOTHEM, ring, Z_FLOOR - ring + 0.1))
 
-    r = INS['radio_pilotos']
-    for i in range(3):
-        a = math.radians(90 + i * 120)
-        x, y = r * math.cos(a), r * math.sin(a)
-        if INS['capturar_sin_tornillos']:
-            body = body.fuse(Part.makeCylinder(INS['piloto_diametro'] / 2,
-                                               INS['brida_espesor'] + 1.4,
-                                               V(x, y, INS['barril_altura'])))
-        else:
-            body = body.cut(Part.makeCylinder(1.25, Z_FLOOR + 1,
-                                              V(x, y, INS['barril_altura'])))
+    ret = NUT['retenes']
+    for a in ret['angulos']:
+        x = ret['radio'] * math.cos(math.radians(a))
+        y = ret['radio'] * math.sin(math.radians(a))
+        body = body.cut(Part.makeCylinder(ret['piloto'] / 2.0, ret['profundidad'] + 0.1,
+                                          V(x, y, Z_FLOOR - ret['profundidad'])))
 
     # Piloto del seguro con profundidad real: el M3 rosca en el macizo de la
     # base.
@@ -716,32 +745,28 @@ def button_features():
     return adds, cuts
 
 
-def usb_features():
-    """Repisa con dos costillas detras del USB-C. La placa del receptaculo
-    entra entre las costillas, apoya en la repisa y una brida rodea las dos.
+def jst_features():
+    """Bolsillo del conector de carga JST-XH, con su cara a ras del panel.
 
-    Por dentro, un asiento plano para el canto de la placa: apoyada en la cara
-    interior curva, sus esquinas la dejaban 2 a 3.6 mm hundida y la clavija no
-    llegaba. Con el asiento el receptaculo queda casi a ras, y el hueco
-    exterior, del tamano del sobremolde, deja entrar la clavija.
+    El header B2B-XH-A entra por fuera, cables primero, hasta apoyar en el
+    fondo; la ranura del fondo deja pasar las patas con los cables soldados.
+    El fondo aguanta el empuje al conectar y una gota de epoxico, el tiron al
+    desconectar. La cara de abajo del bolsillo va a 45 grados: la tapa se
+    imprime de pie y un saliente hacia dentro no puede colgar.
     """
-    u = USB
-    if not u.get('soporte', True):
-        return [], []
-    z_lt = u['z'] - u['eje_sobre_cara_inferior_placa']
-    t, yi, ct = u['repisa_espesor'], u['repisa_fondo_y'], u['costilla_espesor']
-    half_in = u['placa_ancho'] / 2 + u['holgura_lateral']
-    adds = [box(-half_in - ct, half_in + ct, yi, RI + 0.5, z_lt - t, z_lt)]
-    # Costillas hasta la cara superior de la placa: la brida pasa por encima
-    # de ellas y aprieta la placa contra la repisa.
-    z_rib = z_lt + u['placa_espesor']
-    z_b = z_lt - u['costilla_bajada']
-    profile = [(yi, z_b + (RI - yi)), (yi, z_rib), (RO, z_rib), (RO, z_b - (RO - RI))]
-    for x0 in (half_in, -half_in - ct):
-        adds.append(yz_prism(profile, x0, x0 + ct))
-    seat = box(-half_in, half_in, yi, u['apoyo_placa_y'],
-               z_lt, z_lt + u['placa_espesor'] + 0.3)
-    return adds, [seat]
+    j = JST
+    hw = j['ancho'] / 2 + j['holgura']
+    hz = j['fondo'] / 2 + j['holgura']
+    zc, wall = j['z'], j['pared']
+    y_floor = RO - j['hundido'] - j['alto']
+    y_back = y_floor - wall
+    z_lo, z_hi = zc - hz - wall, zc + hz + wall
+    shell = yz_prism([(y_back, z_lo), (y_back, z_hi), (RO, z_hi), (RO, z_lo - (RO - y_back))],
+                     -hw - wall, hw + wall)
+    cavity = box(-hw, hw, y_floor, RO + 2, zc - hz, zc + hz)
+    sw, sh = j['ranura_cables']
+    slot = box(-sw / 2, sw / 2, y_back - 1, y_floor + 0.1, zc - sh / 2, zc + sh / 2)
+    return [shell], [cavity, slot]
 
 
 def build_panel(cfg, features, extra=None):
@@ -946,6 +971,32 @@ def build_references():
                  box(x0, x0 + uw, yf, yf + ut, zp, zp + ul)))
     refs.append(('ref_thing_plus', 'Ref: Thing Plus ESP32-S3',
                  box(x0 + uw + 0.4, x0 + uw + 0.4 + tw, yf, yf + tt, zp, zp + tl)))
+
+    # Tuerca del jalon sobre su anillo, con el diametro menor de su rosca.
+    ring = NUT['anillo_asiento']
+    nut = hex_prism(NUT['entre_caras'] / 2.0, ring, NUT['alto'])
+    nut = nut.cut(Part.makeCylinder(THREAD_MINOR_5_8 / 2, NUT['alto'] + 2, V(0, 0, ring - 1)))
+    refs.append(('ref_nut', 'Ref: tuerca 5/8-11 de laton', nut))
+    ret = NUT['retenes']
+    keepers = []
+    for a in ret['angulos']:
+        x = ret['radio'] * math.cos(math.radians(a))
+        y = ret['radio'] * math.sin(math.radians(a))
+        washer = Part.makeCylinder(ret['arandela_diametro'] / 2, ret['arandela_espesor'],
+                                   V(x, y, Z_FLOOR))
+        head = Part.makeCylinder(M3_BUTTON_HEAD / 2, ret['cabeza_alto'],
+                                 V(x, y, Z_FLOOR + ret['arandela_espesor']))
+        keepers.append(washer.fuse(head))
+    refs.append(('ref_nut_keepers', 'Ref: arandelas y cabezas de los M3 que detienen la tuerca',
+                 keepers[0].fuse(keepers[1:])))
+
+    # Header JST-XH en su bolsillo, con las patas, la soldadura y el termofit.
+    j = JST
+    y_floor = RO - j['hundido'] - j['alto']
+    header = box(-j['ancho'] / 2, j['ancho'] / 2, y_floor, y_floor + j['alto'],
+                 j['z'] - j['fondo'] / 2, j['z'] + j['fondo'] / 2)
+    tails = box(-2.4, 2.4, y_floor - JST_TAILS, y_floor, j['z'] - 1.2, j['z'] + 1.2)
+    refs.append(('ref_jst', 'Ref: header JST-XH B2B-XH-A con sus cables', header.fuse(tails)))
     return refs
 
 
@@ -969,9 +1020,8 @@ parts = [
     ('03-antenna-cap', 'Tapa de antena', build_cap()),
     ('04-imu-platform', 'Plataforma del IMU', build_platform()),
     ('05-panel-cover', 'Tapa del panel principal', build_panel(PAN, [
-        ('box', USB['hueco_exterior'][0], USB['hueco_exterior'][1], USB['z']),
         ('pair', LED['diametro'], LED['z'], LED['separacion']),
-    ], extra=(display_features, button_features, usb_features))),
+    ], extra=(display_features, button_features, jst_features))),
     ('06-bumper-bottom', 'Banda de TPU de abajo', build_band(0.0, band_screws(0.0))),
     ('07-bumper-top', 'Banda de TPU de arriba',
      build_band(Z_TOP - BANDS['alto'], band_screws(Z_TOP - BANDS['alto']))),
@@ -1023,6 +1073,21 @@ resumen = {
     },
     'arp_sobre_asiento_jalon_mm': round(Z_TOP, 2),
     '_nota_arp': 'Del asiento del jalon (cara inferior de la base) a la cara de la tapa donde apoya la antena.',
+    'tuerca_jalon': {
+        'alojamiento_entre_caras_mm': round(2 * NUT_APOTHEM, 3),
+        'alojamiento_z_mm': [NUT['anillo_asiento'], round(Z_FLOOR, 3)],
+        'paso_perno_diametro_mm': NUT['paso_perno_diametro'],
+        'retenes_xy_mm': [[round(NUT['retenes']['radio'] * math.cos(math.radians(a)), 3),
+                           round(NUT['retenes']['radio'] * math.sin(math.radians(a)), 3)]
+                          for a in NUT['retenes']['angulos']],
+    },
+    'conector_carga': {
+        'tipo': 'JST-XH 2 pines, header B2B-XH-A',
+        'z_mm': JST['z'],
+        'hueco_mm': [round(JST['ancho'] + 2 * JST['holgura'], 2),
+                     round(JST['fondo'] + 2 * JST['holgura'], 2)],
+        'cara_bajo_la_superficie_mm': JST['hundido'],
+    },
     'imu': {
         'chip_xy_mm': [0.0, 0.0],
         'agujeros_xy_mm': [[round(x, 3), round(y, 3)] for x, y in HOLES],

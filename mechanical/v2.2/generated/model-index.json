@@ -45,6 +45,33 @@
  },
  "arp_sobre_asiento_jalon_mm": 129.91,
  "_nota_arp": "Del asiento del jalon (cara inferior de la base) a la cara de la tapa donde apoya la antena.",
+ "tuerca_jalon": {
+  "alojamiento_entre_caras_mm": 24.113,
+  "alojamiento_z_mm": [
+   2.0,
+   15.906
+  ],
+  "paso_perno_diametro_mm": 16.6,
+  "retenes_xy_mm": [
+   [
+    0.0,
+    15.0
+   ],
+   [
+    -0.0,
+    -15.0
+   ]
+  ]
+ },
+ "conector_carga": {
+  "tipo": "JST-XH 2 pines, header B2B-XH-A",
+  "z_mm": 93.5,
+  "hueco_mm": [
+   7.7,
+   6.05
+  ],
+  "cara_bajo_la_superficie_mm": 0.25
+ },
  "imu": {
   "chip_xy_mm": [
    0.0,
@@ -75,14 +102,14 @@
    "etiqueta": "Base con rosca 5/8",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 35.77,
+   "volumen_cm3": 34.34,
    "caja": [
     64.0,
     64.0,
     15.91
    ],
    "z": [
-    0.0,
+    -0.0,
     15.91
    ]
   },
@@ -139,7 +166,7 @@
    "etiqueta": "Tapa del panel principal",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 8.98,
+   "volumen_cm3": 9.2,
    "caja": [
     42.53,
     10.24,
@@ -183,5 +210,5 @@
    ]
   }
  ],
- "volumen_total_cm3": 174.1
+ "volumen_total_cm3": 172.89
 }

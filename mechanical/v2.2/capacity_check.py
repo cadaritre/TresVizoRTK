@@ -8,9 +8,9 @@
    de las costillas pasa una brida de una celda del canal a la otra.
 3. Toalleros: detras de cada barra hay sitio para una brida y quedan a mas de
    2 mm del paquete.
-4. Montaje del panel: la tapa, con la pantalla y sus cables y el boton con su
-   tuerca y cables, entra radialmente por su ventana sin tocar el tubo en 35 mm
-   de recorrido.
+4. Montaje del panel: la tapa, con la pantalla y sus cables, el boton con su
+   tuerca y cables y el header JST con los suyos, entra radialmente por su
+   ventana sin tocar el tubo en 35 mm de recorrido.
 5. Pantalla: piel minima de la tapa sobre el bolsillo del vidrio y sobre los
    pilotos.
 6. Boton: espesor del panel en su eje, con junta, frente al maximo que admite
@@ -28,12 +28,18 @@
 10. Seguros: con el modelo cerrado, un tornillo recto atraviesa el paso del
     tubo y entra en el piloto de la base o de la tapa sin tocar pared, y su
     rosca muerde plastico.
-11. Paredes: entre la cresta del seguro de la base y los huecos del inserto, al
-    menos PARED_MIN.
+11. Tuerca del jalon: al menos PARED_MIN del alojamiento hexagonal y de los
+    pilotos de sus retenes a la cresta del seguro de la base, y de cada piloto
+    al alojamiento; la tuerca de referencia cabe sin tocar la base y no
+    sobresale de su cara; cada arandela pisa al menos 1 mm de tuerca sin tapar
+    el paso del perno, y arandelas y cabezas no tocan el tubo ni nada de dentro.
 12. Tornillos del panel: la punta no llega a menos de 0.5 mm del cuello de la
     tapa, de la plataforma ni del paquete.
 13. Bandas de TPU: la cabeza de cada tornillo exterior que queda debajo de una
     banda cae dentro de una de sus ranuras.
+14. Conector de carga: el header JST con sus cables cabe en su bolsillo sin
+    tocar la tapa, su cara no sobresale, y el bolsillo deja PIEL_MIN al
+    piloto de arriba de la tapa.
 
 Sale con codigo distinto de cero si algo falla.
 
@@ -197,7 +203,7 @@ for tipo, lista in (('vertical', t['verticales']), ('horizontal', t['horizontale
 # --- 4. Montaje del panel --------------------------------------------------------------
 cfg = P['panel']
 a = math.radians(cfg['angulo'])
-conjunto = cover.fuse(OBJ['ref_oled']).fuse(OBJ['ref_button'])
+conjunto = cover.fuse(OBJ['ref_oled']).fuse(OBJ['ref_button']).fuse(OBJ['ref_jst'])
 peor, peor_d = 0.0, 0.0
 for paso in range(1, RECORRIDO_PANEL + 1):
     movido = conjunto.copy()
@@ -206,7 +212,7 @@ for paso in range(1, RECORRIDO_PANEL + 1):
     if v > peor:
         peor, peor_d = v, paso
 ok = peor < 1.0
-res['montaje_panel'] = {'con': ['ref_oled', 'ref_button'], 'recorrido_mm': RECORRIDO_PANEL,
+res['montaje_panel'] = {'con': ['ref_oled', 'ref_button', 'ref_jst'], 'recorrido_mm': RECORRIDO_PANEL,
                         'peor_choque_mm3': round(peor, 2), 'a_mm_de_su_sitio': peor_d, 'entra': ok}
 if not ok:
     fallos.append('la tapa del panel no entra por su ventana')
@@ -385,23 +391,58 @@ for nombre, part, z, fondo in (('base', base, H['seguro_base'], seg['profundidad
     if not ok:
         fallos.append(f'seguro de la {nombre} desalineado o sin rosca')
 
-# --- 11. Paredes en la base -----------------------------------------------------------------
-ins = P['inserto_jalon']
+# --- 11. Tuerca del jalon -------------------------------------------------------------------
+tj = P['tuerca_jalon']
+ret = tj['retenes']
 z_floor = H['piso_interior']
-cavidades = {
-    'alojamiento_brida': Part.makeCylinder(ins['brida_diametro'] / 2 + ins['holgura'] / 2,
-                                           ins['brida_espesor'] + 0.1, V(0, 0, ins['barril_altura'])),
-    'barril': Part.makeCylinder(ins['barril_diametro'] / 2 + ins['holgura'] / 2,
-                                ins['barril_altura'] + 0.2, V(0, 0, -0.1)),
-    'paso_esparrago': Part.makeCylinder(ins['paso_libre_macho_radio'], z_floor + 1,
-                                        V(0, 0, ins['barril_altura'])),
-}
+PERNO_5_8 = 15.875       # mm, diametro mayor del perno del baston
+
+
+def hexagono(apotema, z0, h):
+    rc = apotema / math.cos(math.radians(30))
+    pts = [V(rc * math.cos(math.radians(60 * k)), rc * math.sin(math.radians(60 * k)), z0)
+           for k in range(6)]
+    return Part.Face(Part.makePolygon(pts + [pts[0]])).extrude(V(0, 0, h))
+
+
+alojamiento = hexagono((tj['entre_caras'] + tj['holgura_caras']) / 2, tj['anillo_asiento'],
+                       z_floor - tj['anillo_asiento'])
 cresta = rod(1.5, screws['seguro_base'], H['seguro_base'], RO - seg['cabeza_profundidad'])
-paredes = {f'seguro_base-{k}': cresta.distToShape(c)[0] for k, c in cavidades.items()}
-res['paredes_mm'] = {k: round(v, 2) for k, v in paredes.items()}
+paredes = {'seguro_base-alojamiento': cresta.distToShape(alojamiento)[0]}
+pisa = []
+for k, ang in enumerate(ret['angulos'], start=1):
+    x = ret['radio'] * math.cos(math.radians(ang))
+    y = ret['radio'] * math.sin(math.radians(ang))
+    reten = Part.makeCylinder(1.5, ret['profundidad'], V(x, y, z_floor - ret['profundidad']))
+    paredes[f'reten_{k}-alojamiento'] = reten.distToShape(alojamiento)[0]
+    paredes[f'seguro_base-reten_{k}'] = cresta.distToShape(reten)[0]
+    pisa.append(tj['entre_caras'] / 2 - (ret['radio'] - ret['arandela_diametro'] / 2))
+libre_perno = ret['radio'] - ret['arandela_diametro'] / 2 - PERNO_5_8 / 2
+tuerca = OBJ['ref_nut']
+choque_tuerca = common_mm3(tuerca, base)
+sobresale = tuerca.BoundBox.ZMax - z_floor
+dentro = cap.fuse(plat).fuse(paquete).fuse(cover)
+choque_retenes = common_mm3(OBJ['ref_nut_keepers'], tube) + common_mm3(OBJ['ref_nut_keepers'], dentro)
+res['tuerca_jalon'] = {
+    'paredes_mm': {k: round(v, 2) for k, v in paredes.items()},
+    'arandela_pisa_tuerca_mm': [round(p, 2) for p in pisa],
+    'arandela_a_perno_mm': round(libre_perno, 2),
+    'holgura_perno_en_anillo_mm': round((tj['paso_perno_diametro'] - PERNO_5_8) / 2, 2),
+    'choque_tuerca_con_base_mm3': round(choque_tuerca, 2),
+    'tuerca_sobre_cara_de_la_base_mm': round(sobresale, 2),
+    'choque_retenes_mm3': round(choque_retenes, 2),
+}
 for k, v in paredes.items():
     if v < PARED_MIN:
         fallos.append(f'pared de {v:.2f} mm entre {k}')
+if min(pisa) < 1.0:
+    fallos.append(f'la arandela solo pisa {min(pisa):.2f} mm de la tuerca')
+if libre_perno < 0.5:
+    fallos.append('la arandela tapa el paso del perno')
+if choque_tuerca > 0.01 or sobresale > 0.0:
+    fallos.append('la tuerca no cabe en su alojamiento')
+if choque_retenes > 0.01:
+    fallos.append('las arandelas o las cabezas de los retenes tocan algo')
 
 # --- 12. Tornillos del panel -----------------------------------------------------------------
 obstaculos = cap.fuse(plat).fuse(paquete)
@@ -438,6 +479,31 @@ for nombre_b, ((z0, z1), ranuras) in bandas.items():
         if not en_ranura:
             fallos.append(f'la cabeza del {nombre} queda bajo la banda de {nombre_b} sin ranura')
     res['bandas'][nombre_b] = {'z_mm': [z0, z1], 'tornillos_debajo': debajo}
+
+# --- 14. Conector de carga --------------------------------------------------------------------
+jx = cfg['jst_xh']
+jst = OBJ['ref_jst']
+choque_jst = common_mm3(jst, cover)
+cara = jst.BoundBox.YMax
+x_borde = jx['ancho'] / 2
+saliente_centro = cara - RO
+saliente_borde = cara - math.sqrt(RO ** 2 - x_borde ** 2)
+# El bolsillo tiene que pasar por la ventana del tubo: por encima de su borde
+# empieza el engrosamiento donde apoya el reborde de la tapa.
+borde_ventana = cfg['z_centro'] + cfg['alto'] / 2 - cfg['reborde_z']
+techo_bolsillo = jx['z'] + jx['fondo'] / 2 + jx['holgura'] + jx['pared']
+res['conector_carga'] = {
+    'choque_con_la_tapa_mm3': round(choque_jst, 2),
+    'cara_sobre_la_superficie_en_el_centro_mm': round(saliente_centro, 2),
+    'cara_sobre_la_superficie_en_los_extremos_mm': round(saliente_borde, 2),
+    'bolsillo_bajo_el_borde_de_la_ventana_mm': round(borde_ventana - techo_bolsillo, 2),
+}
+if choque_jst > 0.01:
+    fallos.append('el header JST no cabe en su bolsillo')
+if saliente_centro > 0.0 or saliente_borde > 0.05:
+    fallos.append('la cara del header JST sobresale del panel')
+if borde_ventana - techo_bolsillo < 0.3:
+    fallos.append('el bolsillo del JST no pasa por la ventana del tubo')
 
 res['cabe_todo'] = not fallos
 res['fallos'] = fallos

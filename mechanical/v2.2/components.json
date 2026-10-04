@@ -65,9 +65,15 @@
     },
     "confianza": "etiqueta"
   },
-  "inserto_jalon": {
-    "descripcion": "McMaster 90611A121, 5/8-11 UNC hembra",
-    "confianza": "catalogo"
+  "tuerca_jalon": {
+    "descripcion": "Tuerca hexagonal 5/8-11 UNC (NC estandar) de laton, 15/16 in entre caras, 35/64 in de alto",
+    "confianza": "norma ASME B18.2.2; medir la comprada",
+    "compra": "Los Tornillos (Guadalajara), 'TUERCA HEXAGONAL NC ESTANDAR 5/8 LATON', 51.79 MXN, consultado el 04-10-2026"
+  },
+  "conector_carga": {
+    "descripcion": "JST-XH 2 pines, paso 2.5: header macho vertical B2B-XH-A en el panel; carcasa XHP-2 con terminales SXH del lado del cargador",
+    "confianza": "plano de JST (serie XH)",
+    "nota": "Va a ras del panel, pegado con epoxico. JST lo vende como conector de placa, no para conectar y desconectar a diario."
   },
   "bateria_18650": {
     "descripcion": "Celda 18650 1S, 3.7 V, 3000 mAh (hardware/bom.md del 02-10-2026)",

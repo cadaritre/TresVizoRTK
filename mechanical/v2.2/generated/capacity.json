@@ -67,7 +67,8 @@
  "montaje_panel": {
   "con": [
    "ref_oled",
-   "ref_button"
+   "ref_button",
+   "ref_jst"
   ],
   "recorrido_mm": 35,
   "peor_choque_mm3": 0.0,
@@ -178,10 +179,23 @@
    "alineado": true
   }
  },
- "paredes_mm": {
-  "seguro_base-alojamiento_brida": 1.85,
-  "seguro_base-barril": 11.27,
-  "seguro_base-paso_esparrago": 11.2
+ "tuerca_jalon": {
+  "paredes_mm": {
+   "seguro_base-alojamiento": 6.83,
+   "reten_1-alojamiento": 1.44,
+   "seguro_base-reten_1": 25.48,
+   "reten_2-alojamiento": 1.44,
+   "seguro_base-reten_2": 19.83
+  },
+  "arandela_pisa_tuerca_mm": [
+   1.41,
+   1.41
+  ],
+  "arandela_a_perno_mm": 2.56,
+  "holgura_perno_en_anillo_mm": 0.36,
+  "choque_tuerca_con_base_mm3": 0.0,
+  "tuerca_sobre_cara_de_la_base_mm": -0.02,
+  "choque_retenes_mm3": 0.0
  },
  "tornillos_panel": {
   "largo_mm": 4,
@@ -224,6 +238,12 @@
     }
    ]
   }
+ },
+ "conector_carga": {
+  "choque_con_la_tapa_mm3": 0.0,
+  "cara_sobre_la_superficie_en_el_centro_mm": -0.25,
+  "cara_sobre_la_superficie_en_los_extremos_mm": -0.04,
+  "bolsillo_bajo_el_borde_de_la_ventana_mm": 0.67
  },
  "cabe_todo": true,
  "fallos": []

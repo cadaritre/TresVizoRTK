@@ -3,5 +3,6 @@
  "seguro_tapa": 12,
  "panel": 4,
  "imu": 6,
- "pantalla": 4
+ "pantalla": 4,
+ "reten_tuerca": 8
 }

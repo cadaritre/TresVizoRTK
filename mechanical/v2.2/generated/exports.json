@@ -3,17 +3,17 @@
   {
    "pieza": "01-threaded-base",
    "etiqueta": "Base con rosca 5/8",
-   "triangulos": 2426,
+   "triangulos": 1888,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 35.77,
+   "volumen_cm3": 34.34,
    "stl": "01-threaded-base.stl"
   },
   {
    "pieza": "02-logo-tube",
    "etiqueta": "Tubo con logo y respaldo de amarre",
-   "triangulos": 11734,
+   "triangulos": 11732,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
@@ -43,11 +43,11 @@
   {
    "pieza": "05-panel-cover",
    "etiqueta": "Tapa del panel principal",
-   "triangulos": 3696,
+   "triangulos": 3390,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 8.98,
+   "volumen_cm3": 9.2,
    "stl": "05-panel-cover.stl"
   },
   {
