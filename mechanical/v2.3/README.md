@@ -22,6 +22,8 @@ cambia; cambian el interior, la base, la tapa del panel y las bandas, para la pl
 | 08 Chasis (nueva) | Se arma **fuera del tubo**: dos rieles donde corre la placa, una placa superior con ventana grande que los une y lleva H1/H2, ranuras de la carrier, lengua sobre la 18650 y zapatas bajo el cuello de la tapa. Entra por arriba entre los nervios |
 | 09 Logo de TPU (nueva) | Incrustación **plana** del logo para imprimir en TPU, desenrollada de la curva del tubo para llenar su grabado |
 
+El tubo lleva además **líneas verticales decorativas en los dos costados del panel**: además de 144–180° y 205–241°, ahora 0–36° y 312–348° (espejo respecto al panel, hasta 5.5° del logo), en z 34–98, entre las bandas.
+
 Tapa de antena y plataforma del IMU son las de V2.2.
 
 ## Cómo se arma (sin tornillos dentro del tubo)
