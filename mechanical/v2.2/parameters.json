@@ -283,7 +283,7 @@
   "arco_grados": 86.0,
   "z_centro": 65.95,
   "alto": 82.9,
-  "_nota_tamano": "86 grados x 82.9 mm a radio 32. La ventana del tubo deja pasar el marco de la pantalla (29.5 de ancho). Los rebordes de arriba y abajo quedan en parte bajo las bandas de TPU, que llevan ranura en sus tornillos.",
+  "_nota_tamano": "86 grados x 82.9 mm a radio 32. La ventana del tubo deja pasar el marco de la pantalla (29.5 de ancho). Los rebordes de arriba y abajo, con sus tornillos, quedan bajo las bandas de TPU, que llevan una caja en cada tornillo.",
   "espesor": 2.5,
   "holgura": 0.3,
   "tornillo_separacion_z": 73.9,
@@ -469,10 +469,10 @@
   "ancho_max_mm": 32.0,
   "_nota_max": "Tope de ancho: el logo es una proyeccion plana y a mas de +-30 grados se estira. 32 mm a radio 32 es la misma proporcion que 35.5 a radio 34.5 en V2.1.",
   "profundidad_grabado": 0.8,
-  "z_centro": 65.0,
+  "z_centro": 66.0,
   "angulo": 276.5,
   "_nota": "GRABADO, no en relieve. Lo coloca layout_check.py en el mayor hueco libre.",
-  "_nota_posicion": "Colocado por layout_check.py en el mayor hueco libre: 242 a 40 grados y 28 a 102 mm, con 3.0 mm de margen por lado.",
+  "_nota_posicion": "Colocado por layout_check.py en el mayor hueco libre: 242 a 40 grados y 34 a 97 mm, con 3.0 mm de margen por lado.",
   "angulo_preferido": 276.5,
   "_nota_preferido": "En la espalda, opuesta al panel, como en V2.1. Sin el panel auxiliar el hueco libre va de 242 a 49 grados y su centro caeria en una esquina trasera."
  },
@@ -519,14 +519,24 @@
   "_nota": "En las paredes laterales, por delante del respaldo: las verticales a 30 y 150 grados y las horizontales a 10 y 170, encima de las placas. Barra de 4 x 4 a 4.5 mm de la pared. Postes con escuadra a 45 grados por debajo: se imprimen de pie sin soportes; la barra horizontal es un puente."
  },
  "bandas": {
-  "_que_es": "Piezas 7 y 8: dos bandas de proteccion de TPU, abajo y arriba.",
-  "alto": 28.0,
+  "_que_es": "Piezas 6 y 7: dos bandas de proteccion de TPU, abajo y arriba.",
+  "alto_abajo": 34.5,
+  "alto_arriba": 32.5,
+  "_nota_alto": "Cada banda llega hasta tapar entera la cabeza de los tornillos que tiene debajo, con 1.5 de borde mas alla de su caja. Abajo, la caja del tornillo de la tapa del panel (z = 29.0) llega a 33.0: banda de 34.5. Arriba, la del de z = 102.9 baja a 98.9: banda desde 97.4, de 32.5, a 0.9 del hueco del JST. capacity_check comprueba que tapen.",
   "espesor": 2.0,
   "apriete_diametral": 0.6,
   "redondeo": 1.0,
-  "ranura_alto": 8.0,
-  "ranura_profundidad": 1.2,
-  "_nota": "Diametro interior 0.6 menor que el cuerpo: el TPU se estira y aprieta. La de abajo cubre la base y el arranque del tubo (z 0-28); la de arriba, el final del tubo y la tapa. Por dentro, una ranura corrida de 8 x 1.2 a la altura de cada tornillo que queda debajo (los seguros de bayoneta y los de la tapa del panel), por si su cabeza asoma; corrida para que la banda entre en cualquier giro. El modelo las dibuja con su diametro de impresion: el solape de 0.3 con el cuerpo es el apriete."
+  "caja_holgura_diametro": 2.0,
+  "caja_profundidad": 1.2,
+  "borde_minimo": 1.2,
+  "_nota_cajas": "Por dentro, una caja redonda en cada tornillo, 2 mm mayor que su cabeza (8 para las de 6) y 1.2 de fondo, por si la cabeza asoma. Ya no es una ranura corrida: la banda entra en una sola posicion. Se imprime sin soporte: el techo de cada caja vuela 1.2 mm.",
+  "marca": {
+   "ancho": 1.2,
+   "largo": 1.0,
+   "profundidad": 0.5,
+   "_nota": "Muesca en el canto libre de cada banda, sobre el centro del panel (90 grados): alineandola con el panel, las cajas caen sobre sus tornillos. Mide 1.0 de largo para no cruzarse con la caja del tornillo del panel, que queda a 1.5 del canto: cruzadas dejaban 0.3 mm de TPU."
+  },
+  "_nota": "Diametro interior 0.6 menor que el cuerpo: el TPU se estira y aprieta. El modelo las dibuja con su diametro de impresion: el solape de 0.3 con el cuerpo es el apriete."
  },
  "acabados": {
   "_que_es": "Detalles esteticos leves.",

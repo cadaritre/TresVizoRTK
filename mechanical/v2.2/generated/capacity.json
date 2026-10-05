@@ -205,39 +205,49 @@
   "abajo": {
    "z_mm": [
     0.0,
-    28.0
+    34.5
    ],
+   "alto_mm": 34.5,
    "tornillos_debajo": [
     {
      "tornillo": "seguro de la base",
      "z_mm": 13.71,
-     "en_su_ranura": true
+     "en_su_caja": true,
+     "borde_hasta_el_canto_mm": 9.71
     },
     {
      "tornillo": "tapa del panel, abajo",
      "z_mm": 29.0,
-     "en_su_ranura": true
+     "en_su_caja": true,
+     "borde_hasta_el_canto_mm": 1.5
     }
-   ]
+   ],
+   "muesca_a_caja_mm": 0.5
   },
   "arriba": {
    "z_mm": [
-    101.91,
+    97.41,
     129.91
    ],
+   "alto_mm": 32.5,
    "tornillos_debajo": [
     {
      "tornillo": "seguro de la tapa",
      "z_mm": 119.91,
-     "en_su_ranura": true
+     "en_su_caja": true,
+     "borde_hasta_el_canto_mm": 6.0
     },
     {
      "tornillo": "tapa del panel, arriba",
      "z_mm": 102.9,
-     "en_su_ranura": true
+     "en_su_caja": true,
+     "borde_hasta_el_canto_mm": 1.49
     }
-   ]
-  }
+   ],
+   "muesca_a_caja_mm": 0.49
+  },
+  "canto_de_abajo_al_boton_mm": 1.5,
+  "canto_de_arriba_al_jst_mm": 0.88
  },
  "conector_carga": {
   "choque_con_la_tapa_mm3": 0.0,

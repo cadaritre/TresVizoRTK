@@ -187,11 +187,13 @@ que **la batería tiene que ocupar el centro**: no cabe apoyada en la cara de un
 placa diametral, porque su esquina más lejana cae a radio 32.42 contra los 31
 disponibles. Eso obliga a desplazar la placa del trineo y a llevar el IMU a una
 repisa por encima de la zona de batería, que es la altura que se perdió. La
-comprobación está en [`check_battery_fit.py`](v2/parameters.json).
+comprobación estaba en `check_battery_fit.py` de V2, que se quitó del
+repositorio el 04-10-2026 (sigue en el historial de git, commit `94f00f9`).
 
 Aun así: **30 % menos de material, 15 mm menos de largo y 7 mm menos de diámetro**,
 con 4 piezas en vez de 10 y 5 tornillos en vez de 19. El resultado y sus límites
-están en [V2](v2/README.md).
+estaban en el README de V2, que ya no está en el repositorio; la carcasa vigente
+es [V2.2](v2.2/README.md).
 
 ### Lo que no cambia
 

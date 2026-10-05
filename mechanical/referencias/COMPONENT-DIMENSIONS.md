@@ -1,6 +1,6 @@
 ﻿# Dimensiones de los componentes comprados
 
-> Referencia heredada de A5. Para fabricar y montar usar [V2](../v2/README.md); sus cambios y estado sustituyen los pendientes históricos de este documento.
+> Referencia heredada de A5. Para fabricar y montar usar [V2.2](../v2.2/README.md); sus cambios y estado sustituyen los pendientes históricos de este documento.
 
 Investigación: 19 de septiembre de 2026. Unidades: mm. Este documento separa las cotas publicadas, la correspondencia visual con la compra y las reservas del CAD. No constituye una inspección dimensional de las piezas recibidas. Actualización del 20 de septiembre: el montaje ajustable del BMI088 ya está incorporado en `TresVizo-A5.FCStd`; véase [montaje y centrado](IMU-ALIGNMENT.md).
 
@@ -54,7 +54,7 @@ La identificación eléctrica y el diseño de carga pertenecen a [BATTERY_REFERE
 
 ## Fuentes ya disponibles: antena y Waveshare
 
-Antena: [plano HA-901A](https://i.ebayimg.com/images/g/F2sAAOSwLzJl8nTm/s-l1600.webp), [anuncio XYANT Wireless](https://www.ebay.com/itm/315222778620). El montaje incorporado, la tornillería y las verificaciones están descritos en [V2](../v2/README.md).
+Antena: [plano HA-901A](https://i.ebayimg.com/images/g/F2sAAOSwLzJl8nTm/s-l1600.webp), [anuncio XYANT Wireless](https://www.ebay.com/itm/315222778620). El montaje incorporado, la tornillería y las verificaciones están descritos en [V2.2](../v2.2/README.md).
 
 Waveshare: [documentación oficial ESP32-S3-Tiny](https://www.waveshare.com/wiki/ESP32-S3-Tiny) y [plano mecánico oficial](https://docs.waveshare.com/assets/images/ESP32-S3-Tiny-details-1-3cb57dcb7847e1db49d2faee9722d6df.webp). El adaptador USB separado no es un cargador de batería. Botón, USB-C de carga y LEDs siguen sujetos a la PCB que se está diseñando; no se seleccionan módulos nuevos ni se cierran perforaciones del panel en esta investigación.
 

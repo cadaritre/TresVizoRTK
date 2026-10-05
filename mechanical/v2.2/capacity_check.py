@@ -35,8 +35,10 @@
     el paso del perno, y arandelas y cabezas no tocan el tubo ni nada de dentro.
 12. Tornillos del panel: la punta no llega a menos de 0.5 mm del cuello de la
     tapa, de la plataforma ni del paquete.
-13. Bandas de TPU: la cabeza de cada tornillo exterior que queda debajo de una
-    banda cae dentro de una de sus ranuras.
+13. Bandas de TPU: cada banda tapa entera la cabeza de los tornillos que
+    tiene debajo, con borde_minimo hasta su canto, y sobre cada uno hay una
+    caja redonda mayor que la cabeza; sus cantos libres no pisan el boton ni el
+    hueco del JST.
 14. Conector de carga: el header JST con sus cables cabe en su bolsillo sin
     tocar la tapa, su cara no sobresale, y el bolsillo deja PIEL_MIN al
     piloto de arriba de la tapa.
@@ -460,25 +462,60 @@ if peor < PASO_TORNILLO:
 
 # --- 13. Bandas de TPU ------------------------------------------------------------------------
 bd = P['bandas']
-bandas = {'abajo': (tuple(H['banda_abajo']), H['ranuras_banda_abajo']),
-          'arriba': (tuple(H['banda_arriba']), H['ranuras_banda_arriba'])}
+ri_banda = RO - bd['apriete_diametral'] / 2
+bandas = {'abajo': (tuple(H['banda_abajo']), OBJ['06_bumper_bottom']),
+          'arriba': (tuple(H['banda_arriba']), OBJ['07_bumper_top'])}
 half = cfg['tornillo_separacion_z'] / 2
-cabezas = [('seguro de la base', H['seguro_base'], seg['cabeza_diametro']),
-           ('seguro de la tapa', H['seguro_tapa'], seg['cabeza_diametro']),
-           ('tapa del panel, abajo', cfg['z_centro'] - half, cfg['tornillo_cabeza']),
-           ('tapa del panel, arriba', cfg['z_centro'] + half, cfg['tornillo_cabeza'])]
+cabezas = [('seguro de la base', seg['angulo'], H['seguro_base'], seg['cabeza_diametro']),
+           ('seguro de la tapa', seg['angulo'], H['seguro_tapa'], seg['cabeza_diametro']),
+           ('tapa del panel, abajo', cfg['angulo'], cfg['z_centro'] - half, cfg['tornillo_cabeza']),
+           ('tapa del panel, arriba', cfg['angulo'], cfg['z_centro'] + half, cfg['tornillo_cabeza'])]
 res['bandas'] = {}
-for nombre_b, ((z0, z1), ranuras) in bandas.items():
+for nombre_b, ((z0, z1), banda) in bandas.items():
     debajo = []
-    for nombre, z, dia in cabezas:
+    for nombre, ang, z, dia in cabezas:
         if z + dia / 2 <= z0 or z - dia / 2 >= z1:
             continue
-        en_ranura = any(r - bd['ranura_alto'] / 2 <= z - dia / 2 - 0.5 and
-                        z + dia / 2 + 0.5 <= r + bd['ranura_alto'] / 2 for r in ranuras)
-        debajo.append({'tornillo': nombre, 'z_mm': round(z, 2), 'en_su_ranura': en_ranura})
-        if not en_ranura:
-            fallos.append(f'la cabeza del {nombre} queda bajo la banda de {nombre_b} sin ranura')
-    res['bandas'][nombre_b] = {'z_mm': [z0, z1], 'tornillos_debajo': debajo}
+        r_caja = dia / 2 + bd['caja_holgura_diametro'] / 2
+        borde = min(z - r_caja - z0, z1 - (z + r_caja))
+        # La caja esta en su sitio: un disco de la cabeza mas 0.5 por lado,
+        # metido en la banda hasta 0.2 antes del fondo de la caja, no toca TPU.
+        a = math.radians(ang)
+        ux, uy = math.cos(a), math.sin(a)
+        r0 = ri_banda - 0.5
+        sonda = Part.makeCylinder(dia / 2 + 0.5, bd['caja_profundidad'] + 0.3,
+                                  V(ux * r0, uy * r0, z), V(ux, uy, 0))
+        en_caja = common_mm3(sonda, banda) < 0.01
+        debajo.append({'tornillo': nombre, 'z_mm': round(z, 2), 'en_su_caja': en_caja,
+                       'borde_hasta_el_canto_mm': round(borde, 2)})
+        if not en_caja:
+            fallos.append(f'la cabeza del {nombre} queda bajo la banda de {nombre_b} sin su caja')
+        if borde < bd['borde_minimo']:
+            fallos.append(f'la banda de {nombre_b} no tapa entera la cabeza del {nombre}')
+    res['bandas'][nombre_b] = {'z_mm': [z0, z1], 'alto_mm': round(z1 - z0, 2),
+                               'tornillos_debajo': debajo}
+# La muesca de alineacion, en el canto libre sobre el panel, no se cruza con la
+# caja del tornillo del panel: por fuera y por dentro a la vez dejaria 0.3 de TPU.
+mk = bd['marca']
+for nombre_b, (z0, z1), libre_arriba in (('abajo', tuple(H['banda_abajo']), True),
+                                         ('arriba', tuple(H['banda_arriba']), False)):
+    muesca = (z1 - mk['largo'], z1) if libre_arriba else (z0, z0 + mk['largo'])
+    for nombre, ang, z, dia in cabezas:
+        r_caja = dia / 2 + bd['caja_holgura_diametro'] / 2
+        if abs(ang - cfg['angulo']) < 1e-6 and z0 < z < z1:
+            hueco = max(muesca[0] - (z + r_caja), (z - r_caja) - muesca[1])
+            res['bandas'][nombre_b]['muesca_a_caja_mm'] = round(hueco, 2)
+            if hueco < 0.3:
+                fallos.append(f'la muesca de la banda de {nombre_b} se cruza con la caja del {nombre}')
+# Los cantos libres no pisan el boton ni el hueco del JST.
+bt_p = cfg['boton']
+jx_p = cfg['jst_xh']
+a_boton = bt_p['z'] - bt_p['asiento_exterior_diametro'] / 2 - H['banda_abajo'][1]
+a_jst = H['banda_arriba'][0] - (jx_p['z'] + jx_p['fondo'] / 2 + jx_p['holgura'])
+res['bandas']['canto_de_abajo_al_boton_mm'] = round(a_boton, 2)
+res['bandas']['canto_de_arriba_al_jst_mm'] = round(a_jst, 2)
+if min(a_boton, a_jst) < 0.5:
+    fallos.append('el canto de una banda queda encima del boton o del JST')
 
 # --- 14. Conector de carga --------------------------------------------------------------------
 jx = cfg['jst_xh']

@@ -28,19 +28,35 @@
   ],
   "banda_abajo": [
    0.0,
-   28.0
+   34.5
   ],
   "banda_arriba": [
-   101.91,
+   97.41,
    129.91
   ],
-  "ranuras_banda_abajo": [
-   13.71,
-   29.0
+  "cajas_banda_abajo": [
+   [
+    193.0,
+    13.71,
+    6.0
+   ],
+   [
+    90.0,
+    29.0,
+    6.0
+   ]
   ],
-  "ranuras_banda_arriba": [
-   119.91,
-   102.9
+  "cajas_banda_arriba": [
+   [
+    193.0,
+    119.91,
+    6.0
+   ],
+   [
+    90.0,
+    102.9,
+    6.0
+   ]
   ]
  },
  "arp_sobre_asiento_jalon_mm": 129.91,
@@ -182,15 +198,15 @@
    "etiqueta": "Banda de TPU de abajo",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 8.74,
+   "volumen_cm3": 13.96,
    "caja": [
     67.4,
     67.4,
-    27.98
+    34.5
    ],
    "z": [
-    0.0,
-    27.98
+    -0.0,
+    34.5
    ]
   },
   {
@@ -198,17 +214,17 @@
    "etiqueta": "Banda de TPU de arriba",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 8.25,
+   "volumen_cm3": 13.14,
    "caja": [
     67.4,
     67.4,
-    27.98
+    32.5
    ],
    "z": [
-    101.93,
+    97.41,
     129.91
    ]
   }
  ],
- "volumen_total_cm3": 172.89
+ "volumen_total_cm3": 183.0
 }

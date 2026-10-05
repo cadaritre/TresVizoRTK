@@ -1,6 +1,6 @@
 ﻿# Montaje ajustable del BMI088 — A5
 
-> Referencia heredada de A5. Para fabricar y montar usar [V2](../v2/README.md); sus cambios y estado sustituyen los pendientes históricos de este documento.
+> Referencia heredada de A5. Para fabricar y montar usar [V2.2](../v2.2/README.md); sus cambios y estado sustituyen los pendientes históricos de este documento.
 
 Actualizado: 20 de septiembre de 2026. **Implementado en `TresVizo-A5.FCStd`; prototipo pendiente de prueba física.** La placa se ajusta sobre el asiento existente y después se bloquea. No queda flotante durante uso.
 
@@ -10,7 +10,7 @@ El asiento está integrado en `BatteryIMUCarrier`; desaparecen sus dos M3 indepe
 
 La cuna se referencia al chasis mediante dos guías inferiores y dos M3×20 superiores. Tiene contacto nominal en Y=5.4; las tolerancias reales de guía e impresión forman parte del error de montaje. La plantilla alinea el encapsulado con el datum nominal del conjunto, no garantiza error físico cero. La referencia final debe verificarse después de fijar toda la cuna.
 
-La plantilla reutilizable se retira después de alinear. Consultar las piezas y el montaje vigentes en [V2](../v2/README.md).
+La plantilla reutilizable se retira después de alinear. Consultar las piezas y el montaje vigentes en [V2.2](../v2.2/README.md): allí el IMU va en una plataforma sin plantilla, centrado por sus agujeros.
 
 ## Plano identificado y datos que sí están publicados
 
@@ -40,6 +40,6 @@ El [BMI088 de Bosch](https://www.bosch-sensortec.com/en/products/motion-sensors/
 
 ## Validación y precisión
 
-Se comprobaron sólidos, contacto de apriete y nueve posiciones XY sin intersecciones de las piezas representadas. Se comprobó la inserción de la cuna y se prepararon mallas cerradas. No se ensayó el conjunto impreso ni su rigidez/repetibilidad. Consultar las comprobaciones del montaje vigente en [V2](../v2/README.md).
+Se comprobaron sólidos, contacto de apriete y nueve posiciones XY sin intersecciones de las piezas representadas. Se comprobó la inserción de la cuna y se prepararon mallas cerradas. No se ensayó el conjunto impreso ni su rigidez/repetibilidad. Consultar las comprobaciones del montaje vigente en [V2.2](../v2.2/README.md).
 
 Centrar nominalmente XY no elimina el brazo de palanca en Z ni la calibración de orientación. El [manual de diseño BMI08x de Bosch](https://community.bosch-sensortec.com/knowledge-base-pg631enp/post/bmi08x-design-guide-ZWU1wwmHYnSw68r) advierte que la flexión de PCB durante ensamble puede alterar offsets y recomienda calibrar después de montar en la carcasa. Registrar los desplazamientos reales entre IMU, referencia de antena y punta del jalón; [referencia GNSS/INS de NovAtel](https://docs.novatel.com/OEM7/Content/SPAN_Install/Mount_the_IMU.htm).

@@ -89,9 +89,9 @@ El enlace GNSS usa RX del ESP32 en **GPIO44** y TX en **GPIO43**, con GND común
 - [Lista de materiales](hardware/bom.md)
 - [Identificación del hardware recibido](hardware/identification.md)
 - [Interfaces y conexiones](hardware/wiring.md)
-- [Mecánica vigente, V2](mechanical/README.md)
+- [Mecánica vigente, V2.2](mechanical/README.md)
 - [Auditoría de la carcasa V1](mechanical/AUDITORIA-V1.md)
-- [BOM de tornillería](mechanical/v2/BOM-TORNILLERIA.md)
+- [BOM de tornillería](mechanical/v2.2/SCREW-BOM.md)
 - [Revisión de integración de V1, antecedente](docs/INTEGRATION_REVIEW.md)
 
 No se ha seleccionado una licencia. El contenido del repositorio no debe interpretarse como publicado bajo una licencia específica hasta que el propietario la defina expresamente.

@@ -53,21 +53,21 @@
   {
    "pieza": "06-bumper-bottom",
    "etiqueta": "Banda de TPU de abajo",
-   "triangulos": 7034,
+   "triangulos": 7286,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 8.74,
+   "volumen_cm3": 13.96,
    "stl": "06-bumper-bottom.stl"
   },
   {
    "pieza": "07-bumper-top",
    "etiqueta": "Banda de TPU de arriba",
-   "triangulos": 7034,
+   "triangulos": 7286,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 8.25,
+   "volumen_cm3": 13.14,
    "stl": "07-bumper-top.stl"
   }
  ],

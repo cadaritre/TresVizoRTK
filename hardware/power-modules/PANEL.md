@@ -1,6 +1,6 @@
-# Panel exterior — V1 vigente
+# Panel exterior
 
-Usar los paneles del [receptor V2](../../mechanical/v2/README.md). El principal lleva USB-C, botón y dos LED; el auxiliar queda previsto para ampliaciones. Ninguno se ha ensayado físicamente.
+Usar el panel del [receptor V2.2](../../mechanical/v2.2/README.md): pantalla OLED, botón de 12 mm, conector de carga JST-XH de 2 pines y dos LED. No hay panel auxiliar. No se ha ensayado físicamente.
 
 | Elemento | Posición X / Z, mm | Montaje V1 |
 | --- | --- | --- |
@@ -12,4 +12,4 @@ Usar los paneles del [receptor V2](../../mechanical/v2/README.md). El principal 
 
 Panel, actuador y cartucho son tres impresiones estructurales; los dos difusores usan material translúcido. El interior incorpora bandejas para PowerBoost sin USB-A y SparkFun Mk2; ambos con dos bridas y retirada hacia atrás. Tiny-Adapter conserva su FPC original.
 
-Ver [STL vigentes](../../mechanical/v2/generated/stl/), [validación de integración](../../docs/INTEGRATION_REVIEW.md), [BOM de tornillería](../../mechanical/v2/BOM-TORNILLERIA.md), [arnés](WIRING.md) y [compra en México](SOURCING_MX.md). La validación CAD no sustituye el primer ajuste físico del AU-101, enchufe o impresión.
+Ver [STL vigentes](../../mechanical/v2.2/generated/stl/), [validación de integración](../../docs/INTEGRATION_REVIEW.md), [BOM de tornillería](../../mechanical/v2.2/SCREW-BOM.md), [arnés](WIRING.md) y [compra en México](SOURCING_MX.md). La validación CAD no sustituye el primer ajuste físico del AU-101, enchufe o impresión.

@@ -846,16 +846,17 @@ def build_panel(cfg, features, extra=None):
 
 
 # --- Piezas 6 y 7: bandas de TPU -------------------------------------------
-def build_band(z0, z_screws):
+def build_band(z0, height, screws, free_edge_up):
     """Banda de proteccion para imprimir en TPU. Diametro interior menor que el
-    cuerpo: el TPU se estira y aprieta. Por dentro, una ranura corrida a la
-    altura de cada seguro de bayoneta, por si la cabeza del M3 asoma; corrida
-    para que la banda entre en cualquier giro. Tambien en los tornillos de la
-    tapa del panel que quedan debajo."""
+    cuerpo: el TPU se estira y aprieta. Tapa entera la cabeza de cada tornillo
+    que queda debajo y, por dentro, lleva una caja redonda en cada uno, 2 mm
+    mayor que la cabeza, por si asoma. Con cajas sueltas la banda entra en una
+    sola posicion: una muesca en su canto libre, sobre el centro del panel,
+    dice cual."""
     b = BANDS
     ri = RO - b['apriete_diametral'] / 2
     ro = ri + b['espesor']
-    body = tube_ring(ro, ri, z0, b['alto'])
+    body = tube_ring(ro, ri, z0, height)
     edges = [e for e in body.Edges
              if hasattr(e.Curve, 'Radius') and abs(e.Curve.Radius - ro) < 0.01]
     if edges and b.get('redondeo', 0) > 0:
@@ -863,9 +864,20 @@ def build_band(z0, z_screws):
             body = body.makeFillet(b['redondeo'], edges)
         except Exception as error:
             print(f'AVISO: no se redondearon los cantos de la banda ({error})')
-    for z in z_screws:
-        body = body.cut(tube_ring(ri + b['ranura_profundidad'], ri - 1,
-                                  z - b['ranura_alto'] / 2, b['ranura_alto']))
+    for angle, z, head in screws:
+        a = math.radians(angle)
+        ux, uy = math.cos(a), math.sin(a)
+        start = ri - 2.0
+        body = body.cut(Part.makeCylinder(head / 2 + b['caja_holgura_diametro'] / 2,
+                                          b['caja_profundidad'] + 2.0,
+                                          V(ux * start, uy * start, z), V(ux, uy, 0)))
+    m = b['marca']
+    z_edge = z0 + height if free_edge_up else z0
+    z_notch = z_edge - m['largo'] if free_edge_up else z_edge - 1.0
+    notch = Part.makeBox(m['profundidad'] + 1.0, m['ancho'], m['largo'] + 1.0,
+                         V(ro - m['profundidad'], -m['ancho'] / 2, z_notch))
+    notch.rotate(V(), V(0, 0, 1), PAN['angulo'])
+    body = body.cut(notch)
     return clean(body)
 
 
@@ -1001,15 +1013,20 @@ def build_references():
 
 
 # --- Ensamble ---------------------------------------------------------------
-def band_screws(z0):
-    """Alturas de los tornillos exteriores cuya cabeza queda bajo una banda que
-    empieza en z0: los dos seguros de bayoneta y los de la tapa del panel."""
+BAND_LOW = (0.0, BANDS['alto_abajo'])
+BAND_HIGH = (Z_TOP - BANDS['alto_arriba'], BANDS['alto_arriba'])
+
+
+def band_screws(z0, height):
+    """Tornillos exteriores cuya cabeza queda bajo una banda: (angulo, z,
+    diametro de la cabeza). Son los dos seguros de bayoneta y los dos de la
+    tapa del panel."""
     half = PAN['tornillo_separacion_z'] / 2
-    heads = [(Z_LOCK_BASE, LOCK['cabeza_diametro']), (Z_LOCK_CAP, LOCK['cabeza_diametro']),
-             (PAN['z_centro'] - half, PAN['tornillo_cabeza']),
-             (PAN['z_centro'] + half, PAN['tornillo_cabeza'])]
-    z1 = z0 + BANDS['alto']
-    return [z for z, d in heads if z + d / 2 > z0 and z - d / 2 < z1]
+    heads = [(LOCK['angulo'], Z_LOCK_BASE, LOCK['cabeza_diametro']),
+             (LOCK['angulo'], Z_LOCK_CAP, LOCK['cabeza_diametro']),
+             (PAN['angulo'], PAN['z_centro'] - half, PAN['tornillo_cabeza']),
+             (PAN['angulo'], PAN['z_centro'] + half, PAN['tornillo_cabeza'])]
+    return [h for h in heads if h[1] + h[2] / 2 > z0 and h[1] - h[2] / 2 < z0 + height]
 
 
 doc = App.newDocument('TresVizoV22')
@@ -1022,9 +1039,10 @@ parts = [
     ('05-panel-cover', 'Tapa del panel principal', build_panel(PAN, [
         ('pair', LED['diametro'], LED['z'], LED['separacion']),
     ], extra=(display_features, button_features, jst_features))),
-    ('06-bumper-bottom', 'Banda de TPU de abajo', build_band(0.0, band_screws(0.0))),
+    ('06-bumper-bottom', 'Banda de TPU de abajo',
+     build_band(*BAND_LOW, band_screws(*BAND_LOW), free_edge_up=True)),
     ('07-bumper-top', 'Banda de TPU de arriba',
-     build_band(Z_TOP - BANDS['alto'], band_screws(Z_TOP - BANDS['alto']))),
+     build_band(*BAND_HIGH, band_screws(*BAND_HIGH), free_edge_up=False)),
 ]
 summary = []
 for name, label, shape in parts:
@@ -1066,10 +1084,10 @@ resumen = {
         'pcb_imu_cara_inferior': round(Z_BOARD, 2),
         'unas': [round(Z_NAIL, 3), round(Z_NAIL_TOP, 3)],
         'ventanas_cuello': [round(Z_WIN0, 3), round(Z_WIN1, 3)],
-        'banda_abajo': [0.0, BANDS['alto']],
-        'banda_arriba': [round(Z_TOP - BANDS['alto'], 2), round(Z_TOP, 2)],
-        'ranuras_banda_abajo': [round(z, 2) for z in band_screws(0.0)],
-        'ranuras_banda_arriba': [round(z, 2) for z in band_screws(Z_TOP - BANDS['alto'])],
+        'banda_abajo': [BAND_LOW[0], round(BAND_LOW[0] + BAND_LOW[1], 2)],
+        'banda_arriba': [round(BAND_HIGH[0], 2), round(Z_TOP, 2)],
+        'cajas_banda_abajo': [[a, round(z, 2), d] for a, z, d in band_screws(*BAND_LOW)],
+        'cajas_banda_arriba': [[a, round(z, 2), d] for a, z, d in band_screws(*BAND_HIGH)],
     },
     'arp_sobre_asiento_jalon_mm': round(Z_TOP, 2),
     '_nota_arp': 'Del asiento del jalon (cara inferior de la base) a la cara de la tapa donde apoya la antena.',

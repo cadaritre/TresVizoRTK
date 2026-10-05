@@ -1,6 +1,6 @@
 # Integración de TresVizo V1 — antecedente
 
-> **Documento histórico.** V1 quedó sustituida por [V2](../mechanical/v2/README.md)
+> **Documento histórico.** V1 quedó sustituida por V2, y hoy la carcasa vigente es [V2.2](../mechanical/v2.2/README.md)
 > el 22/09/2026 y sus archivos se retiraron del repositorio. Se conserva esta
 > página porque documenta decisiones de integración —alimentación, arnés, datum
 > del IMU, retención del inserto— que siguen siendo válidas y que V2 hereda o

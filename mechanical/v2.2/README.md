@@ -1,7 +1,6 @@
 # TresVizo V2.2 — Ø64 × 130, panel con pantalla y botón, IMU en la tapa, bandas de TPU
 
-Revisión de [V2.1](../v2.1/README.md) pedida por el propietario el 2 de octubre
-de 2026:
+Revisión de V2.1 pedida por el propietario el 2 de octubre de 2026:
 
 1. **Diámetro máximo 64 mm** (sin contar las bandas de TPU) y altura de unos
    130 mm. La batería es una **18650**: no hace falta el ancho que pedía la
@@ -22,6 +21,10 @@ de 2 pines en lugar del USB-C, para simplificar la carga.
 El primer borrador de V2.2 medía Ø79 (commit `5d196e6`). El propietario fijó
 después Ø64 como máximo. Entre medias, una revisión independiente del modelo
 encontró fallos que quedan corregidos (ver [abajo](#lo-que-corrigió-la-revisión)).
+
+V2.1, V2 y la opción del domo se quitaron del repositorio el 4 de octubre.
+Siguen en el historial de git: la última vez que están completas es el commit
+`94f00f9`.
 
 **Nada de V2.2 se ha impreso ni ensayado.** La geometría es coherente en CAD y
 pasa las comprobaciones automáticas; eso no es validación.
@@ -184,8 +187,8 @@ los toalleros. Nada por debajo de z = 22: ahí está el collar inferior.
 ## Panel frontal
 
 Tapa curva a ras de 86° × 83 mm. Todo va montado en la tapa y entra por la
-ventana del tubo al cerrarla. Sus rebordes de arriba y de abajo quedan en parte
-bajo las bandas de TPU.
+ventana del tubo al cerrarla. Sus rebordes de arriba y de abajo, con sus dos
+tornillos, quedan bajo las bandas de TPU.
 
 | Elemento | Altura z | Montaje |
 | --- | ---: | --- |
@@ -220,15 +223,23 @@ bajo las bandas de TPU.
 
 ## Bandas de TPU
 
-Piezas 6 y 7. Dos fundas de 28 mm de alto y 2 mm de pared, para imprimir en TPU:
+Piezas 6 y 7. Dos fundas de 2 mm de pared, para imprimir en TPU. Cada una tapa
+entera la cabeza de los tornillos que tiene debajo: el seguro de bayoneta y un
+tornillo de la tapa del panel.
 
-- **Abajo:** de z = 0 a 28. Cubre la base y el arranque del tubo.
-- **Arriba:** de z = 101.9 a 129.9. Cubre el final del tubo y la tapa.
+- **Abajo:** de z = 0 a 34.5. Cubre la base, el arranque del tubo y el tornillo de
+  abajo de la tapa del panel; su canto queda a 1.5 mm del botón.
+- **Arriba:** de z = 97.4 a 129.9 (32.5 de alto). Cubre el final del tubo, la tapa y
+  el tornillo de arriba de la tapa del panel; su canto queda a 0.9 mm del hueco
+  del JST.
 - Diámetro interior 0.6 menor que el cuerpo: el TPU se estira y aprieta. Por
   fuera miden 67.4.
-- Por dentro, una ranura corrida de 8 × 1.2 a la altura de cada tornillo que queda
-  debajo, por si su cabeza asoma: el seguro de bayoneta y un tornillo de la tapa
-  del panel en cada banda. Es corrida para que la banda entre en cualquier giro.
+- Por dentro, una **caja redonda en cada tornillo**, 2 mm mayor que su cabeza (Ø8)
+  y 1.2 de fondo, por si la cabeza asoma. Entre la caja y el canto de la banda
+  quedan 1.5 mm.
+- Como las cajas no son corridas, la banda entra en una sola posición: una
+  **muesca** de 1.2 × 1 en su canto libre va sobre el centro del panel.
+- Se imprimen sin soporte: el techo de cada caja vuela 1.2 mm.
 - Cantos exteriores redondeados.
 - Para abrir la bayoneta o quitar la tapa del panel hay que quitar antes la banda.
 
@@ -264,7 +275,8 @@ Piezas 6 y 7. Dos fundas de 28 mm de alto y 2 mm de pared, para imprimir en TPU:
    seguro.
 7. **Tapa del panel:** conectar pantalla, botón, JST y LEDs y cerrar con dos
    M3×4.
-8. **Bandas de TPU:** deslizarlas, una por abajo y otra por arriba.
+8. **Bandas de TPU:** deslizarlas, una por abajo y otra por arriba, con la muesca
+   sobre el centro del panel.
 
 La lista completa está en [SCREW-BOM.md](SCREW-BOM.md).
 
@@ -327,8 +339,6 @@ alojamiento.
   medirlo antes de imprimir la tapa del panel y, si hace falta, cambiar
   `panel.jst_xh`. Si la clavija no entra completa, `hundido` negativo saca el
   header.
-- **La opción del domo** ([option-oem-dome](../option-oem-dome/README.md)) es
-  para V2.1 (Ø69) y no está adaptada a V2.2.
 
 ## Piezas
 

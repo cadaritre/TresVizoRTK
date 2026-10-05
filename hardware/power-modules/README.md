@@ -3,7 +3,7 @@
 > **Histórico — 02/10/2026:** esta propuesta corresponde a la Tiny. La placa definitiva es Thing Plus ESP32-S3 y el control del Soft Power Switch está implementado; la distribución portátil del UM980 sigue pendiente. No aplicar este arnés al montaje nuevo; consultar [cableado vigente](../wiring.md).
 
 
-Revisión del 20 de septiembre de 2026. Sustituye la propuesta de PCB personalizada por módulos comprables y un arnés. Se conservan la Tiny, su Tiny-Adapter y cable original, el UM980, BMI088, microSD y batería. El [receptor V2](../../mechanical/v2/README.md) integra los paneles y los soportes internos; el firmware se conserva.
+Revisión del 20 de septiembre de 2026. Sustituye la propuesta de PCB personalizada por módulos comprables y un arnés. Se conservan la Tiny, su Tiny-Adapter y cable original, el UM980, BMI088, microSD y batería. El receptor V2 (hoy [V2.2](../../mechanical/v2.2/README.md)) integra los paneles y los soportes internos; el firmware se conserva.
 
 **Resultado: tres módulos principales, pulsador y dos ventanas de luz en el panel.** El USB-C exterior se usa para alimentación/carga y para el USB nativo del ESP32. El botón exterior acciona el encendido electrónico; el cierre de archivos antes de apagar requiere integración en firmware. No hay PCB que mandar fabricar.
 
@@ -82,7 +82,7 @@ Estos puntos separan el prototipo económico de la anterior propuesta de product
 
 - [Cableado y control](WIRING.md).
 - [Montaje al panel y dimensiones para mecánica](PANEL.md).
-- [CAD, STEP, STL y montaje de V2](../../mechanical/v2/README.md).
+- [CAD, STEP, STL y montaje de V2.2](../../mechanical/v2.2/README.md).
 - [Proveedores para México](SOURCING_MX.md).
 - [Diagrama inicial del reparto](panel-and-modules.svg), anterior a seleccionar pulsador y RGB Steren; no usar sus precios como presupuesto vigente.
 

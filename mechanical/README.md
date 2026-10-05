@@ -9,9 +9,6 @@
 | [v2.2/generated/stl](v2.2/generated/stl/) | Imprimir: cinco piezas rígidas y dos bandas de TPU. |
 | [v2.2/generated/step](v2.2/generated/step/) | STEP por pieza para otros CAD, en posición cerrada. |
 | [v2.2/SCREW-BOM.md](v2.2/SCREW-BOM.md) | Compra: 15 tornillos, la tuerca de latón del jalón y el conector de carga JST-XH. Los dos del IMU, avellanados. |
-| [v2.1](v2.1/README.md) | Anterior. Se conserva como estaba. |
-| [option-oem-dome](option-oem-dome/README.md) | **Otra posibilidad, no una V3:** antena de topografía ArduSimple dentro de un domo. Es para V2.1 (Ø69): no está adaptada a V2.2. |
-| [v2](v2/README.md) | Anterior a V2.1. |
 | [AUDITORIA-V1.md](AUDITORIA-V1.md) | Por qué se rehízo la carcasa desde cero. |
 | [referencias](referencias/) | Cotas de los componentes comprados y datum del BMI088. |
 
@@ -30,7 +27,9 @@
 | Bayonetas | entraban en tres posiciones | **una sola posición** |
 | Protección | — | **bandas de TPU** arriba y abajo |
 
-V2.1 no se modificó, para no perder la referencia; imprimir V2.2.
+Las versiones anteriores (V2, V2.1 y la opción del domo para V2.1) se quitaron
+del repositorio el 04-10-2026. Siguen en el historial de git: la última vez que
+están completas es el commit `94f00f9`.
 
 ## Regenerar
 

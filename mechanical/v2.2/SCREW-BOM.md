@@ -57,7 +57,7 @@ patron de agujeros publicado.
 | Termofit de 2.5 mm | 5 cm | Patas del header JST soldadas a sus cables |
 | Brida de 2.5 mm, 100-150 mm | 4-8 | Componentes extra en los toalleros |
 | Lamina transparente de 1 mm (acrilico o PETG), 26.7 x 19.3 | 1 | Mica de la pantalla |
-| Filamento TPU 95A | ~25 g | Las dos bandas de proteccion |
+| Filamento TPU 95A | ~35 g | Las dos bandas de proteccion |
 | Cinta de espuma o fieltro adhesivo | 1 tira | Entre la 18650 y el respaldo |
 | Llave Allen 2 mm | 1 | M3 cabeza boton y M2.5 cilindrica de la antena |
 | Llave Allen 1.5 mm o desarmador Phillips 0 | 1 | M2 de la pantalla y M2.5 avellanado del IMU |
