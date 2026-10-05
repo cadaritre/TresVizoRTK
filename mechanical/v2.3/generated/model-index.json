@@ -1,0 +1,244 @@
+{
+ "posicion": "cerrada: dientes de base y tapa contra el fondo de su ranura",
+ "giro_cierre_grados": 28.7,
+ "tapa_cierra_horario": true,
+ "altura_total_mm": 129.91,
+ "diametro_exterior_mm": 64.0,
+ "plano_alturas": {
+  "piso_interior": 15.91,
+  "techo_interior": 122.91,
+  "largo_util_mm": 107.0,
+  "cara_montaje_antena": 129.91,
+  "borde_superior_tubo": 124.91,
+  "fondo_cuello_tapa": 99.41,
+  "seguro_base": 13.71,
+  "seguro_tapa": 119.91,
+  "plataforma_disco": [
+   99.91,
+   102.41
+  ],
+  "pcb_imu_cara_inferior": 103.91,
+  "unas": [
+   112.226,
+   114.406
+  ],
+  "ventanas_cuello": [
+   112.726,
+   115.006
+  ],
+  "banda_abajo": [
+   0.0,
+   28.0
+  ],
+  "banda_arriba": [
+   101.91,
+   129.91
+  ],
+  "ranuras_banda_abajo": [
+   13.71,
+   29.0
+  ],
+  "ranuras_banda_arriba": [
+   119.91,
+   102.9
+  ]
+ },
+ "arp_sobre_asiento_jalon_mm": 129.91,
+ "_nota_arp": "Del asiento del jalon (cara inferior de la base) a la cara de la tapa donde apoya la antena.",
+ "tuerca_jalon": {
+  "alojamiento_entre_caras_mm": 24.113,
+  "alojamiento_z_mm": [
+   2.0,
+   15.906
+  ],
+  "paso_perno_diametro_mm": 16.6,
+  "retenes_xy_mm": [
+   [
+    0.0,
+    15.0
+   ],
+   [
+    -0.0,
+    -15.0
+   ]
+  ]
+ },
+ "usb_c_panel": {
+  "z_mm": 93.2,
+  "hueco_mm": [
+   12.8,
+   7.0
+  ],
+  "radio_mm": 1.2
+ },
+ "chasis": {
+  "riel_x_mm": [
+   23.3,
+   25.2
+  ],
+  "riel_z_mm": [
+   17.0,
+   99.0
+  ],
+  "travesano_z_mm": [
+   95.8,
+   99.0
+  ],
+  "radio_paso_mm": 25.5
+ },
+ "imu": {
+  "chip_xy_mm": [
+   0.0,
+   0.0
+  ],
+  "agujeros_xy_mm": [
+   [
+    -9.0,
+    5.65
+   ],
+   [
+    9.5,
+    5.65
+   ]
+  ],
+  "placa_x_mm": [
+   -11.5,
+   12.0
+  ],
+  "placa_y_mm": [
+   -9.85,
+   8.15
+  ]
+ },
+ "piezas": [
+  {
+   "pieza": "01-threaded-base",
+   "etiqueta": "Base con rosca 5/8",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 34.19,
+   "caja": [
+    64.0,
+    64.0,
+    15.91
+   ],
+   "z": [
+    -0.0,
+    15.91
+   ]
+  },
+  {
+   "pieza": "02-logo-tube",
+   "etiqueta": "Tubo con logo, nervios guia y cuna de la 18650",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 71.44,
+   "caja": [
+    64.0,
+    64.0,
+    116.91
+   ],
+   "z": [
+    8.0,
+    124.91
+   ]
+  },
+  {
+   "pieza": "03-antenna-cap",
+   "etiqueta": "Tapa de antena",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 25.21,
+   "caja": [
+    64.0,
+    64.0,
+    30.5
+   ],
+   "z": [
+    99.41,
+    129.91
+   ]
+  },
+  {
+   "pieza": "04-imu-platform",
+   "etiqueta": "Plataforma del IMU",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 7.23,
+   "caja": [
+    45.9,
+    41.75,
+    25.0
+   ],
+   "z": [
+    99.91,
+    124.91
+   ]
+  },
+  {
+   "pieza": "05-panel-cover",
+   "etiqueta": "Tapa del panel principal",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 8.98,
+   "caja": [
+    42.53,
+    10.24,
+    82.3
+   ],
+   "z": [
+    24.8,
+    107.1
+   ]
+  },
+  {
+   "pieza": "08-sled",
+   "etiqueta": "Chasis deslizable de la placa principal y la carrier",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 9.96,
+   "caja": [
+    50.4,
+    17.8,
+    82.0
+   ],
+   "z": [
+    17.0,
+    99.0
+   ]
+  },
+  {
+   "pieza": "06-bumper-bottom",
+   "etiqueta": "Banda de TPU de abajo",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 8.74,
+   "caja": [
+    67.4,
+    67.4,
+    27.98
+   ],
+   "z": [
+    0.0,
+    27.98
+   ]
+  },
+  {
+   "pieza": "07-bumper-top",
+   "etiqueta": "Banda de TPU de arriba",
+   "solidos": 1,
+   "valido": true,
+   "volumen_cm3": 8.25,
+   "caja": [
+    67.4,
+    67.4,
+    27.98
+   ],
+   "z": [
+    101.93,
+    129.91
+   ]
+  }
+ ],
+ "volumen_total_cm3": 174.0
+}

@@ -1,0 +1,88 @@
+{
+ "piezas": [
+  {
+   "pieza": "01-threaded-base",
+   "etiqueta": "Base con rosca 5/8",
+   "triangulos": 1904,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 34.19,
+   "stl": "01-threaded-base.stl"
+  },
+  {
+   "pieza": "02-logo-tube",
+   "etiqueta": "Tubo con logo, nervios guia y cuna de la 18650",
+   "triangulos": 11158,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 71.44,
+   "stl": "02-logo-tube.stl"
+  },
+  {
+   "pieza": "03-antenna-cap",
+   "etiqueta": "Tapa de antena",
+   "triangulos": 3186,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 25.21,
+   "stl": "03-antenna-cap.stl"
+  },
+  {
+   "pieza": "04-imu-platform",
+   "etiqueta": "Plataforma del IMU",
+   "triangulos": 1764,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 7.23,
+   "stl": "04-imu-platform.stl"
+  },
+  {
+   "pieza": "05-panel-cover",
+   "etiqueta": "Tapa del panel principal",
+   "triangulos": 4102,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 8.98,
+   "stl": "05-panel-cover.stl"
+  },
+  {
+   "pieza": "08-sled",
+   "etiqueta": "Chasis deslizable de la placa principal y la carrier",
+   "triangulos": 1190,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 9.96,
+   "stl": "08-sled.stl"
+  },
+  {
+   "pieza": "06-bumper-bottom",
+   "etiqueta": "Banda de TPU de abajo",
+   "triangulos": 7034,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 8.74,
+   "stl": "06-bumper-bottom.stl"
+  },
+  {
+   "pieza": "07-bumper-top",
+   "etiqueta": "Banda de TPU de arriba",
+   "triangulos": 7034,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 8.25,
+   "stl": "07-bumper-top.stl"
+  }
+ ],
+ "todas_cerradas": true,
+ "interferencias": [],
+ "sin_interferencias": true,
+ "deflexion_lineal": 0.05
+}

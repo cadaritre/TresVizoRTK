@@ -1,0 +1,87 @@
+{
+  "units": "mm",
+  "criterio": [
+    "Esta tabla NO genera geometria de la carcasa. Dibuja las piezas de",
+    "referencia del modelo (objetos ref_*, que no se exportan) y sirve para",
+    "COMPROBAR que lo que hoy se piensa meter cabe y no choca.",
+    "'confianza' dice de donde sale el dato."
+  ],
+  "paquete": {
+    "_que_es": "Disposicion de referencia de lo que se amarra al respaldo. Es una propuesta para comprobar sitio, no una obligacion: el propietario decide el orden al montar.",
+    "z_inferior": 22.0,
+    "_nota_z": "Por encima del collar inferior (llega a 21): la 18650 llega por detras a r = 28.9, fuera del paso del collar."
+  },
+  "carrier_um980": {
+    "descripcion": "BDLX RTK_UM98_V1.0.1",
+    "publicado": [
+      11.0,
+      32.0,
+      52.0
+    ],
+    "confianza": "publicado",
+    "sujecion": "brida, sobre la cara delantera de la bateria",
+    "nota": "Sin plano de agujeros publicado: no se atornilla."
+  },
+  "thing_plus": {
+    "descripcion": "SparkFun Thing Plus ESP32-S3 WRL-24408",
+    "publicado": [
+      8.0,
+      22.9,
+      58.4
+    ],
+    "confianza": "publicado (2.3 x 0.9 in); el espesor incluye USB-C y socket microSD",
+    "sujecion": "brida, junto al UM980"
+  },
+  "oled": {
+    "descripcion": "OLED 0.96 in 128x64 I2C SSD1306, 4 pines (ANPOMNHBUK)",
+    "pcb": [
+      27.5,
+      27.8,
+      1.6
+    ],
+    "confianza": "plano del vendedor (captura del propietario, 02-10-2026)",
+    "nota": "A 64 de diametro no caben los conectores Dupont detras de la pantalla: los cuatro cables se sueldan a los pines (o a los pads, quitando los pines). Se reservan 10 mm detras del PCB para pines y cables.",
+    "cables_detras": 10.0
+  },
+  "boton": {
+    "descripcion": "Push button metalico 12 mm momentaneo, anillo LED azul 12 V",
+    "confianza": "plano del vendedor (captura del propietario, 02-10-2026)",
+    "cables_detras": 6.0,
+    "nota": "El LED es de 12 V. A 3.3-5 V enciende poco o nada: hay que alimentarlo aparte o cambiar su resistencia."
+  },
+  "bmi088": {
+    "descripcion": "Breakout BMI088 V1.0 azul",
+    "confianza": "render del vendedor, plano y dos fotos (02-10-2026)",
+    "nota": "Ver parameters.json, imu. Contorno real 23.1 x 17.4-17.7 segun render y fotos; el plano dice 23.5 x 18."
+  },
+  "antena": {
+    "descripcion": "Helix externa HA-901A",
+    "publicado": {
+      "diametro": 43.5,
+      "altura": 40.8,
+      "tornillos": 3,
+      "metrica": "M2.5",
+      "circulo_pernos": 26.6
+    },
+    "confianza": "etiqueta"
+  },
+  "tuerca_jalon": {
+    "descripcion": "Tuerca hexagonal 5/8-11 UNC (NC estandar) de laton, 15/16 in entre caras, 35/64 in de alto",
+    "confianza": "norma ASME B18.2.2; medir la comprada",
+    "compra": "Los Tornillos (Guadalajara), 'TUERCA HEXAGONAL NC ESTANDAR 5/8 LATON', 51.79 MXN, consultado el 04-10-2026"
+  },
+  "conector_carga": {
+    "descripcion": "JST-XH 2 pines, paso 2.5: header macho vertical B2B-XH-A en el panel; carcasa XHP-2 con terminales SXH del lado del cargador",
+    "confianza": "plano de JST (serie XH)",
+    "nota": "Va a ras del panel, pegado con epoxico. JST lo vende como conector de placa, no para conectar y desconectar a diario."
+  },
+  "bateria_18650": {
+    "descripcion": "Celda 18650 1S, 3.7 V, 3000 mAh (hardware/bom.md del 02-10-2026)",
+    "diametro": 18.6,
+    "largo_nominal": 65.0,
+    "largo_peor_caso": 69.0,
+    "confianza": "formato estandar; el largo con PCM de proteccion llega a 69-70",
+    "sujecion": "detras del respaldo, en el canal central, con bridas por las ranuras de +-5",
+    "nota": "Sin portapilas: no cabe uno de 77 mm. La celda va con su funda termoencogible, amarrada con bridas sobre una tira de fieltro o espuma."
+  }
+}

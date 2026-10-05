@@ -1,0 +1,82 @@
+{
+ "choques_piezas": [],
+ "choques_referencias": [],
+ "holguras": {
+  "chasis-tubo": 0.0,
+  "chasis-tapa": 0.406,
+  "chasis-plataforma": 0.906,
+  "chasis-base": 1.094,
+  "chasis-18650": 1.0,
+  "tubo-18650": 0.0,
+  "chasis-coaxial": 0.5,
+  "chasis-carrier": 0.0
+ },
+ "choques_entre_referencias": [
+  {
+   "a": "clavija:J101_cables",
+   "b": "clavija:J502_cables",
+   "mm3": 29.544
+  },
+  {
+   "a": "panel_usb:PCB_panel_usb",
+   "b": "panel_usb:pusb_J501",
+   "mm3": 0.085
+  },
+  {
+   "a": "panel_usb:PCB_panel_usb",
+   "b": "panel_usb:pusb_J515",
+   "mm3": 0.085
+  },
+  {
+   "a": "panel_usb:pusb_U502",
+   "b": "panel_usb:pusb_U521",
+   "mm3": 0.093
+  },
+  {
+   "a": "panel_usb:pusb_U503",
+   "b": "panel_usb:pusb_U521",
+   "mm3": 0.093
+  },
+  {
+   "a": "panel_usb:pusb_U504",
+   "b": "panel_usb:pusb_U521",
+   "mm3": 0.093
+  },
+  {
+   "a": "panel_usb:pusb_U505",
+   "b": "panel_usb:pusb_U521",
+   "mm3": 0.093
+  },
+  {
+   "a": "panel_usb:pusb_U506",
+   "b": "panel_usb:pusb_U521",
+   "mm3": 0.093
+  },
+  {
+   "a": "panel_usb:pusb_U507",
+   "b": "panel_usb:pusb_U521",
+   "mm3": 0.093
+  },
+  {
+   "a": "supuesto:battery_1s",
+   "b": "v23:ref_battery",
+   "mm3": 18748.428
+  },
+  {
+   "a": "supuesto:pusb_heads",
+   "b": "supuesto:pusb_heads002",
+   "mm3": 20.106
+  },
+  {
+   "a": "supuesto:pusb_heads001",
+   "b": "supuesto:pusb_heads002",
+   "mm3": 20.106
+  }
+ ],
+ "collar": {
+  "radio_limite": 25.65,
+  "radio_max_vertices": 25.5,
+  "fuera": []
+ },
+ "antena_plastico_mm3": 0.0
+}
