@@ -167,7 +167,9 @@ PLACE = {
     # ---- alrededor del cargador (U102 en 30.5, 22.4; VBUS arriba, BAT abajo, I2C a la izquierda)
     "C103": (28.6, 18.4, 90),                       # REGN
     "R101": (27.6, 26.6, 90), "R102": (26.5, 26.6, 90),   # ILIM
-    "R104": (25.4, 26.6, 90), "R105": (24.2, 26.8, 90), "R106": (23.0, 26.6, 90),   # TS
+    "R104": (25.4, 26.6, 90), "R105": (24.2, 26.8, 90),   # TS
+    # 10k fijo de TS y su puente (cortar para usar NTC) junto a J404
+    "R106": (32.1, 56.8, 0), "JP101": (34.9, 56.8, 0),
     "R103": (30.9, 30.0, 270),                      # PROG (1S 4.7k; 2S 8.2k), bajo su pin
     "R107": (29.3, 30.0, 90),                       # BATP, bajo su pin
     "R108": (21.0, 37.4, 90),                       # INT pull-up, bajo el ESP32
@@ -178,7 +180,7 @@ PLACE = {
     "C117": (38.4, 33.6, 90), "C118": (40.2, 33.8, 90), "C119": (42.2, 33.8, 90), "C120": (33.6, 38.2, 0),
     "C111": (41.2, 29.4, 0),
     # ---- medidor y protección de polaridad junto a la batería
-    "U103": (32.4, 49.4, 0), "R113": (32.4, 51.35, 0), "C114": (34.4, 51.35, 0), "R115": (33.4, 52.9, 90),
+    "U103": (32.4, 49.4, 0), "R113": (32.4, 51.35, 0), "C114": (34.4, 51.35, 0), "R115": (32.4, 52.6, 0),
     "R114": (34.6, 49.4, 90),
     "Q102": (39.6, 48.3, 0), "Q103": (39.6, 51.8, 0), "R110": (42.4, 48.6, 90), "R111": (36.8, 51.8, 90),
     "R112": (42.4, 51.8, 90),
@@ -193,7 +195,7 @@ PLACE = {
     "C201": (9.5, 34.8, 0), "C202": (6.0, 34.4, 0), "R203": (13.2, 34.6, 90),
     # Pull-ups del bus I2C junto a la OLED (en el canal entre el ESP32 y el cargador el plano de 3V3
     # queda partido por las vías)
-    "R204": (31.5, 11.3, 180), "R205": (31.5, 10.2, 180),
+    "R204": (32.7, 11.3, 180), "R205": (32.7, 10.2, 180),
     # Pull-ups bajo el ESP32, en la franja sobre el botón (bajas; el plano de 3V3 está entero ahí)
     "R414": (18.6, 37.4, 90), "R415": (19.8, 37.4, 90),
     "TP201": (3.6, 16.1, 0), "TP202": (5.8, 16.1, 0), "TP203": (22.6, 29.8, 0),
@@ -211,6 +213,16 @@ PLACE = {
 TRACKS = []
 VIAS = []
 
+# VBUS ancho de J101 al cargador (en 2S pide ~2.2 A de entrada): barra bajo los tres pines de VBUS,
+# bajada de 1 mm bajo el cuerpo de J403 (entre sus pads de anclaje y los de señal) y tramo de 0.8 mm
+# entre la TVS (D101) y el 22 uF de entrada (C104), donde arranca el abanico del cargador.
+TRACKS += [
+    ("VBUS", "F.Cu", 0.8, [(24.6, 6.0), (27.65, 6.0)]),
+    ("VBUS", "F.Cu", 1.0, [(27.65, 6.0), (27.65, 13.2)]),
+    ("VBUS", "F.Cu", 0.8, [(27.65, 13.2), (28.45, 14.0), (32.15, 14.0)]),
+    ("VBUS", "F.Cu", 0.8, [(31.37, 14.0), (31.37, 13.0)]),
+    ("VBUS", "F.Cu", 0.8, [(32.15, 14.0), (32.15, 15.0)]),
+]
 # Cargador: las GND de la columna izquierda (pines 10, 11 y 13) quedan cercadas por las salidas de VBUS,
 # BTN_N e I2C; cada grupo lleva su vía al plano de GND.
 TRACKS += [
@@ -219,12 +231,13 @@ TRACKS += [
     ("GND", "F.Cu", 0.2, [(28.4, 22.6), (26.6, 22.6)]),
 ]
 VIAS += [("GND", 27.75, 21.6), ("GND", 26.6, 22.6)]
-# Medidor: CELL y VDD bajan directo a R113 (VPACK -> FG_VDD); VDD sigue a C114 y a R115
+# Medidor: CELL y VDD bajan directo a R113 (VPACK -> FG_VDD); VDD sigue a C114 y baja a R115, que va justo
+# debajo de R113 para dejar libre la línea de serigrafía de JP101
 TRACKS += [
     ("VPACK", "F.Cu", 0.2, [(32.15, 50.4), (32.15, 51.2)]),
     ("FG_VDD", "F.Cu", 0.2, [(32.65, 50.4), (32.65, 51.2)]),
     ("FG_VDD", "F.Cu", 0.25, [(32.88, 51.35), (33.92, 51.35)]),
-    ("FG_VDD", "F.Cu", 0.25, [(33.4, 51.35), (33.4, 52.42)]),
+    ("FG_VDD", "F.Cu", 0.25, [(32.91, 51.35), (32.91, 52.6)]),
 ]
 
 for _org, _rot, _parts, _tracks, _vias in ((CHG_ORIGIN, CHG_ROT, CHG_PARTS, CHG_TRACKS, CHG_VIAS),
@@ -245,10 +258,10 @@ TEXTS = [
     ("BTN", "F.SilkS", 6.0, 40.1, 0.8, 0),
     ("J402", "F.SilkS", 6.0, 41.5, 0.8, 0),
     ("GNSS J301", "F.SilkS", 24.57, 57.0, 0.8, 0),
-    ("J404 NTC", "F.SilkS", 33.2, 56.0, 0.8, 0),
-    ("(opc.)", "F.SilkS", 33.2, 57.2, 0.8, 0),
-    ("BAT", "F.SilkS", 37.4, 54.0, 0.8, 0),
-    ("J102", "F.SilkS", 35.0, 55.0, 0.8, 0),
+    ("cortar JP101", "F.SilkS", 33.6, 53.75, 0.8, 0),
+    ("NTC J404", "F.SilkS", 33.6, 54.95, 0.8, 0),
+    ("BAT", "F.SilkS", 44.2, 54.0, 0.8, 0),
+    ("J102", "F.SilkS", 44.2, 55.0, 0.8, 0),
     ("-", "F.SilkS", 38.2, 56.4, 1.0, 0),
     ("+", "F.SilkS", 42.8, 56.4, 1.0, 0),
     ("v0.2", "F.SilkS", 23.0, 48.4, 0.8, 0),
@@ -353,17 +366,22 @@ PANEL = {
     "gap": 2.0,
     "rails": [5.0, 5.0, 5.0, 5.0],
     # Puentes con mouse bites. Arriba y abajo de la placa principal no hay sitio (conectores en los dos
-    # cantos): dos puentes en cada canto lateral, sin cobre a 1 mm. Los de v 10.5 y 15.91 caen en la zona
-    # de los rieles: lijar la rebaba. El de la derecha a v 15.91 une la principal con la panel-usb, cuyos
-    # puentes van a esa misma altura (sin cobre en v 13-19 de esa placa).
+    # cantos): dos puentes en cada canto lateral, sin cobre a 1 mm. Los de v 10.5 y 15.11 caen en la zona
+    # de los rieles: lijar la rebaba. El de la derecha a v 15.11 une la principal con la panel-usb, cuyos
+    # puentes van a esa misma altura: v 16.0 de esa placa, 15.11 por debajo del canto de su lengüeta (sin
+    # cobre en v 13-19 de esa placa).
     "tabs": [
         {"board": "main", "edge": "left", "offset": 10.5, "width": 5.0},
         {"board": "main", "edge": "left", "offset": 54.5, "width": 5.0},
-        {"board": "main", "edge": "right", "offset": 15.91, "width": 5.0},
+        {"board": "main", "edge": "right", "offset": 15.11, "width": 5.0},
         {"board": "main", "edge": "right", "offset": 52.0, "width": 5.0},
-        {"board": "usb", "edge": "left", "offset": 15.91, "width": 5.0},
-        {"board": "usb", "edge": "right", "offset": 15.91, "width": 5.0},
+        {"board": "usb", "edge": "left", "offset": 15.11, "width": 5.0},
+        {"board": "usb", "edge": "right", "offset": 15.11, "width": 5.0},
     ],
+    # El USB-C de la panel-usb sobresale 1.29 mm del canto de su lengüeta (u 5.2-15.6 de esa placa): con
+    # la fresa de 2 mm quedaría a 0.71 mm del marco. Frente a la lengüeta la fresa llega a 3 mm (1.71 mm
+    # libres) y el marco sube 1 mm para que el riel de arriba siga teniendo 5 mm.
+    "cuts": [{"board": "usb", "edge": "top", "offset": 3.2, "width": 14.4, "depth": 3.0}],
     "mousebite": {"drill": 0.6, "pitch": 0.9, "offset": 0.0},
     "keepout": 1.0,
     "marks": {"tooling_drill": 2.0, "tooling_inset": [2.5, 2.5], "fiducial_inset": [6.0, 2.5]},
@@ -396,13 +414,13 @@ def write_board_json(design, kicad_dir, place=None):
     chg_box = [(-8.0, -13.4), (8.0, -13.4), (8.0, 3.0), (-8.0, 3.0)]
     chg_box = [rot_pt(x, y, CHG_ROT) for x, y in chg_box]
     chg_box = [to_abs(CHG_ORIGIN[0] + x, CHG_ORIGIN[1] + y) for x, y in chg_box]
-    # Planos internos con 0.15 mm de margen (JLC admite 0.1 en capas internas): con 0.2 las vías dejan
+    # Planos internos con 0.12 mm de margen (JLC admite 0.09 en capas internas): con más, las vías dejan
     # tiras y cuellos finos en el plano de 3V3
     zones += [
-        {"net": "GND", "layer": "In1.Cu", "priority": 0, "name": "GND_L2", "clearance": 0.15},
-        {"net": "+3V3", "layer": "In2.Cu", "priority": 0, "name": "3V3_L3", "clearance": 0.15},
+        {"net": "GND", "layer": "In1.Cu", "priority": 0, "name": "GND_L2", "clearance": 0.12},
+        {"net": "+3V3", "layer": "In2.Cu", "priority": 0, "name": "3V3_L3", "clearance": 0.12},
         {"net": "GND", "layer": "In2.Cu", "priority": 1, "name": "GND_L3_cargador", "polygon": chg_box,
-         "clearance": 0.15},
+         "clearance": 0.12},
         {"net": "GND", "layer": "F.Cu", "priority": 0, "name": "GND_TOP", "post": True},
         {"net": "GND", "layer": "B.Cu", "priority": 0, "name": "GND_BOT", "post": True},
     ]

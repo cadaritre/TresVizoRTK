@@ -53,7 +53,7 @@ Se compararon los planos de los dos candidatos (stock de la API de JLCPCB del 04
 | Stock / precio unitario | 424 026 / 0.19 USD | 882 909 / 0.07 USD |
 | Valores nominales | 20 V, 5 A | 5 V, 3 A |
 | Canto de la placa | **Dibujado** («PCB EDGE»): 5.79 mm por delante de los postes de centrado | No lo da: su «PRODUCT EDGE» es el frente del propio conector |
-| Cara de acoplamiento | 6.28 mm por delante de los postes (2.60 mm por delante de las patas delanteras) → **sobresale 0.49 mm** del canto | 6.28 mm por delante de los postes; sin referencia al canto |
+| Cara de acoplamiento | 6.28 mm por delante de los postes (2.60 mm por delante de las patas delanteras) → **sobresale 0.49 mm** del canto dibujado | 6.28 mm por delante de los postes; sin referencia al canto |
 | Altura del eje | No acotada; altura total 3.26 mm | No acotada; altura total 3.16 mm |
 
 Se eligió el **HRO TYPE-C-31-M-12**: su plano fija la cara respecto del canto. Ningún plano acota la
@@ -76,9 +76,15 @@ izquierda mirando el panel. La placa es horizontal: cara inferior en z = 90.17 y
 z = 91.77, hacia arriba. Coordenadas de la placa, vista desde arriba con el USB-C arriba:
 **u = x + 10.4**, **v = 31.3 − y**.
 
-- **Contorno:** cuerpo u 0–20.8, v 4.7–19.8; lengüeta frontal u 5.2–15.6, v **0.09**–4.7; esquinas de
-  R0.5. El frente de la lengüeta pasó de v = 0 a v = 0.09 (y = 31.21) para que, con el voladizo de
-  0.49 mm del HRO, la cara siga en v = −0.40.
+- **Contorno:** cuerpo u 0–20.8, v 4.7–19.8; lengüeta frontal u 5.2–15.6, v **0.89**–4.7; esquinas de
+  R0.5.
+  - **El USB-C sobresale 1.29 mm** del frente de la lengüeta (decisión del propietario del
+    05-10-2026). El frente quedó 0.8 mm más atrás que el canto del plano de HRO: v = 0.89
+    (y = 30.41). La cara sigue en v = −0.40.
+  - El cobre más cercano al frente es el de las ranuras delanteras de la carcasa del USB-C, a
+    0.41 mm (la regla pide 0.3 mm). Los rellenos de GND paran a 0.3 mm.
+  - Los agujeros no cambian: están en el cuerpo, a 0.5 mm de su canto delantero (v 4.7) y a 1.4 mm
+    de los laterales.
 - **J501:** centrado en u = 10.4 (x = 0), **cara en v = −0.40 (y = 31.70)**, a ras de la tapa curva.
   **Eje a 1.65 mm de la cara de componentes → z = 93.42** (el estudio buscaba 93.50; la abertura de la
   tapa está centrada en z = 93.2 con ±3.5 mm). Carcasa de x = ±4.47, z 91.82–95.02.
@@ -101,12 +107,13 @@ z = 91.77, hacia arriba. Coordenadas de la placa, vista desde arriba con el USB-
 
   Todo queda a más de 1 mm de los agujeros (la zona sin cobre es de Ø4.4) y de los cantos laterales.
 - **Puentes del panel:** uno en cada canto lateral (u = 0 y u = 20.8), centrados en v = 16.0, de 5 mm.
-  - Medido desde la esquina superior izquierda del rectángulo que encierra la placa (u 0, v 0.09):
-    **canto izquierdo y canto derecho, a 15.91 mm**.
+  - Medido desde la esquina superior izquierda del rectángulo que encierra la placa (u 0, v 0.89):
+    **canto izquierdo y canto derecho, a 15.11 mm**.
   - Zona sin cobre de 1 mm de fondo en v 13.0–19.0.
   - El canto trasero no sirve: allí están la boca y los anclajes de J502.
-  - En el panel, el marco no debe acercarse a menos de 1 mm del frente de la lengüeta, porque el USB-C
-    sobresale 0.49 mm.
+  - En el panel, el USB-C asoma 1.29 mm sobre la fresa. Con la fresa normal de 2 mm quedaría a
+    0.71 mm del marco. Por eso, frente a la lengüeta, la fresa del panel se ensancha a 3 mm y quedan
+    **1.71 mm** (`cuts` en `../main-board/kicad/panel.json`).
 
 `fab/check3d.txt` (lo escribe `build.py`) mide estas posiciones sobre los modelos 3D de la placa armada.
 
@@ -120,6 +127,11 @@ z = 91.77, hacia arriba. Coordenadas de la placa, vista desde arriba con el USB-
     la placa.
   - La lengüeta (x = ±5.2) entra en el hueco con 0.95 mm por lado en las esquinas redondeadas, a la
     altura de la cara inferior.
+  - Con el USB-C sobresaliendo 1.29 mm, la lengüeta entra 0.8 mm menos en la pared y el hueco no
+    cambia. La pared mide 2.5 mm, de r = 29.5 a r = 32 (`mechanical/v2.2/parameters.json`). El
+    frente de la lengüeta (y = 30.41) queda:
+    - 1.16 mm detrás de la cara exterior en sus extremos (x = ±5.2) y 1.59 mm en el centro;
+    - 1.37 mm (extremos) y 0.91 mm (centro) por delante de la cara interior.
 - Dos soportes, de x = 5.9 a 10.2 a cada lado (es decir, x ±5.9 a ±10.2), con la cara de apoyo en
   z = 90.17 sobre el marco de la OLED.
 - Agujeros guía de Ø1.6 × 4.5 mm en (x ±7.9, y 25.0) para tornillos autorroscantes M2×5.
@@ -191,7 +203,7 @@ C19077509. El GH se copia de la biblioteca de la placa principal. Los STEP no se
 
 ## Verificaciones
 
-Hechas el 04-10-2026 con KiCad 10.0.6 (`kicad-cli`). **No** se ha fabricado, montado ni medido nada.
+Hechas el 05-10-2026 con KiCad 10.0.6 (`kicad-cli`). **No** se ha fabricado, montado ni medido nada.
 
 | Comprobación | Resultado |
 | --- | --- |
@@ -199,9 +211,10 @@ Hechas el 04-10-2026 con KiCad 10.0.6 (`kicad-cli`). **No** se ha fabricado, mon
 | DRC con las reglas de la placa principal (separación ≥ 0.127 mm, clases 0.15 mm; vías 0.6/0.3 mm; agujero-agujero ≥ 0.5 mm; cobre-canto ≥ 0.3 mm; cobre-agujero ≥ 0.25 mm) | 0 errores, 0 avisos ([fab/drc.rpt](fab/drc.rpt)) |
 | Conexiones sin rutear | 0; todo va prerruteado en `layout.py` y `route_rest.py` no tuvo nada que rutear |
 | Paridad esquemático ↔ PCB | 0 diferencias |
-| Reproducibilidad | Dos ejecuciones seguidas de `build.py` dieron las mismas huellas, pistas y vías (59 tramos, 40 vías) |
+| Reproducibilidad | Dos ejecuciones seguidas de `build.py` dieron las mismas huellas, pistas y vías (59 tramos, 39 vías) |
 | Máscara | Solo hay aberturas en pads y agujeros (vías tapadas por las dos caras, según los gerbers) |
-| Posición en el modelo 3D ([fab/check3d.txt](fab/check3d.txt)) | Cara del USB-C en y = 31.70, sobresale 0.49 mm, eje a 1.65 mm (z = 93.42); boca del GH 0.23 mm dentro del canto |
+| Posición en el modelo 3D ([fab/check3d.txt](fab/check3d.txt)) | Cara del USB-C en y = 31.70, sobresale 1.29 mm del canto (v = 0.89), eje a 1.65 mm (z = 93.42); boca del GH 0.23 mm dentro del canto |
+| Cobre al canto frontal | 0.41 mm (ranuras delanteras del USB-C); rellenos a 0.3 mm |
 | Planos consultados | HRO TYPE-C-31-M-12, SHOU HAN TYPE-C 16PIN 2MD(073), JST GH, XUNPU WAFER-GH1.25 |
 
 ## Lo que no está verificado
@@ -210,8 +223,8 @@ Hechas el 04-10-2026 con KiCad 10.0.6 (`kicad-cli`). **No** se ha fabricado, mon
 - **Orientación en el CPL:** las huellas de LCSC conservan la orientación de JLCPCB (J501 va girado
   180°), pero hay que revisar cada pieza en la vista previa de JLCPCB.
 - **Altura del eje (1.65 mm):** sale del modelo 3D de LCSC; el plano de HRO no la acota.
-- **Tolerancias:** la cara de J501 depende de la tolerancia del receptáculo y del corte del canto.
-  El estudio admite ±0.25 mm.
+- **Tolerancias:** la cara de J501 depende de la tolerancia del receptáculo y de su colocación sobre
+  los postes. El estudio admite ±0.25 mm. El canto ya no la toca: queda 1.29 mm atrás.
 - **Pasta en las patas del USB-C:** las cuatro ranuras llevan pasta para soldarlas en el reflujo,
   como indica JLCPCB para esta pieza. Confirmar con JLCPCB que la plantilla y el proceso son los
   adecuados.

@@ -71,8 +71,9 @@ precrimpados GH y SH (8 pines como máximo). Lo que resultó al aplicarlas, con 
    - La fila inferior del cargador (pines 17–24, paso 0.4) sale en abanico prerruteado: ILIM, BATP,
      PROG, INT, BAT y SDRV, con R103 (PROG) y R107 (BATP) justo debajo de sus pines y C113 (BAT)
      abajo a la derecha.
-   - Potencia solo por capas externas (VBUS, VSYS, PMID, BAT: 0.4–0.5 mm, con cuellos de 0.2 mm
-     junto a pads finos), nunca por las internas de 0.5 oz.
+   - Potencia solo por capas externas, nunca por las internas de 0.5 oz: VBUS prerruteado de J101
+     al 22 µF de entrada con 0.8–1.0 mm (aguanta los ~2.2 A de 2S); VSYS, PMID y BAT con 0.4–0.5 mm
+     y cuellos de 0.2 mm junto a pads finos.
 6. **Conectores de cable de 8 pines o menos, GH o SH de entrada lateral** (kit del propietario):
    - El panel se partió en botón (J402, GH4) y LEDs (J406, SH5).
    - La OLED pasa a SH4 lateral.
@@ -90,13 +91,17 @@ precrimpados GH y SH (8 pines como máximo). Lo que resultó al aplicarlas, con 
 9. **Un solo pedido en JLCPCB** con las dos placas en un panel. Ver
    [Pedido en JLCPCB](#pedido-en-jlcpcb) y [Costo](#costo).
 10. **Serigrafía sin solapes**: cada conector lleva su función y su referencia («IMU J405»,
-    «J404 NTC (opc.)»…); `silk_clean.py` revisa con el DRC de KiCad que ninguna referencia ni
-    trazo pise pads u otra serigrafía, y las huellas de LCSC cuya serigrafía pisaba sus propios
-    pads se recortaron en la biblioteca (`fp_silk_trim.py`: L2520 y SOD-882).
+    «NTC J404»…); `silk_clean.py` revisa con el DRC de KiCad que ninguna referencia ni trazo pise
+    pads u otra serigrafía, y las huellas cuya serigrafía pisaba sus propios pads se recortaron en
+    la biblioteca (`fp_silk_trim.py`: L2520, SOD-882 y el puente de soldadura de JP101).
 11. **Logotipo de TresVizo** (el de www.tresvizo.com, tomado del SVG del firmware,
     `firmware/esp32/assets/tresvizo-logo.svg`): completo, de 30 mm, con «www.tresvizo.com» en la
     cara trasera; y el distintivo (hexágono con el 3, de `mechanical/v2.2/logo.json`) en la cara
     de componentes, en el hueco frente al botón, donde no hay piezas.
+12. **J404 (NTC) montado de fábrica, con la NTC opcional** (decisión del propietario del
+    05-10-2026): sin NTC el cargador tiene que ver 25 °C, así que la resistencia fija R106 (10 kΩ)
+    va a GND por **JP101, un puente de soldadura cerrado de fábrica**. Para usar la NTC se corta
+    JP101 y se enchufa en J404. Ver [Conectores](#conectores).
 
 ## Mecánica
 
@@ -134,16 +139,17 @@ carcasa ([research/v02.md](research/v02.md) §8). Ejes de V2.2: z = eje del jal�
   - Superior (hacia la tapa), boca hacia arriba: IMU (J405), USB del panel (J101, justo bajo el
     J502 de la placa panel-usb) y LEDs (J406). Sobre el canto hay 12 mm libres hasta la plataforma
     del IMU, salvo bajo la placa panel-usb, donde baja el cable del USB.
-  - Inferior, boca hacia abajo: microSD (J401), carrier (J301), NTC (J404, opcional) y batería
-    (J102); se alcanzan quitando la base.
+  - Inferior, boca hacia abajo: microSD (J401), carrier (J301), NTC (J404) y batería (J102); se
+    alcanzan quitando la base.
   - Dentro de la placa, boca hacia una zona libre: OLED (J403) hacia la izquierda, bajo los pines de
     la OLED, y botón (J402) hacia la izquierda, junto al botón.
   - Antena del ESP32 en el canto izquierdo (+X), u 0–6.2, v 17.3–33.3 sin cobre en ninguna capa.
 - **La carcasa necesita cambios** (propuesta, no aplicada al CAD): quitar la placa del respaldo y
   los toalleros; recortar los nervios a y ≤ −10.5; rieles en z 39–90 (cortado en z 54–71 el de
-  +X); brazos detrás de la placa en (x, z) = (11.0, 75.3) y (−17.4, 83.8); topes del carrier;
-  repisa de la 18650; y en la tapa del panel, el hueco y las ménsulas del USB-C (ver
-  [../panel-usb](../panel-usb/README.md)).
+  +X); brazos detrás de la placa en (x, z) = (11.0, 75.3) y (−17.4, 83.8); **una ranura de 3 mm
+  de hondo en la base bajo J102** (x −21.5…−13.5, y 2.5…8.5), para que la base no pellizque los
+  cables de la batería; topes del carrier; repisa de la 18650; y en la tapa del panel, el hueco y
+  las ménsulas del USB-C (ver [../panel-usb](../panel-usb/README.md)).
 - **2S** no cabe en este orden sin un recorte de 11 × 11 mm frente al botón; ver
   [Antes de mandar a fabricar](#antes-de-mandar-a-fabricar).
 
@@ -153,7 +159,8 @@ carcasa ([research/v02.md](research/v02.md) §8). Ejes de V2.2: z = eje del jal�
   propuestos.
 - Paso por Ø52: radio máximo 23.21 mm.
 - Lo más justo:
-  - los cables de la batería, a 0.46 mm de la base;
+  - los cables de la batería, a 0.46 mm de la base (de ahí la ranura propuesta en la base, que
+    les deja ~3.5 mm);
   - la cara trasera, a 0.40 mm del carrier;
   - la cara de la placa, a 2.51 mm del botón.
 - Los rieles y brazos del primer estudio sí chocan con la placa nueva: hay que hacerlos con la
@@ -187,13 +194,20 @@ También van en `kicad/plugs.json` para la comprobación en CAD.
 | J402 | Botón: GND, contacto, anillo LED A, K | A la izquierda del botón; boca hacia la izquierda, sobre una zona libre de 6.1 × 8.3 mm (el cable da la vuelta hacia el botón) | GH 4 lateral SM04B-GHS-TB (C189895) | GHR-04V-S (C160418) | SSHL-002T-P0.2 (C189897) | «cable JST GH 1.25 4 pines una cabeza» |
 | J401 | microSD (zócalo push-push) | Canto inferior, a la izquierda; la tarjeta entra por abajo quitando la base | TF-015 (C113206) | — | — | — |
 | J301 | Carrier GNSS (arnés en Y) | Canto inferior, al centro; boca hacia abajo | Igual que J101 (C3029383) | GHR-08V-S (C485357); a la carrier, GHR-08V-S y GHR-05V-S (C160419) | SSHL-002T-P0.2 (C189897) | «cables precrimpados JST GH 1.25 28 AWG» |
-| J404 | NTC opcional, **sin montar** | Canto inferior, entre J301 y J102; boca hacia abajo | SH 2 lateral SM02B-SRSS-TB (C160402) | SHR-02V-S (C398472) | SSH-003T-P0.2-H (C263995) | «cable JST SH 1.0 2 pines una cabeza» |
+| J404 | NTC de la celda (el conector va montado; la NTC es opcional) | Canto inferior, entre J301 y J102; boca hacia abajo | SH 2 lateral SM02B-SRSS-TB (C160402) | SHR-02V-S (C398472) | SSH-003T-P0.2-H (C263995) | «cable JST SH 1.0 2 pines una cabeza» |
 | J102 | Batería: 1 = BAT−, 2 = BAT+ | Canto inferior, a la derecha; boca hacia abajo | **JST PH 2.0 mm**, 2 pines, lateral S2B-PH-SM4-TB (C295747) | PHR-2 (C157955) | SPH-002T-P0.5S (C111515) | La del pack: **confirmar paso y polaridad** |
 
-- **J404 sale «vacío» en las vistas 3D** porque está marcado como *sin montar* (KiCad no dibuja
-  esas piezas). Es el conector del NTC de la celda, opcional: sin él, una resistencia fija (R106,
-  10 kΩ) le dice al cargador que la celda está a 25 °C. Para usar un NTC 10k B3435 pegado a la
-  celda, soldar J404 y **quitar R106**.
+- **J404 viene montado; la NTC es opcional.** TS del cargador es un divisor de REGN (5.1 kΩ
+  arriba, 30 kΩ abajo) con la NTC en paralelo con los 30 kΩ:
+  - **Sin NTC** no hay que hacer nada: R106 (10 kΩ, lo que mide una NTC 10k a 25 °C) va a GND por
+    **JP101**, un puente de soldadura **cerrado de fábrica**, y el cargador ve 25 °C (TS ≈ 60 % de
+    REGN).
+  - **Con NTC** (10k B3435, pegada a la celda): **cortar JP101** con un cúter (la pista fina entre
+    sus dos pads; comprobar con el multímetro que quedó abierto) y enchufar la NTC en J404. Sobre
+    JP101 la serigrafía dice «cortar JP101» y, debajo, «NTC J404». Si no se corta, la NTC queda en
+    paralelo con R106 y la temperatura que ve el cargador sale mal.
+  - **JP101 cortado y sin NTC**: TS sube a ~85 % de REGN, el cargador lo toma como frío extremo y
+    no carga. Para volver a la resistencia fija, unir los pads de JP101 con una gota de estaño.
 - **J101 va justo bajo la placa panel-usb.** El cable entre J101 y J502 queda muy corto en línea
   recta: usar el más corto del kit y dejar el sobrante doblado en el hueco sobre el canto.
 
@@ -263,7 +277,7 @@ separado.
    - Subir el zip del panel.
    - 4 capas, 1.6 mm, apilado JLC04161H-7628 (por defecto).
    - **Delivery Format: Panel by Customer**, **Different Design: 2**, tamaño del panel
-     **82.8 × 78.0 mm** y cantidad en paneles (un panel = un juego de las dos placas).
+     **82.8 × 79.0 mm** y cantidad en paneles (un panel = un juego de las dos placas).
    - Acabado ENIG recomendado (o HASL sin plomo).
 2. **Montaje**:
    - PCBA **Standard**: el ESP32-S3-MINI-1 la obliga, «Standard Only» y rayos X.
@@ -272,34 +286,40 @@ separado.
      JLCPCB. Las placas van unidas con puentes de 5 mm con *mouse bites* (agujeros de 0.6 mm): dos en
      cada canto lateral de la placa madre (uno de ellos la une a la panel-usb) y uno a cada lado de la
      panel-usb. Arriba y abajo de la placa madre no hay puentes porque esos cantos llevan conectores.
-   - Los puentes de la placa madre a v 10.5 y 15.9 caen donde van los rieles: **lijar la rebaba** al
+   - Los puentes de la placa madre a v 10.5 y 15.1 caen donde van los rieles: **lijar la rebaba** al
      separar las placas.
+   - El USB-C de la panel-usb sobresale 1.29 mm del canto de su placa. Frente a él la fresa se
+     ensancha de 2 a 3 mm (`cuts` en `kicad/panel.json`), así que quedan 1.71 mm hasta el marco. El
+     marco crece 1 mm hacia arriba para que el riel conserve sus 5 mm.
 3. Subir BOM y CPL del panel y elegir «Complete File, just proceed with my own files».
    **Revisar la orientación de cada pieza en la vista previa** (sobre todo U102, U105, U301, Q1xx,
    D1xx y los conectores).
-4. Las piezas sin montar (DNP) quedan fuera del BOM: R115 (0 Ω de 2S) y J404 (NTC).
+4. La única pieza sin montar (DNP) es R115 (0 Ω de 2S) y queda fuera del BOM. JP101 es un puente
+   de cobre de la propia placa: no va en el BOM ni en el CPL. J404 sí se monta.
 
 ## Costo
 
 Estimación de [fab/costo-jlcpcb.md](fab/costo-jlcpcb.md) para **5 juegos**, con precios y
-existencias de la API pública de JLCPCB del 04-10-2026 y las tarifas de su página (no es una
+existencias de la API pública de JLCPCB del 05-10-2026 y las tarifas de su página (no es una
 cotización):
 
 | Pedido | Montaje + piezas | Por juego |
 | --- | ---: | ---: |
-| (A) Un panel con las dos placas, PCBA Standard | 211.38 USD | 42.28 USD |
-| (B) Dos pedidos: principal Standard + panel-usb Economic | 224.13 USD | 44.83 USD |
+| (A) Un panel con las dos placas, PCBA Standard | 213.60 USD | 42.72 USD |
+| (B) Dos pedidos: principal Standard + panel-usb Economic | 226.35 USD | 45.27 USD |
 
 - El panel único ahorra **12.75 USD** en montaje, y además es un solo envío.
 - **No incluye el PCB desnudo** (4 capas, panel con dos diseños): JLCPCB no publica ese precio ni
   el cargo por diseño distinto; sale en el cotizador.
-- Lo que más pesa: los alimentadores de PCBA Standard (38 piezas distintas × 1.53 USD = 58.14 USD)
-  y las piezas (99.45 USD, sobre todo el ESP32, el BQ25798 y el MAX17048).
+- Lo que más pesa: los alimentadores de PCBA Standard (39 piezas distintas × 1.53 USD = 59.67 USD)
+  y las piezas (100.11 USD, sobre todo el ESP32, el BQ25798 y el MAX17048).
+- J404, ahora montado, suma 2.22 USD a los 5 juegos: su alimentador (1.53 USD), 5 conectores
+  (0.66 USD) y 20 juntas (0.03 USD).
 - **El ESP32-S3-MINI-1 obliga a PCBA Standard** (JLCPCB lo marca «Standard Only» y con rayos X),
   así que el ahorro de Economic no aplica a la placa madre.
 - Piezas *Extended* que quedan: no tienen equivalente *Basic* en JLCPCB (cargador, medidor,
   reguladores, ESP32, conectores GH/SH, TVS y ESD; ver [research/v02.md](research/v02.md) §4).
-- Todas tienen existencias (la menor: ESP32-S3-MINI-1-N4R2, 1888).
+- Todas tienen existencias (la menor: ESP32-S3-MINI-1-N4R2, 1873).
 
 ## Antes de mandar a fabricar
 
@@ -307,15 +327,15 @@ cotización):
 | --- | --- | --- |
 | Orientación de cada pieza en el CPL | Sí | Revisarla en la vista previa de JLCPCB y corregir el giro ahí |
 | **Batería: conector y polaridad** | Sí | J102 es JST PH de 2.0 mm, pin 1 = BAT− y pin 2 = BAT+. **Confirmar que el pack tiene ese conector y esa polaridad** (medir con multímetro). La placa tiene protección contra inversión |
-| Pinout de los conectores de la carrier | Sí, para el arnés | Leído de la serigrafía de la foto oficial (pin 1 = pad cuadrado, sin plano). Comprobarlo en la carrier real antes de armar el arnés en Y |
+| Pinout de los conectores de la carrier | Sí, para el arnés | Leído de la serigrafía de la foto oficial; que el pin 1 sea el pad cuadrado es una suposición (no hay plano). **Antes de enchufar el arnés, medir con multímetro en la carrier cuál pin es GND y cuál 5V_IN**: si estuviera al revés, los 5 V de J301 entrarían a una línea TTL del UM980 |
 | Breakout BMI088 | Sí, para el cable | El orden del header (1 VCC … 9 INT3) salió de fotos del vendedor. Comprobarlo con multímetro, poner el selector en IIC y confirmar que SDO va a la hilera |
 | Cables GH de 8 pines | Sí | J101 y J301 son iguales: no cruzarlos. Con el pinout de J101 un cable en espejo pone VBUS contra GND |
 | LED RGB del panel de ánodo común | Sí, si ya lo compraste | J406 da +3V3 en el pin 1 y los cátodos van a los GPIO |
 | Anillo del botón | Sí, si es el de 12 V | La placa lo alimenta con VSYS (3.5–4.2 V en 1S): usar el de 3–6 V |
-| Carcasa (rieles en z 39–90, brazos de H1/H2, topes, ménsulas y hueco del USB-C) | No para la PCB | Hacerla en el CAD antes de imprimir. La placa va 2.5 mm más arriba que en el primer estudio (z 23.5–87.5); ver [Mecánica](#mecánica) |
+| Carcasa (rieles en z 39–90, brazos de H1/H2, ranura en la base bajo J102, topes, ménsulas y hueco del USB-C) | No para la PCB | Hacerla en el CAD antes de imprimir. La placa va 2.5 mm más arriba que en el primer estudio (z 23.5–87.5); ver [Mecánica](#mecánica) |
 | Cable USB entre J101 y la panel-usb | No | Los dos conectores quedan casi enfrentados: usar el cable GH8 más corto del kit, pin 1 con pin 1, y doblar el sobrante sobre el canto |
 | Rebabas de los puentes del panel | No | Lijar las de los cantos laterales de la placa madre antes de meterla en los rieles |
-| NTC (J404, sin montar) | No | Si se quiere protección térmica de la celda: soldar J404, quitar R106 y pegar un NTC 10k B3435 a la celda |
+| NTC (J404 montado, JP101 cerrado) | No | Sin NTC no hay que hacer nada. Para la protección térmica de la celda: cortar JP101 y enchufar en J404 una NTC 10k B3435 pegada a la celda. Con JP101 cortado y sin NTC, el cargador no carga |
 | Carrier: espesor real y acceso a sus conectores | No para la PCB | El estudio supuso 11 mm en todo el largo y la carrier de cara a la placa. Medirla |
 | 2S | No para 1S | No cabe sin recorte frente al botón; decidirlo antes de rehacer la carcasa |
 | Antena del ESP32 a 6.8 mm de la carrier | No | Medir RSSI en el primer prototipo |
@@ -331,14 +351,14 @@ Lo comprobado con las herramientas (nada se ha fabricado ni medido):
 | ERC (KiCad 10.0.6), placa madre y panel-usb | 0 errores, 0 avisos |
 | DRC placa madre ([fab/drc.rpt](fab/drc.rpt)) | 0 errores, 0 avisos, 0 sin conectar, 0 diferencias de paridad con el esquema |
 | DRC panel-usb ([../panel-usb/fab/drc.rpt](../panel-usb/fab/drc.rpt)) | 0 errores, 0 avisos, 0 sin conectar, 0 de paridad |
-| DRC del panel ([fab/drc-panel.rpt](fab/drc-panel.rpt)) | 0 errores, 0 avisos, 0 sin conectar; 82.8 × 78.0 mm |
-| Clavijas enchufadas | Áreas `clavija_*` en el DRC: ninguna pieza dentro. En CAD: 0 mm³ contra la carcasa y los componentes; la más justa, la batería (0.46 mm a la base) |
+| DRC del panel ([fab/drc-panel.rpt](fab/drc-panel.rpt)) | 0 errores, 0 avisos, 0 sin conectar; 82.8 × 79.0 mm |
+| Clavijas enchufadas | Áreas `clavija_*` en el DRC: ninguna pieza dentro. En CAD: 0 mm³ contra la carcasa y los componentes; la más justa, la batería (0.46 mm a la base sin la ranura propuesta) |
 | Rieles, botón y antena | Áreas `riel_*`, `boton` y `esp32_antena` en el DRC: sin violaciones |
 | Serigrafía | 0 solapes ni serigrafía sobre pads (DRC); textos de 0.8 mm o más; el logotipo no tiene trazos de menos de 0.35 mm (apertura morfológica), sobre el mínimo de 0.15 mm de JLCPCB |
-| Ruteo | 143 de 143 conexiones con `route_rest.py`; potencia solo por capas externas |
+| Ruteo | 140 de 140 conexiones con `route_rest.py`; potencia solo por capas externas. No es determinista: dos ejecuciones seguidas de `build.py` dieron la misma colocación con pistas algo distintas (3103 y 3115 tramos y vías), y cada una pasó su DRC |
 | *Bootstrap* del cargador | BTST1 → C101: 0.9 mm; BTST2 → C102: 1.6 mm (cara superior). Retorno a SW por vía y 4.3 / 5.7 mm de B.Cu |
 | Mecánica (primer estudio y placa terminada) | Ver [research/v02.md](research/v02.md) §7 y §8 |
-| Costo y existencias | API de JLCPCB del 04-10-2026: todas las piezas con existencias |
+| Costo y existencias | API de JLCPCB del 05-10-2026: todas las piezas con existencias |
 
 No comprobado: fabricación y montaje, ninguna medida eléctrica, el firmware para esta placa, el
 pinout real de la carrier y del breakout BMI088, el lugar exacto de los conectores en la carrier, el
@@ -354,12 +374,12 @@ impresa con los cambios propuestos.
 - **Bootstrap del BQ25798**: los condensadores quedan junto a sus pines en la cara superior, pero
   su retorno a SW pasa por una vía y 4–6 mm de B.Cu; TI lo muestra con los condensadores en la cara
   inferior, que aquí no se puede usar.
-- **VBUS por pistas de 0.4–0.5 mm** en la capa externa: holgado para 1S (~1.5 A). Con 2S el cargador
-  pide ~2.2 A de entrada: calentará ~20 °C sobre el ambiente; ensancharlas si se fabrica en 2S.
 - **Plano interno de 3V3** perforado por las vías del ruteo automático: quedan tiras y cuellos finos
-  (el DRC no encuentra cuellos bajo 0.127 mm, pero conviene mirarlo a mano antes de pedir).
-- **TS sin NTC**: un divisor fijo pone 25 °C; la celda no tiene protección térmica de carga dentro
-  de un tubo al sol. Recomendado: NTC en J404 (sin montar).
+  (el DRC no encuentra cuellos bajo 0.127 mm, pero conviene mirarlo a mano antes de pedir). Los
+  planos internos van con 0.12 mm de margen a otras redes (JLCPCB admite 0.09 mm en capas internas)
+  para que las vías dejen menos tiras.
+- **TS sin NTC**: con JP101 cerrado, R106 pone 25 °C y la celda no tiene protección térmica de
+  carga dentro de un tubo al sol. Recomendado: NTC en J404 y JP101 cortado.
 - **Hoja del BQ2579x rev D**: la copia pública dice «TI Confidential»; pedir la oficial.
 - **Ruteo automático** con `route_rest.py`, un ruteador propio (A* en rejilla con arranque y
   reruteo). Las pistas críticas están prerruteadas en `layout.py`:
@@ -404,7 +424,8 @@ Otros scripts:
 - `logo.py` convierte el logotipo del repositorio en polígonos de serigrafía.
 - `silk_clean.py` (dentro de `build.py`) corrige la serigrafía que el DRC marca encimada.
 - `fp_silk_trim.py` recorta la serigrafía de una huella de la biblioteca que pisa sus propios pads
-  (se usó una vez, con L2520 y SOD-882).
+  (se usó una vez, con L2520, SOD-882 y `SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm`,
+  copiada de la biblioteca estándar de KiCad).
 - `layout.py` escribe además `kicad/plugs.json`: las clavijas enchufadas y los agujeros, para
   comprobarlos en CAD contra la carcasa.
 - El proyecto del panel usa la biblioteca de la placa madre; `build.py` le copia la huella y el

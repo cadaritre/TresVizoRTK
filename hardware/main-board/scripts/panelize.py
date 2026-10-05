@@ -13,6 +13,10 @@ Se ejecuta con el Python de KiCad:
     tabs       [{"board", "edge": "top|bottom|left|right", "offset", "width"}]: puentes que cruzan la
                fresa, en el canto indicado de la placa, a "offset" mm de su esquina izquierda (cantos de
                arriba y abajo) o de arriba (cantos laterales). También se admite {"at": [x, y], "dir"}.
+    cuts       [{"board", "edge", "offset", "width", "depth"}]: ensancha la fresa frente a un tramo del
+               canto (donde una pieza sobresale): rectángulo de "width" mm, ubicado como los puentes, que
+               llega a "depth" mm del canto, con esquinas de R1. El marco crece si hace falta para que los
+               rieles conserven su ancho.
     mousebite  {"drill", "pitch", "offset"}: agujeros sin metalizar en el canto de la placa, dentro de
                cada puente ("offset" los saca hacia el puente).
     keepout    profundidad de la zona sin cobre que se deja dentro de la placa junto a cada puente.
@@ -200,11 +204,22 @@ def main():
     gap = spec.get("gap", 2.0)
     grown = pcbnew.SHAPE_POLY_SET(outlines)
     grown.Inflate(mm(gap), pcbnew.CORNER_STRATEGY_ROUND_ALL_CORNERS, mm(0.01))
+    boxes = {name: (x1, y1, x2, y2) for name, x1, y1, x2, y2 in placed}
+    for c in spec.get("cuts", []):
+        bx1, by1, bx2, by2 = boxes[c["board"]]
+        off, w, dep = c["offset"], c["width"], c["depth"]
+        x1, y1, x2, y2 = {"top": (bx1 + off, by1 - dep, bx1 + off + w, by1),
+                          "bottom": (bx1 + off, by2, bx1 + off + w, by2 + dep),
+                          "left": (bx1 - dep, by1 + off, bx1, by1 + off + w),
+                          "right": (bx2, by1 + off, bx2 + dep, by1 + off + w)}[c["edge"]]
+        cut = rect_poly(x1 + 1.0, y1 + 1.0, x2 - 1.0, y2 - 1.0)
+        cut.Inflate(mm(1.0), pcbnew.CORNER_STRATEGY_ROUND_ALL_CORNERS, mm(0.01))
+        grown.BooleanAdd(cut)
+        print("fresa ensanchada en %s (%s): %.1f mm de fondo" % (c["board"], c["edge"], dep))
     ring = pcbnew.SHAPE_POLY_SET(grown)
     ring.BooleanSubtract(outlines)
     keepouts = []
     mb = spec.get("mousebite", {"drill": 0.5, "pitch": 0.8, "offset": 0.0})
-    boxes = {name: (x1, y1, x2, y2) for name, x1, y1, x2, y2 in placed}
     for k, t in enumerate(spec.get("tabs", [])):
         w = t.get("width", 5.0)
         if "board" in t:

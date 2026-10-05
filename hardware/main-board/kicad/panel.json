@@ -41,7 +41,7 @@
   {
    "board": "main",
    "edge": "right",
-   "offset": 15.91,
+   "offset": 15.11,
    "width": 5.0
   },
   {
@@ -53,14 +53,23 @@
   {
    "board": "usb",
    "edge": "left",
-   "offset": 15.91,
+   "offset": 15.11,
    "width": 5.0
   },
   {
    "board": "usb",
    "edge": "right",
-   "offset": 15.91,
+   "offset": 15.11,
    "width": 5.0
+  }
+ ],
+ "cuts": [
+  {
+   "board": "usb",
+   "edge": "top",
+   "offset": 3.2,
+   "width": 14.4,
+   "depth": 3.0
   }
  ],
  "mousebite": {

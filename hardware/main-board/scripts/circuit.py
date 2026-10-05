@@ -185,7 +185,13 @@ def build(libs):
     v2s["prog"] = R(s, "chg", "4.7k", "CHG_PROG", "GND", note="PROG: 4.7k = 1S a 750 kHz; 2S: 8.2k")
     R(s, "chg", "5.1k", "REGN", "CHG_TS")
     R(s, "chg", "30k", "CHG_TS", "GND")
-    R(s, "chg", "10k", "CHG_TS", "GND", note="Sustituye a la NTC (~25 C). Sin montar si se usa NTC en J404")
+    # 10k fijo en lugar de la NTC (el cargador ve ~25 C) mientras JP101 esté cerrado. JP101 es un puente de
+    # cobre cerrado de fábrica: al conectar una NTC 10k B3435 en J404 se corta con un cúter (se vuelve a
+    # cerrar con estaño), sin desoldar nada.
+    R(s, "chg", "10k", "CHG_TS", "CHG_TS_FIJA", note="Sustituye a la NTC (~25 C) con JP101 cerrado")
+    d.add("JP101", "Jumper:SolderJumper_2_Bridged", "NTC_CORTAR", s, "chg", {"1": "CHG_TS_FIJA", "2": "GND"},
+          footprint=LC + "SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm", in_bom=False,
+          description="Puente cerrado de fábrica: cortarlo si se conecta una NTC en J404")
     R(s, "chg", "100", "VPACK", "CHG_BATP", note="BATP: 100 ohm en serie, Kelvin a VPACK")
     R(s, "chg", "10k", "+3V3", "CHG_INT_N")
     R(s, "chg", "1k", "CHG_STAT", "CHG_LED_K", note="LED de carga del panel (ánodo a +3V3)")
@@ -361,8 +367,8 @@ def build(libs):
           description="JST SH 4 lateral con el orden Qwiic: GND, 3V3, SDA, SCL")
     d.add("J404", "Connector_Generic_MountingPin:Conn_01x02_MountingPin", "NTC", s, "ui",
           {"1": "CHG_TS", "2": "GND", "MP": "GND"}, footprint=LC + "CONN-SMD_2P-P1.00_SM02B-SRSS-TB-LF-SN",
-          lcsc="C160402", mpn="SM02B-SRSS-TB(LF)(SN)", dnp=True,
-          description="Opcional: NTC 10k B3435 pegada a la celda (quitar el 10k fijo de TS)")
+          lcsc="C160402", mpn="SM02B-SRSS-TB(LF)(SN)",
+          description="NTC 10k B3435 opcional, pegada a la celda: al conectarla, cortar JP101")
     # IMU de la tapa por I2C en un segundo bus (GPIO11 SDA, GPIO12 SCL) con sus dos interrupciones. El GH7 sigue
     # el orden del header de 9 pines del breakout BMI088 V1.0 (research/constraints.md §4) sin CSB1/CSB2:
     # cable n -> pin [1, 2, 3, 4, 5, 8, 9][n-1] del breakout. El pin 3 (SDO1/SDO2) a GND fija las direcciones
@@ -433,7 +439,8 @@ def main():
     sym_dir, kicad_dir = sys.argv[1:3]
     libs = Libraries()
     for n in ("Device", "power", "Connector", "Connector_Generic_MountingPin", "Battery_Management", "Switch",
-              "Sensor_Motion", "Power_Management", "Power_Protection", "Transistor_FET", "Regulator_Linear"):
+              "Sensor_Motion", "Power_Management", "Power_Protection", "Transistor_FET", "Regulator_Linear",
+              "Jumper"):
         libs.add(os.path.join(sym_dir, n + ".kicad_sym"))
     libs.add(os.path.join(kicad_dir, "lib", "tresvizo.kicad_sym"), "tresvizo")
     d = build(libs)

@@ -7873,7 +7873,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp yes)
+		(dnp no)
 		(uuid "a9d4af64-8325-59a8-bcac-5ded49b9584d")
 		(property "Reference" "J404"
 			(at 81.28 152.94 0)
@@ -7911,7 +7911,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Opcional: NTC 10k B3435 pegada a la celda (quitar el 10k fijo de TS)"
+		(property "Description" "NTC 10k B3435 opcional, pegada a la celda: al conectarla, cortar JP101"
 			(at 86.36 156.21 0)
 			(effects
 				(font

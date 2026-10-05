@@ -56,7 +56,7 @@ def build(libs):
     d.add("J501", "Connector:USB_C_Receptacle_USB2.0_16P", "USB_C", s, "rx", usb,
           footprint=LC + "USB-C_SMD-TYPE-C-31-M-12", lcsc="C165948", mpn="TYPE-C-31-M-12",
           datasheet="https://www.lcsc.com/datasheet/lcsc_datasheet_2205251630_Korean-Hroparts-Elec-TYPE-C-31-M-12_C165948.pdf",
-          description="HRO TYPE-C-31-M-12: USB-C 16 contactos horizontal; cara 0.49 mm por delante del canto, "
+          description="HRO TYPE-C-31-M-12: USB-C 16 contactos horizontal; cara 1.29 mm por delante del canto, "
                       "eje a ~1.65 mm de la placa; carcasa a GND")
     for ref, net in (("R501", "CC1"), ("R502", "CC2")):
         d.add(ref, "Device:R", "5.1k", s, "rx", {"1": net, "2": "GND"}, footprint=R0402, rot=90,

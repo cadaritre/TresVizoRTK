@@ -293,28 +293,50 @@ def main():
         if t.get("angle"):
             tx.SetTextAngleDegrees(t["angle"])
         board.Add(tx)
-    # Gráficos rellenos (logotipo): contorno con huecos, partido en polígonos simples (el formato de
-    # KiCad guarda un solo contorno por polígono)
+    # Gráficos rellenos (logotipo). El formato de KiCad guarda un solo contorno por polígono, y un
+    # contorno «fracturado» (hueco unido al borde por una ranura) se deforma al guardarlo. Las piezas
+    # con huecos (el anillo del hexágono, la «O») se parten en tiras verticales que cruzan cada hueco
+    # por su centro: quedan piezas sin huecos que, juntas, dan la misma figura.
     for g in spec.get("graphics", []):
         ps = pcbnew.SHAPE_POLY_SET()
         ps.NewOutline()
         for x, y in g["outline"]:
             ps.Append(mm(x), mm(y))
-        for hole in g.get("holes", []):
-            ps.NewHole()
-            for x, y in hole:
-                ps.Append(mm(x), mm(y), -1, -1)
-        ps.Fracture()
-        for i in range(ps.OutlineCount()):
-            one = pcbnew.SHAPE_POLY_SET()
-            one.AddOutline(ps.Outline(i))
-            sh = pcbnew.PCB_SHAPE(board)
-            sh.SetShape(pcbnew.SHAPE_T_POLY)
-            sh.SetPolyShape(one)
-            sh.SetFilled(True)
-            sh.SetWidth(0)
-            sh.SetLayer(LAYERS[g.get("layer", "F.SilkS")])
-            board.Add(sh)
+        pieces = [ps]
+        holes = g.get("holes", [])
+        if holes:
+            hs = pcbnew.SHAPE_POLY_SET()
+            for hole in holes:
+                hs.NewOutline()
+                for x, y in hole:
+                    hs.Append(mm(x), mm(y))
+            ps.BooleanSubtract(hs)
+            bb = ps.BBox()
+            cuts = sorted(mm(sum(x for x, _ in h) / len(h)) for h in holes)
+            edges = [bb.GetLeft() - mm(1)] + cuts + [bb.GetRight() + mm(1)]
+            top, bot = bb.GetTop() - mm(1), bb.GetBottom() + mm(1)
+            pieces = []
+            for x1, x2 in zip(edges, edges[1:]):
+                strip = pcbnew.SHAPE_POLY_SET()
+                strip.NewOutline()
+                for px, py in ((x1, top), (x2, top), (x2, bot), (x1, bot)):
+                    strip.Append(int(px), int(py))
+                part = pcbnew.SHAPE_POLY_SET(ps)
+                part.BooleanIntersection(strip)
+                pieces.append(part)
+        for part in pieces:
+            for i in range(part.OutlineCount()):
+                if part.HoleCount(i):
+                    raise SystemExit("gráfico con un hueco sin partir en %s" % g.get("layer"))
+                one = pcbnew.SHAPE_POLY_SET()
+                one.AddOutline(part.Outline(i))
+                sh = pcbnew.PCB_SHAPE(board)
+                sh.SetShape(pcbnew.SHAPE_T_POLY)
+                sh.SetPolyShape(one)
+                sh.SetFilled(True)
+                sh.SetWidth(0)
+                sh.SetLayer(LAYERS[g.get("layer", "F.SilkS")])
+                board.Add(sh)
     pcbnew.SaveBoard(out, board)
     print("guardado", out, "huellas:", len(comps), "redes:", len(nets))
 

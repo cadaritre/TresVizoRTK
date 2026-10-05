@@ -25,9 +25,11 @@ W = 20.8                       # ancho del cuerpo (u 0-20.8)
 V_BODY, V_REAR = 4.7, 19.8     # el cuerpo empieza en v 4.7; canto trasero
 TONGUE = (5.2, 15.6)           # lengüeta frontal bajo el USB-C
 # Canto frontal de la lengüeta: el plano de HRO pone el canto de la placa 5.79 mm por delante de los
-# postes de centrado y la cara del receptáculo 6.28 mm por delante (sobresale 0.49 mm). Con la cara en
-# v = -0.40 (y = 31.70, a ras de la tapa curva), los postes quedan en v = 5.88 y el canto en v = 0.09.
-V_FRONT = 0.09
+# postes de centrado y la cara del receptáculo 6.28 mm por delante (sobresale 0.49 mm). La cara queda en
+# v = -0.40 (y = 31.70, a ras de la tapa curva) y los postes en v = 5.88. A pedido del propietario el
+# canto retrocede a v = 0.89 (y = 30.41) para que el receptáculo sobresalga 1.29 mm y sea más fácil de
+# montar en la tapa; el cobre de las ranuras delanteras del blindaje queda a 0.41 mm del canto (>= 0.3).
+V_FRONT = 0.89
 R_CORNER = 0.5
 
 RULES = {"min_clearance": 0.127, "min_track": 0.127, "min_via_dia": 0.5, "min_drill": 0.3, "min_annular": 0.1,
@@ -36,7 +38,7 @@ RULES = {"min_clearance": 0.127, "min_track": 0.127, "min_via_dia": 0.5, "min_dr
 # ---------------------------------------------------------------- colocación
 # ref: (u, v, rot)   rot en grados, antihorario visto desde arriba (convención de KiCad)
 PLACE = {
-    # USB-C con la boca hacia el panel (-v): cara en v = 0.09 - 0.49 = -0.40, centrado en u = 10.4 (x = 0)
+    # USB-C con la boca hacia el panel (-v): cara en v = -0.40 (1.29 mm por delante del canto), u = 10.4 (x = 0)
     "J501": (10.4, 4.67, 180),
     # GH 8 lateral con la boca hacia el canto trasero (+v, -Y). Los anclajes llegan a v = 19.48 (0.32 mm del
     # canto: cobre a >= 0.3 mm). El plano de XUNPU pone el frente del cuerpo a ras de los anclajes y el modelo

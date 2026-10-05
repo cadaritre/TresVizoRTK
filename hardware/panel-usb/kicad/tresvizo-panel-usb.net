@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-kicad/hardware/panel-usb/kicad/tresvizo-panel-usb.kicad_sch")
-		(date "2026-10-04T23:55:14")
+		(date "2026-10-05T06:07:51")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")
@@ -173,7 +173,7 @@
 			(value "USB_C")
 			(footprint "tresvizo_lcsc:USB-C_SMD-TYPE-C-31-M-12")
 			(datasheet "https://www.lcsc.com/datasheet/lcsc_datasheet_2205251630_Korean-Hroparts-Elec-TYPE-C-31-M-12_C165948.pdf")
-			(description "HRO TYPE-C-31-M-12: USB-C 16 contactos horizontal; cara 0.49 mm por delante del canto, eje a ~1.65 mm de la placa; carcasa a GND")
+			(description "HRO TYPE-C-31-M-12: USB-C 16 contactos horizontal; cara 1.29 mm por delante del canto, eje a ~1.65 mm de la placa; carcasa a GND")
 			(fields
 				(field
 					(name "MPN") "TYPE-C-31-M-12")
@@ -184,7 +184,7 @@
 				(field
 					(name "Datasheet") "https://www.lcsc.com/datasheet/lcsc_datasheet_2205251630_Korean-Hroparts-Elec-TYPE-C-31-M-12_C165948.pdf")
 				(field
-					(name "Description") "HRO TYPE-C-31-M-12: USB-C 16 contactos horizontal; cara 0.49 mm por delante del canto, eje a ~1.65 mm de la placa; carcasa a GND")
+					(name "Description") "HRO TYPE-C-31-M-12: USB-C 16 contactos horizontal; cara 1.29 mm por delante del canto, eje a ~1.65 mm de la placa; carcasa a GND")
 			)
 			(libsource
 				(lib "Connector")

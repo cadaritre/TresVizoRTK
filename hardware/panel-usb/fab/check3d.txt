@@ -1,7 +1,7 @@
 USB-C (modelo 3D de LCSC):
   ancho u 5.93-14.87 (centro 10.40, x = 0.00)
   cara v = -0.40 (y = 31.70), extremo de las colas SMD v = 7.50
-  sobresale del canto frontal (v = 0.09): 0.49 mm
+  sobresale del canto frontal (v = 0.89): 1.29 mm
   carcasa de 0.05 a 3.25 mm sobre la cara de componentes; eje a 1.65 mm (z = 93.42)
 GH 8 (modelo 3D de LCSC):
   boca v = 19.57 (y = 11.73, 0.23 mm dentro del canto), extremo de las patas v = 14.57; alto 4.35 mm sobre la placa

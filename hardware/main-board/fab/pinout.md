@@ -40,6 +40,13 @@ Generado por `scripts/doc_tables.py`; no editar a mano.
 | 47 | 27 (IO47) | SD_D2 | SD_MMC D2 (10k) |
 | 48 | 30 (IO48) | SD_DET | Detección de tarjeta: HIGH con tarjeta (inversor con AO3401A) |
 
+## JP101 NTC_CORTAR
+
+| Pin | Red |
+| --- | --- |
+| 1 | CHG_TS_FIJA |
+| 2 | GND |
+
 ## J101 PANEL_USB
 
 WAFER-GH1.25-8PWB (LCSC C3029383). GH 8 lateral a la placa del USB-C del panel: VBUS x3, GND x3, D-, D+ (cable 1 a 1)
@@ -128,7 +135,7 @@ SM04B-SRSS-TB(LF)(SN) (LCSC C160404). JST SH 4 lateral con el orden Qwiic: GND, 
 
 ## J404 NTC
 
-SM02B-SRSS-TB(LF)(SN) (LCSC C160402), sin montar. Opcional: NTC 10k B3435 pegada a la celda (quitar el 10k fijo de TS)
+SM02B-SRSS-TB(LF)(SN) (LCSC C160402). NTC 10k B3435 opcional, pegada a la celda: al conectarla, cortar JP101
 
 | Pin | Red |
 | --- | --- |
