@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-kicad/hardware/main-board/kicad/tresvizo-main.kicad_sch")
-		(date "2026-10-04T17:21:14")
+		(date "2026-10-04T18:07:18")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")

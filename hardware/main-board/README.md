@@ -207,7 +207,9 @@ o en el hueco disponible; conviene revisarlas a mano:
 
 ## Regenerar
 
-Requisitos: KiCad 10 (con su Python) y Python 3; nada más.
+Requisitos: KiCad 10 (con su Python) y Python 3; nada más. KiCad tiene que tener sus bibliotecas
+estándar en las tablas globales (Preferencias → Gestionar bibliotecas); si no, el ERC y el DRC
+añaden cientos de avisos de «biblioteca no incluida» que no son errores del diseño.
 
 ```bash
 cd hardware/main-board/scripts

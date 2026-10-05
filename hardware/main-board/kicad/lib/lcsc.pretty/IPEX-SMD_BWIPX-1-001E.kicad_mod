@@ -32,6 +32,6 @@
 	(model "${KIPRJMOD}/lib/lcsc.3dshapes/IPEX-SMD_BWIPX-1-001E.wrl"
 		(offset (xyz 0.000 0.000 0.000))
 		(scale (xyz 1 1 1))
-		(rotate (xyz 0 0 180))
+		(rotate (xyz 0 0 0))
 	)
 )
