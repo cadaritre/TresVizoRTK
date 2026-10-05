@@ -46,6 +46,10 @@ ZONE_REACH = 3.0            # una zona se alcanza a menos de esto del punto que 
 INFL = 1.3                  # alcance máximo de una marca alrededor del eje o centro de su forma (mm)
 BLOCK = -1
 FLEX_NETS = ("GND", "+3V3")    # sus zonas no son obstáculo: al rellenar de nuevo rodean las pistas nuevas
+NECK_W = 0.2                # ancho del cuello junto a pads de paso fino
+NECK_R = 1.0                # el cuello solo se permite a menos de esto de los pads de los extremos (mm)
+OUTER = ("F.Cu", "B.Cu")    # capas permitidas a las redes de potencia y de conmutación
+OUTER_CLASSES = ("Power", "Switch")
 
 
 def seg_dist(px, py, ax, ay, bx, by):
@@ -410,8 +414,12 @@ MOVES = [(1, 0, 1.0), (-1, 0, 1.0), (0, 1, 1.0), (0, -1, 1.0),
          (1, 1, 1.4142), (1, -1, 1.4142), (-1, 1, 1.4142), (-1, -1, 1.4142)]
 
 
-def astar(g, w, vs, net, starts, goals, layer_cost, soft=None, hist=None, max_expand=500000):
-    """A* en la rejilla g. Con soft, las celdas que soft bloquea se permiten con penalización."""
+def astar(g, w, vs, net, starts, goals, layer_cost, soft=None, hist=None, max_expand=500000, neck=None):
+    """A* en la rejilla g. Con soft, las celdas que soft bloquea se permiten con penalización.
+    layer_cost[l] None prohíbe la capa. neck = (celdas (i, j)) permite pasar con NECK_W donde el
+    ancho w no cabe, solo en esas celdas (junto a los pads de los extremos)."""
+    starts = [c for c in starts if layer_cost[c[0]] is not None]
+    goals = [c for c in goals if layer_cost[c[0]] is not None]
     goal_set = set(goals)
     if not starts or not goal_set:
         return None
@@ -428,6 +436,17 @@ def astar(g, w, vs, net, starts, goals, layer_cost, soft=None, hist=None, max_ex
     N = nx * ny
     trk = g.trk[w]
     via = g.via[vs]
+    ncells = neck if neck and w > NECK_W else None
+    ntrk = g.trk[NECK_W] if ncells else None
+
+    def ok(li, i2, j2, k2):
+        v = trk[li][k2]
+        if v == 0 or v == net:
+            return True
+        if ncells is not None and (i2, j2) in ncells:
+            v = ntrk[li][k2]
+            return v == 0 or v == net
+        return False
     strk = soft.trk[w] if soft else None
     svia = soft.via[vs] if soft else None
     L = len(g.lids)
@@ -446,6 +465,20 @@ def astar(g, w, vs, net, starts, goals, layer_cost, soft=None, hist=None, max_ex
             return 0.0
         return RIP_PENALTY + hist[li * N + k]
 
+    min_via = (vs[1] + HOLE_TO_HOLE + MARGIN) / R      # celdas entre centros de vías del mismo camino
+
+    def near_own_via(st):
+        """True si el camino que llega a st cambió de capa (puso una vía) a menos de min_via celdas."""
+        cur = st
+        for _ in range(16):
+            par = parent.get(cur)
+            if par is None:
+                return False
+            if par[0] != cur[0] and math.hypot(cur[1] - st[1], cur[2] - st[2]) < min_via:
+                return True
+            cur = par
+        return False
+
     while heap:
         _, cost, s = heapq.heappop(heap)
         if s in done:
@@ -459,21 +492,17 @@ def astar(g, w, vs, net, starts, goals, layer_cost, soft=None, hist=None, max_ex
         if len(done) > max_expand:
             return None
         li, i, j = s
-        occ = trk[li]
         lc = layer_cost[li]
         for di, dj, step in MOVES:
             ni, nj = i + di, j + dj
             if not (0 <= ni < nx and 0 <= nj < ny):
                 continue
             k2 = nj * nx + ni
-            v = occ[k2]
             ns = (li, ni, nj)
-            if v != 0 and v != net and ns not in goal_set:
+            if not ok(li, ni, nj, k2) and ns not in goal_set:
                 continue
             if di and dj:   # diagonal: las dos celdas ortogonales deben estar libres
-                v1 = occ[j * nx + ni]
-                v2 = occ[nj * nx + i]
-                if (v1 != 0 and v1 != net) or (v2 != 0 and v2 != net):
+                if not ok(li, ni, j, j * nx + ni) or not ok(li, i, nj, nj * nx + i):
                     continue
             nc = cost + step * lc
             if soft:
@@ -486,18 +515,17 @@ def astar(g, w, vs, net, starts, goals, layer_cost, soft=None, hist=None, max_ex
                 heapq.heappush(heap, (nc + h(ni, nj), nc, ns))
         k = j * nx + i
         vv = via[k]
-        if vv == 0 or vv == net:
+        if (vv == 0 or vv == net) and not near_own_via(s):
             extra = 0.0
             if soft:
                 sv = svia[k]
                 if sv != 0 and sv != net:
                     extra = RIP_PENALTY + hist[li * N + k]
             for l2 in range(L):
-                if l2 == li:
+                if l2 == li or layer_cost[l2] is None:
                     continue
-                v2 = trk[l2][k]
                 ns = (l2, i, j)
-                if v2 != 0 and v2 != net and ns not in goal_set:
+                if not ok(l2, i, j, k) and ns not in goal_set:
                     continue
                 nc = cost + VIA_COST + extra
                 if soft:
@@ -509,35 +537,40 @@ def astar(g, w, vs, net, starts, goals, layer_cost, soft=None, hist=None, max_ex
     return None
 
 
-def path_shapes(g, path, w, vs, net, clr, via_start=False, via_end=False):
+def path_shapes(g, path, w, vs, net, clr, via_start=False, via_end=False, widths=None):
     """Convierte el camino de celdas en formas: ("seg", capa, ax, ay, bx, by, ancho, red, sep) y
-    ("via", None, x, y, diámetro, taladro, red, sep). via_start/via_end añaden la vía a un plano."""
+    ("via", None, x, y, diámetro, taladro, red, sep). via_start/via_end añaden la vía a un plano.
+    widths da el ancho que admite cada celda (cuellos); un tramo usa el menor de sus dos extremos."""
+    wc = widths or [w] * len(path)
     segs, vias = [], []
     if via_start:
         vias.append((path[0][1], path[0][2]))
     if via_end and (len(path) > 1 or not via_start):
         vias.append((path[-1][1], path[-1][2]))
     start = prev = path[0]
-    direction = None
-    for c in path[1:]:
+    direction, run_w = None, None
+    for n in range(1, len(path)):
+        c = path[n]
         if c[0] != prev[0]:
             if prev != start:
-                segs.append((prev[0], start, prev))
+                segs.append((prev[0], start, prev, run_w))
             vias.append((prev[1], prev[2]))
-            start, direction = c, None
+            start, direction, run_w = c, None, None
         else:
             d = (c[1] - prev[1], c[2] - prev[2])
-            if direction is not None and d != direction:
-                segs.append((prev[0], start, prev))
+            sw = min(wc[n], wc[n - 1])
+            if direction is not None and (d != direction or sw != run_w):
+                segs.append((prev[0], start, prev, run_w))
                 start = prev
-            direction = d
+            direction, run_w = d, sw
         prev = c
     if prev != start:
-        segs.append((prev[0], start, prev))
+        segs.append((prev[0], start, prev, run_w))
     vias = list(dict.fromkeys(vias))
     shapes = []
-    for li, a, b in segs:
-        shapes.append(("seg", li, g.x0 + a[1] * R, g.y0 + a[2] * R, g.x0 + b[1] * R, g.y0 + b[2] * R, w, net, clr))
+    for li, a, b, sw in segs:
+        shapes.append(("seg", li, g.x0 + a[1] * R, g.y0 + a[2] * R, g.x0 + b[1] * R, g.y0 + b[2] * R, sw or w, net,
+                       clr))
     for i, j in vias:
         shapes.append(("via", None, g.x0 + i * R, g.y0 + j * R, vs[0], vs[1], net, clr))
     return shapes
@@ -599,14 +632,20 @@ class Router:
         print("rejilla %d x %d x %d, anchos %s, vías %s (%.0f s)" % (
             self.fixed.nx, self.fixed.ny, len(self.fixed.lids), self.fixed.widths, self.fixed.via_sizes,
             time.time() - t0))
-        self.layer_cost = [1.0 if n in ("F.Cu", "B.Cu") else INNER_COST for n in layer_names]
+        self.layer_cost = [1.0 if n in OUTER else INNER_COST for n in layer_names]
+        self.layer_cost_power = [1.0 if n in OUTER else None for n in layer_names]
+        self.neck_cache = {}
         self.hist = array("f", [0.0]) * (len(layer_names) * self.fixed.nx * self.fixed.ny)
         self.routes = {}          # índice de par -> (formas, objetos de la placa)
         self.used = {}            # índice de par -> (ancho, vía)
         self.end_cache = {}
 
+    def outer_only(self, item):
+        return any(c in OUTER_CLASSES for c in self.netclass(item).GetName().split(","))
+
     def options(self, item):
-        """Ancho y vía de la clase; si no caben, vía pequeña y después pista más delgada."""
+        """Ancho y vía de la clase (con cuello de NECK_W junto a los pads finos); si aun así no cabe, vía
+        pequeña y después pista más delgada (se informa como «reducida»)."""
         nc = self.netclass(item)
         w = round(to_mm(nc.GetTrackWidth()), 3)
         vs = (round(to_mm(nc.GetViaDiameter()), 3), round(to_mm(nc.GetViaDrill()), 3))
@@ -614,6 +653,36 @@ class Router:
         for o in ((w, vs), (w, SMALL_VIA), (min(w, 0.3), SMALL_VIA), (0.2, SMALL_VIA)):
             if o not in out:
                 out.append(o)
+        return out
+
+    def costs(self, item):
+        """Las redes de potencia y de conmutación no pasan por la capa interna (plano de +3V3)."""
+        return self.layer_cost_power if self.outer_only(item) else self.layer_cost
+
+    def neck(self, idx):
+        """Celdas (i, j) a menos de NECK_R de los pads de los extremos del par."""
+        if idx not in self.neck_cache:
+            ea, eb = self.end_cache[idx]
+            r = int(round(NECK_R / R))
+            disc = [(di, dj) for di in range(-r, r + 1) for dj in range(-r, r + 1) if di * di + dj * dj <= r * r]
+            cells = set()
+            for item, e in zip(self.pairs[idx], (ea, eb)):
+                if item.Type() != pcbnew.PCB_PAD_T:
+                    continue
+                for _, i, j in set(e[0]):
+                    for di, dj in disc:
+                        cells.add((i + di, j + dj))
+            self.neck_cache[idx] = cells
+        return self.neck_cache[idx]
+
+    def widths_for(self, g, p, w, net):
+        """Ancho que admite cada celda del camino: w o, en un cuello, NECK_W."""
+        if w <= NECK_W:
+            return None
+        out = []
+        for li, i, j in p:
+            v = g.trk[w][li][j * g.nx + i]
+            out.append(w if v in (0, net) else NECK_W)
         return out
 
     def ends(self, g, idx, w, vs, net):
@@ -624,13 +693,14 @@ class Router:
             else:
                 self.end_cache[idx] = (endpoints(self.fixed, a, pa), endpoints(self.fixed, b, pb))
         ea, eb = self.end_cache[idx]
-        return usable(g, w, vs, net, ea), usable(g, w, vs, net, eb)
+        we = min(w, NECK_W)     # los extremos en un pad pueden ser de cuello
+        return usable(g, we, vs, net, ea), usable(g, we, vs, net, eb)
 
-    def shapes_for(self, idx, p, w, vs, net, clr):
+    def shapes_for(self, idx, p, w, vs, net, clr, g):
         ea, eb = self.end_cache[idx]
         via_start = p[0] in set(ea[1]) and p[0] not in set(ea[0])
         via_end = p[-1] in set(eb[1]) and p[-1] not in set(eb[0])
-        return path_shapes(self.fixed, p, w, vs, net, clr, via_start, via_end)
+        return path_shapes(self.fixed, p, w, vs, net, clr, via_start, via_end, self.widths_for(g, p, w, net))
 
     def commit(self, idx, shapes):
         a = self.pairs[idx][0]
@@ -688,9 +758,9 @@ class Router:
         clr = to_mm(self.netclass(a).GetClearance())
         for w, vs in self.options(a):
             sa, sb = self.ends(self.g, idx, w, vs, net)
-            p = astar(self.g, w, vs, net, sa, sb, self.layer_cost)
+            p = astar(self.g, w, vs, net, sa, sb, self.costs(a), neck=self.neck(idx))
             if p is not None:
-                shapes = self.shapes_for(idx, p, w, vs, net, clr)
+                shapes = self.shapes_for(idx, p, w, vs, net, clr, self.g)
                 if not shapes:
                     return False
                 self.commit(idx, shapes)
@@ -705,11 +775,11 @@ class Router:
         clr = to_mm(self.netclass(a).GetClearance())
         for w, vs in self.options(a):
             sa, sb = self.ends(self.fixed, idx, w, vs, net)
-            p = astar(self.fixed, w, vs, net, sa, sb, self.layer_cost, soft=self.g, hist=self.hist,
-                      max_expand=2500000)
+            p = astar(self.fixed, w, vs, net, sa, sb, self.costs(a), soft=self.g, hist=self.hist,
+                      max_expand=2500000, neck=self.neck(idx))
             if p is None:
                 continue
-            shapes = self.shapes_for(idx, p, w, vs, net, clr)
+            shapes = self.shapes_for(idx, p, w, vs, net, clr, self.fixed)
             if not shapes:
                 continue
             victims = self.conflicts(shapes)
@@ -745,6 +815,11 @@ def main():
         # encerrados por las señales antes de que existan los rellenos.
         ic = any(x.Type() == pcbnew.PCB_PAD_T and x.GetParentFootprint().GetReference().startswith("U")
                  for x in items)
+        # ...salvo de pin a pin del mismo CI: esa unión rodea a los pines de en medio y los encierra;
+        # la hacen los rellenos de GND en la segunda pasada.
+        if ic and all(x.Type() == pcbnew.PCB_PAD_T for x in items) and \
+                items[0].GetParentFootprint().GetReference() == items[1].GetParentFootprint().GetReference():
+            ic = False
         if items[0].GetNetname().split("/")[-1] not in skip or ic:
             # El DRC da como posición de una zona su primer vértice, no el punto más cercano: se usa la
             # posición del otro extremo.
@@ -812,6 +887,9 @@ def main():
         w, vs = rt.used[idx]
         if (w, vs) != rt.options(pairs[idx][0])[0]:
             print("  reducida: %s (%.2f mm, vía %.1f/%.1f)" % (label(idx), w, vs[0], vs[1]))
+        neck = sum(math.hypot(s[4] - s[2], s[5] - s[3]) for s in rt.routes[idx][0] if s[0] == "seg" and s[6] < w)
+        if neck > 0:
+            print("  cuello: %s (%.1f mm a %.2f mm junto a pads; el resto a %.2f mm)" % (label(idx), neck, NECK_W, w))
     for idx in pending:
         print("  sin ruta:", label(idx))
     inner = sum(1 for shapes, _ in rt.routes.values() for s in shapes

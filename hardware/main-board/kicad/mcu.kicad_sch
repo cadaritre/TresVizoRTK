@@ -7,11 +7,11 @@
 	(title_block
 		(title "ESP32-S3")
 		(date "2026-10-04")
-		(rev "0.1")
+		(rev "0.2")
 		(company "TresVizo")
 		(comment 1 "Exploratorio: no fabricado ni probado")
-		(comment 2 "UM980 + ESP32-S3-MINI-1-N4R2 + BMI088 + BQ25798 (1S; 2S por variante)")
-		(comment 3 "JLCPCB 4 capas JLC04161H-7628, 50 x 76 mm")
+		(comment 2 "ESP32-S3-MINI-1-N4R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+		(comment 3 "JLCPCB 4 capas JLC04161H-7628")
 	)
 	(lib_symbols
 		(symbol "tresvizo:ESP32-S3-MINI-1_LCSC"
@@ -2596,7 +2596,7 @@
 		)
 		(uuid "2a12b996-fb99-5c1f-ae5c-24357f702ad0")
 	)
-	(global_label "GNSS_TXD3_MCU"
+	(global_label "GNSS_EVENT_MCU"
 		(shape bidirectional)
 		(at 33.02 54.61 180)
 		(fields_autoplaced yes)
@@ -2617,34 +2617,9 @@
 			)
 		)
 	)
-	(wire
-		(pts (xy 35.56 57.15) (xy 33.02 57.15))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "dd94ae8e-9b8b-52d3-ab62-2cdbe5febd8e")
-	)
-	(global_label "ESP_TX1"
-		(shape bidirectional)
-		(at 33.02 57.15 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right)
-		)
-		(uuid "fbe30b89-e7f8-5b87-9141-e02d42fe26ee")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 33.02 57.15 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(hide yes)
-			)
-		)
+	(no_connect
+		(at 35.56 57.15)
+		(uuid "2479ae44-0d18-5d99-90b1-2b78a640a4d4")
 	)
 	(wire
 		(pts (xy 35.56 59.69) (xy 33.02 59.69))
@@ -2770,7 +2745,7 @@
 		)
 		(uuid "d4b5f43b-fd12-56f2-917a-2c4cec18ba0a")
 	)
-	(global_label "IMU_MOSI"
+	(global_label "IMU_SDA"
 		(shape bidirectional)
 		(at 33.02 69.85 180)
 		(fields_autoplaced yes)
@@ -2799,7 +2774,7 @@
 		)
 		(uuid "2019c688-e150-5d9c-924e-f3e835d3ae86")
 	)
-	(global_label "IMU_SCK"
+	(global_label "IMU_SCL"
 		(shape bidirectional)
 		(at 33.02 72.39 180)
 		(fields_autoplaced yes)
@@ -2820,34 +2795,9 @@
 			)
 		)
 	)
-	(wire
-		(pts (xy 35.56 74.93) (xy 33.02 74.93))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a0fd8436-291f-5437-813e-c96701988fca")
-	)
-	(global_label "IMU_MISO"
-		(shape bidirectional)
-		(at 33.02 74.93 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right)
-		)
-		(uuid "e912dff8-01a1-555c-ac01-f81905fa9a5d")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 33.02 74.93 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(hide yes)
-			)
-		)
+	(no_connect
+		(at 35.56 74.93)
+		(uuid "9e020ff9-40a9-5912-97e8-c1fca5d369ba")
 	)
 	(wire
 		(pts (xy 35.56 77.47) (xy 33.02 77.47))
@@ -2868,63 +2818,13 @@
 		)
 		(uuid "3489231b-9ea0-59a1-b0c1-62c18ae4019c")
 	)
-	(wire
-		(pts (xy 35.56 80.01) (xy 33.02 80.01))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2566d66a-2b9c-5dbe-8fa5-67af5fb60385")
+	(no_connect
+		(at 35.56 80.01)
+		(uuid "82829c6d-c130-5275-ae3d-6a1907fde0c1")
 	)
-	(global_label "IMU_CS_ACC_N"
-		(shape bidirectional)
-		(at 33.02 80.01 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right)
-		)
-		(uuid "710bec9e-7077-50a7-9a4f-55c828560e5a")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 33.02 80.01 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(hide yes)
-			)
-		)
-	)
-	(wire
-		(pts (xy 35.56 82.55) (xy 33.02 82.55))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d5cca899-501f-580b-8d12-71bde856bd95")
-	)
-	(global_label "IMU_CS_GYR_N"
-		(shape bidirectional)
-		(at 33.02 82.55 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right)
-		)
-		(uuid "61322632-5015-5d92-8cbc-67d42c9b094d")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 33.02 82.55 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(hide yes)
-			)
-		)
+	(no_connect
+		(at 35.56 82.55)
+		(uuid "914f8514-232e-50d5-a4d8-e1e859ce85f2")
 	)
 	(wire
 		(pts (xy 35.56 85.09) (xy 33.02 85.09))
@@ -3365,34 +3265,9 @@
 			)
 		)
 	)
-	(wire
-		(pts (xy 66.04 74.93) (xy 68.58 74.93))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "17a5ad93-5a85-5d1b-a77d-a7036be079cf")
-	)
-	(global_label "ANT_FAULT_N"
-		(shape bidirectional)
-		(at 68.58 74.93 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify left)
-		)
-		(uuid "ae9588b4-9760-5a1a-a560-23505871ca35")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 68.58 74.93 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(hide yes)
-			)
-		)
+	(no_connect
+		(at 66.04 74.93)
+		(uuid "8ccc4748-70fc-5311-87fb-177f02b9cf7a")
 	)
 	(wire
 		(pts (xy 66.04 77.47) (xy 68.58 77.47))

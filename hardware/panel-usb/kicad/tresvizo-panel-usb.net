@@ -1,0 +1,1170 @@
+(export
+	(version "E")
+	(design
+		(source "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-kicad/hardware/panel-usb/kicad/tresvizo-panel-usb.kicad_sch")
+		(date "2026-10-04T23:55:14")
+		(tool "Eeschema 10.0.6")
+		(sheet
+			(number "1")
+			(name "/")
+			(tstamps "/")
+			(title_block
+				(title "TresVizo MeridianV — USB-C del panel")
+				(company "TresVizo")
+				(rev "0.1")
+				(date "2026-10-04")
+				(source "tresvizo-panel-usb.kicad_sch")
+				(comment
+					(number "1")
+					(value "Exploratorio: no fabricado ni probado")
+				)
+				(comment
+					(number "2")
+					(value "USB-C 2.0 al ras de la tapa del panel; cable JST GH 8 a J101 de la placa principal")
+				)
+				(comment
+					(number "3")
+					(value "JLCPCB 4 capas JLC04161H-7628, montaje por una cara")
+				)
+				(comment
+					(number "4")
+					(value "")
+				)
+				(comment
+					(number "5")
+					(value "")
+				)
+				(comment
+					(number "6")
+					(value "")
+				)
+				(comment
+					(number "7")
+					(value "")
+				)
+				(comment
+					(number "8")
+					(value "")
+				)
+				(comment
+					(number "9")
+					(value "")
+				)
+			)
+		)
+		(sheet
+			(number "2")
+			(name "/USB-C del panel y conector a la placa principal/")
+			(tstamps "/5dac570d-e984-594e-ae8f-9dce49a7ed8b/")
+			(title_block
+				(title "USB-C del panel y conector a la placa principal")
+				(company "TresVizo")
+				(rev "0.1")
+				(date "2026-10-04")
+				(source "usb.kicad_sch")
+				(comment
+					(number "1")
+					(value "Exploratorio: no fabricado ni probado")
+				)
+				(comment
+					(number "2")
+					(value "USB-C 2.0 al ras de la tapa del panel; cable JST GH 8 a J101 de la placa principal")
+				)
+				(comment
+					(number "3")
+					(value "JLCPCB 4 capas JLC04161H-7628, montaje por una cara")
+				)
+				(comment
+					(number "4")
+					(value "")
+				)
+				(comment
+					(number "5")
+					(value "")
+				)
+				(comment
+					(number "6")
+					(value "")
+				)
+				(comment
+					(number "7")
+					(value "")
+				)
+				(comment
+					(number "8")
+					(value "")
+				)
+				(comment
+					(number "9")
+					(value "")
+				)
+			)
+		)
+	)
+	(components
+		(comp
+			(ref "D501")
+			(value "SMF15A")
+			(footprint "tresvizo_lcsc:SOD-123FL_L2.7-W1.8-LS3.8-RD")
+			(datasheet "https://wmsc.lcsc.com/wmsc/upload/file/pdf/v2/lcsc/2312041000_hongjiacheng-SMF15A_C19077509.pdf")
+			(description "TVS unidireccional de VBUS, 15 V de trabajo (la misma de la placa principal)")
+			(fields
+				(field
+					(name "MPN") "SMF15A")
+				(field
+					(name "LCSC") "C19077509")
+				(field
+					(name "Footprint") "tresvizo_lcsc:SOD-123FL_L2.7-W1.8-LS3.8-RD")
+				(field
+					(name "Datasheet") "https://wmsc.lcsc.com/wmsc/upload/file/pdf/v2/lcsc/2312041000_hongjiacheng-SMF15A_C19077509.pdf")
+				(field
+					(name "Description") "TVS unidireccional de VBUS, 15 V de trabajo (la misma de la placa principal)")
+			)
+			(libsource
+				(lib "Device")
+				(part "D_Zener")
+				(description "Zener diode")
+			)
+			(property
+				(name "MPN")
+				(value "SMF15A")
+			)
+			(property
+				(name "LCSC")
+				(value "C19077509")
+			)
+			(property
+				(name "Sheetname")
+				(value "USB-C del panel y conector a la placa principal")
+			)
+			(property
+				(name "Sheetfile")
+				(value "usb.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "diode")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "TO-???* *_Diode_* *SingleDiode* D_*")
+			)
+			(sheetpath
+				(names "/USB-C del panel y conector a la placa principal/")
+				(tstamps "/5dac570d-e984-594e-ae8f-9dce49a7ed8b/")
+			)
+			(tstamps "881609d7-0564-52f9-bdaf-2f7896f3e6aa")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "J501")
+			(value "USB_C")
+			(footprint "tresvizo_lcsc:USB-C_SMD-TYPE-C-31-M-12")
+			(datasheet "https://www.lcsc.com/datasheet/lcsc_datasheet_2205251630_Korean-Hroparts-Elec-TYPE-C-31-M-12_C165948.pdf")
+			(description "HRO TYPE-C-31-M-12: USB-C 16 contactos horizontal; cara 0.49 mm por delante del canto, eje a ~1.65 mm de la placa; carcasa a GND")
+			(fields
+				(field
+					(name "MPN") "TYPE-C-31-M-12")
+				(field
+					(name "LCSC") "C165948")
+				(field
+					(name "Footprint") "tresvizo_lcsc:USB-C_SMD-TYPE-C-31-M-12")
+				(field
+					(name "Datasheet") "https://www.lcsc.com/datasheet/lcsc_datasheet_2205251630_Korean-Hroparts-Elec-TYPE-C-31-M-12_C165948.pdf")
+				(field
+					(name "Description") "HRO TYPE-C-31-M-12: USB-C 16 contactos horizontal; cara 0.49 mm por delante del canto, eje a ~1.65 mm de la placa; carcasa a GND")
+			)
+			(libsource
+				(lib "Connector")
+				(part "USB_C_Receptacle_USB2.0_16P")
+				(description "USB 2.0-only 16P Type-C Receptacle connector")
+			)
+			(property
+				(name "MPN")
+				(value "TYPE-C-31-M-12")
+			)
+			(property
+				(name "LCSC")
+				(value "C165948")
+			)
+			(property
+				(name "Sheetname")
+				(value "USB-C del panel y conector a la placa principal")
+			)
+			(property
+				(name "Sheetfile")
+				(value "usb.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "usb universal serial bus type-C USB2.0")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "USB*C*Receptacle*")
+			)
+			(sheetpath
+				(names "/USB-C del panel y conector a la placa principal/")
+				(tstamps "/5dac570d-e984-594e-ae8f-9dce49a7ed8b/")
+			)
+			(tstamps "4ae61a9a-5dfe-5f03-8a8e-947b8add3fd9")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "SH")
+						)
+						(pin
+							(num "A1")
+						)
+						(pin
+							(num "A12")
+						)
+						(pin
+							(num "B1")
+						)
+						(pin
+							(num "B12")
+						)
+						(pin
+							(num "A4")
+						)
+						(pin
+							(num "A9")
+						)
+						(pin
+							(num "B4")
+						)
+						(pin
+							(num "B9")
+						)
+						(pin
+							(num "A5")
+						)
+						(pin
+							(num "B5")
+						)
+						(pin
+							(num "A7")
+						)
+						(pin
+							(num "B7")
+						)
+						(pin
+							(num "A6")
+						)
+						(pin
+							(num "B6")
+						)
+						(pin
+							(num "A8")
+						)
+						(pin
+							(num "B8")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "J502")
+			(value "PANEL_USB")
+			(footprint "tresvizo_lcsc:CONN-SMD_8P-P1.25_XUNPU-WAFER-GH1.25-8PWB")
+			(datasheet "https://www.jst-mfg.com/product/pdf/eng/eGH.pdf")
+			(description "GH 8 lateral (XUNPU, huella de JST SM08B-GHS-TB): 1-3 VBUS, 4-6 GND, 7 D-, 8 D+; tres contactos por lado (GH ~1 A por contacto con AWG26)")
+			(fields
+				(field
+					(name "MPN") "WAFER-GH1.25-8PWB")
+				(field
+					(name "LCSC") "C3029383")
+				(field
+					(name "Footprint") "tresvizo_lcsc:CONN-SMD_8P-P1.25_XUNPU-WAFER-GH1.25-8PWB")
+				(field
+					(name "Datasheet") "https://www.jst-mfg.com/product/pdf/eng/eGH.pdf")
+				(field
+					(name "Description") "GH 8 lateral (XUNPU, huella de JST SM08B-GHS-TB): 1-3 VBUS, 4-6 GND, 7 D-, 8 D+; tres contactos por lado (GH ~1 A por contacto con AWG26)")
+			)
+			(libsource
+				(lib "Connector_Generic_MountingPin")
+				(part "Conn_01x08_MountingPin")
+				(description "Generic connectable mounting pin connector, single row, 01x08, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(property
+				(name "MPN")
+				(value "WAFER-GH1.25-8PWB")
+			)
+			(property
+				(name "LCSC")
+				(value "C3029383")
+			)
+			(property
+				(name "Sheetname")
+				(value "USB-C del panel y conector a la placa principal")
+			)
+			(property
+				(name "Sheetfile")
+				(value "usb.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "connector")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Connector*:*_1x??-1MP*")
+			)
+			(sheetpath
+				(names "/USB-C del panel y conector a la placa principal/")
+				(tstamps "/5dac570d-e984-594e-ae8f-9dce49a7ed8b/")
+			)
+			(tstamps "e56cfd70-1795-5738-95d1-f779b74dae45")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "7")
+						)
+						(pin
+							(num "8")
+						)
+						(pin
+							(num "MP")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R501")
+			(value "5.1k")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(description "Rd de CC1: el cargador ve un sumidero y entrega 5 V (sin PD ni HVDCP)")
+			(fields
+				(field
+					(name "MPN") "0402WGF5101TCE")
+				(field
+					(name "LCSC") "C25905")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Rd de CC1: el cargador ve un sumidero y entrega 5 V (sin PD ni HVDCP)")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF5101TCE")
+			)
+			(property
+				(name "LCSC")
+				(value "C25905")
+			)
+			(property
+				(name "Sheetname")
+				(value "USB-C del panel y conector a la placa principal")
+			)
+			(property
+				(name "Sheetfile")
+				(value "usb.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/USB-C del panel y conector a la placa principal/")
+				(tstamps "/5dac570d-e984-594e-ae8f-9dce49a7ed8b/")
+			)
+			(tstamps "b7d72238-df4d-5083-b062-0137607feb06")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R502")
+			(value "5.1k")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(description "Rd de CC2: el cargador ve un sumidero y entrega 5 V (sin PD ni HVDCP)")
+			(fields
+				(field
+					(name "MPN") "0402WGF5101TCE")
+				(field
+					(name "LCSC") "C25905")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Rd de CC2: el cargador ve un sumidero y entrega 5 V (sin PD ni HVDCP)")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF5101TCE")
+			)
+			(property
+				(name "LCSC")
+				(value "C25905")
+			)
+			(property
+				(name "Sheetname")
+				(value "USB-C del panel y conector a la placa principal")
+			)
+			(property
+				(name "Sheetfile")
+				(value "usb.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/USB-C del panel y conector a la placa principal/")
+				(tstamps "/5dac570d-e984-594e-ae8f-9dce49a7ed8b/")
+			)
+			(tstamps "7bc4e17a-9b05-54f5-a98f-c7fad94cb24b")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U501")
+			(value "USBLC6-2SC6")
+			(footprint "tresvizo_lcsc:SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL")
+			(datasheet "https://www.st.com/resource/en/datasheet/usblc6-2.pdf")
+			(description "ESD de D+/D-; pin 5 a VBUS (5 V fijos: solo Rd, sin PD)")
+			(fields
+				(field
+					(name "MPN") "USBLC6-2SC6")
+				(field
+					(name "LCSC") "C2687116")
+				(field
+					(name "Footprint") "tresvizo_lcsc:SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL")
+				(field
+					(name "Datasheet") "https://www.st.com/resource/en/datasheet/usblc6-2.pdf")
+				(field
+					(name "Description") "ESD de D+/D-; pin 5 a VBUS (5 V fijos: solo Rd, sin PD)")
+			)
+			(libsource
+				(lib "Power_Protection")
+				(part "USBLC6-2SC6")
+				(description "Very low capacitance ESD protection diode, 2 data-line, SOT-23-6")
+			)
+			(property
+				(name "MPN")
+				(value "USBLC6-2SC6")
+			)
+			(property
+				(name "LCSC")
+				(value "C2687116")
+			)
+			(property
+				(name "Sheetname")
+				(value "USB-C del panel y conector a la placa principal")
+			)
+			(property
+				(name "Sheetfile")
+				(value "usb.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "usb ethernet video")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "SOT?23*")
+			)
+			(sheetpath
+				(names "/USB-C del panel y conector a la placa principal/")
+				(tstamps "/5dac570d-e984-594e-ae8f-9dce49a7ed8b/")
+			)
+			(tstamps "52176224-2cdb-503b-ac2a-8cbf3749d572")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "4")
+						)
+					)
+				)
+			)
+		)
+	)
+	(groups)
+	(variants)
+	(libparts
+		(libpart
+			(lib "Connector")
+			(part "USB_C_Receptacle_USB2.0_16P")
+			(description "USB 2.0-only 16P Type-C Receptacle connector")
+			(docs "https://www.usb.org/sites/default/files/documents/usb_type-c.zip")
+			(footprints
+				(fp "USB*C*Receptacle*")
+			)
+			(fields
+				(field
+					(name "Reference") "J")
+				(field
+					(name "Value") "USB_C_Receptacle_USB2.0_16P")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet") "https://www.usb.org/sites/default/files/documents/usb_type-c.zip")
+				(field
+					(name "Description") "USB 2.0-only 16P Type-C Receptacle connector")
+			)
+			(pins
+				(pin
+					(num "A1")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "A4")
+					(name "VBUS")
+					(type "passive")
+				)
+				(pin
+					(num "A5")
+					(name "CC1")
+					(type "bidirectional")
+				)
+				(pin
+					(num "A6")
+					(name "D+")
+					(type "bidirectional")
+				)
+				(pin
+					(num "A7")
+					(name "D-")
+					(type "bidirectional")
+				)
+				(pin
+					(num "A8")
+					(name "SBU1")
+					(type "bidirectional")
+				)
+				(pin
+					(num "A9")
+					(name "VBUS")
+					(type "passive")
+				)
+				(pin
+					(num "A12")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "B1")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "B4")
+					(name "VBUS")
+					(type "passive")
+				)
+				(pin
+					(num "B5")
+					(name "CC2")
+					(type "bidirectional")
+				)
+				(pin
+					(num "B6")
+					(name "D+")
+					(type "bidirectional")
+				)
+				(pin
+					(num "B7")
+					(name "D-")
+					(type "bidirectional")
+				)
+				(pin
+					(num "B8")
+					(name "SBU2")
+					(type "bidirectional")
+				)
+				(pin
+					(num "B9")
+					(name "VBUS")
+					(type "passive")
+				)
+				(pin
+					(num "B12")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "SH")
+					(name "SHIELD")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Connector_Generic_MountingPin")
+			(part "Conn_01x08_MountingPin")
+			(description "Generic connectable mounting pin connector, single row, 01x08, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			(footprints
+				(fp "Connector*:*_1x??-1MP*")
+			)
+			(fields
+				(field
+					(name "Reference") "J")
+				(field
+					(name "Value") "Conn_01x08_MountingPin")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Generic connectable mounting pin connector, single row, 01x08, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "Pin_1")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "Pin_2")
+					(type "passive")
+				)
+				(pin
+					(num "3")
+					(name "Pin_3")
+					(type "passive")
+				)
+				(pin
+					(num "4")
+					(name "Pin_4")
+					(type "passive")
+				)
+				(pin
+					(num "5")
+					(name "Pin_5")
+					(type "passive")
+				)
+				(pin
+					(num "6")
+					(name "Pin_6")
+					(type "passive")
+				)
+				(pin
+					(num "7")
+					(name "Pin_7")
+					(type "passive")
+				)
+				(pin
+					(num "8")
+					(name "Pin_8")
+					(type "passive")
+				)
+				(pin
+					(num "MP")
+					(name "MountPin")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "D_Zener")
+			(description "Zener diode")
+			(footprints
+				(fp "TO-???*")
+				(fp "*_Diode_*")
+				(fp "*SingleDiode*")
+				(fp "D_*")
+			)
+			(fields
+				(field
+					(name "Reference") "D")
+				(field
+					(name "Value") "D_Zener")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Zener diode")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "K")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "A")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "R")
+			(description "Resistor")
+			(footprints
+				(fp "R_*")
+			)
+			(fields
+				(field
+					(name "Reference") "R")
+				(field
+					(name "Value") "R")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Power_Protection")
+			(part "USBLC6-2SC6")
+			(description "Very low capacitance ESD protection diode, 2 data-line, SOT-23-6")
+			(docs "https://www.st.com/resource/en/datasheet/usblc6-2.pdf")
+			(footprints
+				(fp "SOT?23*")
+			)
+			(fields
+				(field
+					(name "Reference") "U")
+				(field
+					(name "Value") "USBLC6-2SC6")
+				(field
+					(name "Footprint") "Package_TO_SOT_SMD:SOT-23-6")
+				(field
+					(name "Datasheet") "https://www.st.com/resource/en/datasheet/usblc6-2.pdf")
+				(field
+					(name "Description") "Very low capacitance ESD protection diode, 2 data-line, SOT-23-6")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "I/O1")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "3")
+					(name "I/O2")
+					(type "passive")
+				)
+				(pin
+					(num "4")
+					(name "I/O2")
+					(type "passive")
+				)
+				(pin
+					(num "5")
+					(name "VBUS")
+					(type "passive")
+				)
+				(pin
+					(num "6")
+					(name "I/O1")
+					(type "passive")
+				)
+			)
+		)
+	)
+	(libraries
+		(library
+			(logical "Connector")
+			(uri "${KICAD10_SYMBOL_DIR}/Connector.kicad_sym")
+		)
+		(library
+			(logical "Connector_Generic_MountingPin")
+			(uri "${KICAD10_SYMBOL_DIR}/Connector_Generic_MountingPin.kicad_sym")
+		)
+		(library
+			(logical "Device")
+			(uri "${KICAD10_SYMBOL_DIR}/Device.kicad_sym")
+		)
+		(library
+			(logical "Power_Protection")
+			(uri "${KICAD10_SYMBOL_DIR}/Power_Protection.kicad_sym")
+		)
+	)
+	(nets
+		(net
+			(code "1")
+			(name "CC1")
+			(class "Default")
+			(node
+				(ref "J501")
+				(pin "A5")
+				(pinfunction "CC1_A5")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "R501")
+				(pin "1")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "2")
+			(name "CC2")
+			(class "Default")
+			(node
+				(ref "J501")
+				(pin "B5")
+				(pinfunction "CC2_B5")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "R502")
+				(pin "1")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "3")
+			(name "GND")
+			(class "Default")
+			(node
+				(ref "D501")
+				(pin "2")
+				(pinfunction "A_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "J501")
+				(pin "A1")
+				(pinfunction "GND_A1")
+				(pintype "passive")
+			)
+			(node
+				(ref "J501")
+				(pin "A12")
+				(pinfunction "GND_A12")
+				(pintype "passive")
+			)
+			(node
+				(ref "J501")
+				(pin "B1")
+				(pinfunction "GND_B1")
+				(pintype "passive")
+			)
+			(node
+				(ref "J501")
+				(pin "B12")
+				(pinfunction "GND_B12")
+				(pintype "passive")
+			)
+			(node
+				(ref "J501")
+				(pin "SH")
+				(pinfunction "SHIELD_SH")
+				(pintype "passive")
+			)
+			(node
+				(ref "J502")
+				(pin "4")
+				(pinfunction "Pin_4_4")
+				(pintype "passive")
+			)
+			(node
+				(ref "J502")
+				(pin "5")
+				(pinfunction "Pin_5_5")
+				(pintype "passive")
+			)
+			(node
+				(ref "J502")
+				(pin "6")
+				(pinfunction "Pin_6_6")
+				(pintype "passive")
+			)
+			(node
+				(ref "J502")
+				(pin "MP")
+				(pinfunction "MountPin_MP")
+				(pintype "passive")
+			)
+			(node
+				(ref "R501")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "R502")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U501")
+				(pin "2")
+				(pinfunction "GND_2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "4")
+			(name "USB_DN")
+			(class "USB,Default")
+			(node
+				(ref "J501")
+				(pin "A7")
+				(pinfunction "D-_A7")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "J501")
+				(pin "B7")
+				(pinfunction "D-_B7")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "J502")
+				(pin "7")
+				(pinfunction "Pin_7_7")
+				(pintype "passive")
+			)
+			(node
+				(ref "U501")
+				(pin "3")
+				(pinfunction "I/O2_3")
+				(pintype "passive")
+			)
+			(node
+				(ref "U501")
+				(pin "4")
+				(pinfunction "I/O2_4")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "5")
+			(name "USB_DP")
+			(class "USB,Default")
+			(node
+				(ref "J501")
+				(pin "A6")
+				(pinfunction "D+_A6")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "J501")
+				(pin "B6")
+				(pinfunction "D+_B6")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "J502")
+				(pin "8")
+				(pinfunction "Pin_8_8")
+				(pintype "passive")
+			)
+			(node
+				(ref "U501")
+				(pin "1")
+				(pinfunction "I/O1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U501")
+				(pin "6")
+				(pinfunction "I/O1_6")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "6")
+			(name "VBUS")
+			(class "Power,Default")
+			(node
+				(ref "D501")
+				(pin "1")
+				(pinfunction "K_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "J501")
+				(pin "A4")
+				(pinfunction "VBUS_A4")
+				(pintype "passive")
+			)
+			(node
+				(ref "J501")
+				(pin "A9")
+				(pinfunction "VBUS_A9")
+				(pintype "passive")
+			)
+			(node
+				(ref "J501")
+				(pin "B4")
+				(pinfunction "VBUS_B4")
+				(pintype "passive")
+			)
+			(node
+				(ref "J501")
+				(pin "B9")
+				(pinfunction "VBUS_B9")
+				(pintype "passive")
+			)
+			(node
+				(ref "J502")
+				(pin "1")
+				(pinfunction "Pin_1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "J502")
+				(pin "2")
+				(pinfunction "Pin_2_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "J502")
+				(pin "3")
+				(pinfunction "Pin_3_3")
+				(pintype "passive")
+			)
+			(node
+				(ref "U501")
+				(pin "5")
+				(pinfunction "VBUS_5")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "7")
+			(name "unconnected-(J501-SBU1-PadA8)")
+			(class "Default")
+			(node
+				(ref "J501")
+				(pin "A8")
+				(pinfunction "SBU1_A8")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "8")
+			(name "unconnected-(J501-SBU2-PadB8)")
+			(class "Default")
+			(node
+				(ref "J501")
+				(pin "B8")
+				(pinfunction "SBU2_B8")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+	)
+)

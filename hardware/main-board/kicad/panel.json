@@ -1,0 +1,94 @@
+{
+ "boards": [
+  {
+   "name": "main",
+   "file": "tresvizo-main.kicad_pcb",
+   "at": [
+    107.0,
+    107.0
+   ]
+  },
+  {
+   "name": "usb",
+   "file": "../../panel-usb/kicad/tresvizo-panel-usb.kicad_pcb",
+   "at": [
+    155.0,
+    107.0
+   ],
+   "net_prefix": "PUSB/"
+  }
+ ],
+ "gap": 2.0,
+ "rails": [
+  5.0,
+  5.0,
+  5.0,
+  5.0
+ ],
+ "tabs": [
+  {
+   "board": "main",
+   "edge": "left",
+   "offset": 10.5,
+   "width": 5.0
+  },
+  {
+   "board": "main",
+   "edge": "left",
+   "offset": 54.5,
+   "width": 5.0
+  },
+  {
+   "board": "main",
+   "edge": "right",
+   "offset": 15.91,
+   "width": 5.0
+  },
+  {
+   "board": "main",
+   "edge": "right",
+   "offset": 52.0,
+   "width": 5.0
+  },
+  {
+   "board": "usb",
+   "edge": "left",
+   "offset": 15.91,
+   "width": 5.0
+  },
+  {
+   "board": "usb",
+   "edge": "right",
+   "offset": 15.91,
+   "width": 5.0
+  }
+ ],
+ "mousebite": {
+  "drill": 0.6,
+  "pitch": 0.9,
+  "offset": 0.0
+ },
+ "keepout": 1.0,
+ "marks": {
+  "tooling_drill": 2.0,
+  "tooling_inset": [
+   2.5,
+   2.5
+  ],
+  "fiducial_inset": [
+   6.0,
+   2.5
+  ]
+ },
+ "texts": [
+  {
+   "text": "JLCJLCJLCJLC",
+   "layer": "B.SilkS",
+   "at": [
+    140.0,
+    175.5
+   ],
+   "size": 1.0
+  }
+ ]
+}

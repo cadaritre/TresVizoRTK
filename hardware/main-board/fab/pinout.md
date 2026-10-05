@@ -8,56 +8,103 @@ Generado por `scripts/doc_tables.py`; no editar a mano.
 | --- | --- | --- | --- |
 | - | 45 (EN) | ESP_EN | EN (RC 10k/1uF y pulsador RESET) |
 | 0 | 4 (IO0) | ESP_BOOT | BOOT (pulsador a GND, 10k a 3V3) |
-| 1 | 5 (IO1) | GNSS_PPS_MCU | PPS del UM980 (100 ohm) |
+| 1 | 5 (IO1) | GNSS_PPS_MCU | PPS de la carrier GNSS (100 ohm desde J301.5) |
 | 2 | 6 (IO2) | CHG_INT_N | INT del BQ25798 (drenador abierto, 10k a 3V3) |
 | 3 | 7 (IO3) | ESP_IO3 | Pin de arranque: 10k a GND |
-| 4 | 8 (IO4) | GNSS_RESET_MCU | RESET_N del UM980 (usar en drenador abierto, pulso >= 5 ms) |
-| 5 | 9 (IO5) | GNSS_TXD3_MCU | RX de UART1 <- TXD3 del UM980 |
-| 6 | 10 (IO6) | ESP_TX1 | TX de UART1 -> RXD3 del UM980 (1k) |
-| 7 | 11 (IO7) | LED_R | Cátodo rojo del LED del panel (1k) |
+| 4 | 8 (IO4) | GNSS_RESET_MCU | RESET_N de la carrier (J301.7, 1k; usar en drenador abierto, pulso >= 5 ms). La BDLX no lo saca |
+| 5 | 9 (IO5) | GNSS_EVENT_MCU | EVENT de la carrier (J301.6, 1k; 100k a GND) |
+| 7 | 11 (IO7) | LED_R | Cátodo rojo del LED del panel (1k; J406.2) |
 | 8 | 12 (IO8) | I2C_SDA | I2C: OLED 0x3C/0x3D, MAX17048 0x36, BQ25798 0x6B (4.7k) |
 | 9 | 13 (IO9) | I2C_SCL | I2C |
-| 10 | 14 (IO10) | BTN_SENSE_N | Botón del panel (activo bajo, por 1N4148W desde QON) |
-| 11 | 15 (IO11) | IMU_MOSI | SPI del BMI088 (SDI) |
-| 12 | 16 (IO12) | IMU_SCK | SPI del BMI088 (SCK, hasta 10 MHz) |
-| 13 | 17 (IO13) | IMU_MISO | SPI del BMI088 (SDO1 + SDO2) |
+| 10 | 14 (IO10) | BTN_SENSE_N | Botón del panel (J402.2; activo bajo, por 1N4148W desde QON) |
+| 11 | 15 (IO11) | IMU_SDA | I2C del BMI088 de la tapa, segundo bus: SDA (4.7k; J405.4). Acelerómetro 0x18, giróscopo 0x68 |
+| 12 | 16 (IO12) | IMU_SCL | I2C del BMI088: SCL (4.7k; J405.5), 400 kHz |
 | 14 | 18 (IO14) | ESP_IO14 | Libre (antes OFF del Mk2); punto de prueba |
-| 15 | 19 (IO15) | IMU_CS_ACC_N | CSB1 del BMI088 (acelerómetro) |
-| 16 | 20 (IO16) | IMU_CS_GYR_N | CSB2 del BMI088 (giróscopo) |
-| 17 | 21 (IO17) | IMU_INT1 | INT1 del acelerómetro |
-| 18 | 22 (IO18) | IMU_INT3 | INT3 del giróscopo |
-| 19 | 23 (USB_D-) | USB_DN | USB nativo D- (panel) |
-| 20 | 24 (USB_D+) | USB_DP | USB nativo D+ (panel) |
-| 21 | 25 (IO21) | LED_G | Cátodo verde (100 ohm) |
+| 17 | 21 (IO17) | IMU_INT1 | INT1 del acelerómetro (J405.6) |
+| 18 | 22 (IO18) | IMU_INT3 | INT3 del giróscopo (J405.7) |
+| 19 | 23 (USB_D-) | USB_DN | USB nativo D- (J101.7, a la placa del USB-C del panel) |
+| 20 | 24 (USB_D+) | USB_DP | USB nativo D+ (J101.8) |
+| 21 | 25 (IO21) | LED_G | Cátodo verde (100 ohm; J406.3) |
 | 33 | 28 (IO33) | SD_D3 | SD_MMC D3 (10k) |
 | 34 | 29 (IO34) | SD_CMD | SD_MMC CMD (10k) |
 | 35 | 31 (IO35) | FG_ALRT_N | ALRT del MAX17048 (10k) |
-| 36 | 32 (IO36) | LED_B | Cátodo azul (100 ohm) |
-| 37 | 33 (IO37) | BTN_LED_EN | Anillo LED del botón (MOSFET N, 100k a GND) |
+| 36 | 32 (IO36) | LED_B | Cátodo azul (100 ohm; J406.4) |
+| 37 | 33 (IO37) | BTN_LED_EN | Anillo LED del botón (MOSFET N en J402.4, 100k a GND) |
 | 38 | 34 (IO38) | SD_CLK | SD_MMC CLK |
 | 39 | 35 (IO39) | SD_D0 | SD_MMC D0 (10k) |
 | 40 | 36 (IO40) | SD_D1 | SD_MMC D1 (10k) |
-| 41 | 37 (IO41) | ANT_FAULT_N | Falla de la alimentación de antena (OC del TPS22945) |
 | 42 | 38 (IO42) | ESP_IO42 | Libre; punto de prueba |
-| 43 | 39 (TXD0) | ESP_TX0 | U0TXD -> RXD2 del UM980 (1k); la ROM escribe aquí al arrancar |
-| 44 | 40 (RXD0) | GNSS_TXD2_MCU | U0RXD <- TXD2 del UM980 (COM2, 115200) |
-| 45 | 41 (IO45) | GNSS_PWR_EN | Habilita el riel del UM980 (TPS22919); 100k a GND (pin de arranque, LOW en reset) |
+| 43 | 39 (TXD0) | ESP_TX0 | U0TXD -> RXD2 de la carrier (1k, J301.3); la ROM escribe aquí al arrancar |
+| 44 | 40 (RXD0) | GNSS_TXD2_MCU | U0RXD <- TXD2 de la carrier (100 ohm, J301.4; COM2, 115200) |
+| 45 | 41 (IO45) | GNSS_PWR_EN | Enciende el 5 V de la carrier GNSS; 100k a GND (pin de arranque, LOW en reset = GNSS apagado) |
 | 47 | 27 (IO47) | SD_D2 | SD_MMC D2 (10k) |
 | 48 | 30 (IO48) | SD_DET | Detección de tarjeta: HIGH con tarjeta (inversor con AO3401A) |
 
-## J101 PANEL_USB (JST PH 6 vertical)
+## J101 PANEL_USB
+
+WAFER-GH1.25-8PWB (LCSC C3029383). GH 8 lateral a la placa del USB-C del panel: VBUS x3, GND x3, D-, D+ (cable 1 a 1)
 
 | Pin | Red |
 | --- | --- |
 | 1 | VBUS |
 | 2 | VBUS |
-| 3 | GND |
-| 4 | USB_DN |
-| 5 | USB_DP |
+| 3 | VBUS |
+| 4 | GND |
+| 5 | GND |
 | 6 | GND |
+| 7 | USB_DN |
+| 8 | USB_DP |
 | MP | GND |
 
-## J402 PANEL_UI (JST SH 9 vertical)
+## J102 BATTERY
+
+S2B-PH-SM4-TB(LF)(SN) (LCSC C295747). JST PH 2: 1 = BAT-, 2 = BAT+ (medir el pack)
+
+| Pin | Red |
+| --- | --- |
+| 1 | GND |
+| 2 | VBATT_IN |
+| MP | GND |
+
+## J301 GNSS
+
+WAFER-GH1.25-8PWB (LCSC C3029383). GH 8 lateral (XUNPU, huella JST SM08B-GHS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND
+
+| Pin | Red |
+| --- | --- |
+| 1 | GNSS_5V |
+| 2 | GND |
+| 3 | GNSS_RXD2 |
+| 4 | GNSS_TXD2 |
+| 5 | GNSS_PPS |
+| 6 | GNSS_EVENT |
+| 7 | GNSS_RESET_N |
+| 8 | GND |
+| MP | GND |
+
+## J401 TF-015
+
+TF-015 (LCSC C113206). 
+
+| Pin | Red |
+| --- | --- |
+| 1 | SD_D2 |
+| 2 | SD_D3 |
+| 3 | SD_CMD |
+| 4 | +3V3 |
+| 5 | SD_CLK |
+| 6 | GND |
+| 7 | SD_D0 |
+| 8 | SD_D1 |
+| 9 | SD_CD_N |
+| 10 | GND |
+| 11 | GND |
+| 12 | GND |
+| 13 | GND |
+
+## J402 BOTON
+
+SM04B-GHS-TB(LF)(SN) (LCSC C189895). GH 4 lateral al botón del panel: GND, contacto, anillo LED ánodo y cátodo
 
 | Pin | Red |
 | --- | --- |
@@ -65,14 +112,11 @@ Generado por `scripts/doc_tables.py`; no editar a mano.
 | 2 | BTN_N |
 | 3 | BTN_LED_A |
 | 4 | BTN_LED_K |
-| 5 | +3V3 |
-| 6 | LED_R_K |
-| 7 | LED_G_K |
-| 8 | LED_B_K |
-| 9 | CHG_LED_K |
 | MP | GND |
 
-## J403 OLED (JST SH 4 vertical, orden Qwiic)
+## J403 OLED
+
+SM04B-SRSS-TB(LF)(SN) (LCSC C160404). JST SH 4 lateral con el orden Qwiic: GND, 3V3, SDA, SCL
 
 | Pin | Red |
 | --- | --- |
@@ -82,29 +126,40 @@ Generado por `scripts/doc_tables.py`; no editar a mano.
 | 4 | I2C_SCL |
 | MP | GND |
 
-## J302 UM980_AUX (JST SH 5 vertical)
+## J404 NTC
 
-| Pin | Red |
-| --- | --- |
-| 1 | GND |
-| 2 | AUX_TXD1 |
-| 3 | AUX_RXD1 |
-| 4 | AUX_PPS |
-| 5 | AUX_EVENT |
-| MP | GND |
-
-## J102 BATTERY (JST PH 2 lateral)
-
-| Pin | Red |
-| --- | --- |
-| 1 | GND |
-| 2 | VBATT_IN |
-| MP | GND |
-
-## J404 NTC opcional (JST SH 2 vertical, sin montar)
+SM02B-SRSS-TB(LF)(SN) (LCSC C160402), sin montar. Opcional: NTC 10k B3435 pegada a la celda (quitar el 10k fijo de TS)
 
 | Pin | Red |
 | --- | --- |
 | 1 | CHG_TS |
 | 2 | GND |
+| MP | GND |
+
+## J405 IMU
+
+SM07B-GHS-TB(LF)(SN) (LCSC C495552). GH 7 lateral al BMI088 de la tapa (I2C): 3V3, GND, SDO a GND, SDA, SCL, INT1, INT3
+
+| Pin | Red |
+| --- | --- |
+| 1 | +3V3 |
+| 2 | GND |
+| 3 | GND |
+| 4 | IMU_SDA |
+| 5 | IMU_SCL |
+| 6 | IMU_INT1 |
+| 7 | IMU_INT3 |
+| MP | GND |
+
+## J406 LEDS
+
+SM05B-SRSS-TB(LF)(SN) (LCSC C136657). SH 5 lateral a los LEDs del panel: ánodo común (3V3), cátodos R, G, B y de carga
+
+| Pin | Red |
+| --- | --- |
+| 1 | +3V3 |
+| 2 | LED_R_K |
+| 3 | LED_G_K |
+| 4 | LED_B_K |
+| 5 | CHG_LED_K |
 | MP | GND |

@@ -1,4 +1,4 @@
-ERC report (2026-10-04T18:07:17, Encoding UTF8)
+ERC report (2026-10-04T23:50:39, Encoding UTF8)
 Report includes: Errors, Warnings, Exclusions
 
 ***** Sheet /
@@ -7,9 +7,9 @@ Report includes: Errors, Warnings, Exclusions
 
 ***** Sheet /ESP32-S3/
 
-***** Sheet /GNSS UM980 y antena/
+***** Sheet /GNSS: carrier UM980 por conector y su 5 V/
 
-***** Sheet /microSD, IMU y panel/
+***** Sheet /microSD, IMU por conector y panel/
 
  ** ERC messages: 0  Errors 0  Warnings 0
 

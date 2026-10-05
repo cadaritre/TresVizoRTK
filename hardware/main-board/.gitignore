@@ -7,7 +7,7 @@ fp-info-cache
 
 # Intermedios que build.py vuelve a generar
 kicad/tresvizo-main-unrouted.*
-fab/gerbers/
+fab/gerbers-*/
 fab/jlc_parts_cache.json
 
 # Pesados y regenerables: caché de easyeda2kicad, modelos STEP de LCSC (61 MB; los .wrl sí se

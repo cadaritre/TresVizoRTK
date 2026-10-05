@@ -1,52 +1,8 @@
 ** Drc report for tresvizo-main.kicad_pcb **
-** Created on 2026-10-04T18:07:23 **
+** Created on 2026-10-04T23:54:53 **
 ** Report includes: Errors, Warnings, Exclusions **
 
-** Found 14 DRC violations **
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(112.5500 mm, 162.7800 mm): Segmento de J102 en F.Silkscreen
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(112.5500 mm, 162.7800 mm): Segmento de J102 en F.Silkscreen
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(111.6000 mm, 107.6500 mm): Círculo de L301 en F.Silkscreen
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(145.4000 mm, 114.2000 mm): Círculo de FB101 en F.Silkscreen
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(110.4000 mm, 108.9700 mm): Círculo de D302 en F.Silkscreen
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(135.7000 mm, 134.2000 mm): Círculo de D401 en F.Silkscreen
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(116.4500 mm, 142.3200 mm): Segmento de D101 en F.Silkscreen
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(126.9000 mm, 161.1000 mm): Segmento de U201 en F.Silkscreen
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(147.4000 mm, 161.1000 mm): Segmento de U201 en F.Silkscreen
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(135.1500 mm, 171.4000 mm): Círculo de L102 en F.Silkscreen
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(109.9000 mm, 162.1000 mm): Segmento de Q102 en F.Silkscreen
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(109.9000 mm, 162.1000 mm): Segmento de Q102 en F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: restricciones de configuración de placa para serigrafía; warning
-    @(112.5500 mm, 162.7800 mm): Segmento de J102 en F.Silkscreen
-    @(112.6700 mm, 164.1300 mm): Segmento de Q103 en F.Silkscreen
-[silk_overlap]: Silkscreen clearance
-    Rule: restricciones de configuración de placa para serigrafía; warning
-    @(114.1300 mm, 164.1300 mm): Segmento de Q103 en F.Silkscreen
-    @(112.5500 mm, 162.7800 mm): Segmento de J102 en F.Silkscreen
+** Found 0 DRC violations **
 
 ** Found 0 unconnected pads **
 

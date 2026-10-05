@@ -5,6 +5,10 @@
 --fab-only no regenera ni rutea el PCB: parte de kicad/tresvizo-main.kicad_pcb tal como esté
 (por ejemplo, después de retocarlo a mano en KiCad) y rehace DRC y archivos de fabricación.
 
+Si existe la placa del USB-C del panel (../../panel-usb), la regenera con su propio build.py, arma el
+panel de las dos placas (panelize.py con kicad/panel.json) y saca un solo juego de archivos para el
+pedido: fab/tresvizo-panel-*.
+
 Variables de entorno:
     KICAD_APP          ruta a KiCad.app (por omisión /Applications/KiCad/KiCad.app)
 
@@ -24,6 +28,9 @@ ROOT = os.path.dirname(HERE)
 KDIR = os.path.join(ROOT, "kicad")
 FAB = os.path.join(ROOT, "fab")
 PROJECT = "tresvizo-main"
+PANEL = "tresvizo-panel"
+PUSB = os.path.join(os.path.dirname(ROOT), "panel-usb")
+PUSB_NET = os.path.join(PUSB, "kicad", "tresvizo-panel-usb.net")
 
 KICAD_APP = os.environ.get("KICAD_APP", "/Applications/KiCad/KiCad.app")
 KCLI = os.path.join(KICAD_APP, "Contents/MacOS/kicad-cli")
@@ -41,6 +48,39 @@ def run(cmd, **kw):
     if r.returncode not in (0, 5):  # 5 = kicad-cli con violaciones
         raise SystemExit("falló: %s (código %d)" % (cmd[0], r.returncode))
     return out
+
+
+def fab_outputs(name, pcb, nets, env, renders=False, step=True):
+    """Gerbers y taladros en zip, posiciones, BOM y CPL de JLCPCB, vistas y STEP de un PCB."""
+    gdir = os.path.join(FAB, "gerbers-" + name)
+    shutil.rmtree(gdir, ignore_errors=True)
+    os.makedirs(gdir)
+    layers = "F.Cu,In1.Cu,In2.Cu,B.Cu,F.Paste,B.Paste,F.Silkscreen,B.Silkscreen,F.Mask,B.Mask,Edge.Cuts"
+    run([KCLI, "pcb", "export", "gerbers", "--layers", layers, "--subtract-soldermask",
+         "--no-protel-ext", "-o", gdir + "/", pcb], env=env)
+    run([KCLI, "pcb", "export", "drill", "--format", "excellon", "--excellon-separate-th",
+         "--generate-map", "--map-format", "gerberx2", "-o", gdir + "/", pcb], env=env)
+    zpath = os.path.join(FAB, name + "-gerbers-jlcpcb.zip")
+    with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
+        for fn in sorted(os.listdir(gdir)):
+            z.write(os.path.join(gdir, fn), fn)
+    pos = os.path.join(FAB, name + "-pos.csv")
+    run([KCLI, "pcb", "export", "pos", "--format", "csv", "--units", "mm", "--side", "both",
+         "--exclude-dnp", "-o", pos, pcb], env=env)
+    cmd = [sys.executable, os.path.join(HERE, "export_jlc.py"), nets[0], pos,
+           os.path.join(FAB, name + "-bom-jlcpcb.csv"), os.path.join(FAB, name + "-cpl-jlcpcb.csv"),
+           os.path.join(KDIR, "jlc_rotations.json")]
+    for extra in nets[1:]:
+        cmd += ["--net", extra]
+    run(cmd, env=env)
+    if renders:
+        for side in ("top", "bottom"):
+            run([KCLI, "pcb", "render", "--side", side, "--quality", "high", "--width", "1600", "--height",
+                 "1200", "--background", "opaque", "-o", os.path.join(FAB, "%s-%s.png" % (name, side)), pcb],
+                env=env)
+    if step:
+        run([KCLI, "pcb", "export", "step", "--subst-models", "-f", "-o", os.path.join(FAB, name + ".step"),
+             pcb], env=env)
 
 
 def main():
@@ -90,35 +130,34 @@ def main():
         route("2")
         # Las pistas nuevas pueden partir los rellenos: otra vez cosido e islas
         run([KPY, os.path.join(HERE, "finish_pcb.py"), pcb, spec], env=env)
+    if not a.fab_only:
+        # Serigrafía sin solapes (referencias y trazos de huellas que pisan pads u otra serigrafía)
+        run([KPY, os.path.join(HERE, "silk_clean.py"), pcb, KCLI], env=env)
 
     # 4. DRC final con paridad de esquemático
     run([KCLI, "pcb", "drc", "--refill-zones", "--schematic-parity", "--severity-all", "--format", "report",
          "-o", os.path.join(FAB, "drc.rpt"), pcb], env=env)
 
-    # 5. Fabricación
-    gdir = os.path.join(FAB, "gerbers")
-    shutil.rmtree(gdir, ignore_errors=True)
-    os.makedirs(gdir)
-    layers = "F.Cu,In1.Cu,In2.Cu,B.Cu,F.Paste,B.Paste,F.Silkscreen,B.Silkscreen,F.Mask,B.Mask,Edge.Cuts"
-    run([KCLI, "pcb", "export", "gerbers", "--layers", layers, "--subtract-soldermask",
-         "--no-protel-ext", "-o", gdir + "/", pcb], env=env)
-    run([KCLI, "pcb", "export", "drill", "--format", "excellon", "--excellon-separate-th",
-         "--generate-map", "--map-format", "gerberx2", "-o", gdir + "/", pcb], env=env)
-    zpath = os.path.join(FAB, PROJECT + "-gerbers-jlcpcb.zip")
-    with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
-        for fn in sorted(os.listdir(gdir)):
-            z.write(os.path.join(gdir, fn), fn)
-    pos = os.path.join(FAB, PROJECT + "-pos.csv")
-    run([KCLI, "pcb", "export", "pos", "--format", "csv", "--units", "mm", "--side", "both",
-         "--exclude-dnp", "-o", pos, pcb], env=env)
-    run([sys.executable, os.path.join(HERE, "export_jlc.py"), net, pos,
-         os.path.join(FAB, PROJECT + "-bom-jlcpcb.csv"), os.path.join(FAB, PROJECT + "-cpl-jlcpcb.csv"),
-         os.path.join(KDIR, "jlc_rotations.json")], env=env)
-    for side in ("top", "bottom"):
-        run([KCLI, "pcb", "render", "--side", side, "--quality", "high", "--width", "1600", "--height", "1200",
-             "--background", "opaque", "-o", os.path.join(FAB, "%s-%s.png" % (PROJECT, side)), pcb], env=env)
-    run([KCLI, "pcb", "export", "step", "--subst-models", "-f", "-o",
-         os.path.join(FAB, PROJECT + ".step"), pcb], env=env)
+    # 5. Fabricación de la placa sola (referencia y comparación de costo)
+    fab_outputs(PROJECT, pcb, [net], env, renders=True)
+
+    # 6. Panel del pedido: placa madre + placa del USB-C del panel
+    if os.path.exists(os.path.join(PUSB, "scripts", "build.py")):
+        if not a.fab_only:
+            run([sys.executable, os.path.join(PUSB, "scripts", "build.py")], env=env)
+        ppcb = os.path.join(KDIR, PANEL + ".kicad_pcb")
+        shutil.copy(os.path.join(KDIR, PROJECT + ".kicad_pro"), os.path.join(KDIR, PANEL + ".kicad_pro"))
+        # El proyecto del panel usa la biblioteca de la placa madre: se le añaden las huellas y modelos que
+        # solo tiene la placa del USB-C (el receptáculo), con el mismo nombre de biblioteca
+        for sub in ("lcsc.pretty", "lcsc.3dshapes"):
+            src = os.path.join(PUSB, "kicad", "lib", sub)
+            for fn in sorted(os.listdir(src)):
+                if not os.path.exists(os.path.join(KDIR, "lib", sub, fn)):
+                    shutil.copy(os.path.join(src, fn), os.path.join(KDIR, "lib", sub, fn))
+        run([KPY, os.path.join(HERE, "panelize.py"), os.path.join(KDIR, "panel.json"), ppcb], env=env)
+        run([KCLI, "pcb", "drc", "--refill-zones", "--severity-all", "--format", "report",
+             "-o", os.path.join(FAB, "drc-panel.rpt"), ppcb], env=env)
+        fab_outputs(PANEL, ppcb, [net, PUSB_NET], env, renders=True, step=False)
     shutil.rmtree(tmp, ignore_errors=True)
     print("listo:", FAB)
 

@@ -99,7 +99,8 @@ def main():
                 if d < r + 0.05:
                     return False
                 continue
-            need = r + (0.05 if pnet == net else CLR)
+            # Pads de la misma red de otra huella: tampoco rozarlos (un roce deja una unión de ancho casi 0)
+            need = r + (0.05 if pnet == net and fp is own_fp else 0.1 if pnet == net else CLR)
             if ref.startswith("U") and fp is not own_fp:
                 need = max(need, r + IC_ESCAPE)   # deja sitio para que salgan las pistas del CI
             if d < need:
@@ -118,9 +119,9 @@ def main():
         for k in range(n + 1):
             px, py = x1 + (x2 - x1) * k / n, y1 + (y2 - y1) * k / n
             for ref, num, pnet, rect, pad, fp in pads:
-                if pad is own_pad or pnet == net:
+                if pad is own_pad or (pnet == net and fp is own_pad.GetParentFootprint()):
                     continue
-                if rect_dist(px, py, rect) < hw + CLR:
+                if rect_dist(px, py, rect) < hw + (0.1 if pnet == net else CLR):
                     return False
             for tnet, a, b, c, d, thw, layer in tracks:
                 if tnet != net and layer == pcbnew.F_Cu and seg_dist(px, py, a, b, c, d) < hw + thw + CLR:

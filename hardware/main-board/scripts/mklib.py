@@ -1,15 +1,13 @@
-"""Genera la biblioteca propia del proyecto: símbolos (tresvizo.kicad_sym) y la huella del UM980.
+"""Genera la biblioteca propia del proyecto: símbolos (tresvizo.kicad_sym) y ajustes de las huellas de LCSC.
 
     python3 mklib.py <dir_simbolos_kicad> <kicad_dir>
 
 Los símbolos son rectángulos con los pines agrupados por función. Los números de pin
-coinciden con los pads de las huellas importadas de LCSC (lib/lcsc.pretty) o con la
-huella propia del UM980, generada a partir de las cotas del manual de Unicore (R1.10,
-tabla 2-6 y figuras 2-1/3-4) recogidas en research/um980_footprint.json.
+coinciden con los pads de las huellas importadas de LCSC (lib/lcsc.pretty).
+(La v0.1 generaba aquí también la huella del UM980; la v0.2 lo lleva en su carrier, fuera de la placa.)
 """
 
 import copy
-import json
 import math
 import os
 import sys
@@ -137,41 +135,22 @@ LCSC_FP = "tresvizo_lcsc:"
 
 def build_symbols(kicad_sym_dir):
     syms = []
-    um_nc = ["13", "15", "16", "17", "18", "22", "23", "24", "25", "35", "38", "39", "40", "46", "47", "50", "52", "54"]
-    um_gnd = ["1", "3", "12", "14", "32", "37", "41", "48"]
-    syms.append(ic(
-        "UM980",
-        left=[("33", "VCC", PW), ("36", "V_BCKP", PW), None, ("49", "RESET_N", I), None,
-              ("43", "RXD1", I), ("26", "RXD2", I), ("31", "RXD3", I), None, ("51", "EVENT", I), None,
-              ("28", "BIF1", P), ("29", "BIF2", P), None, ("2", "ANT_IN", I), ("4", "ANT_DETECT", I),
-              ("6", "ANT_SHORT_N", I), ("5", "ANT_OFF", O), ("7", "VCC_RF", PO)],
-        right=[("42", "TXD1", O), ("27", "TXD2", O), ("30", "TXD3", O), None, ("53", "PPS", O), None,
-               ("19", "PVT_STAT", O), ("20", "RTK_STAT", O), ("21", "ERR_STAT", O), None,
-               ("8", "SPIS_CSN", I), ("9", "SPIS_MOSI", I), ("10", "SPIS_CLK", I), ("11", "SPIS_MISO", O),
-               ("44", "SDA", B), ("45", "SCL", B)],
-        bottom=[("55", "GND", PW)],
-        hidden=[("34", "VCC", PW, "33")] + [(n, "GND", PW, "55") for n in um_gnd]
-               + [(n, "NC", NC, "55") for n in um_nc],
-        footprint="tresvizo:UM980", datasheet="https://en.unicore.com/uploads/file/UM980_User%20Manual_EN_R1.10.pdf",
-        description="Unicore UM980 GNSS RTK multibanda, LGA 22x17 mm (54 pads + 48 pads de GND)"))
-    # Los pines NC ocultos del UM980 no deben aparecer como «apilados» sobre GND: se mueven fuera.
-    um = syms[-1]
-    for sub in findall(um, "symbol"):
-        for p in findall(sub, "pin"):
-            if p[1] == "no_connect":
-                at = find(p, "at")
-                at[1], at[2] = 0.0, 0.0
     syms.append(ic(
         "TPS62903", left=[("6", "VIN", PW), ("5", "EN", I), ("7", "MODE", I), ("8", "SS/TR", P)],
         right=[("2", "SW", PO), ("3", "VOS", I), ("9", "FB", I), ("1", "PG", OC)], bottom=[("4", "GND", PW)],
         footprint=LCSC_FP + "VQFN-HR-9_L2.0-W1.5-P0.50-TL",
         datasheet="https://www.ti.com/lit/ds/symlink/tps62903.pdf",
         description="TI TPS62903 buck síncrono 3-17 V, 3 A, modo 100 %"))
+    # Huella de LCSC: los pads de VIN (12 y 13) llevan el número 12 y los de VOUT (7 y 8) el 7.
     syms.append(ic(
-        "TPS22945", left=[("5", "VIN", PW), ("4", "ON", I)], right=[("1", "VOUT", PO), ("3", "OC", OC)],
-        bottom=[("2", "GND", PW)], footprint=LCSC_FP + "SC-70-5_L2.1-W1.3-P0.65-LS2.1-BL",
-        datasheet="https://www.ti.com/lit/ds/symlink/tps22945.pdf",
-        description="TI TPS22945 interruptor de carga con límite de corriente (alimentación de antena)"))
+        "TPS63070", left=[("12", "VIN", PW), ("14", "EN", I), ("1", "PS/SYNC", I), ("15", "VSEL", I),
+                          ("3", "VAUX", P)],
+        right=[("11", "L1", P), ("9", "L2", P), ("7", "VOUT", PO), ("5", "FB", I), ("6", "FB2", P),
+               ("2", "PG", OC)],
+        bottom=[("4", "GND", PW), ("10", "PGND", PW)],
+        footprint=LCSC_FP + "VQFN-15_L3.0-W2.5-P0.50-BL",
+        datasheet="https://www.ti.com/lit/ds/symlink/tps63070.pdf",
+        description="TI TPS63070 buck-boost 2-16 V a 2.5-9 V, 2 A, desconecta la carga en apagado"))
     syms.append(ic(
         "MAX17048", left=[("3", "VDD", PW), ("2", "CELL", I), ("1", "CTG", I), ("6", "QSTRT", I)],
         right=[("8", "SDA", B), ("7", "SCL", I), ("5", "~{ALRT}", OC)], bottom=[("4", "GND", PW), ("9", "EP", P)],
@@ -186,10 +165,6 @@ def build_symbols(kicad_sym_dir):
         ref="J", footprint=LCSC_FP + "TF-SMD_TF-015", min_w=7.62,
         datasheet="https://www.lcsc.com/datasheet/C113206.pdf",
         description="Zócalo microSD push-push SOFNG TF-015; CD cierra contra la carcasa con tarjeta"))
-    syms.append(ic(
-        "U.FL", left=[("1", "RF", P)], right=[], bottom=[("2", "GND", P)], hidden=[("3", "GND", P, "2")],
-        ref="J", footprint=LCSC_FP + "IPEX-SMD_BWIPX-1-001E", min_w=5.08,
-        datasheet="https://www.lcsc.com/datasheet/C5137195.pdf", description="Receptáculo u.FL (IPEX MHF I)"))
     # Pulsador de 4 pads: se usan dos pads en diagonal (1 y 4), que nunca están unidos por dentro.
     sw = two_pin("SW_TACT", "SW",
                  [("1", "A", P, 5.08, 270), ("4", "B", P, -5.08, 90)],
@@ -224,23 +199,6 @@ def build_symbols(kicad_sym_dir):
             p[2] = QStr(LCSC_FP + "BULETM-SMD_ESP32-S3-MINI-1-N8")
     syms.append(esp)
 
-    # Copias de símbolos de KiCad con tipos de pin ajustados a cómo se usan aquí (para el ERC):
-    # SDO1/SDO2 del BMI088 se unen en el bus SPI (salidas de tres estados) y QOD del TPS22919
-    # se une a OUT, como indica su hoja de datos.
-    def derive(libname, symname, newname, types):
-        lib = libs.add(os.path.join(kicad_sym_dir, libname + ".kicad_sym"))
-        node = copy.deepcopy(lib.get(symname).node)
-        node[1] = QStr(newname)
-        for sub in findall(node, "symbol"):
-            sub[1] = QStr(str(sub[1]).replace(symname, newname, 1))
-            for item in findall(sub, "pin"):
-                num = str(find(item, "number")[1])
-                if num in types:
-                    item[1] = types[num]
-        return node
-
-    syms.append(derive("Sensor_Motion", "BMI088", "BMI088_SPI", {"10": "tri_state", "15": "tri_state"}))
-    syms.append(derive("Power_Management", "TPS22919DCK", "TPS22919DCK_QOD", {"5": "passive"}))
     return syms
 
 
@@ -249,58 +207,6 @@ def write_symbols(path, syms):
            ["generator_version", QStr("9.0")]] + syms
     with open(path, "w", encoding="utf-8") as f:
         f.write(dumps(lib) + "\n")
-
-
-# ------------------------------------------------------------------- huella UM980
-def um980_footprint(json_path, out_path):
-    d = json.load(open(json_path, encoding="utf-8"))
-    W, H = d["outline"]["width_mm"], d["outline"]["height_mm"]
-    items = ["footprint", QStr("UM980"), ["version", 20241229], ["generator", QStr("pcbnew")],
-             ["generator_version", QStr("9.0")], ["layer", QStr("F.Cu")],
-             ["descr", QStr("Unicore UM980, LGA 22.0 x 17.0 mm, 54 pads perimetrales de 0.8 x 1.5 mm (paso 1.1) "
-                            "y 48 pads interiores de GND de 1.1 mm (paso 2.1). Cotas del manual Unicore UM980 "
-                            "R1.10, tabla 2-6 y figuras 2-1/3-4, vista superior.")],
-             ["tags", QStr("UM980 GNSS RTK LGA")],
-             ["property", QStr("Reference"), QStr("REF**"), ["at", 0, -H / 2 - 1.6, 0], ["layer", QStr("F.SilkS")],
-              ["uuid", QStr("6d0c7d5c-0000-4000-8000-000000000001")], font(1.0)],
-             ["property", QStr("Value"), QStr("UM980"), ["at", 0, H / 2 + 1.6, 0], ["layer", QStr("F.Fab")],
-              ["uuid", QStr("6d0c7d5c-0000-4000-8000-000000000002")], font(1.0)],
-             ["attr", "smd"]]
-
-    def line(x1, y1, x2, y2, layer, w):
-        items.append(["fp_line", ["start", x1, y1], ["end", x2, y2],
-                      ["stroke", ["width", w], ["type", "solid"]], ["layer", QStr(layer)]])
-
-    def rect(x1, y1, x2, y2, layer, w):
-        line(x1, y1, x2, y1, layer, w)
-        line(x2, y1, x2, y2, layer, w)
-        line(x2, y2, x1, y2, layer, w)
-        line(x1, y2, x1, y1, layer, w)
-
-    rect(-W / 2, -H / 2, W / 2, H / 2, "F.Fab", 0.1)
-    cy = 0.5
-    rect(-11.25 - cy, -8.75 - cy, 11.25 + cy, 8.75 + cy, "F.CrtYd", 0.05)
-    s = 0.15
-    o = 0.25
-    # Serigrafía: solo esquinas, fuera del cuerpo.
-    for sx in (-1, 1):
-        for sy in (-1, 1):
-            x, y = sx * (W / 2 + o), sy * (H / 2 + o)
-            line(x, y, x - sx * 2.0, y, "F.SilkS", s)
-            line(x, y, x, y - sy * 2.0, "F.SilkS", s)
-    # Marca del pin 1 (abajo a la izquierda en vista superior).
-    items.append(["fp_circle", ["center", -W / 2 - 0.9, H / 2 + 0.9], ["end", -W / 2 - 0.6, H / 2 + 0.9],
-                  ["stroke", ["width", 0.3], ["type", "solid"]], ["fill", "yes"], ["layer", QStr("F.SilkS")]])
-    for p in d["pads"]:
-        num = p["pin"]
-        if int(num) > 54:
-            num = "55"  # todos los pads interiores son GND: un único número
-        shape = "circle" if p.get("shape") == "circle" or p.get("shape") == "round" else "rect"
-        pad = ["pad", QStr(num), "smd", shape, ["at", p["x_mm"], p["y_mm"]], ["size", p["w_mm"], p["h_mm"]],
-               ["layers", QStr("F.Cu"), QStr("F.Paste"), QStr("F.Mask")]]
-        items.append(pad)
-    with open(out_path, "w", encoding="utf-8") as f:
-        f.write(dumps(items) + "\n")
 
 
 def connector_mount_pads(pretty):
@@ -361,9 +267,6 @@ def main():
     npth_alignment_holes(os.path.join(kicad_dir, "lib", "lcsc.pretty"))
     lib = os.path.join(kicad_dir, "lib")
     write_symbols(os.path.join(lib, "tresvizo.kicad_sym"), build_symbols(kicad_sym_dir))
-    os.makedirs(os.path.join(lib, "tresvizo.pretty"), exist_ok=True)
-    um980_footprint(os.path.join(os.path.dirname(kicad_dir), "research", "um980_footprint.json"),
-                    os.path.join(lib, "tresvizo.pretty", "UM980.kicad_mod"))
     print("biblioteca escrita en", lib)
 
 

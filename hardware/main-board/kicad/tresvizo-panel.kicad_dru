@@ -1,0 +1,4 @@
+(version 1)
+(rule "mouse_bites"
+  (condition "A.memberOfFootprint('MB*') && B.memberOfFootprint('MB*')")
+  (constraint hole_to_hole (min 0.25mm)))

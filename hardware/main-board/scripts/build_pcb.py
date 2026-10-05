@@ -252,6 +252,7 @@ def main():
     for h in spec["board"].get("holes", []):
         fp = pcbnew.FootprintLoad(os.path.join(std_fp, "MountingHole.pretty"), h["footprint"])
         fp.SetReference(h["ref"])
+        fp.Reference().SetVisible(False)
         fp.SetPosition(V(h["x"], h["y"]))
         fp.SetBoardOnly(True)
         board.Add(fp)
@@ -292,6 +293,28 @@ def main():
         if t.get("angle"):
             tx.SetTextAngleDegrees(t["angle"])
         board.Add(tx)
+    # Gráficos rellenos (logotipo): contorno con huecos, partido en polígonos simples (el formato de
+    # KiCad guarda un solo contorno por polígono)
+    for g in spec.get("graphics", []):
+        ps = pcbnew.SHAPE_POLY_SET()
+        ps.NewOutline()
+        for x, y in g["outline"]:
+            ps.Append(mm(x), mm(y))
+        for hole in g.get("holes", []):
+            ps.NewHole()
+            for x, y in hole:
+                ps.Append(mm(x), mm(y), -1, -1)
+        ps.Fracture()
+        for i in range(ps.OutlineCount()):
+            one = pcbnew.SHAPE_POLY_SET()
+            one.AddOutline(ps.Outline(i))
+            sh = pcbnew.PCB_SHAPE(board)
+            sh.SetShape(pcbnew.SHAPE_T_POLY)
+            sh.SetPolyShape(one)
+            sh.SetFilled(True)
+            sh.SetWidth(0)
+            sh.SetLayer(LAYERS[g.get("layer", "F.SilkS")])
+            board.Add(sh)
     pcbnew.SaveBoard(out, board)
     print("guardado", out, "huellas:", len(comps), "redes:", len(nets))
 

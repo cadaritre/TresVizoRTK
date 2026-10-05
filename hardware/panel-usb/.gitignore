@@ -1,0 +1,12 @@
+# Estado local de KiCad
+*.kicad_prl
+*.lck
+*-backups/
+_autosave-*
+fp-info-cache
+
+# Intermedios que build.py vuelve a generar
+fab/gerbers-*/
+
+# Pesados y regenerables: modelos STEP de LCSC (los .wrl sí se guardan; mklib.py los vuelve a copiar)
+kicad/lib/lcsc.3dshapes/*.step

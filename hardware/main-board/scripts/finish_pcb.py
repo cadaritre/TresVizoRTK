@@ -53,6 +53,51 @@ def seg_dist(px, py, ax, ay, bx, by):
     return math.hypot(px - (ax + t * dx), py - (ay + t * dy))
 
 
+def join_tangents(board):
+    """Las vías que el ruteador deja tocando de canto una pista de su misma red (sin que la pista termine
+    en ellas) quedan unidas por un hilo de cobre de ancho casi nulo: se unen con un tramo corto."""
+    vias = [t for t in board.GetTracks() if t.Type() == pcbnew.PCB_VIA_T]
+    tracks = [t for t in board.GetTracks() if t.Type() == pcbnew.PCB_TRACE_T]
+    added = 0
+    for v in vias:
+        c = v.GetPosition()
+        cx, cy = to_mm(c.x), to_mm(c.y)
+        r = to_mm(v.GetWidth(pcbnew.F_Cu)) / 2
+        for t in tracks:
+            if t.GetNetCode() != v.GetNetCode():
+                continue
+            a, b = t.GetStart(), t.GetEnd()
+            ax, ay, bx, by = to_mm(a.x), to_mm(a.y), to_mm(b.x), to_mm(b.y)
+            if min(math.hypot(ax - cx, ay - cy), math.hypot(bx - cx, by - cy)) < r:
+                continue
+            hw = to_mm(t.GetWidth()) / 2
+            d = seg_dist(cx, cy, ax, ay, bx, by)
+            # ¿ya hay un tramo que sale de la vía y acaba sobre la pista? (segunda pasada)
+            done = False
+            for u in tracks:
+                if u is t or u.GetNetCode() != v.GetNetCode() or u.GetLayer() != t.GetLayer():
+                    continue
+                us, ue = u.GetStart(), u.GetEnd()
+                for p1, p2 in ((us, ue), (ue, us)):
+                    if math.hypot(to_mm(p1.x) - cx, to_mm(p1.y) - cy) < 0.01 and \
+                            seg_dist(to_mm(p2.x), to_mm(p2.y), ax, ay, bx, by) < 0.01:
+                        done = True
+            if not done and r + hw - 0.15 < d < r + hw + 0.02:
+                dx, dy = bx - ax, by - ay
+                L = dx * dx + dy * dy
+                k = max(0.0, min(1.0, ((cx - ax) * dx + (cy - ay) * dy) / L)) if L else 0.0
+                nt = pcbnew.PCB_TRACK(board)
+                nt.SetStart(c)
+                nt.SetEnd(pcbnew.VECTOR2I(mm(ax + k * dx), mm(ay + k * dy)))
+                nt.SetWidth(t.GetWidth())
+                nt.SetLayer(t.GetLayer())
+                nt.SetNet(t.GetNet())
+                board.Add(nt)
+                tracks.append(nt)
+                added += 1
+    print("contactos de canto unidos:", added)
+
+
 def place_refs(board):
     """Pone cada referencia visible donde no pise pads, serigrafía ni el canto; si no cabe, la oculta
     (sigue en la capa de fabricación)."""
@@ -125,6 +170,8 @@ def main():
         keepouts += [z["polygon"] for z in spec.get("zones", [])
                      if not z.get("rule_area") and z.get("net") != "GND" and "polygon" in z]
         avoid = [tuple(a) + (r,) for a, r in st.get("avoid_circles", [])]
+        # Bajo los logotipos no se cosen vías (la serigrafía queda lisa); las de islas sí pueden ir ahí
+        logos = st.get("avoid_polys", [])
         obstacles = []  # (tipo, geometría, holgura)
         under_modules = []
         for t in board.GetTracks():
@@ -182,7 +229,7 @@ def main():
         while y < max(ys):
             x = min(xs) + step / 2
             while x < max(xs):
-                if spot_ok(x, y, keepouts + under_modules):
+                if spot_ok(x, y, keepouts + under_modules + logos):
                     add_via(x, y)
                     added += 1
                 x += step
@@ -228,6 +275,7 @@ def main():
                             fixed += 1
                             break
         print("islas de GND sin vía: %d, con vía nueva: %d" % (islands, fixed))
+    join_tangents(board)
     place_refs(board)
     filler = pcbnew.ZONE_FILLER(board)
     filler.Fill(board.Zones())

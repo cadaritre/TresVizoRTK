@@ -1,11 +1,14 @@
 """Convierte las salidas de kicad-cli a los formatos de BOM y CPL de JLCPCB.
 
-    python3 export_jlc.py <netlist.net> <pos.csv> <bom_salida.csv> <cpl_salida.csv> [rotaciones.json]
+    python3 export_jlc.py <netlist.net> <pos.csv> <bom_salida.csv> <cpl_salida.csv> [rotaciones.json] \
+        [--net <otra_netlist.net> ...]
 
 - BOM: Comment, Designator, Footprint, LCSC Part #  (agrupado por pieza LCSC)
 - CPL: Designator, Mid X, Mid Y, Layer, Rotation
 Las piezas marcadas DNP o sin campo LCSC no se mandan a ensamblar y se listan aparte.
 `rotaciones.json` permite corregir la orientación por referencia o por prefijo de huella.
+Con `--net` se suman las piezas de otras placas del mismo panel (las referencias no se repiten
+entre placas); el CPL sale entonces del archivo de posiciones del panel.
 """
 
 import csv
@@ -48,9 +51,22 @@ def natural(ref):
 
 
 def main():
-    net, pos, bom_out, cpl_out = sys.argv[1:5]
-    rot_fix = json.load(open(sys.argv[5])) if len(sys.argv) > 5 and os.path.exists(sys.argv[5]) else {}
+    args, extra = [], []
+    argv = sys.argv[1:]
+    while argv:
+        a = argv.pop(0)
+        if a == "--net":
+            extra.append(argv.pop(0))
+        else:
+            args.append(a)
+    net, pos, bom_out, cpl_out = args[:4]
+    rot_fix = json.load(open(args[4])) if len(args) > 4 and os.path.exists(args[4]) else {}
     comps = comps_from_netlist(net)
+    for path in extra:
+        for ref, c in comps_from_netlist(path).items():
+            if ref in comps and not ref.startswith("#"):
+                raise SystemExit("referencia repetida entre placas: %s" % ref)
+            comps[ref] = c
     groups = OrderedDict()
     skipped = []
     for ref, c in comps.items():

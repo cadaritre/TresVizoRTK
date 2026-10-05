@@ -1,0 +1,87 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "1ddd6590-792a-550f-a0e0-3f9b2726302b")
+	(paper "A4")
+	(title_block
+		(title "TresVizo MeridianV — USB-C del panel")
+		(date "2026-10-04")
+		(rev "0.1")
+		(company "TresVizo")
+		(comment 1 "Exploratorio: no fabricado ni probado")
+		(comment 2 "USB-C 2.0 al ras de la tapa del panel; cable JST GH 8 a J101 de la placa principal")
+		(comment 3 "JLCPCB 4 capas JLC04161H-7628, montaje por una cara")
+	)
+	(lib_symbols)
+	(sheet
+		(at 30.48 50.8)
+		(size 101.6 38.1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "5dac570d-e984-594e-ae8f-9dce49a7ed8b")
+		(property "Sheetname" "USB-C del panel y conector a la placa principal"
+			(at 30.48 50.1 0)
+			(effects
+				(font
+					(size 1.8 1.8)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "usb.kicad_sch"
+			(at 30.48 89.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "tresvizo-panel-usb"
+				(path "/1ddd6590-792a-550f-a0e0-3f9b2726302b"
+					(page "2")
+				)
+			)
+		)
+	)
+	(text "Placa del USB-C del panel de TresVizo MeridianV. Nada de esto se ha fabricado ni probado."
+		(exclude_from_sim no)
+		(at 30.48 119.3 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left top)
+		)
+		(uuid "54560185-f410-5bbb-acf5-49f7f555060a")
+	)
+	(text "J502 (GH 8) va con un cable 1 a 1 (pin 1 con pin 1) a J101 de la placa principal. Un cable en espejo pone VBUS contra GND: medirlo pin a pin antes de conectar."
+		(exclude_from_sim no)
+		(at 30.48 125.3 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left top)
+		)
+		(uuid "8ceb8ff2-4a79-54dc-bfbe-444ce2ce85e8")
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)
