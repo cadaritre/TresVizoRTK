@@ -17,8 +17,8 @@ cambia; cambian el interior, la base, la tapa del panel y las bandas, para la pl
 | --- | --- |
 | 01 Base | **Cuatro retenes M3 en cruz** sobre la tuerca del jalón (antes dos). Ranura de 3 mm bajo J102 (x −21.5…−13.5, y 3.5…9.5) para el cable de la batería |
 | 02 Tubo | Fuera el respaldo de amarre y los toalleros. Dos pares de **nervios guía** (desde x ±23.6, z 30–95) donde corren los rieles del chasis; dos **topes** sobre el collar inferior (z 15.95–17); **cuna de la 18650** en la pared trasera: nervios guía a todo lo alto, labios abajo y repisa con hueco y canal para el cable |
-| 05 Tapa del panel | Hueco con la **forma exacta del USB-C** de la placa panel-usb y, por dentro, una **cuna tipo cajón** que la abraza sin tornillos. Fuera el bolsillo del JST-XH. El botón de 12 mm y los LEDs no cambian |
-| 06 / 07 Bandas de TPU | Más altas para **tapar los tornillos de la tapa del panel** (z 29.0 y 102.9): la de abajo va de z 0 a 34 y la de arriba de 98.0 a 129.91, por encima del USB-C y los LEDs. Por dentro, ranura para la cabeza |
+| 05 Tapa del panel | Hueco con la **forma exacta del USB-C** de la placa panel-usb y, por dentro, una **cuna tipo cajón** que la abraza sin tornillos. Fuera el bolsillo del JST-XH y **fuera los dos LEDs** (la OLED ya muestra el estado; J406 de la placa queda sin usar). El bolsillo de los pines de la OLED queda **abierto hacia arriba**, para no encerrar pines ni cables. El botón de 12 mm no cambia |
+| 06 / 07 Bandas de TPU | Más altas para **tapar los tornillos de la tapa del panel** (z 29.0 y 102.9): la de abajo va de z 0 a 34 y la de arriba de 98.0 a 129.91, por encima del hueco del USB-C. Por dentro, ranura para la cabeza |
 | 08 Chasis (nueva) | Se arma **fuera del tubo**: dos rieles donde corre la placa, una placa superior con ventana grande que los une y lleva H1/H2, ranuras de la carrier, lengua sobre la 18650 y zapatas bajo el cuello de la tapa. Entra por arriba entre los nervios |
 | 09 Logo de TPU (nueva) | Incrustación **plana** del logo para imprimir en TPU, desenrollada de la curva del tubo para llenar su grabado |
 
@@ -53,8 +53,8 @@ Tapa de antena y plataforma del IMU son las de V2.2.
 8. **Panel:**
    - La placa panel-usb entra en su cuna deslizando hacia la tapa hasta que el USB-C asoma por el
      hueco; los dos dedos de atrás la retienen.
-   - Se enchufan OLED (J403), botón (J402), LEDs (J406) y USB (J502 ↔ J101) por la ventana, y se
-     atornilla la tapa del panel.
+   - Se enchufan OLED (J403), botón (J402) y USB (J502 ↔ J101) por la ventana, y se atornilla la
+     tapa del panel.
    - Las bandas de TPU tapan sus tornillos. Para abrir la tapa del panel o una bayoneta hay que
      quitar antes su banda.
 

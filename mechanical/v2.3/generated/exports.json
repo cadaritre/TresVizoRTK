@@ -43,11 +43,11 @@
   {
    "pieza": "05-panel-cover",
    "etiqueta": "Tapa del panel principal",
-   "triangulos": 3874,
+   "triangulos": 3416,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 9.36,
+   "volumen_cm3": 9.37,
    "stl": "05-panel-cover.stl"
   },
   {

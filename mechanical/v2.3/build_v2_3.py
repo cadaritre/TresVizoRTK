@@ -746,6 +746,9 @@ def display_features():
     for key in ('pines', 'flex'):
         x0, x1 = xr(d[key]['u'])
         z0, z1 = zr(d[key]['v'])
+        if key == 'pines' and d['pines'].get('abierto_arriba', False):
+            # Abierto hacia arriba: los pines y sus cables no quedan encerrados.
+            z1 = z_hi + 1.0
         cuts.append(box(x0, x1, yf - 1, yf + d[key]['relieve'], z0, z1))
     for u, v in d['agujeros']:
         cuts.append(Part.makeCylinder(d['piloto'] / 2, d['piloto_profundidad'] + 1,
@@ -1103,9 +1106,9 @@ parts = [
     ('02-logo-tube', 'Tubo con logo, nervios guia y cuna de la 18650', build_tube(logo)),
     ('03-antenna-cap', 'Tapa de antena', build_cap()),
     ('04-imu-platform', 'Plataforma del IMU', build_platform()),
-    ('05-panel-cover', 'Tapa del panel principal', build_panel(PAN, [
-        ('pair', LED['diametro'], LED['z'], LED['separacion']),
-    ], extra=(display_features, button_features, usb_features))),
+    ('05-panel-cover', 'Tapa del panel principal', build_panel(PAN, (
+        [('pair', LED['diametro'], LED['z'], LED['separacion'])] if LED.get('activo', True) else []
+    ), extra=(display_features, button_features, usb_features))),
     ('08-sled', 'Chasis deslizable de la placa principal y la carrier', build_sled()),
     ('06-bumper-bottom', 'Banda de TPU de abajo', build_band(0.0, band_screws(0.0))),
     ('07-bumper-top', 'Banda de TPU de arriba',

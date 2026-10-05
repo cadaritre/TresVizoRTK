@@ -366,7 +366,9 @@
      0.0,
      2.8
     ],
-    "relieve": 2.0
+    "relieve": 2.0,
+    "abierto_arriba": true,
+    "_nota_abierto": "El bolsillo de los pines de la OLED queda abierto hacia arriba (sin el margen del marco encima): los pines y los cables soldados no quedan encerrados."
    },
    "flex": {
     "u": [
@@ -458,7 +460,9 @@
    "diametro": 3.2,
    "z": 93.5,
    "separacion": 27.0,
-   "_nota": "Uno a cada lado del conector de carga, a +-13.5 y a su misma altura."
+   "_nota": "Uno a cada lado del conector de carga, a +-13.5 y a su misma altura.",
+   "activo": false,
+   "_nota_activo": "Sin LEDs en el panel (decision del propietario del 05-10-2026: la OLED ya muestra el estado). J406 se queda en la placa principal, sin usar."
   },
   "usb_c": {
    "_que_es": "Placa panel-usb (hardware/panel-usb) sin tornillos: el hueco de la tapa tiene la forma exacta del receptaculo USB-C y por dentro una cuna tipo cajon abraza la placa (piso, paredes con labios sobre los cantos, bolsillo de la lengueta en la cara interior de la tapa) y un reten flexible atras le impide salir. Por fuera solo se ve el USB-C, a ras.",
