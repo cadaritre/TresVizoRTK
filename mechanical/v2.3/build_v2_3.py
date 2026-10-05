@@ -426,7 +426,7 @@ def build_sled():
         spans = [(rz0, rl['corte_antena_z'][0]), (rl['corte_antena_z'][1], rz1)] if sx > 0 else [(rz0, rz1)]
         for za, zb in spans:
             parts.append(bx(xi, xe, ry0, ry1, za, zb))
-            parts.append(bx(rl['lengueta_x'], xi + 0.01, ry0, yb, za, min(zb, rz1 - 3.2)))
+            parts.append(bx(rl['lengueta_x'], xi + 0.01, ry0, yb - 0.15, za, min(zb, rz1 - 3.2)))
         zones = rl['lengueta_z_mas_x'] if sx > 0 else rl['lengueta_z_menos_x']
         for za, zb in zones:
             parts.append(bx(rl['lengueta_x'], xi, rl['lengueta_y'][0], rl['lengueta_y'][1], za, zb))

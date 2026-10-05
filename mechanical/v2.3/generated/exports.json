@@ -53,7 +53,7 @@
   {
    "pieza": "08-sled",
    "etiqueta": "Chasis deslizable de la placa principal y la carrier",
-   "triangulos": 1402,
+   "triangulos": 1354,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
