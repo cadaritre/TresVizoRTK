@@ -235,7 +235,9 @@
   "_nota_piso": "Cara superior de la base, la misma de antes, para no mover la altura (129.9). Alojamiento de 13.906 sobre el anillo: una tuerca de 13.49 a 13.89 queda de 0.0 a 0.4 bajo la cara.",
   "retenes": {
    "angulos": [
+    0.0,
     90.0,
+    180.0,
     270.0
    ],
    "radio": 15.0,
@@ -244,7 +246,19 @@
    "arandela_diametro": 9.0,
    "arandela_espesor": 0.8,
    "cabeza_alto": 1.65,
-   "_nota": "M3 cabeza boton con arandela ancha DIN 9021 (9 x 0.8). Cada tornillo cae frente a una cara del hexagono: la arandela pisa 1.4 mm de la tuerca y la cresta de la rosca queda a 1.4 del alojamiento. Solo la detienen mientras entra el perno o con el equipo suelto: apretado al baston, el perno la jala contra el anillo."
+   "_nota": "Cuatro M3 cabeza boton con arandela ancha DIN 9021 (9 x 0.8), en cruz. Los de 90 y 270 caen frente a una cara del hexagono (r 15); los de 0 y 180, frente a una esquina, van a r 16 para que su piloto deje 0.8 mm de pared al alojamiento (esquina a r 13.9). Solo detienen la tuerca mientras entra el perno o con el equipo suelto: apretado al baston, el perno la jala contra el anillo. Los de 0 y 180 llevan arandela normal ISO 7089 (Ø7): con la ancha, la de 180 rozaria el cable de J102; frente a la esquina de la tuerca la de Ø7 pisa 1.25 mm.",
+   "radios": [
+    16.0,
+    15.0,
+    16.0,
+    15.0
+   ],
+   "arandela_diametros": [
+    7.0,
+    9.0,
+    7.0,
+    9.0
+   ]
   }
  },
  "bayoneta": {
@@ -447,36 +461,61 @@
    "_nota": "Uno a cada lado del conector de carga, a +-13.5 y a su misma altura."
   },
   "usb_c": {
-   "_que_es": "USB-C de la placa panel-usb (hardware/panel-usb): hueco a ras en la tapa y dos mensulas donde se atornilla la placa (M2 x 5 autorroscantes).",
-   "z": 93.2,
-   "hueco": [
-    12.8,
-    7.0
-   ],
-   "radio": 1.2,
-   "mensulas_x": [
-    5.9,
-    10.2
-   ],
-   "mensula_z_apoyo": 90.17,
-   "mensula_alto": 4.0,
-   "mensula_y": [
-    22.0,
-    28.8
-   ],
-   "piloto": 1.6,
-   "piloto_hondo": 4.5,
-   "agujeros": [
-    [
-     7.9,
-     25.0
+   "_que_es": "Placa panel-usb (hardware/panel-usb) sin tornillos: el hueco de la tapa tiene la forma exacta del receptaculo USB-C y por dentro una cuna tipo cajon abraza la placa (piso, paredes con labios sobre los cantos, bolsillo de la lengueta en la cara interior de la tapa) y un reten flexible atras le impide salir. Por fuera solo se ve el USB-C, a ras.",
+   "receptaculo": {
+    "ancho": 9.1,
+    "alto": 3.36,
+    "z_eje": 93.39,
+    "cara_y": 31.7,
+    "holgura": 0.12,
+    "_nota": "HRO TYPE-C-31-M-12, envolvente maxima de su carcasa en el STEP de la panel-usb cerca de la cara: x +-4.55, z 91.71-95.07; rectangulo de esquinas redondeadas (no estadio: sus esquinas son mas cuadradas).",
+    "radio_esquina": 1.1
+   },
+   "pcb": {
+    "x": [
+     -10.4,
+     10.4
     ],
-    [
-     -7.9,
-     25.0
-    ]
-   ],
-   "_nota": "De hardware/panel-usb/README.md, Cambios que necesita la tapa del panel."
+    "y": [
+     11.5,
+     26.6
+    ],
+    "lengueta_x": [
+     -5.2,
+     5.2
+    ],
+    "lengueta_y": [
+     26.6,
+     30.41
+    ],
+    "z": [
+     90.17,
+     91.77
+    ],
+    "holgura": 0.15
+   },
+   "piso": {
+    "espesor": 1.2,
+    "y0": 10.0
+   },
+   "pared": {
+    "x": [
+     10.55,
+     11.3
+    ],
+    "alto_sobre_pcb": 0.9,
+    "labio_x": 9.7,
+    "labio_espesor": 0.7
+   },
+   "reten": {
+    "x": [
+     7.2,
+     9.6
+    ],
+    "largo": 8.0,
+    "diente": 0.85,
+    "_nota": "Dedo flexible del piso, a cada lado de J502 (llega a x +-6.63): la placa pasa por encima y el diente la detiene por su canto trasero (y 11.5)."
+   }
   }
  },
  "accesorios": {
@@ -552,13 +591,14 @@
  },
  "bandas": {
   "_que_es": "Piezas 7 y 8: dos bandas de proteccion de TPU, abajo y arriba.",
-  "alto": 28.0,
   "espesor": 2.0,
   "apriete_diametral": 0.6,
   "redondeo": 1.0,
   "ranura_alto": 8.0,
   "ranura_profundidad": 1.2,
-  "_nota": "Diametro interior 0.6 menor que el cuerpo: el TPU se estira y aprieta. La de abajo cubre la base y el arranque del tubo (z 0-28); la de arriba, el final del tubo y la tapa. Por dentro, una ranura corrida de 8 x 1.2 a la altura de cada tornillo que queda debajo (los seguros de bayoneta y los de la tapa del panel), por si su cabeza asoma; corrida para que la banda entre en cualquier giro. El modelo las dibuja con su diametro de impresion: el solape de 0.3 con el cuerpo es el apriete."
+  "_nota": "Diametro interior 0.6 menor que el cuerpo: el TPU se estira y aprieta. Las dos TAPAN los tornillos de la tapa del panel (z 29.0 y 102.9, cabeza Ø6): la de abajo va de z 0 a 34; la de arriba de z 98.0 a 129.91, por encima del hueco del USB-C (hasta z 96.7) y de los LEDs (hasta 95.1). Por dentro, una ranura corrida de 8 x 1.2 a la altura de cada tornillo que queda debajo (seguros de bayoneta y tapa del panel), por si la cabeza asoma; corrida para que la banda entre en cualquier giro. Para abrir la tapa del panel o una bayoneta hay que quitar antes su banda.",
+  "alto_abajo": 34.0,
+  "alto_arriba": 31.91
  },
  "acabados": {
   "_que_es": "Detalles esteticos leves.",
@@ -578,8 +618,8 @@
     -23.0,
     23.0
    ],
-   "y_dorso": 1.5,
-   "y_cara": 3.1,
+   "y_dorso": 2.5,
+   "y_cara": 4.1,
    "z": [
     23.5,
     87.5
@@ -594,23 +634,23 @@
      83.8
     ]
    ],
-   "_nota": "De hardware/main-board/README.md, Mecanica. u = 23 - x, v = 87.5 - z."
+   "_nota": "De hardware/main-board/README.md, Mecanica, pero 1.0 mm mas hacia el panel (alli: dorso en y 1.5) para dejar aire entre placa, carrier y 18650. u = 23 - x, v = 87.5 - z. Cara de la placa a 1.5 mm de los terminales del boton de V2.2 (el boton ultracorto deja mas)."
   },
   "riel": {
    "x_interior": 23.3,
    "x_exterior": 25.2,
    "y": [
-    -3.0,
-    3.3
+    -2.0,
+    4.3
    ],
    "z": [
     17.0,
-    99.0
+    99.2
    ],
    "lengueta_x": 21.5,
    "lengueta_y": [
-    3.3,
-    4.8
+    4.3,
+    5.8
    ],
    "lengueta_z_mas_x": [
     [
@@ -630,40 +670,18 @@
     71.0
    ]
   },
-  "travesano": {
-   "y": [
-    -2.4,
-    1.2
-   ],
-   "z": [
-    95.8,
-    99.0
-   ],
-   "_nota": "Bajo el cuello de la tapa (z 99.41, r 23.15-25.65): al cerrar la tapa el chasis queda preso con 0.4 mm de juego. Su cara trasera en y -2.4 deja pasar el coaxial (y -4.4, d 3)."
-  },
-  "brazos": {
-   "boss_diametro": 6.0,
-   "y": [
-    -4.5,
-    1.5
-   ],
-   "ancho": 4.0,
-   "piloto": 2.1,
-   "piloto_hondo": 5.5,
-   "_nota": "Tornillos M2.5 x 8 autorroscantes por el frente de la placa, con el chasis fuera del tubo."
-  },
   "carrier": {
    "x": [
     -21.0,
     11.0
    ],
    "y": [
-    -9.9,
-    1.1
+    -9.6,
+    1.4
    ],
    "z": [
-    18.0,
-    70.0
+    19.0,
+    71.0
    ],
    "pcb": 1.6,
    "sma": {
@@ -673,16 +691,16 @@
     ],
     "alto": 13.0
    },
-   "_nota": "Envolvente SUPUESTA (32 x 52 x 11, componentes hacia la placa, SMA arriba). Sin plano de BDLX: medir la carrier y corregir aqui antes de imprimir."
+   "_nota": "Envolvente SUPUESTA (32 x 52 x 11, componentes hacia la placa, SMA arriba). Sin plano de BDLX: medir la carrier y corregir aqui antes de imprimir. Su canto inferior va en z 19.0 para librar la cabeza del reten de la tuerca a 180 grados (z 18.36). Centrada en y entre la placa (1.1 mm) y la 18650 (1.0 mm)."
   },
   "ranuras_carrier": {
    "y": [
-    -10.6,
-    -7.5
+    -10.3,
+    -7.2
    ],
    "labio_y": [
-    -10.6,
-    -10.1
+    -10.3,
+    -9.8
    ],
    "labio_ancho": 1.9,
    "piso_alto": 1.0,
@@ -703,18 +721,18 @@
    ],
    "z": [
     92.0,
-    99.0
+    99.2
    ],
    "_nota": "Sobre la 18650 (llega a z 91): no la deja subir. A la derecha del SMA para dejar pasar el coaxial."
   },
   "nervios_tubo": {
    "delantero_y": [
-    5.0,
-    6.8
+    6.0,
+    7.8
    ],
    "trasero_y": [
-    -5.0,
-    -3.3
+    -4.4,
+    -2.7
    ],
    "x_interior": 23.6,
    "z": [
@@ -742,8 +760,8 @@
     -13.5
    ],
    "y": [
-    2.5,
-    8.5
+    3.5,
+    9.5
    ],
    "hondo": 3.0,
    "_nota": "Propuesta de hardware/main-board (research/v02.md 8)."
@@ -754,21 +772,76 @@
     16.0
    ],
    "y": [
-    -10.6,
-    -7.5
+    -10.3,
+    -7.2
    ],
    "z": [
     45.0,
-    77.0
+    73.4
    ],
    "_nota": "Une el tramo bajo del riel +X (y su ranura de la carrier) con el brazo de H1 sin pasar junto a la antena del ESP32 (x 16.8-23, z 54.2-70.2): va 10 mm detras de la placa, entre el canto de la carrier (x 11) y x 16."
+  },
+  "placa_superior": {
+   "y": [
+    -2.4,
+    2.35
+   ],
+   "z": [
+    71.4,
+    99.2
+   ],
+   "ventana": {
+    "x": [
+     -14.0,
+     7.5
+    ],
+    "z": [
+     70.0,
+     95.6
+    ]
+   },
+   "boss_diametro": 6.0,
+   "boss_y0": -4.5,
+   "piloto": 2.1,
+   "piloto_hondo": 5.5,
+   "topes_carrier": [
+    [
+     -21.0,
+     -17.0
+    ],
+    [
+     7.0,
+     16.0
+    ]
+   ],
+   "topes_y0": -10.3,
+   "topes_alto": 2.0,
+   "_nota": "Placa superior del chasis, detras de la placa principal y encima de la carrier (z 71.4 = canto superior de la carrier + 0.4). Une los dos rieles, lleva los salientes de H1 y H2 y una ventana grande, abierta por abajo, por donde pasan la clavija SMA de la carrier, el coaxial y el cable del IMU. Dos topes hacia atras, sobre los cantos de la carrier, no la dejan subir. Su cara trasera (y -2.4) deja pasar el coaxial (y -4.4, d 3). Abajo del todo no cabe una placa: entre placa principal y carrier quedan 0.4 mm, y entre carrier y 18650 otros 0.4."
+  },
+  "zapatas": {
+   "r": [
+    24.2,
+    25.5
+   ],
+   "medio_arco_grados": 14.0,
+   "z": [
+    97.0,
+    99.2
+   ],
+   "_nota": "Bajo el cuello de la tapa (z 99.41): apoyan en su cara plana (r 24.4-25.65; por dentro de 24.4 esta el chaflan de entrada) en 12 mm de arco por lado. Juego de 0.21 mm con la tapa cerrada."
+  },
+  "desplazamiento_placa_y": 1.0,
+  "muesca_retenes": {
+   "radio": 4.9,
+   "z_techo": 18.9,
+   "_nota": "El chasis se recorta alrededor de cada reten de la tuerca (cabeza hasta z 18.36)."
   }
  },
  "cuna_18650": {
   "_que_es": "Cuna de la 18650 en la pared trasera del tubo: dos nervios flexibles con labios (entra a presion desde delante, antes que el chasis) y una repisa con hueco para el cable.",
   "eje": [
    0.0,
-   -19.6
+   -19.9
   ],
   "diametro": 18.6,
   "largo": 69.0,
@@ -778,8 +851,8 @@
    11.2
   ],
   "labio_y": [
-   -15.0,
-   -13.8
+   -15.3,
+   -14.1
   ],
   "labio_x": 7.8,
   "repisa_z": [
@@ -787,7 +860,7 @@
    21.7
   ],
   "repisa_hueco": 10.0,
-  "_nota": "La celda baja por el collar de arriba corrida 3.2 mm hacia delante (eje en y -16.4), con los nervios a todo lo alto como guias (x 9.6 contra 9.3: no la tocan). Ya entera bajo el collar (fondo bajo z 42.9) se empuja hacia atras y entra en los labios, que solo van de z 26 a 42. Con el chasis puesto, la carrier (0.4 mm delante) y la lengua (arriba) la retienen. El cable baja por el hueco de la repisa y sale por un canal a ras del piso hacia -X.",
+  "_nota": "La celda baja por el collar de arriba corrida 3.5 mm hacia delante (eje en y -16.4), con los nervios a todo lo alto como guias. Ya entera bajo el collar (fondo bajo z 42.9) se empuja hacia atras hasta su eje en y -19.9 (a 0.3 mm de la pared) y entra en los labios, que solo van de z 26 a 42. Con el chasis puesto, la carrier (1.0 mm delante) y la lengua (arriba) la retienen. El cable baja por el hueco de la repisa y sale por un canal a ras del piso hacia -X.",
   "labio_z": [
    26.0,
    42.0
@@ -798,7 +871,7 @@
     0.0
    ],
    "y": [
-    -19.6,
+    -19.9,
     -15.0
    ],
    "salida_x": [
@@ -817,7 +890,7 @@
      -3.0
     ],
     "y": [
-     -19.6,
+     -19.9,
      -14.6
     ],
     "z_techo": 20.2,

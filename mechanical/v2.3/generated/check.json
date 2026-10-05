@@ -3,20 +3,25 @@
  "choques_referencias": [],
  "holguras": {
   "chasis-tubo": 0.0,
-  "chasis-tapa": 0.406,
-  "chasis-plataforma": 0.906,
+  "chasis-tapa": 0.206,
+  "chasis-plataforma": 0.706,
   "chasis-base": 1.094,
   "chasis-carrier": 0.0,
-  "chasis-clavija_sma": 1.1,
+  "chasis-clavija_sma": 0.6,
+  "chasis-coaxial": 0.5,
   "chasis-18650": 1.0,
-  "tubo-18650": 0.0,
-  "chasis-coaxial": 0.5
+  "tubo-18650": 0.0
  },
  "choques_entre_referencias": [
   {
    "a": "clavija:J101_cables",
    "b": "clavija:J502_cables",
    "mm3": 29.544
+  },
+  {
+   "a": "clavija:J502_clavija",
+   "b": "panel_usb:pusb_J502",
+   "mm3": 18.915
   },
   {
    "a": "panel_usb:PCB_panel_usb",
@@ -26,7 +31,7 @@
   {
    "a": "supuesto:carrier_sma_plug",
    "b": "supuesto:coax",
-   "mm3": 11.31
+   "mm3": 18.951
   }
  ],
  "collar": {

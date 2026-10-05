@@ -15,8 +15,10 @@ TPU) y cambia solo el interior y el panel:
   - cuna de la 18650 en la pared trasera (entra a presion antes que el chasis)
     con repisa y hueco para el cable;
   - ranura en la base bajo J102 para los cables de la bateria;
-  - tapa del panel: hueco del USB-C de la placa panel-usb y sus dos mensulas en
-    lugar del bolsillo del JST-XH.
+  - tapa del panel: hueco con la forma exacta del USB-C de la placa panel-usb y
+    una cuna tipo cajon que la abraza sin tornillos, en lugar del JST-XH;
+  - base con cuatro retenes en cruz sobre la tuerca; bandas de TPU que tapan
+    los tornillos de la tapa del panel.
 
 Ejes: Z es el eje del jalon, hacia arriba. FRONT es +Y. Origen en la cara de
 apoyo del jalon (Z=0). Mirando la cara +Y con Z arriba, X apunta a la izquierda.
@@ -282,9 +284,9 @@ def build_base():
     body = body.cut(hex_prism(NUT_APOTHEM, ring, Z_FLOOR - ring + 0.1))
 
     ret = NUT['retenes']
-    for a in ret['angulos']:
-        x = ret['radio'] * math.cos(math.radians(a))
-        y = ret['radio'] * math.sin(math.radians(a))
+    for a, rr in zip(ret['angulos'], ret['radios']):
+        x = rr * math.cos(math.radians(a))
+        y = rr * math.sin(math.radians(a))
         body = body.cut(Part.makeCylinder(ret['piloto'] / 2.0, ret['profundidad'] + 0.1,
                                           V(x, y, Z_FLOOR - ret['profundidad'])))
 
@@ -401,10 +403,15 @@ def build_tube_interior():
 
 
 def build_sled():
-    """Chasis deslizable: dos rieles, travesano, brazos de H1/H2, ranuras de la
-    carrier y lengua sobre la 18650. Se recorta a r 25.5 para pasar el collar.
+    """Chasis deslizable: dos rieles, una placa superior con ventana grande que
+    los une y lleva H1/H2, ranuras de la carrier, lengua sobre la 18650 y
+    zapatas bajo el cuello de la tapa. Se recorta a r 25.5 para pasar el collar.
+
+    No es una placa entera porque detras de la placa principal no hay sitio: la
+    carrier va a 0.4 mm de ella y la 18650 a 0.4 mm de la carrier. La placa solo
+    cabe encima de la carrier; abajo quedan los rieles con sus ranuras.
     """
-    rl, tv, br, cr, rc = CH['riel'], CH['travesano'], CH['brazos'], CH['carrier'], CH['ranuras_carrier']
+    rl, cr, rc = CH['riel'], CH['carrier'], CH['ranuras_carrier']
     pl = CH['placa']
     xi, xe = rl['x_interior'], rl['x_exterior']
     ry0, ry1 = rl['y']
@@ -429,45 +436,53 @@ def build_sled():
         ly0, ly1 = rc['labio_y']
         edge = cr['x'][1] if sx > 0 else -cr['x'][0]
         cz0, cz1 = cr['z']
-        zlim = rc['z_mas_x'] if sx > 0 else [rz0, cz1 + 1.0]
+        zlim = rc['z_mas_x'] if sx > 0 else [rz0, cz1 + 0.5]
         parts.append(bx(edge + 0.2, xi, y0, ry0 + 0.5, zlim[0], zlim[1]))
         parts.append(bx(edge - rc['labio_ancho'], edge + 0.2, ly0, ly1, cz0, zlim[1]))
         parts.append(bx(edge - rc['labio_ancho'] - 1.0, edge + 0.2, y0, cr['y'][0] + cr['pcb'] + 0.2,
                         cz0 - rc['piso_alto'], cz0))
-        if sx < 0:
-            # Tope de arriba de la carrier del lado -X.
-            parts.append(bx(edge - rc['labio_ancho'], edge + 0.2, y0, cr['y'][0] + cr['pcb'] + 0.2, cz1 + 0.4, cz1 + 1.4))
 
-    # Travesano bajo el cuello.
-    ty0, ty1 = tv['y']
-    tz0, tz1 = tv['z']
-    parts.append(box(-xe, xe, ty0, ty1, tz0, tz1))
-    # Brazos de H1 y H2: bajan del travesano detras de la placa.
-    by0, by1 = br['y']
-    w = br['ancho'] / 2.0
-    rb = br['boss_diametro'] / 2.0
+    # Placa superior: une los rieles, lleva H1 y H2 y deja una ventana grande.
+    ps = CH['placa_superior']
+    py0, py1 = ps['y']
+    pz0, pz1 = ps['z']
+    plate = box(-xe, xe, py0, py1, pz0, pz1)
+    wx, wz = ps['ventana']['x'], ps['ventana']['z']
+    plate = plate.cut(box(wx[0], wx[1], py0 - 1, py1 + 1, wz[0], wz[1]))
+    parts.append(plate)
+    rb = ps['boss_diametro'] / 2.0
     pilots = []
     for (hx, hz) in pl['agujeros']:
-        parts.append(box(hx - w, hx + w, by0, by1, hz, tz0 + 0.5))
-        parts.append(Part.makeCylinder(rb, by1 - by0, V(hx, by0, hz), V(0, 1, 0)))
-        pilots.append(Part.makeCylinder(br['piloto'] / 2.0, br['piloto_hondo'], V(hx, yb - br['piloto_hondo'], hz), V(0, 1, 0)))
-    # Tope de la carrier bajo el brazo de H1 (su esquina +X de arriba).
-    h1x, h1z = pl['agujeros'][0]
-    parts.append(box(h1x - w, cr['x'][1] + 0.01, by0, cr['y'][1] - 0.1, cr['z'][1] + 0.4, h1z))
-    # Enlace del tramo bajo del riel +X con el brazo de H1, por detras y lejos
-    # de la antena (a ~10 mm de la placa).
+        parts.append(Part.makeCylinder(rb, py1 - ps['boss_y0'], V(hx, ps['boss_y0'], hz), V(0, 1, 0)))
+        pilots.append(Part.makeCylinder(ps['piloto'] / 2.0, ps['piloto_hondo'],
+                                        V(hx, yb - ps['piloto_hondo'], hz), V(0, 1, 0)))
+    # Topes sobre los cantos de la carrier (por detras, sobre su PCB).
+    for tx0, tx1 in ps['topes_carrier']:
+        parts.append(box(tx0, tx1, ps['topes_y0'], py0 + 0.5, pz0, pz0 + ps['topes_alto']))
+    # Enlace del tramo bajo del riel +X con la placa superior, por detras y lejos
+    # de la antena (a ~10 mm de la placa principal).
     lk = CH['enlace_mas_x']
     parts.append(box(lk['x'][0], lk['x'][1], lk['y'][0], lk['y'][1], lk['z'][0], lk['z'][1]))
-    parts.append(box(h1x - w, h1x + w, lk['y'][0], by0 + 0.5, cr['z'][1] + 0.4, lk['z'][1]))
     # Lengua sobre la 18650.
     lb = CH['lengua_bateria']
-    parts.append(box(lb['x'][0], lb['x'][1], lb['y'][0], lb['y'][1], lb['z'][0], lb['z'][1]))
+    parts.append(box(lb['x'][0], lb['x'][1], lb['y'][0], py0 + 0.5, lb['z'][0], lb['z'][1]))
+    # Zapatas bajo el cuello de la tapa, sobre cada riel.
+    zp = CH['zapatas']
+    for a0 in (0.0, 180.0):
+        parts.append(sector(zp['r'][1], zp['r'][0], zp['z'][0], zp['z'][1] - zp['z'][0],
+                            a0 - zp['medio_arco_grados'], 2 * zp['medio_arco_grados']))
 
     body = parts[0]
     for p in parts[1:]:
         body = body.fuse(p)
     for p in pilots:
         body = body.cut(p)
+    # Muesca alrededor de los retenes de la tuerca del jalon.
+    mr = CH['muesca_retenes']
+    nr = NUT['retenes']
+    for a, rr in zip(nr['angulos'], nr['radios']):
+        body = body.cut(Part.makeCylinder(mr['radio'], mr['z_techo'] - 10,
+                                          V(rr * math.cos(math.radians(a)), rr * math.sin(math.radians(a)), 10)))
     # Hueco de la placa: los rieles la reciben con 0.15 mm por cara.
     body = body.cut(box(-pl['x'][1] - 0.3, pl['x'][1] + 0.3, yb - 0.15, yf + 0.2, pl['z'][0], pl['z'][1] + 5))
     body = body.common(Part.makeCylinder(CH['radio_paso'], 400, V(0, 0, -100)))
@@ -771,32 +786,66 @@ def button_features():
 
 
 def usb_features():
-    """Hueco del USB-C de la placa panel-usb, a ras de la tapa, y dos mensulas
-    por dentro donde apoya y se atornilla la placa (M2 x 5 autorroscantes).
-    La placa queda horizontal con su cara inferior en z 90.17; las mensulas
-    nacen de la tapa con la cara de abajo a 45 grados."""
+    """Placa panel-usb sin tornillos (ver panel.usb_c en parameters.json).
+
+    - Hueco de la tapa con la forma exacta del receptaculo USB-C (estadio de
+      8.94 x 3.2 mas holgura): por fuera solo se ve el conector, a ras.
+    - Bolsillo de la lengueta del PCB en la cara interior de la tapa.
+    - Cuna tipo cajon: piso bajo el PCB, paredes laterales con labios sobre sus
+      cantos y un dedo flexible a cada lado de J502 que la retiene por su canto
+      trasero. La placa entra deslizando hacia la tapa (+Y)."""
     u = USBP
-    zc = u['z']
-    hw, hh = u['hueco'][0] / 2.0, u['hueco'][1] / 2.0
-    r = u['radio']
-    face = Part.Face(Part.Wire(Part.makePolygon([V(-hw, 0, zc - hh), V(hw, 0, zc - hh),
-                                                V(hw, 0, zc + hh), V(-hw, 0, zc + hh),
-                                                V(-hw, 0, zc - hh)])))
-    hole = face.extrude(V(0, RO + 3 - 26.5, 0))
-    hole.translate(V(0, 26.5, 0))
-    edges = [e for e in hole.Edges if abs(e.Vertexes[0].Point.y - e.Vertexes[-1].Point.y) > 1.0]
-    hole = hole.makeFillet(r, edges)
-    za = u['mensula_z_apoyo']
-    y0 = u['mensula_y'][0]
-    adds, cuts = [], [hole]
+    rc, pc, fl, wl, rt = u['receptaculo'], u['pcb'], u['piso'], u['pared'], u['reten']
+    g = rc['holgura']
+    hw = rc['ancho'] / 2.0 + g
+    r = rc['alto'] / 2.0 + g
+    zc = rc['z_eje']
+    hole = box(-hw, hw, 26.0, RO + 3, zc - r, zc + r)
+    ys = [e for e in hole.Edges if abs(e.Vertexes[0].Point.y - e.Vertexes[-1].Point.y) > 1.0]
+    hole = hole.makeFillet(rc['radio_esquina'] + g, ys)
+    hp = pc['holgura']
+    z0, z1 = pc['z']
+    tab = box(pc['lengueta_x'][0] - hp, pc['lengueta_x'][1] + hp, pc['y'][1] - 1.0,
+              pc['lengueta_y'][1] + hp, z0 - hp, z1 + hp)
+    # Cuna.
+    xin = pc['x'][1] + hp
+    y0 = fl['y0']
+    zf0 = z0 - fl['espesor']
+    floor = box(-wl['x'][1], wl['x'][1], y0, RO, zf0, z0)
+    adds = [floor]
+    zw1 = z1 + wl['alto_sobre_pcb']
     for sx in (-1, 1):
-        x0, x1 = sorted((sx * u['mensulas_x'][0], sx * u['mensulas_x'][1]))
-        prof = [(y0, za), (RO, za), (RO, za - u['mensula_alto'] - (RO - y0)), (y0, za - u['mensula_alto'])]
-        adds.append(yz_prism(prof, x0, x1))
-    for hx, hy in u['agujeros']:
-        cuts.append(Part.makeCylinder(u['piloto'] / 2.0, u['piloto_hondo'] + 0.1,
-                                      V(hx, hy, za - u['piloto_hondo'])))
+        x0, x1 = sorted((sx * wl['x'][0], sx * wl['x'][1]))
+        adds.append(box(x0, x1, y0, RO, zf0, zw1))
+        lx0, lx1 = sorted((sx * wl['labio_x'], sx * wl['x'][1]))
+        adds.append(box(lx0, lx1, y0, RO, zw1 - wl['labio_espesor'], zw1))
+    cuts = [hole, tab,
+            box(-xin, xin, pc['y'][0] - hp, pc['y'][1] + 0.01, z0 - 0.01, z1 + hp)]
+    # Retenes: dedo del piso (dos ranuras a sus lados, libre en el canto de atras
+    # del piso) con un diente en rampa: la placa lo dobla hacia abajo al entrar y
+    # su cara vertical detiene el canto trasero del PCB.
+    yb = pc['y'][0] - hp
+    for sx in (-1, 1):
+        x0, x1 = sorted((sx * rt['x'][0], sx * rt['x'][1]))
+        for xa, xb in ((x0 - 0.5, x0), (x1, x1 + 0.5)):
+            cuts.append(box(xa, xb, y0 - 1, yb + rt['largo'], zf0 - 1, z0 + 0.01))
+        adds.append(yz_prism([(y0 + 0.3, z0), (yb, z0), (yb, z0 + rt['diente'])], x0, x1))
     return adds, cuts
+
+
+def build_panel_usb_ref():
+    """Placa panel-usb con su contorno real (cuerpo + lengueta), USB-C y J502."""
+    pc, rc = USBP['pcb'], USBP['receptaculo']
+    z0, z1 = pc['z']
+    ref = box(pc['x'][0], pc['x'][1], pc['y'][0], pc['y'][1], z0, z1)
+    ref = ref.fuse(box(pc['lengueta_x'][0], pc['lengueta_x'][1], pc['lengueta_y'][0], pc['lengueta_y'][1], z0, z1))
+    shell = box(-rc['ancho'] / 2.0, rc['ancho'] / 2.0, 23.8, rc['cara_y'],
+                rc['z_eje'] - rc['alto'] / 2.0, rc['z_eje'] + rc['alto'] / 2.0)
+    ys = [e for e in shell.Edges if abs(e.Vertexes[0].Point.y - e.Vertexes[-1].Point.y) > 1.0]
+    shell = shell.makeFillet(rc['radio_esquina'], ys)
+    ref = ref.fuse(shell)
+    ref = ref.fuse(box(-6.63, 6.63, 11.73, 16.73, z1, 96.12))
+    return ref
 
 
 def build_panel(cfg, features, extra=None):
@@ -885,7 +934,8 @@ def build_band(z0, z_screws):
     b = BANDS
     ri = RO - b['apriete_diametral'] / 2
     ro = ri + b['espesor']
-    body = tube_ring(ro, ri, z0, b['alto'])
+    alto = b['alto_abajo'] if z0 < 1.0 else b['alto_arriba']
+    body = tube_ring(ro, ri, z0, alto)
     edges = [e for e in body.Edges
              if hasattr(e.Curve, 'Radius') and abs(e.Curve.Radius - ro) < 0.01]
     if edges and b.get('redondeo', 0) > 0:
@@ -996,16 +1046,13 @@ def build_references():
     ex, ey = cu['eje']
     refs.append(('ref_battery', 'Ref: 18650 en su cuna',
                  Part.makeCylinder(cu['diametro'] / 2.0, cu['largo'], V(ex, ey, cu['z_inferior']))))
-    za = USBP['mensula_z_apoyo']
-    pusb = box(-10.4, 10.4, 11.5, 30.41, za, za + 1.6)
-    pusb = pusb.fuse(box(-4.47, 4.47, 24.0, 31.70, za + 1.65, za + 4.85))
-    pusb = pusb.fuse(box(-4.4, 4.4, 11.73, 15.5, za + 1.6, 96.12))
+    pusb = build_panel_usb_ref()
     refs.append(('ref_panel_usb', 'Ref: placa panel-usb con USB-C y J502', pusb))
     # Clavijas enchufadas y reserva de sus cables (hardware/main-board/kicad/plugs.json).
     plugs_path = ROOT.parent.parent / 'hardware' / 'main-board' / 'kicad' / 'plugs.json'
     if plugs_path.exists():
         pj = json.loads(plugs_path.read_text(encoding='utf-8'))
-        zt, yfc = pj['z_top'], pj['y_face']
+        zt, yfc = pj['z_top'], pj['y_face'] + CH.get('desplazamiento_placa_y', 0.0)
         shapes = []
         for pg in pj['plugs']:
             for key in ('plug', 'wires'):
@@ -1024,10 +1071,10 @@ def build_references():
     refs.append(('ref_nut', 'Ref: tuerca 5/8-11 de laton', nut))
     ret = NUT['retenes']
     keepers = []
-    for a in ret['angulos']:
-        x = ret['radio'] * math.cos(math.radians(a))
-        y = ret['radio'] * math.sin(math.radians(a))
-        washer = Part.makeCylinder(ret['arandela_diametro'] / 2, ret['arandela_espesor'],
+    for a, rr, dw in zip(ret['angulos'], ret['radios'], ret['arandela_diametros']):
+        x = rr * math.cos(math.radians(a))
+        y = rr * math.sin(math.radians(a))
+        washer = Part.makeCylinder(dw / 2, ret['arandela_espesor'],
                                    V(x, y, Z_FLOOR))
         head = Part.makeCylinder(M3_BUTTON_HEAD / 2, ret['cabeza_alto'],
                                  V(x, y, Z_FLOOR + ret['arandela_espesor']))
@@ -1045,7 +1092,7 @@ def band_screws(z0):
     heads = [(Z_LOCK_BASE, LOCK['cabeza_diametro']), (Z_LOCK_CAP, LOCK['cabeza_diametro']),
              (PAN['z_centro'] - half, PAN['tornillo_cabeza']),
              (PAN['z_centro'] + half, PAN['tornillo_cabeza'])]
-    z1 = z0 + BANDS['alto']
+    z1 = z0 + (BANDS['alto_abajo'] if z0 < 1.0 else BANDS['alto_arriba'])
     return [z for z, d in heads if z + d / 2 > z0 and z - d / 2 < z1]
 
 
@@ -1062,7 +1109,7 @@ parts = [
     ('08-sled', 'Chasis deslizable de la placa principal y la carrier', build_sled()),
     ('06-bumper-bottom', 'Banda de TPU de abajo', build_band(0.0, band_screws(0.0))),
     ('07-bumper-top', 'Banda de TPU de arriba',
-     build_band(Z_TOP - BANDS['alto'], band_screws(Z_TOP - BANDS['alto']))),
+     build_band(Z_TOP - BANDS['alto_arriba'], band_screws(Z_TOP - BANDS['alto_arriba']))),
 ]
 summary = []
 for name, label, shape in parts:
@@ -1104,10 +1151,10 @@ resumen = {
         'pcb_imu_cara_inferior': round(Z_BOARD, 2),
         'unas': [round(Z_NAIL, 3), round(Z_NAIL_TOP, 3)],
         'ventanas_cuello': [round(Z_WIN0, 3), round(Z_WIN1, 3)],
-        'banda_abajo': [0.0, BANDS['alto']],
-        'banda_arriba': [round(Z_TOP - BANDS['alto'], 2), round(Z_TOP, 2)],
+        'banda_abajo': [0.0, BANDS['alto_abajo']],
+        'banda_arriba': [round(Z_TOP - BANDS['alto_arriba'], 2), round(Z_TOP, 2)],
         'ranuras_banda_abajo': [round(z, 2) for z in band_screws(0.0)],
-        'ranuras_banda_arriba': [round(z, 2) for z in band_screws(Z_TOP - BANDS['alto'])],
+        'ranuras_banda_arriba': [round(z, 2) for z in band_screws(Z_TOP - BANDS['alto_arriba'])],
     },
     'arp_sobre_asiento_jalon_mm': round(Z_TOP, 2),
     '_nota_arp': 'Del asiento del jalon (cara inferior de la base) a la cara de la tapa donde apoya la antena.',
@@ -1115,19 +1162,18 @@ resumen = {
         'alojamiento_entre_caras_mm': round(2 * NUT_APOTHEM, 3),
         'alojamiento_z_mm': [NUT['anillo_asiento'], round(Z_FLOOR, 3)],
         'paso_perno_diametro_mm': NUT['paso_perno_diametro'],
-        'retenes_xy_mm': [[round(NUT['retenes']['radio'] * math.cos(math.radians(a)), 3),
-                           round(NUT['retenes']['radio'] * math.sin(math.radians(a)), 3)]
-                          for a in NUT['retenes']['angulos']],
+        'retenes_xy_mm': [[round(rr * math.cos(math.radians(a)), 3), round(rr * math.sin(math.radians(a)), 3)]
+                          for a, rr in zip(NUT['retenes']['angulos'], NUT['retenes']['radios'])],
     },
     'usb_c_panel': {
-        'z_mm': USBP['z'],
-        'hueco_mm': USBP['hueco'],
-        'radio_mm': USBP['radio'],
+        'receptaculo_mm': [USBP['receptaculo']['ancho'], USBP['receptaculo']['alto']],
+        'z_eje_mm': USBP['receptaculo']['z_eje'],
+        'holgura_mm': USBP['receptaculo']['holgura'],
     },
     'chasis': {
         'riel_x_mm': [CH['riel']['x_interior'], CH['riel']['x_exterior']],
         'riel_z_mm': CH['riel']['z'],
-        'travesano_z_mm': CH['travesano']['z'],
+        'placa_superior_z_mm': CH['placa_superior']['z'],
         'radio_paso_mm': CH['radio_paso'],
     },
     'imu': {

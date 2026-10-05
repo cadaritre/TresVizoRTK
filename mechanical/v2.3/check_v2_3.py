@@ -60,11 +60,21 @@ for group, dct in (('placa', board), ('clavija', plugs), ('panel_usb', pusb), ('
     for k, v in dct.items():
         if 'v02b' in k or 'export_tmp' in k or len(v.Solids) > 1 and group == 'supuesto':
             continue
-        if group == 'supuesto' and 'carrier' in k.lower():
-            # El chasis pone la carrier 1.6 mm mas arriba que la envolvente de cad/.
-            v = v.copy()
-            v.translate(App.Vector(0, 0, CH['carrier']['z'][0] - 16.4))
+        lk = k.lower()
+        if group == 'supuesto' and ('battery' in lk or 'pusb_heads' in lk):
+            continue   # la 18650 se toma de este modelo; la panel-usb ya no lleva tornillos
+        v = v.copy()
+        if group in ('placa', 'clavija'):
+            # La placa va CH['desplazamiento_placa_y'] mas hacia el panel que en cad/.
+            v.translate(App.Vector(0, CH.get('desplazamiento_placa_y', 0.0), 0))
+        if group == 'supuesto' and 'carrier' in lk:
+            # La carrier y su clavija SMA van donde las pone el chasis (el coaxial se
+            # deja como en cad/: es flexible y su recorrido se ajusta al montar).
+            v.translate(App.Vector(0, CH['carrier']['y'][0] + 9.9, CH['carrier']['z'][0] - 16.4))
         refs[f'{group}:{k}'] = v
+for o in doc.Objects:
+    if o.Name in ('ref_battery', 'ref_button', 'ref_oled', 'ref_nut_keepers'):
+        refs['v23:' + o.Name] = o.Shape
 
 print('referencias:', len(refs), {g: len(d) for g, d in (('placa', board), ('clavija', plugs), ('panel_usb', pusb), ('supuesto', env))})
 
@@ -103,7 +113,7 @@ rr = []
 for i, a in enumerate(keys):
     for b in keys[i + 1:]:
         ga, gb = a.split(':')[0], b.split(':')[0]
-        if ga == gb == 'placa':
+        if ga == gb == 'placa' or ga == gb == 'v23':
             continue
         if not refs[a].BoundBox.intersect(refs[b].BoundBox):
             continue

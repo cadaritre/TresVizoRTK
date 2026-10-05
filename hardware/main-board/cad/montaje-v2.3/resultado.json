@@ -1,0 +1,142 @@
+{
+ "nota": "Recorridos de montaje de V2.3 con la placa v0.2 (cfc44c9). t = distancia a la posición final a lo largo del recorrido; los choques dan el volumen máximo y el tramo de t.",
+ "1_bateria": {
+  "corrimiento_para_el_collar_mm": 3.2,
+  "eje_y_al_pasar": -16.4,
+  "altura_del_empuje_t": 20.51,
+  "a_baja_corrida": {},
+  "b_hacia_atras": {},
+  "c_baja_a_la_repisa": {}
+ },
+ "2_carrier_al_chasis": {},
+ "3a_placa_desde_arriba": {
+  "pcb": {},
+  "componentes": {
+   "U201 × chasis_frente_1": {
+    "mm3_max": 6.535,
+    "t_min": 2.0,
+    "t_max": 32.0
+   },
+   "J102 × chasis_frente_2": {
+    "mm3_max": 0.315,
+    "t_min": 9.0,
+    "t_max": 60.0
+   }
+  }
+ },
+ "3b_placa_desde_abajo": {
+  "pcb": {},
+  "componentes": {}
+ },
+ "4_chasis_al_tubo": {
+  "radio_max_conjunto": 25.5,
+  "choques": {},
+  "holguras_finales": {
+   "chasis-tubo": 0.0,
+   "chasis-18650": 1.0,
+   "carrier-tubo": 2.6,
+   "carrier-18650": 0.4
+  }
+ },
+ "5_J102_desde_abajo": {},
+ "5_J404_desde_abajo": {},
+ "6_tapa_del_panel": {
+  "J502_cables × J101_cables": {
+   "mm3_max": 29.544,
+   "t_min": 0.0,
+   "t_max": 1.5
+  }
+ },
+ "7a_plataforma": {},
+ "7b_tapa_antena": {
+  "tapa_antena × plataforma": {
+   "mm3_max": 13.889,
+   "t_min": 0.0,
+   "t_max": 13.0
+  }
+ },
+ "8_cable_18650_J102": {
+  "diametro_mm": 2.6,
+  "puntos": [
+   [
+    0.0,
+    -19.6,
+    21.0
+   ],
+   [
+    -2.6,
+    -18.9,
+    19.9
+   ],
+   [
+    -3.8,
+    -17.5,
+    18.3
+   ],
+   [
+    -6.0,
+    -16.9,
+    17.6
+   ],
+   [
+    -7.8,
+    -13.0,
+    17.5
+   ],
+   [
+    -20.5,
+    -12.8,
+    17.5
+   ],
+   [
+    -20.5,
+    -12.8,
+    22.8
+   ],
+   [
+    -24.5,
+    -12.6,
+    23.5
+   ],
+   [
+    -25.6,
+    -9.0,
+    24.0
+   ],
+   [
+    -27.2,
+    -3.5,
+    24.3
+   ],
+   [
+    -27.2,
+    4.0,
+    24.5
+   ],
+   [
+    -23.1,
+    5.9,
+    24.6
+   ],
+   [
+    -23.1,
+    5.9,
+    18.0
+   ],
+   [
+    -20.0,
+    5.9,
+    17.3
+   ]
+  ],
+  "largo_mm": 65.4,
+  "choques": {},
+  "holguras": {
+   "tubo": 0.155,
+   "chasis": 0.176,
+   "18650": 0.0,
+   "retenes_tuerca": 0.18,
+   "comp_J102": 0.338
+  }
+ }
+}

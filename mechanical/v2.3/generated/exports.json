@@ -3,11 +3,11 @@
   {
    "pieza": "01-threaded-base",
    "etiqueta": "Base con rosca 5/8",
-   "triangulos": 1904,
+   "triangulos": 2312,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 34.19,
+   "volumen_cm3": 34.11,
    "stl": "01-threaded-base.stl"
   },
   {
@@ -17,7 +17,7 @@
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 71.22,
+   "volumen_cm3": 71.08,
    "stl": "02-logo-tube.stl"
   },
   {
@@ -43,41 +43,41 @@
   {
    "pieza": "05-panel-cover",
    "etiqueta": "Tapa del panel principal",
-   "triangulos": 4102,
+   "triangulos": 3874,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 8.98,
+   "volumen_cm3": 9.36,
    "stl": "05-panel-cover.stl"
   },
   {
    "pieza": "08-sled",
    "etiqueta": "Chasis deslizable de la placa principal y la carrier",
-   "triangulos": 1164,
+   "triangulos": 1402,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 9.88,
+   "volumen_cm3": 12.15,
    "stl": "08-sled.stl"
   },
   {
    "pieza": "06-bumper-bottom",
    "etiqueta": "Banda de TPU de abajo",
-   "triangulos": 7034,
+   "triangulos": 8000,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 8.74,
+   "volumen_cm3": 9.98,
    "stl": "06-bumper-bottom.stl"
   },
   {
    "pieza": "07-bumper-top",
    "etiqueta": "Banda de TPU de arriba",
-   "triangulos": 7034,
+   "triangulos": 8000,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 8.25,
+   "volumen_cm3": 9.13,
    "stl": "07-bumper-top.stl"
   }
  ],

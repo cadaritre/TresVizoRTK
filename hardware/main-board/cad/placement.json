@@ -1,0 +1,347 @@
+{
+ "nota": "Posiciones de la v0.2 en ejes de la carcasa V2.2 (mm). z = eje del jalón hacia arriba, +Y hacia el panel, +X a la izquierda mirando el panel. Comprobadas en FreeCAD el 05-10-2026 con la placa del commit cfc44c9. Lo marcado como supuesto no tiene plano.",
+ "placa_principal": {
+  "x": [
+   -23.0,
+   23.0
+  ],
+  "y_dorso": 1.5,
+  "y_cara_componentes": 3.1,
+  "z": [
+   23.5,
+   87.5
+  ],
+  "de_kicad": "x = 23 - u, z = 87.5 - v (u, v desde la esquina superior izquierda vista desde el panel)",
+  "radio_max_con_componentes": 23.21,
+  "agujeros": [
+   {
+    "ref": "H1",
+    "x": 11.0,
+    "z": 75.3,
+    "taladro": 2.7,
+    "sin_cobre_d": 5.2,
+    "tornillo": "M2.5"
+   },
+   {
+    "ref": "H2",
+    "x": -17.4,
+    "z": 83.8,
+    "taladro": 2.7,
+    "sin_cobre_d": 5.2,
+    "tornillo": "M2.5"
+   }
+  ],
+  "franjas_sin_componentes_rieles": {
+   "ancho": 2.5,
+   "x": [
+    [
+     20.5,
+     23.0
+    ],
+    [
+     -23.0,
+     -20.5
+    ]
+   ],
+   "z": [
+    39.0,
+    87.5
+   ]
+  },
+  "antena_esp32_sin_cobre": {
+   "x": [
+    16.8,
+    23.0
+   ],
+   "z": [
+    54.2,
+    70.2
+   ],
+   "nota": "sin plástico al lado en z 54-71"
+  },
+  "boton_nada_delante": {
+   "x": [
+    -5.5,
+    5.5
+   ],
+   "z": [
+    38.0,
+    49.0
+   ]
+  },
+  "boton_max_2mm": {
+   "x": [
+    -8.1,
+    8.1
+   ],
+   "z": [
+    35.4,
+    51.6
+   ]
+  },
+  "cables_oled_max_8_15mm": {
+   "x": [
+    -7.25,
+    7.25
+   ],
+   "z": [
+    78.5,
+    85.0
+   ]
+  },
+  "altura_max_componentes": 10.0,
+  "clavijas": [
+   {
+    "ref": "J101",
+    "familia": "GH",
+    "pines": 8,
+    "alto_mm": 4.35,
+    "zona_x": [
+     -6.32,
+     6.93
+    ],
+    "zona_z": [
+     87.15,
+     93.25
+    ]
+   },
+   {
+    "ref": "J102",
+    "familia": "PH",
+    "pines": 2,
+    "alto_mm": 4.5,
+    "zona_x": [
+     -21.54,
+     -13.64
+    ],
+    "zona_z": [
+     16.37,
+     23.87
+    ]
+   },
+   {
+    "ref": "J301",
+    "familia": "GH",
+    "pines": 8,
+    "alto_mm": 4.35,
+    "zona_x": [
+     -8.2,
+     5.05
+    ],
+    "zona_z": [
+     17.7,
+     23.8
+    ]
+   },
+   {
+    "ref": "J402",
+    "familia": "GH",
+    "pines": 4,
+    "alto_mm": 4.35,
+    "zona_x": [
+     13.95,
+     20.05
+    ],
+    "zona_z": [
+     42.58,
+     50.83
+    ]
+   },
+   {
+    "ref": "J403",
+    "familia": "SH",
+    "pines": 4,
+    "alto_mm": 2.95,
+    "zona_x": [
+     -1.76,
+     4.24
+    ],
+    "zona_z": [
+     73.0,
+     80.0
+    ]
+   },
+   {
+    "ref": "J404",
+    "familia": "SH",
+    "pines": 2,
+    "alto_mm": 2.95,
+    "zona_x": [
+     -13.39,
+     -8.39
+    ],
+    "zona_z": [
+     17.86,
+     23.86
+    ]
+   },
+   {
+    "ref": "J405",
+    "familia": "GH",
+    "pines": 7,
+    "alto_mm": 4.35,
+    "zona_x": [
+     7.9,
+     19.9
+    ],
+    "zona_z": [
+     87.05,
+     93.15
+    ]
+   },
+   {
+    "ref": "J406",
+    "familia": "SH",
+    "pines": 5,
+    "alto_mm": 2.95,
+    "zona_x": [
+     -14.6,
+     -6.6
+    ],
+    "zona_z": [
+     86.89,
+     92.89
+    ]
+   }
+  ],
+  "clavijas_detalle": "kicad/plugs.json (coordenadas de placa) y cad/clavijas.step (en ejes de la carcasa)"
+ },
+ "carrier_bdlx_supuesto": {
+  "x": [
+   -21.0,
+   11.0
+  ],
+  "y": [
+   -9.9,
+   1.1
+  ],
+  "z": [
+   16.4,
+   68.4
+  ],
+  "nota": "32 x 52 x 11 publicado; 11 mm en todo el largo supuesto; componentes hacia la placa (0.4 mm); conectores GH8/GH5 sin ubicar",
+  "sma": {
+   "x": -2.6,
+   "y": -4.4,
+   "d": 9.2,
+   "z": [
+    68.4,
+    81.4
+   ],
+   "clavija_acodada_supuesta": [
+    9.0,
+    9.0,
+    11.0
+   ]
+  }
+ },
+ "bateria_18650_1s": {
+  "eje_x": 0.0,
+  "eje_y": -19.6,
+  "d": 18.6,
+  "z": [
+   22.0,
+   91.0
+  ],
+  "nota": "frente en y -10.3: 0.4 mm detrás del carrier"
+ },
+ "panel_usb": {
+  "x": [
+   -10.4,
+   10.4
+  ],
+  "y": [
+   11.5,
+   30.41
+  ],
+  "z_cara_inferior": 90.17,
+  "z_cara_componentes": 91.77,
+  "de_kicad": "u = x + 10.4, v = 31.3 - y",
+  "usb_c": {
+   "cara_y": 31.7,
+   "sobresale_del_canto": 1.29,
+   "eje_z": 93.42,
+   "carcasa_x": [
+    -4.47,
+    4.47
+   ],
+   "carcasa_z": [
+    91.82,
+    95.02
+   ]
+  },
+  "agujeros_m2": [
+   [
+    -7.9,
+    25.0
+   ],
+   [
+    7.9,
+    25.0
+   ]
+  ],
+  "j502_gh8": {
+   "boca": "hacia -Y en y 11.73",
+   "alto_z": 96.12
+  }
+ },
+ "coaxial_supuesto": {
+  "d": 3.0,
+  "recorrido": [
+   [
+    -2.6,
+    -4.4,
+    92.4
+   ],
+   [
+    -2.6,
+    -4.4,
+    96.0
+   ],
+   [
+    0.0,
+    -17.5,
+    97.5
+   ],
+   [
+    0.0,
+    -17.5,
+    113.9
+   ]
+  ]
+ },
+ "carcasa_v22": {
+  "r_interior_tubo": 29.5,
+  "r_collar": 26.0,
+  "collar_inferior_z": [
+   8.0,
+   21.0
+  ],
+  "collar_superior_z": [
+   111.91,
+   124.91
+  ],
+  "cuello_desde_z": 99.41,
+  "base_z": 15.91,
+  "plataforma_imu_z": 99.91,
+  "ranura_propuesta_base_bajo_j102": {
+   "x": [
+    -21.5,
+    -13.5
+   ],
+   "y": [
+    2.5,
+    8.5
+   ],
+   "hondo": 3.0
+  }
+ },
+ "holguras_medidas": {
+  "placa_carrier": 0.4,
+  "carrier_bateria": 0.4,
+  "base_cables_j102": 0.46,
+  "boton_cara_placa": 2.51,
+  "sma_carrier_placa": 1.4,
+  "collar_margen": 2.79
+ }
+}

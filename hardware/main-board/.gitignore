@@ -15,3 +15,6 @@ fab/jlc_parts_cache.json
 .easyeda_cache/
 kicad/lib/lcsc.3dshapes/*.step
 fab/*.step
+
+# STEP de referencia para la carcasa (los exporta la comprobación en FreeCAD; pesados)
+cad/*.step
