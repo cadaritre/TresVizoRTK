@@ -85,9 +85,18 @@ precrimpados GH y SH (8 pines como máximo). Lo que resultó al aplicarlas, con 
      doblez de sus cables, con 1 mm a cada lado para tomarla. Ver [Conectores](#conectores).
 7. **TVS de VBUS SMF15A** (limita a 24.4 V, por debajo de los 30 V de VBUS del BQ25798) en lugar
    de la SMF20A (32.4 V).
-8. **D+/D− del cargador sin conectar**: R101/R102 de v0.1 nunca se montaban (detección BC1.2). Con
-   D+/D− al aire el BQ25798 ve un «adaptador desconocido» y el límite lo pone ILIM (~2.9 A), como
-   en v0.1.
+8. **D+/D− del cargador sin conectar y techo de entrada de 1.45 A** (05-10-2026): las resistencias de D+/D− de v0.1 (entonces R101/R102)
+   nunca se montaban (detección BC1.2), y el ESP32-S3 activa el pull-up de D+ desde el reset, lo que
+   confundiría esa detección. Con D+/D− al aire el BQ25798 ve un «adaptador desconocido» y el
+   límite lo pone ILIM.
+   - Antes era ~2.9 A (10k/22k): demasiado para un puerto de computadora.
+   - Ahora **R102 = 8.2 kΩ** (10k/8.2k desde REGN, 4.6–5.0 V): techo de **1.34–1.56 A**, que
+     alcanza para cargar 1S a 1 A con el equipo encendido (~1.3 A de entrada).
+   - La placa sigue sin saber cuánto da el puerto. Con un puerto USB-A de 0.5/0.9 A, el cargador
+     baja la corriente si VBUS se cae (VINDPM), y el firmware puede bajar IINDPM por I2C (modo de
+     carga lenta).
+   - La detección real (CC del USB-C hacia un ADC del ESP32) queda para v0.3; ver
+     [Pendientes y riesgos](#pendientes-y-riesgos).
 9. **Un solo pedido en JLCPCB** con las dos placas en un panel. Ver
    [Pedido en JLCPCB](#pedido-en-jlcpcb) y [Costo](#costo).
 10. **Serigrafía sin solapes**: cada conector lleva su función y su referencia («IMU J405»,
@@ -251,6 +260,7 @@ en 33/34/38/39/40/47 con la detección en 48 (HIGH con tarjeta) y el botón en 1
 | Ref. | 1S (por defecto) | 2S |
 | --- | --- | --- |
 | R103 (PROG) | 4.7 kΩ | 8.2 kΩ (C25924) |
+| R102 (ILIM, techo de entrada) | 8.2 kΩ: ~1.45 A | 22 kΩ (C25768): ~2.9 A |
 | R117 (EN del TPS62903) | 10 kΩ | 3.9 kΩ (C51721) |
 | U103 | MAX17048G+T10 | MAX17049G+T10 (C18185545; JLCPCB tenía 50 a 9.60 USD) |
 | R113 (VPACK → VDD del medidor) | 0 Ω | sin montar |
@@ -366,6 +376,19 @@ asomo de la clavija PH de la batería (3.5 mm estimado; JST no da el plano enchu
 impresa con los cambios propuestos.
 
 ## Pendientes y riesgos
+
+- **Corriente del USB (revisión del 05-10-2026):** sin detección del puerto, el techo fijo (R102)
+  es la única protección para una computadora. Para v0.3: llevar CC1/CC2 de la panel-usb (OR con
+  diodos) por uno de los GND de J101/J502 a un ADC del ESP32 y fijar IINDPM según lo que anuncie la
+  fuente (0.5 / 1.5 / 3 A).
+- **D+/D− (revisión del 05-10-2026):** D+ mide 22.4 mm y cambia de cara por dos vías; D− mide
+  31.3 mm por arriba.
+  - Para USB Full Speed (12 Mb/s, lo único que tiene el ESP32-S3) la diferencia, unos 60 ps, es
+    despreciable frente a un bit de 83 ns, y el tramo es corto.
+  - Aun así, Espressif recomienda par diferencial con referencia continua.
+  - El cruce viene del orden de pines: D− va a la izquierda de D+ en J101 y al revés en U101 y el
+    ESP32. Corregirlo pide invertir los pines 7/8 de J101 y de J502 (la panel-usb también) y
+    rutear el par junto. Queda para v0.3 junto con el CC.
 
 - **Nada medido**: carga 1S/2S, modo *ship*, arranque del TPS63070 con la carrier y su consumo,
   ruido del GNSS (C/N0) con el ESP32 transmitiendo, alcance de BLE/Wi-Fi.

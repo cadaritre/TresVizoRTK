@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-kicad/hardware/main-board/kicad/tresvizo-main.kicad_sch")
-		(date "2026-10-05T06:04:09")
+		(date "2026-10-05T14:38:34")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")
@@ -2252,13 +2252,13 @@
 		)
 		(comp
 			(ref "R102")
-			(value "22k")
+			(value "8.2k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(fields
 				(field
-					(name "MPN") "0402WGF2202TCE")
+					(name "MPN") "0402WGF8201TCE")
 				(field
-					(name "LCSC") "C25768")
+					(name "LCSC") "C25924")
 				(field
 					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
 				(field
@@ -2275,11 +2275,11 @@
 			)
 			(property
 				(name "MPN")
-				(value "0402WGF2202TCE")
+				(value "0402WGF8201TCE")
 			)
 			(property
 				(name "LCSC")
-				(value "C25768")
+				(value "C25924")
 			)
 			(property
 				(name "Sheetname")

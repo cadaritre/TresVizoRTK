@@ -18691,7 +18691,7 @@
 				)
 			)
 		)
-		(property "Value" "22k"
+		(property "Value" "8.2k"
 			(at 0 1.17 90)
 			(layer "F.Fab")
 			(uuid "a3665a80-e91b-494d-920f-5a37caf5568d")
@@ -18736,7 +18736,7 @@
 				)
 			)
 		)
-		(property "MPN" "0402WGF2202TCE"
+		(property "MPN" "0402WGF8201TCE"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -18748,7 +18748,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25768"
+		(property "LCSC" "C25924"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)

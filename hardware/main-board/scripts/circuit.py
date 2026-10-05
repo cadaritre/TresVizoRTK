@@ -179,8 +179,8 @@ def build(libs):
     C(s, "chg", "100nF", "VSYS")
     # BAT: TI pide >= 3 uF efectivos (2 x 10 uF); un 22 uF/25 V da ~10 uF efectivos a 4.2 V.
     C(s, "chg", "22uF", "VBAT_CHG")
-    R(s, "chg", "10k", "REGN", "CHG_ILIM", note="ILIM_HIZ: con 22k da ~2.9 A de techo de entrada")
-    R(s, "chg", "22k", "CHG_ILIM", "GND")
+    R(s, "chg", "10k", "REGN", "CHG_ILIM", note="ILIM_HIZ: con 8.2k da ~1.45 A de techo de entrada (1S); 22k da ~2.9 A (2S)")
+    R(s, "chg", "8.2k", "CHG_ILIM", "GND")
     v2s = d.variant2s = {}
     v2s["prog"] = R(s, "chg", "4.7k", "CHG_PROG", "GND", note="PROG: 4.7k = 1S a 750 kHz; 2S: 8.2k")
     R(s, "chg", "5.1k", "REGN", "CHG_TS")

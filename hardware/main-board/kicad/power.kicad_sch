@@ -8383,7 +8383,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Value" "22k"
+		(property "Value" "8.2k"
 			(at 182.88 105.264 270)
 			(effects
 				(font
@@ -8419,7 +8419,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "0402WGF2202TCE"
+		(property "MPN" "0402WGF8201TCE"
 			(at 186.69 106.68 0)
 			(effects
 				(font
@@ -8428,7 +8428,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C25768"
+		(property "LCSC" "C25924"
 			(at 186.69 106.68 0)
 			(effects
 				(font
