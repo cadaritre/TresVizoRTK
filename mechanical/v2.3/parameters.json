@@ -798,7 +798,7 @@
     0.0
    ],
    "y": [
-    -18.6,
+    -19.6,
     -15.0
    ],
    "salida_x": [
@@ -817,12 +817,13 @@
      -3.0
     ],
     "y": [
-     -18.6,
-     -15.6
+     -19.6,
+     -14.6
     ],
     "z_techo": 20.2,
     "_nota": "Donde el cable pasa del hueco al canal tiene que subir sobre la arandela del reten (z 16.7) y la cabeza (z 18.36): el techo sube hasta la cara inferior de la repisa (z 20.2) en ese tramo."
-   }
+   },
+   "_nota_margen": "El canal arranca en el eje del hueco (y -19.6) y el rebaje llega hasta el frente de la repisa (y -14.6): sin eso el cable de 2.6 mm pasaba a 0.05 mm de la arista donde el hueco se junta con el canal, menos que la tolerancia de MJF (0.3)."
   }
  }
 }

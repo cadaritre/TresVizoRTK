@@ -13,11 +13,11 @@
   {
    "pieza": "02-logo-tube",
    "etiqueta": "Tubo con logo, nervios guia y cuna de la 18650",
-   "triangulos": 11180,
+   "triangulos": 11190,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 71.24,
+   "volumen_cm3": 71.22,
    "stl": "02-logo-tube.stl"
   },
   {

@@ -88,8 +88,8 @@ Los valores salen de [parameters.json](parameters.json) (bloques `chasis`, `cuna
   - Corregir `chasis.carrier` y regenerar.
 - **18650 protegida:** Ø18.6 × 69 mm. El chasis pasa a 0.4 mm de ella al entrar (lo fija la
   envolvente supuesta de 11 mm de la carrier). Si la carrier real es más delgada, la holgura crece.
-- **Cable de la 18650:** se supone que sale por su extremo de abajo. Si sale por arriba, baja por
-  el costado −X de la cuna.
+- **Cable de la 18650:** se supone que sale por su extremo de abajo, de Ø2.6 como máximo y de
+  ~80 mm o más hasta J102. Si sale por arriba, baja por el costado −X de la cuna.
 
 ## Impresión
 
@@ -128,7 +128,7 @@ Hechas el 05-10-2026 con FreeCAD 1.1.3 sobre los archivos de esta carpeta
 | Chasis armado (chasis, placa y carrier) en el collar Ø52 | radio máximo 25.5 mm (límite 25.65 con 0.35 de holgura) |
 | Plástico del chasis junto a la antena del ESP32 (x 16.8–26, z 54.2–70.2) | 0 mm³ |
 | Holguras | chasis–tapa 0.41 (al cerrar), chasis–plataforma del IMU 0.91, chasis–base 1.09, chasis–18650 1.0, chasis–coaxial 0.5; carrier–18650 0.4 (supuesta) |
-| Montaje paso a paso (`hardware/main-board/cad/check_montaje_v2_3.py`, de la otra sesión; tramos de 0.5–1 mm contra lo ya puesto) | Sobre b33f44a encontró 3 problemas; sobre 3d227df, 0 choques en la 18650 (sus tres tramos) y en la placa entrando por abajo, y al cable de la 18650 le faltaban 0.3 mm en la esquina del canal. Esta versión sube ahí el techo del canal a z 20.2 (la otra sesión probó z 20.0: recorrido libre con 0.18 al retén y al chasis). Sin problema: carrier al chasis, chasis al tubo con la 18650 puesta, clavijas de abajo sin base, tapa del panel, plataforma del IMU. No simula el giro de la bayoneta de la tapa |
+| Montaje paso a paso (`hardware/main-board/cad/check_montaje_v2_3.py`, de la otra sesión; tramos de 0.5–1 mm contra lo ya puesto) | Sobre b33f44a encontró 3 problemas; sobre 3d227df, 0 choques en la 18650 (sus tres tramos) y en la placa entrando por abajo, y al cable de la 18650 le faltaban 0.3 mm en la esquina del canal. En d939377 el techo del canal subió ahí a z 20.2 y la otra sesión confirmó el recorrido libre (65 mm, Ø2.6), con 0.05 mm como mínimo a la arista hueco–canal. Esta versión agranda el canal (desde el eje del hueco, y −19.6, y con el rebaje hasta el frente de la repisa, y −14.6) para pasar de ese mínimo a más que la tolerancia de MJF; falta re-medir el recorrido. Sin problema: carrier al chasis, chasis al tubo con la 18650 puesta, clavijas de abajo sin base, tapa del panel, plataforma del IMU. No simula el giro de la bayoneta de la tapa |
 | Contactos intencionados (holgura 0) | pie de los rieles sobre los topes del collar; carrier sobre sus pisos; 18650 tangente a los labios de su cuna (se imprime así; la retención es geométrica, no por interferencia) |
 
 **No verificado:** tolerancias de impresión; el recorrido de montaje paso a paso (solo la posición
