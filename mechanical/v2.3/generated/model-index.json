@@ -132,7 +132,7 @@
    "etiqueta": "Tubo con logo, nervios guia y cuna de la 18650",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 71.44,
+   "volumen_cm3": 71.25,
    "caja": [
     64.0,
     64.0,
@@ -196,7 +196,7 @@
    "etiqueta": "Chasis deslizable de la placa principal y la carrier",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 9.96,
+   "volumen_cm3": 9.88,
    "caja": [
     50.4,
     17.8,
@@ -240,5 +240,5 @@
    ]
   }
  ],
- "volumen_total_cm3": 174.0
+ "volumen_total_cm3": 173.73
 }

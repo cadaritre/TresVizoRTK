@@ -53,17 +53,19 @@ plugs = load_step('clavijas.step')
 pusb = load_step('panel-usb.step')
 env = load_step('envolventes-supuestas.step')
 # Los objetos 'v02b_check' son los grupos que contienen todo: se ignoran. La
-# carrier y su SMA se toman de este modelo (ref_carrier: su posicion la fija el
-# chasis), no de la envolvente de hardware/main-board/cad, que la supone 1.6 mm
-# mas abajo.
+# carrier y su clavija SMA van donde las deja el chasis (su posicion la fija el
+# chasis): la envolvente de hardware/main-board/cad se sube 1.6 mm, a donde la
+# ponen los pisos del chasis. Los compuestos que agrupan varias piezas se ignoran.
 for group, dct in (('placa', board), ('clavija', plugs), ('panel_usb', pusb), ('supuesto', env)):
     for k, v in dct.items():
-        if 'v02b' in k or (group == 'supuesto' and ('carrier' in k.lower() or 'sma' in k.lower())):
+        if 'v02b' in k or 'export_tmp' in k or len(v.Solids) > 1 and group == 'supuesto':
             continue
+        if group == 'supuesto' and 'carrier' in k.lower():
+            # El chasis pone la carrier 1.6 mm mas arriba que la envolvente de cad/.
+            v = v.copy()
+            v.translate(App.Vector(0, 0, CH['carrier']['z'][0] - 16.4))
         refs[f'{group}:{k}'] = v
-for o in doc.Objects:
-    if o.Name in ('ref_carrier', 'ref_battery'):
-        refs['v23:' + o.Name] = o.Shape
+
 print('referencias:', len(refs), {g: len(d) for g, d in (('placa', board), ('clavija', plugs), ('panel_usb', pusb), ('supuesto', env))})
 
 LIM = 0.05  # mm3
@@ -154,8 +156,10 @@ for k, v in refs.items():
     if 'battery' in lk or 'bater' in lk or '18650' in lk:
         pairs['chasis-18650'] = (sled, v)
         pairs['tubo-18650'] = (tube, v)
-    if 'carrier' in lk:
+    if lk.endswith(':carrier'):
         pairs['chasis-carrier'] = (sled, v)
+    if 'sma' in lk:
+        pairs['chasis-clavija_sma'] = (sled, v)
     if 'coax' in lk:
         pairs['chasis-coaxial'] = (sled, v)
 for k, (a, b) in pairs.items():

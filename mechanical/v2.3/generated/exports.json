@@ -13,11 +13,11 @@
   {
    "pieza": "02-logo-tube",
    "etiqueta": "Tubo con logo, nervios guia y cuna de la 18650",
-   "triangulos": 11158,
+   "triangulos": 11168,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 71.44,
+   "volumen_cm3": 71.25,
    "stl": "02-logo-tube.stl"
   },
   {
@@ -53,11 +53,11 @@
   {
    "pieza": "08-sled",
    "etiqueta": "Chasis deslizable de la placa principal y la carrier",
-   "triangulos": 1190,
+   "triangulos": 1164,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 9.96,
+   "volumen_cm3": 9.88,
    "stl": "08-sled.stl"
   },
   {

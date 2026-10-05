@@ -376,7 +376,7 @@ def build_tube_interior():
     for sx in (-1, 1):
         rib = box(min(sx * nx0, sx * nx1), max(sx * nx0, sx * nx1), -RI - 1, ly1, zc0 - 1.5, zc1 - 6)
         # Labio hacia el eje, delante del eje de la celda: la retiene.
-        lip = box(min(sx * lx, sx * nx0), max(sx * lx, sx * nx0), ly0, ly1, zc0 + 4, zc1 - 10)
+        lip = box(min(sx * lx, sx * nx0), max(sx * lx, sx * nx0), ly0, ly1, cu['labio_z'][0], cu['labio_z'][1])
         add(rib.fuse(lip))
     rz0, rz1 = cu['repisa_z']
     shelf = box(-nx1, nx1, -RI - 1, ly1, rz0, rz1)
@@ -386,7 +386,13 @@ def build_tube_interior():
     ramp = ramp.cut(Part.makeCylinder(cu['repisa_hueco'] / 2.0, 40, V(ex, ey, rz0 - 30)))
     # Por encima de la espiga de la base (z 15.906).
     ramp = ramp.common(box(-50, 50, -50, 50, Z_FLOOR + 0.05, 200))
-    add(shelf.fuse(ramp))
+    cradle_block = shelf.fuse(ramp)
+    # Canal del cable a ras del piso: del hueco hacia -X, por fuera del reten de la tuerca.
+    cc = cu['canal_cable']
+    za, zb = cc['z']
+    cradle_block = cradle_block.cut(box(cc['x'][0], cc['x'][1], cc['y'][0], cc['y'][1], za - 1, zb))
+    cradle_block = cradle_block.cut(box(cc['salida_x'][0], cc['salida_x'][1], cc['y'][0], cc['salida_y_frente'], za - 1, zb))
+    add(cradle_block)
     # La celda no debe tocar nada: hueco de la celda a traves de nervios y labios.
     cell = Part.makeCylinder(rc, cu['largo'], V(ex, ey, zc0))
     return out.cut(cell)

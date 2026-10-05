@@ -24,14 +24,22 @@ Base, tapa de antena, plataforma del IMU y bandas son las de V2.2.
 ## Cómo se arma (sin tornillos dentro del tubo)
 
 1. **18650 en su cuna.** Con la tapa de antena quitada, la celda baja por el collar de arriba
-   (en su posición final no cabe: llega a r 28.9 y el collar deja r 26) y se empuja hacia atrás.
-   Los nervios se abren unos 1.5 mm y los labios la retienen delante de su eje. El cable baja por
-   el hueco de la repisa y va por el piso hasta el lado −X.
+   **corrida 3.2 mm hacia el frente** (eje en y −16.4). En su posición final no cabe: llega a
+   r 28.9 y el collar deja r 26. Los nervios de la cuna, a todo lo alto, la guían sin tocarla.
+   - Ya entera bajo el collar (fondo bajo z 42.9), se empuja hacia atrás y entra a presión en los
+     labios, que solo van de z 26 a 42. Los nervios se abren ~1.5 mm.
+   - El cable baja por el hueco de la repisa y sale por un **canal a ras del piso hacia −X**, que
+     rodea el retén de la tuerca. De ahí sigue por el piso, sube junto al collar y pasa por fuera
+     del riel −X, en x −27, z 24, hasta J102.
+   - Con el chasis puesto, la carrier (0.4 mm delante) y la lengua (arriba) no la dejan salir.
 2. **Carrier en el chasis, fuera del tubo.** Entra por el frente (sin la placa puesta) hasta los
    labios traseros de sus dos ranuras y apoya en sus dos pisos.
-3. **Placa en el chasis, fuera del tubo.** Baja por los rieles y se atornilla desde el frente con
-   dos **M2.5 × 8 autorroscantes** a los brazos de H1 y H2. La placa, delante, y dos topes arriba
-   dejan la carrier presa.
+3. **Placa en el chasis, fuera del tubo: entra POR ABAJO.** Sube por los rieles y se atornilla
+   desde el frente con dos **M2.5 × 8 autorroscantes** a los brazos de H1 y H2.
+   - Por arriba no entra: el módulo ESP32 (U201) llega a x 22.19 y chocaría con la lengüeta +X
+     de arriba; J102 también rozaría la −X.
+   - Desde abajo U201 se detiene en z 69.9, antes de esa lengüeta.
+   - La placa, delante, y dos topes arriba dejan la carrier presa.
 4. **Cables** (con el chasis aún fuera): arnés de J301 a la carrier, coaxial al SMA de la carrier.
 5. **Chasis al tubo.** Entra por arriba, con los rieles entre los nervios, hasta apoyar en los
    topes del collar inferior.
@@ -49,7 +57,8 @@ Placa: x = 23 − u, z = 87.5 − v, dorso en y 1.5 y cara de componentes en y 3
 
 - **Rieles** en x ±23.3…25.2, z 17–99. Reciben los cantos de la placa con 0.15 mm por cara.
   - Lengüetas delanteras solo sobre las franjas sin componentes de la placa (u 0–2.5 y 43.5–46,
-    v 0–48.5): en −X de z 39 a 87.5; en +X de z 39 a 54 y de 71 a 87.5.
+    v 0–48.5): en −X de z 39 a 87.5 y en +X solo de z 71 a 87.5, para que la placa entre por
+    abajo sin que el módulo ESP32 las toque.
   - **El riel +X se corta en z 54–71, frente a la antena del ESP32.** Su tramo de abajo se une
     al brazo de H1 por detrás, con un enlace a 10 mm de la placa (x 9–16).
 - **Travesaño** en z 95.8–99.0, y −2.4…1.2, bajo el cuello de la tapa. Su cara trasera deja pasar
@@ -119,6 +128,7 @@ Hechas el 05-10-2026 con FreeCAD 1.1.3 sobre los archivos de esta carpeta
 | Chasis armado (chasis, placa y carrier) en el collar Ø52 | radio máximo 25.5 mm (límite 25.65 con 0.35 de holgura) |
 | Plástico del chasis junto a la antena del ESP32 (x 16.8–26, z 54.2–70.2) | 0 mm³ |
 | Holguras | chasis–tapa 0.41 (al cerrar), chasis–plataforma del IMU 0.91, chasis–base 1.09, chasis–18650 1.0, chasis–coaxial 0.5; carrier–18650 0.4 (supuesta) |
+| Montaje paso a paso (`hardware/main-board/cad/check_montaje_v2_3.py`, de la otra sesión; tramos de 0.5–1 mm contra lo ya puesto) | Sobre b33f44a encontró 3 problemas, corregidos en esta versión: la 18650 no entraba recta (labios hasta z 81), la placa no entraba en los rieles (U201 contra las lengüetas +X) y el cable de la 18650 no salía del hueco de la repisa. Sin problema: carrier al chasis, chasis al tubo con la 18650 puesta, clavijas de abajo sin base, tapa del panel con todo lo suyo, plataforma del IMU. **Pendiente re-correrlo sobre esta versión** |
 | Contactos intencionados (holgura 0) | pie de los rieles sobre los topes del collar; carrier sobre sus pisos; 18650 tangente a los labios de su cuna (se imprime así; la retención es geométrica, no por interferencia) |
 
 **No verificado:** tolerancias de impresión; el recorrido de montaje paso a paso (solo la posición
