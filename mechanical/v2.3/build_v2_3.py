@@ -392,6 +392,8 @@ def build_tube_interior():
     za, zb = cc['z']
     cradle_block = cradle_block.cut(box(cc['x'][0], cc['x'][1], cc['y'][0], cc['y'][1], za - 1, zb))
     cradle_block = cradle_block.cut(box(cc['salida_x'][0], cc['salida_x'][1], cc['y'][0], cc['salida_y_frente'], za - 1, zb))
+    es = cc['esquina']
+    cradle_block = cradle_block.cut(box(es['x'][0], es['x'][1], es['y'][0], es['y'][1], za - 1, es['z_techo']))
     add(cradle_block)
     # La celda no debe tocar nada: hueco de la celda a traves de nervios y labios.
     cell = Part.makeCylinder(rc, cu['largo'], V(ex, ey, zc0))

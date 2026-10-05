@@ -810,7 +810,19 @@
     15.91,
     19.0
    ],
-   "_nota": "Del hueco de la repisa, a ras del piso, hacia -X hasta x -6.5...-9.5 y por delante de la cuna: rodea el reten de la tuerca en (0, -15) (cabeza hasta z 18.4). Recorrido verificado por hardware/main-board/cad/check_montaje_v2_3.py."
+   "_nota": "Del hueco de la repisa, a ras del piso, hacia -X hasta x -6.5...-9.5 y por delante de la cuna: rodea el reten de la tuerca en (0, -15) (cabeza hasta z 18.4). Recorrido verificado por hardware/main-board/cad/check_montaje_v2_3.py.",
+   "esquina": {
+    "x": [
+     -7.0,
+     -3.0
+    ],
+    "y": [
+     -18.6,
+     -15.6
+    ],
+    "z_techo": 20.2,
+    "_nota": "Donde el cable pasa del hueco al canal tiene que subir sobre la arandela del reten (z 16.7) y la cabeza (z 18.36): el techo sube hasta la cara inferior de la repisa (z 20.2) en ese tramo."
+   }
   }
  }
 }

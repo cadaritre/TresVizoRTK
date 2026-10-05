@@ -132,7 +132,7 @@
    "etiqueta": "Tubo con logo, nervios guia y cuna de la 18650",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 71.25,
+   "volumen_cm3": 71.24,
    "caja": [
     64.0,
     64.0,
@@ -240,5 +240,5 @@
    ]
   }
  ],
- "volumen_total_cm3": 173.73
+ "volumen_total_cm3": 173.72
 }
