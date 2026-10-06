@@ -266,6 +266,9 @@ GPIO, así que solo cambia la configuración):
 - **GPIO45 enciende el 5 V de la carrier** (TPS63070); el firmware 0.8.x ya lo pone alto al
   arrancar. En modo «solo carga» se deja bajo. Con la carrier apagada, dejar GPIO8 en alta
   impedancia para no alimentarla por sus entradas.
+  - GPIO45 es pin de arranque con 100k a GND (VDD_SPI a 3.3 V, lo correcto para el N16R2): en
+    **cualquier reinicio del ESP32, también por software, la carrier se apaga** y el GNSS arranca
+    de cero (pierde el fix RTK). El firmware no debe reiniciar el ESP32 a la ligera.
 - **Modo «solo carga»**: si al arrancar hay VBUS y no se pulsa el botón, dejar el GNSS apagado y
   mostrar la carga en la OLED. Un toque del botón pasa a modo normal; al quitar el USB se escribe el
   modo *ship*.
