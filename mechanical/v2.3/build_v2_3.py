@@ -1049,7 +1049,10 @@ def build_references():
     carrier = box(cr['x'][0], cr['x'][1], cr['y'][0], cr['y'][1], cr['z'][0], cr['z'][1])
     sx0, sx1 = cr['sma']['x']
     carrier = carrier.fuse(box(sx0, sx1, cr['y'][0], cr['y'][1], cr['z'][1], cr['z'][1] + cr['sma']['alto']))
-    refs.append(('ref_carrier', 'Ref: carrier BDLX (envolvente supuesta) con SMA', carrier))
+    pt = cr['sma'].get('patas')
+    if pt:   # patas del SMA que asoman por detras de la carrier, hacia la 18650
+        carrier = carrier.fuse(box(pt['x'][0], pt['x'][1], cr['y'][0] - pt['atras'], cr['y'][0], pt['z'][0], pt['z'][1]))
+    refs.append(('ref_carrier', 'Ref: carrier BDLX (envolvente medida en foto) con SMA y sus patas', carrier))
     ex, ey = cu['eje']
     refs.append(('ref_battery', 'Ref: 18650 en su cuna',
                  Part.makeCylinder(cu['diametro'] / 2.0, cu['largo'], V(ex, ey, cu['z_inferior']))))

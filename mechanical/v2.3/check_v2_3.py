@@ -61,8 +61,8 @@ for group, dct in (('placa', board), ('clavija', plugs), ('panel_usb', pusb), ('
         if 'v02b' in k or 'export_tmp' in k or len(v.Solids) > 1 and group == 'supuesto':
             continue
         lk = k.lower()
-        if group == 'supuesto' and ('battery' in lk or 'pusb_heads' in lk):
-            continue   # la 18650 se toma de este modelo; la panel-usb ya no lleva tornillos
+        if group == 'supuesto' and ('battery' in lk or 'pusb_heads' in lk or 'carrier' in lk):
+            continue   # la 18650 y la carrier (medida, con su SMA y sus patas) se toman de este modelo; la panel-usb ya no lleva tornillos
         v = v.copy()
         if group in ('placa', 'clavija'):
             # La placa va CH['desplazamiento_placa_y'] mas hacia el panel que en cad/.
@@ -73,7 +73,7 @@ for group, dct in (('placa', board), ('clavija', plugs), ('panel_usb', pusb), ('
             v.translate(App.Vector(0, CH['carrier']['y'][0] + 9.9, CH['carrier']['z'][0] - 16.4))
         refs[f'{group}:{k}'] = v
 for o in doc.Objects:
-    if o.Name in ('ref_battery', 'ref_button', 'ref_oled', 'ref_nut_keepers'):
+    if o.Name in ('ref_battery', 'ref_button', 'ref_oled', 'ref_nut_keepers', 'ref_carrier'):
         refs['v23:' + o.Name] = o.Shape
 
 print('referencias:', len(refs), {g: len(d) for g, d in (('placa', board), ('clavija', plugs), ('panel_usb', pusb), ('supuesto', env))})
@@ -167,8 +167,10 @@ for k, v in refs.items():
     if 'battery' in lk or 'bater' in lk or '18650' in lk:
         pairs['chasis-18650'] = (sled, v)
         pairs['tubo-18650'] = (tube, v)
-    if lk.endswith(':carrier'):
+    if lk.endswith(':carrier') or lk.endswith('ref_carrier'):
         pairs['chasis-carrier'] = (sled, v)
+        pairs['carrier-18650'] = (v, refs.get('v23:ref_battery'))
+        pairs['placa-carrier'] = (v, next((s for n, s in refs.items() if n.startswith('placa:') and 'PCB' in n), None))
     if 'sma' in lk:
         pairs['chasis-clavija_sma'] = (sled, v)
     if 'coax' in lk:

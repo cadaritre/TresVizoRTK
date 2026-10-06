@@ -65,9 +65,10 @@ Tapa de antena y plataforma del IMU son las de V2.2.
 Ejes de V2.2: z = eje del jalón hacia arriba, +Y = panel, +X a la izquierda mirando el panel.
 
 **Pila de adelante hacia atrás:** placa principal (dorso en y 2.5, cara en y 4.1), carrier
-(y −9.6…1.4) y 18650 (eje y −19.9, frente en y −10.6).
-- Holguras: **1.1 mm** entre placa y carrier, y **1.0 mm** entre carrier y 18650, con la carrier
-  supuesta de 11 mm.
+(y −7.4…1.6, con las patas del SMA hasta y −10.4) y 18650 (eje y −19.9, frente en y −10.6).
+- Holguras: **0.9 mm** entre placa y carrier y **0.32 mm** entre las patas del SMA y la 18650,
+  con la carrier medida en foto **más 1 mm** en todo (9 mm de grueso, patas de 3 mm). Las patas
+  no se cortan: el hueco lo deja la carcasa.
 - La placa va 1.0 mm más hacia el panel que en `hardware/main-board/cad` (allí: dorso en y 1.5).
 - Su cara queda a 1.5 mm de los terminales del botón de V2.2; el botón ultracorto deja más.
 
@@ -88,7 +89,7 @@ Ejes de V2.2: z = eje del jalón hacia arriba, +Y = panel, +X a la izquierda mir
   - **¿Por qué no una placa entera?** Detrás de la placa principal solo hay 1 mm hasta la carrier,
     y otro hasta la pila: la placa solo cabe encima de la carrier. Abajo quedan los rieles con las
     ranuras.
-- **Ranuras de la carrier:** labios detrás de su PCB (y −10.3…−9.8), pisos bajo su canto inferior
+- **Ranuras de la carrier:** labios detrás de su PCB (y −8.1…−7.6), pisos bajo su canto inferior
   (z 18–19). La de +X llega solo a z 50, lejos de la antena.
 - **Zapatas** sobre cada riel, bajo el cuello de la tapa: r 24.2–25.5, ±14° (12 mm de arco por
   lado), z 97.0–99.2.
@@ -125,15 +126,16 @@ Los valores salen de [parameters.json](parameters.json): bloques `chasis`, `cuna
 
 ## Supuestos que hay que medir antes de imprimir
 
-- **Carrier BDLX:** envolvente de 32 × 52 × 11 mm, componentes hacia la placa, SMA arriba. BDLX no
+- **Carrier BDLX:** envolvente de 32 × 52 × 9 mm, componentes hacia la placa, SMA arriba. BDLX no
   publica plano. Medida en foto el 05-10-2026 (±1 mm, sin calibrador):
-  - Mide ~8 mm de grueso (PCB 1.6 + SMA ~6.5): la envolvente deja ~3 mm de reserva hacia la placa.
+  - Mide ~8 mm de grueso (PCB 1.6 + SMA ~6.5). Por decisión del propietario se toma todo con
+    **1 mm de más**: envolvente de 9 mm.
   - SMA acodado: cuerpo en x −10…−2.5 (la envolvente cubre x −11…0.5), eje del cañón en x ≈ −6.2,
-    punta en z ≈ 81. **Sus patas asoman 1–2 mm por detrás, hacia la 18650: cortarlas a ras.**
+    punta en z ≈ 81. Sus 4 patas asoman 1–2 mm por detrás, hacia la 18650; se reservan 3 mm
+    (x −11…−1.5, z 63.5–72) y **no se cortan**: la carrier va 2.2 mm más cerca de la placa que
+    con la envolvente supuesta de 11 mm para dejarles aire.
   - Sus conectores (GH5 vertical y el de 8 pines) no caben con clavija: el arnés de J301 va
     **soldado** a las filas de agujeros de la carrier, plano.
-  - Con 8 mm de grueso la carrier queda con ~3 mm de juego hacia la placa: falta decidir si se
-    calza o se acerca a la placa.
   - Medir con calibrador antes de imprimir y corregir `chasis.carrier`.
 - **18650 protegida:** Ø18.6 × 69 mm.
 - **Cable de la 18650:** se supone que sale por su extremo de abajo, de Ø2.6 como máximo y de
@@ -178,12 +180,12 @@ Hechas el 05-10-2026 con FreeCAD 1.1.3 sobre los archivos de esta carpeta
 | --- | --- |
 | Piezas | 8 piezas, un sólido válido cada una; mallas STL cerradas, sin no-manifold ni autointersecciones. Logo: 6 piezas, mallas cerradas |
 | Choques entre piezas impresas en su posición final | 0 (límite 1 mm³ por pareja) |
-| Choques con la placa v0.2 real (PCB y 110 componentes, movida 1 mm hacia el panel), clavijas enchufadas con sus cables, panel-usb real, carrier y su clavija SMA, 18650, coaxial, OLED, botón y retenes de la tuerca | 0 mm³ |
+| Choques con la placa v0.2 real (PCB y 110 componentes, movida 1 mm hacia el panel), clavijas enchufadas con sus cables, panel-usb real, carrier medida (con su SMA y sus patas, + 1 mm), 18650, coaxial, OLED, botón y retenes de la tuerca | 0 mm³ |
 | Chasis armado en el collar Ø52 | radio máximo 25.5 mm (límite 25.65 con 0.35 de holgura) |
 | Plástico del chasis junto a la antena del ESP32 (antena del WROOM-1: x 16.3–23, z 54.2–72.2) | 0 mm³ |
 | Placa con el ESP32-S3-WROOM-1 (06-10-2026; STEP de `kicad-cli` con el modelo del WROOM corrido a su `.wrl`, fuera de `check_v2_3.py`, que aún usa el STEP de `hardware/main-board/cad` con el MINI) contra las 8 piezas | 0 mm³; radio máximo de la placa 23.35 |
 | Chasis contra la placa y sus 111 objetos del STEP (PCB y componentes) | PCB a 0.15 mm por cara (riel); componente más cercano a 1.1 mm (U201), luego L101 1.2, C307 1.5, J401 1.6, J405 1.6. Lo único delante de la cara de la placa son las lengüetas de los rieles, dentro de las franjas sin componentes de KiCad: +X en u 0–1.5, v 0–16.5 (franja u 0–2.55, v 0–16.55) y −X en u 44.3–46, v 0–48.5 (franja u 43.55–46, v 0–48.55) |
-| Holguras | chasis–tapa 0.21 (zapatas, al cerrar), chasis–plataforma del IMU 0.71, chasis–base 1.09, chasis–18650 1.0, chasis–clavija SMA 0.6, chasis–coaxial 0.5; placa–carrier 1.1 y carrier–18650 1.0 (supuestas) |
+| Holguras | chasis–tapa 0.21 (zapatas, al cerrar), chasis–plataforma del IMU 0.71, chasis–base 1.09, chasis–18650 1.0, chasis–coaxial 0.5; placa–carrier 0.9 y patas del SMA–18650 0.32 (carrier medida en foto + 1 mm) |
 | Montaje paso a paso (`hardware/main-board/cad/check_montaje_v2_3.py`, de la otra sesión, corrido sobre esta versión con la placa movida 1 mm) | 0 choques: 18650 en sus tres tramos, carrier al chasis, placa al chasis desde abajo (PCB y componentes), chasis armado al tubo con la 18650 puesta, clavijas de J102 y J404 desde abajo, plataforma del IMU. Lo que marca y no es real: la placa desde arriba (no se mete por ahí), las reservas de cable de J101/J502 (son el mismo cable) y la tapa de antena bajando recta (en la realidad gira con la bayoneta) |
 | Cable de la 18650 a J102 (Ø2.6, 66.7 mm) | 0 choques con el recorrido corregido por delante del riel −X; holguras 0.17 al tubo, 0.18 a los retenes, 0.29 a la base, 0.52 al chasis |
 | Contactos intencionados (holgura 0) | pie de los rieles sobre los topes del collar; carrier sobre sus pisos; 18650 tangente a los labios de su cuna (la retención es geométrica, no por interferencia) |

@@ -6,9 +6,10 @@
   "chasis-tapa": 0.206,
   "chasis-plataforma": 0.706,
   "chasis-base": 1.094,
-  "chasis-carrier": 0.0,
-  "chasis-clavija_sma": 0.6,
   "chasis-coaxial": 0.5,
+  "chasis-carrier": 0.0,
+  "carrier-18650": 0.318,
+  "placa-carrier": 0.9,
   "chasis-18650": 1.0,
   "tubo-18650": 0.0
  },
@@ -27,11 +28,6 @@
    "a": "panel_usb:PCB_panel_usb",
    "b": "panel_usb:pusb_J501",
    "mm3": 0.085
-  },
-  {
-   "a": "supuesto:carrier_sma_plug",
-   "b": "supuesto:coax",
-   "mm3": 18.951
   }
  ],
  "collar": {

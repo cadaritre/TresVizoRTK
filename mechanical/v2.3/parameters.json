@@ -694,8 +694,8 @@
     11.0
    ],
    "y": [
-    -9.6,
-    1.4
+    -7.4,
+    1.6
    ],
    "z": [
     19.0,
@@ -703,23 +703,34 @@
    ],
    "pcb": 1.6,
    "sma": {
-    "_nota": "Medido en foto (05-10-2026, +-1 mm): cuerpo en x -10...-2.5, eje del canon en x -6.2, punta en z ~81. Sus patas asoman 1-2 mm por detras, hacia la 18650: cortarlas a ras.",
+    "_nota": "Medido en foto (05-10-2026), con 1 mm de mas: cuerpo en x -11...-1.5 (foto: -10...-2.5), eje del canon en x -6.2, punta en z ~81. Sus 4 patas atraviesan la carrier y asoman hasta 3 mm por detras (foto: 1-2 mm): 'patas' es su envolvente, que el chasis y la 18650 dejan libre. No hay que cortarlas.",
     "x": [
      -11.0,
      0.5
     ],
-    "alto": 13.0
+    "alto": 13.0,
+    "patas": {
+     "x": [
+      -11.0,
+      -1.5
+     ],
+     "atras": 3.0,
+     "z": [
+      63.5,
+      72.0
+     ]
+    }
    },
-   "_nota": "Envolvente de 32 x 52 x 11 (componentes hacia la placa, SMA arriba). Medida en foto el 05-10-2026 (+-1 mm, sin calibrador): mide ~8 mm de grueso, asi que la envolvente deja ~3 mm de reserva hacia la placa. El arnes de J301 va soldado a la carrier, sin clavijas. Su canto inferior va en z 19.0 para librar la cabeza del reten de la tuerca a 180 grados (z 18.36). Centrada en y entre la placa (1.1 mm) y la 18650 (1.0 mm)."
+   "_nota": "Envolvente de 32 x 52 x 9 (componentes hacia la placa, SMA arriba): medida en foto el 05-10-2026 (~8 mm de grueso, sin calibrador) con 1 mm de mas por si acaso, decision del propietario. Va 2.2 mm mas cerca de la placa que con la envolvente supuesta de 11 mm para dejar detras el aire de las patas del SMA, que asoman hacia la 18650 (no se cortan). Su canto inferior va en z 19.0 para librar la cabeza del reten de la tuerca a 180 grados (z 18.36). El arnes de J301 va soldado a la carrier, sin clavijas."
   },
   "ranuras_carrier": {
    "y": [
-    -10.3,
-    -7.2
+    -8.1,
+    -5.0
    ],
    "labio_y": [
-    -10.3,
-    -9.8
+    -8.1,
+    -7.6
    ],
    "labio_ancho": 1.9,
    "piso_alto": 1.0,
@@ -833,7 +844,7 @@
      16.0
     ]
    ],
-   "topes_y0": -10.3,
+   "topes_y0": -8.1,
    "topes_alto": 2.0,
    "_nota": "Placa superior del chasis, detras de la placa principal y encima de la carrier (z 71.4 = canto superior de la carrier + 0.4). Une los dos rieles, lleva los salientes de H1 y H2 y una ventana grande, abierta por abajo, por donde pasan la clavija SMA de la carrier, el coaxial y el cable del IMU. Dos topes hacia atras, sobre los cantos de la carrier, no la dejan subir. Su cara trasera (y -2.4) deja pasar el coaxial (y -4.4, d 3). Abajo del todo no cabe una placa: entre placa principal y carrier quedan 0.4 mm, y entre carrier y 18650 otros 0.4."
   },
