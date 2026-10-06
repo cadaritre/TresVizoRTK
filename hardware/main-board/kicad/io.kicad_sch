@@ -10,7 +10,7 @@
 		(rev "0.2")
 		(company "TresVizo")
 		(comment 1 "Exploratorio: no fabricado ni probado")
-		(comment 2 "ESP32-S3-MINI-1-N4R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+		(comment 2 "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
 		(comment 3 "JLCPCB 4 capas JLC04161H-7628")
 	)
 	(lib_symbols
@@ -1374,288 +1374,6 @@
 						)
 					)
 					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -10.16 90)
-					(length 3.048)
-					(name "MountPin"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "MP"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "Connector_Generic_MountingPin:Conn_01x05_MountingPin"
-			(pin_names
-				(offset 1.016)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "J"
-				(at 0 7.62 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "Conn_01x05_MountingPin"
-				(at 1.27 -7.62 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Generic connectable mounting pin connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "connector"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "Connector*:*_1x??-1MP*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "Conn_01x05_MountingPin_1_1"
-				(rectangle
-					(start -1.27 6.35)
-					(end 1.27 -6.35)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-				(rectangle
-					(start -1.27 5.207)
-					(end 0 4.953)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(rectangle
-					(start -1.27 2.667)
-					(end 0 2.413)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(rectangle
-					(start -1.27 0.127)
-					(end 0 -0.127)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(rectangle
-					(start -1.27 -2.413)
-					(end 0 -2.667)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(rectangle
-					(start -1.27 -4.953)
-					(end 0 -5.207)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts (xy -1.016 -7.112) (xy 1.016 -7.112))
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(text "Mounting"
-					(at 0 -6.731 0)
-					(effects
-						(font
-							(size 0.381 0.381)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 5.08 0)
-					(length 3.81)
-					(name "Pin_1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 2.54 0)
-					(length 3.81)
-					(name "Pin_2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 3.81)
-					(name "Pin_3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 -2.54 0)
-					(length 3.81)
-					(name "Pin_4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 -5.08 0)
-					(length 3.81)
-					(name "Pin_5"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -5026,7 +4744,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Invierte la detección: GPIO48 HIGH con tarjeta, como espera el firmware"
+		(property "Description" "Invierte la detección: GPIO17 HIGH con tarjeta"
 			(at 58.42 82.55 0)
 			(effects
 				(font
@@ -5694,340 +5412,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic_MountingPin:Conn_01x05_MountingPin")
-		(at 59.69 123.19 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "2d51ff64-2fe1-5f62-9817-464ac4ec340e")
-		(property "Reference" "J406"
-			(at 54.61 114.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Value" "LEDS"
-			(at 54.61 116.44 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Footprint" "tresvizo_lcsc:CONN-SMD_SM05B-SRSS-TB-LF-SN"
-			(at 59.69 123.19 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 59.69 123.19 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "SH 5 lateral a los LEDs del panel: ánodo común (3V3), cátodos R, G, B y de carga"
-			(at 59.69 123.19 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "SM05B-SRSS-TB(LF)(SN)"
-			(at 59.69 123.19 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C136657"
-			(at 59.69 123.19 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "b364e053-125e-53fa-ae15-e5f53000a4bd")
-		)
-		(pin "2"
-			(uuid "8c63d9c6-c47a-5fd3-be23-5a52236d87fe")
-		)
-		(pin "3"
-			(uuid "2436bf6b-0848-5a06-81cd-a2e3758f6821")
-		)
-		(pin "4"
-			(uuid "d393b03b-2d3c-514e-9947-3600e61379eb")
-		)
-		(pin "5"
-			(uuid "57de5b1a-abd2-5cc4-a234-770c29bb4a1f")
-		)
-		(pin "MP"
-			(uuid "c5df00f4-c56f-5d8d-ba9d-47c72021b23e")
-		)
-		(instances
-			(project "tresvizo-main"
-				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "J406")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts (xy 54.61 118.11) (xy 52.07 118.11))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "206b2b13-abce-55e1-8762-cd3655ead37e")
-	)
-	(symbol
-		(lib_id "power:+3V3")
-		(at 52.07 118.11 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "eea8b3c4-4533-59af-ad69-1ced7e737c72")
-		(property "Reference" "#PWR4018"
-			(at 52.07 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+3V3"
-			(at 52.07 114.91 270)
-			(effects
-				(font
-					(size 1 1)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 52.07 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 52.07 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 52.07 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "74cd7d17-1d31-5f54-8693-d7907a6beb74")
-		)
-		(instances
-			(project "tresvizo-main"
-				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4018")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts (xy 54.61 120.65) (xy 52.07 120.65))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "223d258e-26f7-5d34-8c52-3f1e19b22f83")
-	)
-	(label "LED_R_K"
-		(at 52.07 120.65 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right bottom)
-		)
-		(uuid "8d070689-cce6-54fb-8faf-8d45241c777c")
-	)
-	(wire
-		(pts (xy 54.61 123.19) (xy 52.07 123.19))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "76c7a60e-9c83-545e-96f5-f9bd729f4a22")
-	)
-	(label "LED_G_K"
-		(at 52.07 123.19 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right bottom)
-		)
-		(uuid "98af8d96-0140-5e3a-bc50-785fe6732b03")
-	)
-	(wire
-		(pts (xy 54.61 125.73) (xy 52.07 125.73))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0348a80a-99b3-58b3-8ff2-d6145d223c21")
-	)
-	(label "LED_B_K"
-		(at 52.07 125.73 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right bottom)
-		)
-		(uuid "7a9681d0-5cfd-5b36-bdfc-80032cafac6a")
-	)
-	(wire
-		(pts (xy 54.61 128.27) (xy 52.07 128.27))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5bd1f086-6abf-560f-a025-f56490d84fd5")
-	)
-	(global_label "CHG_LED_K"
-		(shape bidirectional)
-		(at 52.07 128.27 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right)
-		)
-		(uuid "79d1b34b-aa9f-54f5-859a-ed38c2b264c7")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 52.07 128.27 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(hide yes)
-			)
-		)
-	)
-	(wire
-		(pts (xy 59.69 133.35) (xy 59.69 135.89))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f150876c-9a7c-56cb-9e56-5cdfe26de6e8")
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 59.69 135.89 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "ecdeb264-23eb-5821-9920-76203034595e")
-		(property "Reference" "#PWR4019"
-			(at 59.69 135.89 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 59.69 139.09 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 59.69 135.89 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 59.69 135.89 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 59.69 135.89 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "210fac14-efaf-5d11-bb67-8a72a2964339")
-		)
-		(instances
-			(project "tresvizo-main"
-				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4019")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:D_TVS")
-		(at 64.77 123.19 90)
+		(at 40.64 123.19 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6035,7 +5421,7 @@
 		(dnp no)
 		(uuid "e532c350-01de-5616-95d1-1cc0694477c3")
 		(property "Reference" "D401"
-			(at 66.64 122.19 270)
+			(at 42.51 122.19 270)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6044,7 +5430,7 @@
 			)
 		)
 		(property "Value" "PESD5V0F1BL"
-			(at 66.64 124.79 270)
+			(at 42.51 124.79 270)
 			(effects
 				(font
 					(size 1 1)
@@ -6053,7 +5439,7 @@
 			)
 		)
 		(property "Footprint" "tresvizo_lcsc:SOD-882_L1.0-W0.6-BI"
-			(at 64.77 123.19 0)
+			(at 40.64 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6062,7 +5448,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 64.77 123.19 0)
+			(at 40.64 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6071,7 +5457,7 @@
 			)
 		)
 		(property "Description" "ESD del botón metálico, UMW (fuga < 1 nA: QON tiene un pull-up de 200 kohm)"
-			(at 64.77 123.19 0)
+			(at 40.64 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6080,7 +5466,7 @@
 			)
 		)
 		(property "MPN" "PESD5V0F1BL"
-			(at 64.77 123.19 0)
+			(at 40.64 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6089,7 +5475,7 @@
 			)
 		)
 		(property "LCSC" "C3001950"
-			(at 64.77 123.19 0)
+			(at 40.64 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6113,7 +5499,7 @@
 		)
 	)
 	(wire
-		(pts (xy 64.77 127) (xy 64.77 129.54))
+		(pts (xy 40.64 127) (xy 40.64 129.54))
 		(stroke
 			(width 0)
 			(type default)
@@ -6122,7 +5508,7 @@
 	)
 	(global_label "BTN_N"
 		(shape bidirectional)
-		(at 64.77 129.54 270)
+		(at 40.64 129.54 270)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -6132,7 +5518,7 @@
 		)
 		(uuid "3805bfba-9eb8-5642-bb4f-6a1ef3c186af")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 64.77 129.54 0)
+			(at 40.64 129.54 0)
 			(effects
 				(font
 					(size 1 1)
@@ -6142,7 +5528,7 @@
 		)
 	)
 	(wire
-		(pts (xy 64.77 119.38) (xy 64.77 116.84))
+		(pts (xy 40.64 119.38) (xy 40.64 116.84))
 		(stroke
 			(width 0)
 			(type default)
@@ -6151,15 +5537,15 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 64.77 116.84 180)
+		(at 40.64 116.84 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "3740da3d-57ba-5090-b834-8efd49d5203e")
-		(property "Reference" "#PWR4020"
-			(at 64.77 116.84 0)
+		(property "Reference" "#PWR4018"
+			(at 40.64 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6168,7 +5554,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 64.77 120.04 180)
+			(at 40.64 120.04 180)
 			(effects
 				(font
 					(size 1 1)
@@ -6177,7 +5563,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 64.77 116.84 0)
+			(at 40.64 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6186,7 +5572,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 64.77 116.84 0)
+			(at 40.64 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6195,7 +5581,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 64.77 116.84 0)
+			(at 40.64 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6209,7 +5595,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4020")
+					(reference "#PWR4018")
 					(unit 1)
 				)
 			)
@@ -6217,7 +5603,7 @@
 	)
 	(symbol
 		(lib_id "Device:D")
-		(at 82.55 133.35 90)
+		(at 58.42 133.35 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6225,7 +5611,7 @@
 		(dnp no)
 		(uuid "c815ad1e-98f4-5dbf-9629-a2f91a39e57f")
 		(property "Reference" "D402"
-			(at 84.42 132.35 270)
+			(at 60.29 132.35 270)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6234,7 +5620,7 @@
 			)
 		)
 		(property "Value" "1N4148W"
-			(at 84.42 134.95 270)
+			(at 60.29 134.95 270)
 			(effects
 				(font
 					(size 1 1)
@@ -6243,7 +5629,7 @@
 			)
 		)
 		(property "Footprint" "tresvizo_lcsc:SOD-123F_L2.7-W1.6-LS3.8-RD"
-			(at 82.55 133.35 0)
+			(at 58.42 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6252,7 +5638,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 82.55 133.35 0)
+			(at 58.42 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6260,8 +5646,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Aísla QON (pull-up interno a 3.2-3.8 V) del GPIO10; silicio, no Schottky"
-			(at 82.55 133.35 0)
+		(property "Description" "Aísla QON (pull-up interno a 3.2-3.8 V) del GPIO18; silicio, no Schottky"
+			(at 58.42 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6270,7 +5656,7 @@
 			)
 		)
 		(property "MPN" "1N4148W"
-			(at 82.55 133.35 0)
+			(at 58.42 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6279,7 +5665,7 @@
 			)
 		)
 		(property "LCSC" "C81598"
-			(at 82.55 133.35 0)
+			(at 58.42 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6303,7 +5689,7 @@
 		)
 	)
 	(wire
-		(pts (xy 82.55 137.16) (xy 82.55 139.7))
+		(pts (xy 58.42 137.16) (xy 58.42 139.7))
 		(stroke
 			(width 0)
 			(type default)
@@ -6312,7 +5698,7 @@
 	)
 	(global_label "BTN_N"
 		(shape bidirectional)
-		(at 82.55 139.7 270)
+		(at 58.42 139.7 270)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -6322,7 +5708,7 @@
 		)
 		(uuid "586276b9-1ef0-5576-8591-8c59372a16d9")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 82.55 139.7 0)
+			(at 58.42 139.7 0)
 			(effects
 				(font
 					(size 1 1)
@@ -6332,7 +5718,7 @@
 		)
 	)
 	(wire
-		(pts (xy 82.55 129.54) (xy 82.55 127))
+		(pts (xy 58.42 129.54) (xy 58.42 127))
 		(stroke
 			(width 0)
 			(type default)
@@ -6341,7 +5727,7 @@
 	)
 	(global_label "BTN_SENSE_N"
 		(shape bidirectional)
-		(at 82.55 127 90)
+		(at 58.42 127 90)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -6351,7 +5737,7 @@
 		)
 		(uuid "16aab997-e5fe-5667-81ee-3973c897e23b")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 82.55 127 0)
+			(at 58.42 127 0)
 			(effects
 				(font
 					(size 1 1)
@@ -6362,7 +5748,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 102.87 118.11 90)
+		(at 78.74 118.11 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6370,7 +5756,7 @@
 		(dnp no)
 		(uuid "de9f1d96-83dd-5504-bcc1-ec8bf2b88971")
 		(property "Reference" "R408"
-			(at 99.06 115.094 270)
+			(at 74.93 115.094 270)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6379,7 +5765,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 99.06 116.694 270)
+			(at 74.93 116.694 270)
 			(effects
 				(font
 					(size 1 1)
@@ -6388,7 +5774,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 102.87 118.11 0)
+			(at 78.74 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6397,7 +5783,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 102.87 118.11 0)
+			(at 78.74 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6406,7 +5792,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 102.87 118.11 0)
+			(at 78.74 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6415,7 +5801,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1002TCE"
-			(at 102.87 118.11 0)
+			(at 78.74 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6424,7 +5810,7 @@
 			)
 		)
 		(property "LCSC" "C25744"
-			(at 102.87 118.11 0)
+			(at 78.74 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6448,7 +5834,7 @@
 		)
 	)
 	(wire
-		(pts (xy 99.06 118.11) (xy 96.52 118.11))
+		(pts (xy 74.93 118.11) (xy 72.39 118.11))
 		(stroke
 			(width 0)
 			(type default)
@@ -6457,15 +5843,15 @@
 	)
 	(symbol
 		(lib_id "power:+3V3")
-		(at 96.52 118.11 90)
+		(at 72.39 118.11 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "a3a7bf16-d52f-5e08-b54c-48c4c09141f8")
-		(property "Reference" "#PWR4021"
-			(at 96.52 118.11 0)
+		(property "Reference" "#PWR4019"
+			(at 72.39 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6474,7 +5860,7 @@
 			)
 		)
 		(property "Value" "+3V3"
-			(at 96.52 114.91 270)
+			(at 72.39 114.91 270)
 			(effects
 				(font
 					(size 1 1)
@@ -6482,7 +5868,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 96.52 118.11 0)
+			(at 72.39 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6491,7 +5877,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 96.52 118.11 0)
+			(at 72.39 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6500,7 +5886,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 96.52 118.11 0)
+			(at 72.39 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6514,14 +5900,14 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4021")
+					(reference "#PWR4019")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(wire
-		(pts (xy 106.68 118.11) (xy 109.22 118.11))
+		(pts (xy 82.55 118.11) (xy 85.09 118.11))
 		(stroke
 			(width 0)
 			(type default)
@@ -6530,7 +5916,7 @@
 	)
 	(global_label "BTN_SENSE_N"
 		(shape bidirectional)
-		(at 109.22 118.11 0)
+		(at 85.09 118.11 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -6540,7 +5926,7 @@
 		)
 		(uuid "23c57219-eff3-5cbc-996c-eac4f98b5564")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 109.22 118.11 0)
+			(at 85.09 118.11 0)
 			(effects
 				(font
 					(size 1 1)
@@ -6551,7 +5937,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 140.97 118.11 90)
+		(at 115.57 118.11 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6559,7 +5945,7 @@
 		(dnp no)
 		(uuid "52c129dd-e964-52ef-b35d-20da23f26aa9")
 		(property "Reference" "R409"
-			(at 137.16 115.094 270)
+			(at 111.76 115.094 270)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6567,8 +5953,8 @@
 				(justify left bottom)
 			)
 		)
-		(property "Value" "1k"
-			(at 137.16 116.694 270)
+		(property "Value" "100"
+			(at 111.76 116.694 270)
 			(effects
 				(font
 					(size 1 1)
@@ -6577,7 +5963,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 140.97 118.11 0)
+			(at 115.57 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6586,7 +5972,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 140.97 118.11 0)
+			(at 115.57 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6594,8 +5980,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" ""
-			(at 140.97 118.11 0)
+		(property "Description" "Anillo del botón: usar la versión de 3-6 V (la de 12 V no enciende)"
+			(at 115.57 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6603,8 +5989,8 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "0402WGF1001TCE"
-			(at 140.97 118.11 0)
+		(property "MPN" "0402WGF1000TCE"
+			(at 115.57 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6612,8 +5998,8 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C11702"
-			(at 140.97 118.11 0)
+		(property "LCSC" "C25076"
+			(at 115.57 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6637,16 +6023,16 @@
 		)
 	)
 	(wire
-		(pts (xy 137.16 118.11) (xy 134.62 118.11))
+		(pts (xy 111.76 118.11) (xy 109.22 118.11))
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "5a00da91-7401-5a95-85f9-1a96011cc01e")
 	)
-	(global_label "LED_R"
+	(global_label "VSYS"
 		(shape bidirectional)
-		(at 134.62 118.11 180)
+		(at 109.22 118.11 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -6656,7 +6042,7 @@
 		)
 		(uuid "b2b71c7c-c978-5d15-82c9-0fd9d68f60d2")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 134.62 118.11 0)
+			(at 109.22 118.11 0)
 			(effects
 				(font
 					(size 1 1)
@@ -6666,15 +6052,15 @@
 		)
 	)
 	(wire
-		(pts (xy 144.78 118.11) (xy 147.32 118.11))
+		(pts (xy 119.38 118.11) (xy 121.92 118.11))
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "a858f8f7-34dd-5ffc-a586-4c5fc40240cf")
 	)
-	(label "LED_R_K"
-		(at 147.32 118.11 0)
+	(label "BTN_LED_A"
+		(at 121.92 118.11 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -6685,413 +6071,8 @@
 		(uuid "065c2e79-e45d-507d-a842-4352bfe2da28")
 	)
 	(symbol
-		(lib_id "Device:R")
-		(at 173.99 118.11 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "1145db06-177f-5fbf-a066-8c9d8a43c231")
-		(property "Reference" "R410"
-			(at 170.18 115.094 270)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Value" "100"
-			(at 170.18 116.694 270)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 173.99 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 173.99 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 173.99 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "0402WGF1000TCE"
-			(at 173.99 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C25076"
-			(at 173.99 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "f64fc903-0d89-53d1-9c9d-b1135b45e3c1")
-		)
-		(pin "2"
-			(uuid "fa95b1c0-0838-5195-abc3-85deb51e6609")
-		)
-		(instances
-			(project "tresvizo-main"
-				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "R410")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts (xy 170.18 118.11) (xy 167.64 118.11))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4bcf7b6d-b7fc-5fd6-be49-d7ecd53af132")
-	)
-	(global_label "LED_G"
-		(shape bidirectional)
-		(at 167.64 118.11 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right)
-		)
-		(uuid "0f304c67-268c-57a8-8900-266de8beda0c")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 167.64 118.11 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(hide yes)
-			)
-		)
-	)
-	(wire
-		(pts (xy 177.8 118.11) (xy 180.34 118.11))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "18b55db2-d752-57b1-8f5a-bd80917833cd")
-	)
-	(label "LED_G_K"
-		(at 180.34 118.11 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify left bottom)
-		)
-		(uuid "3f73cae9-badc-5579-a859-f5e8dc69c497")
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 207.01 118.11 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "263b1811-942e-55de-84de-1a067240286d")
-		(property "Reference" "R411"
-			(at 203.2 115.094 270)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Value" "100"
-			(at 203.2 116.694 270)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 207.01 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 207.01 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 207.01 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "0402WGF1000TCE"
-			(at 207.01 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C25076"
-			(at 207.01 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "3479b0e9-54a6-531b-9268-2a6a69832d5b")
-		)
-		(pin "2"
-			(uuid "10d35aa9-2c0a-54bf-9954-b6412bc19362")
-		)
-		(instances
-			(project "tresvizo-main"
-				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "R411")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts (xy 203.2 118.11) (xy 200.66 118.11))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "832a966f-46f8-5557-92a3-d92c12bbd13b")
-	)
-	(global_label "LED_B"
-		(shape bidirectional)
-		(at 200.66 118.11 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right)
-		)
-		(uuid "457293fc-86b0-509b-9ca7-1e5a2f53f3fb")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 200.66 118.11 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(hide yes)
-			)
-		)
-	)
-	(wire
-		(pts (xy 210.82 118.11) (xy 213.36 118.11))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6e8afe76-03dc-5cc6-9421-882f24b91399")
-	)
-	(label "LED_B_K"
-		(at 213.36 118.11 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify left bottom)
-		)
-		(uuid "a86d7d91-aaff-56df-adff-b8a4450a333c")
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 240.03 118.11 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "34b23e1e-83b8-5eb5-8634-d6af0e3d63b7")
-		(property "Reference" "R412"
-			(at 236.22 115.094 270)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Value" "100"
-			(at 236.22 116.694 270)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 240.03 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 240.03 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Anillo del botón: usar la versión de 3-6 V (la de 12 V no enciende)"
-			(at 240.03 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "0402WGF1000TCE"
-			(at 240.03 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C25076"
-			(at 240.03 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "197e1895-0c89-515d-85e4-60d9a6124dfc")
-		)
-		(pin "2"
-			(uuid "566d878a-1681-5487-9c18-470554486237")
-		)
-		(instances
-			(project "tresvizo-main"
-				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "R412")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts (xy 236.22 118.11) (xy 233.68 118.11))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "dc3d85c9-def3-5d38-8043-4b2c2263e771")
-	)
-	(global_label "VSYS"
-		(shape bidirectional)
-		(at 233.68 118.11 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right)
-		)
-		(uuid "3f1bd29f-1a7f-57ea-ab18-1147b9fd0bb9")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 233.68 118.11 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(hide yes)
-			)
-		)
-	)
-	(wire
-		(pts (xy 243.84 118.11) (xy 246.38 118.11))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a6a2b914-bdfc-51da-b8a1-f72f82087708")
-	)
-	(label "BTN_LED_A"
-		(at 246.38 118.11 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify left bottom)
-		)
-		(uuid "69e70677-e15e-57d7-8707-d5b707dbe09d")
-	)
-	(symbol
 		(lib_id "Transistor_FET:AO3400A")
-		(at 281.94 133.35 0)
+		(at 157.48 133.35 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -7099,7 +6080,7 @@
 		(dnp no)
 		(uuid "70899dcb-ce87-5824-8e03-6419bb2471ec")
 		(property "Reference" "Q402"
-			(at 276.86 126.27 0)
+			(at 152.4 126.27 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7108,7 +6089,7 @@
 			)
 		)
 		(property "Value" "AO3400A"
-			(at 276.86 127.87 0)
+			(at 152.4 127.87 0)
 			(effects
 				(font
 					(size 1 1)
@@ -7117,7 +6098,7 @@
 			)
 		)
 		(property "Footprint" "tresvizo_lcsc:SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR"
-			(at 281.94 133.35 0)
+			(at 157.48 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7126,7 +6107,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 281.94 133.35 0)
+			(at 157.48 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7135,7 +6116,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 281.94 133.35 0)
+			(at 157.48 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7144,7 +6125,7 @@
 			)
 		)
 		(property "MPN" "AO3400A"
-			(at 281.94 133.35 0)
+			(at 157.48 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7153,7 +6134,7 @@
 			)
 		)
 		(property "LCSC" "C20917"
-			(at 281.94 133.35 0)
+			(at 157.48 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7180,7 +6161,7 @@
 		)
 	)
 	(wire
-		(pts (xy 276.86 133.35) (xy 274.32 133.35))
+		(pts (xy 152.4 133.35) (xy 149.86 133.35))
 		(stroke
 			(width 0)
 			(type default)
@@ -7189,7 +6170,7 @@
 	)
 	(global_label "BTN_LED_EN"
 		(shape bidirectional)
-		(at 274.32 133.35 180)
+		(at 149.86 133.35 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -7199,7 +6180,7 @@
 		)
 		(uuid "d3dc75e5-d9f4-5387-a6fc-51639b00e7cd")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 274.32 133.35 0)
+			(at 149.86 133.35 0)
 			(effects
 				(font
 					(size 1 1)
@@ -7209,7 +6190,7 @@
 		)
 	)
 	(wire
-		(pts (xy 284.48 138.43) (xy 284.48 140.97))
+		(pts (xy 160.02 138.43) (xy 160.02 140.97))
 		(stroke
 			(width 0)
 			(type default)
@@ -7218,15 +6199,15 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 284.48 140.97 0)
+		(at 160.02 140.97 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "ec1a9fd3-82f4-594b-9b49-420e465ae483")
-		(property "Reference" "#PWR4022"
-			(at 284.48 140.97 0)
+		(property "Reference" "#PWR4020"
+			(at 160.02 140.97 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7235,7 +6216,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 284.48 144.17 0)
+			(at 160.02 144.17 0)
 			(effects
 				(font
 					(size 1 1)
@@ -7244,7 +6225,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 284.48 140.97 0)
+			(at 160.02 140.97 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7253,7 +6234,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 284.48 140.97 0)
+			(at 160.02 140.97 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7262,7 +6243,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 284.48 140.97 0)
+			(at 160.02 140.97 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7276,14 +6257,14 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4022")
+					(reference "#PWR4020")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(wire
-		(pts (xy 284.48 128.27) (xy 284.48 125.73))
+		(pts (xy 160.02 128.27) (xy 160.02 125.73))
 		(stroke
 			(width 0)
 			(type default)
@@ -7291,7 +6272,7 @@
 		(uuid "24da1488-1c12-5155-84f9-29df4909a8f0")
 	)
 	(label "BTN_LED_K"
-		(at 284.48 125.73 90)
+		(at 160.02 125.73 90)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -7303,15 +6284,15 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 35.56 156.21 90)
+		(at 184.15 118.11 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "6a1f78be-d6c2-51ff-abf0-6cc2e11e171b")
-		(property "Reference" "R413"
-			(at 31.75 153.194 270)
+		(uuid "1145db06-177f-5fbf-a066-8c9d8a43c231")
+		(property "Reference" "R410"
+			(at 180.34 115.094 270)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7320,7 +6301,7 @@
 			)
 		)
 		(property "Value" "100k"
-			(at 31.75 154.794 270)
+			(at 180.34 116.694 270)
 			(effects
 				(font
 					(size 1 1)
@@ -7329,7 +6310,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 35.56 156.21 0)
+			(at 184.15 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7338,7 +6319,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 35.56 156.21 0)
+			(at 184.15 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7347,7 +6328,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 35.56 156.21 0)
+			(at 184.15 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7356,7 +6337,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1003TCE"
-			(at 35.56 156.21 0)
+			(at 184.15 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7365,7 +6346,7 @@
 			)
 		)
 		(property "LCSC" "C25741"
-			(at 35.56 156.21 0)
+			(at 184.15 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7374,31 +6355,31 @@
 			)
 		)
 		(pin "1"
-			(uuid "d13bcf10-8bcb-57ed-8e02-bee0f5c92fd6")
+			(uuid "f64fc903-0d89-53d1-9c9d-b1135b45e3c1")
 		)
 		(pin "2"
-			(uuid "d5fdc9e5-da45-56e8-9934-fd9eb269bcad")
+			(uuid "fa95b1c0-0838-5195-abc3-85deb51e6609")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "R413")
+					(reference "R410")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(wire
-		(pts (xy 31.75 156.21) (xy 29.21 156.21))
+		(pts (xy 180.34 118.11) (xy 177.8 118.11))
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "6271d9f3-85fd-57a7-af75-1356cd7ba043")
+		(uuid "4bcf7b6d-b7fc-5fd6-be49-d7ecd53af132")
 	)
 	(global_label "BTN_LED_EN"
 		(shape bidirectional)
-		(at 29.21 156.21 180)
+		(at 177.8 118.11 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -7406,9 +6387,9 @@
 			)
 			(justify right)
 		)
-		(uuid "a2689016-e5ec-5128-add0-53b1c5632eb4")
+		(uuid "0f304c67-268c-57a8-8900-266de8beda0c")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 29.21 156.21 0)
+			(at 177.8 118.11 0)
 			(effects
 				(font
 					(size 1 1)
@@ -7418,24 +6399,24 @@
 		)
 	)
 	(wire
-		(pts (xy 39.37 156.21) (xy 41.91 156.21))
+		(pts (xy 187.96 118.11) (xy 190.5 118.11))
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "c28961b8-8e86-56b1-bab6-d107545a5490")
+		(uuid "18b55db2-d752-57b1-8f5a-bd80917833cd")
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 41.91 156.21 90)
+		(at 190.5 118.11 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "c9337dab-806d-5350-a81b-1490712c5174")
-		(property "Reference" "#PWR4023"
-			(at 41.91 156.21 0)
+		(uuid "b07e503e-be03-5236-805d-bcab2f4cb036")
+		(property "Reference" "#PWR4021"
+			(at 190.5 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7444,7 +6425,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 41.91 159.41 270)
+			(at 190.5 121.31 270)
 			(effects
 				(font
 					(size 1 1)
@@ -7453,7 +6434,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 41.91 156.21 0)
+			(at 190.5 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7462,7 +6443,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 41.91 156.21 0)
+			(at 190.5 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7471,7 +6452,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 41.91 156.21 0)
+			(at 190.5 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7480,12 +6461,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "0fcf3910-2736-5429-bfb6-78852261281b")
+			(uuid "7593b532-76ef-5ca3-855c-20d22da22ae3")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4023")
+					(reference "#PWR4021")
 					(unit 1)
 				)
 			)
@@ -7493,7 +6474,7 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic_MountingPin:Conn_01x04_MountingPin")
-		(at 64.77 158.75 0)
+		(at 214.63 120.65 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -7501,7 +6482,7 @@
 		(dnp no)
 		(uuid "a7d7c092-bfab-59e6-a1df-c1fa38a06dad")
 		(property "Reference" "J403"
-			(at 59.69 152.94 0)
+			(at 209.55 114.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7510,7 +6491,7 @@
 			)
 		)
 		(property "Value" "OLED"
-			(at 59.69 154.54 0)
+			(at 209.55 116.44 0)
 			(effects
 				(font
 					(size 1 1)
@@ -7519,7 +6500,7 @@
 			)
 		)
 		(property "Footprint" "tresvizo_lcsc:CONN-SMD_4P-P1.00_SM04B-SRSS-TB-LF-SN"
-			(at 64.77 158.75 0)
+			(at 214.63 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7528,7 +6509,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 64.77 158.75 0)
+			(at 214.63 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7537,7 +6518,7 @@
 			)
 		)
 		(property "Description" "JST SH 4 lateral con el orden Qwiic: GND, 3V3, SDA, SCL"
-			(at 64.77 158.75 0)
+			(at 214.63 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7546,7 +6527,7 @@
 			)
 		)
 		(property "MPN" "SM04B-SRSS-TB(LF)(SN)"
-			(at 64.77 158.75 0)
+			(at 214.63 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7555,7 +6536,7 @@
 			)
 		)
 		(property "LCSC" "C160404"
-			(at 64.77 158.75 0)
+			(at 214.63 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7588,7 +6569,7 @@
 		)
 	)
 	(wire
-		(pts (xy 59.69 156.21) (xy 57.15 156.21))
+		(pts (xy 209.55 118.11) (xy 207.01 118.11))
 		(stroke
 			(width 0)
 			(type default)
@@ -7597,15 +6578,15 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 57.15 156.21 270)
+		(at 207.01 118.11 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "3d20a71d-3abf-5542-af12-b599dd412057")
-		(property "Reference" "#PWR4024"
-			(at 57.15 156.21 0)
+		(property "Reference" "#PWR4022"
+			(at 207.01 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7614,7 +6595,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 57.15 159.41 90)
+			(at 207.01 121.31 90)
 			(effects
 				(font
 					(size 1 1)
@@ -7623,7 +6604,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 57.15 156.21 0)
+			(at 207.01 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7632,7 +6613,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 57.15 156.21 0)
+			(at 207.01 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7641,7 +6622,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 57.15 156.21 0)
+			(at 207.01 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7655,14 +6636,14 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4024")
+					(reference "#PWR4022")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(wire
-		(pts (xy 59.69 158.75) (xy 57.15 158.75))
+		(pts (xy 209.55 120.65) (xy 207.01 120.65))
 		(stroke
 			(width 0)
 			(type default)
@@ -7671,15 +6652,15 @@
 	)
 	(symbol
 		(lib_id "power:+3V3")
-		(at 57.15 158.75 90)
+		(at 207.01 120.65 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "5bb2015d-7b46-51cb-8c42-dd70e4d34385")
-		(property "Reference" "#PWR4025"
-			(at 57.15 158.75 0)
+		(property "Reference" "#PWR4023"
+			(at 207.01 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7688,7 +6669,7 @@
 			)
 		)
 		(property "Value" "+3V3"
-			(at 57.15 155.55 270)
+			(at 207.01 117.45 270)
 			(effects
 				(font
 					(size 1 1)
@@ -7696,7 +6677,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 57.15 158.75 0)
+			(at 207.01 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7705,7 +6686,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 57.15 158.75 0)
+			(at 207.01 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7714,7 +6695,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 57.15 158.75 0)
+			(at 207.01 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7728,14 +6709,14 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4025")
+					(reference "#PWR4023")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(wire
-		(pts (xy 59.69 161.29) (xy 57.15 161.29))
+		(pts (xy 209.55 123.19) (xy 207.01 123.19))
 		(stroke
 			(width 0)
 			(type default)
@@ -7744,7 +6725,7 @@
 	)
 	(global_label "I2C_SDA"
 		(shape bidirectional)
-		(at 57.15 161.29 180)
+		(at 207.01 123.19 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -7754,7 +6735,7 @@
 		)
 		(uuid "74670d0a-1f94-5504-aa9f-bedd00f1f53d")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 57.15 161.29 0)
+			(at 207.01 123.19 0)
 			(effects
 				(font
 					(size 1 1)
@@ -7764,7 +6745,7 @@
 		)
 	)
 	(wire
-		(pts (xy 59.69 163.83) (xy 57.15 163.83))
+		(pts (xy 209.55 125.73) (xy 207.01 125.73))
 		(stroke
 			(width 0)
 			(type default)
@@ -7773,7 +6754,7 @@
 	)
 	(global_label "I2C_SCL"
 		(shape bidirectional)
-		(at 57.15 163.83 180)
+		(at 207.01 125.73 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -7783,7 +6764,7 @@
 		)
 		(uuid "633e26b6-6527-5cf5-bef2-278a1c25f9a7")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 57.15 163.83 0)
+			(at 207.01 125.73 0)
 			(effects
 				(font
 					(size 1 1)
@@ -7793,7 +6774,7 @@
 		)
 	)
 	(wire
-		(pts (xy 64.77 168.91) (xy 64.77 171.45))
+		(pts (xy 214.63 130.81) (xy 214.63 133.35))
 		(stroke
 			(width 0)
 			(type default)
@@ -7802,15 +6783,15 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 64.77 171.45 0)
+		(at 214.63 133.35 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "fc7da417-c6c2-511c-9d8c-80bb19473bc6")
-		(property "Reference" "#PWR4026"
-			(at 64.77 171.45 0)
+		(property "Reference" "#PWR4024"
+			(at 214.63 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7819,7 +6800,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 64.77 174.65 0)
+			(at 214.63 136.55 0)
 			(effects
 				(font
 					(size 1 1)
@@ -7828,7 +6809,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 64.77 171.45 0)
+			(at 214.63 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7837,7 +6818,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 64.77 171.45 0)
+			(at 214.63 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7846,7 +6827,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 64.77 171.45 0)
+			(at 214.63 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7860,7 +6841,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4026")
+					(reference "#PWR4024")
 					(unit 1)
 				)
 			)
@@ -7868,7 +6849,7 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic_MountingPin:Conn_01x02_MountingPin")
-		(at 86.36 156.21 0)
+		(at 236.22 118.11 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -7876,7 +6857,7 @@
 		(dnp no)
 		(uuid "a9d4af64-8325-59a8-bcac-5ded49b9584d")
 		(property "Reference" "J404"
-			(at 81.28 152.94 0)
+			(at 231.14 114.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7885,7 +6866,7 @@
 			)
 		)
 		(property "Value" "NTC"
-			(at 81.28 154.54 0)
+			(at 231.14 116.44 0)
 			(effects
 				(font
 					(size 1 1)
@@ -7894,7 +6875,7 @@
 			)
 		)
 		(property "Footprint" "tresvizo_lcsc:CONN-SMD_2P-P1.00_SM02B-SRSS-TB-LF-SN"
-			(at 86.36 156.21 0)
+			(at 236.22 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7903,7 +6884,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 86.36 156.21 0)
+			(at 236.22 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7912,7 +6893,7 @@
 			)
 		)
 		(property "Description" "NTC 10k B3435 opcional, pegada a la celda: al conectarla, cortar JP101"
-			(at 86.36 156.21 0)
+			(at 236.22 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7921,7 +6902,7 @@
 			)
 		)
 		(property "MPN" "SM02B-SRSS-TB(LF)(SN)"
-			(at 86.36 156.21 0)
+			(at 236.22 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7930,7 +6911,7 @@
 			)
 		)
 		(property "LCSC" "C160402"
-			(at 86.36 156.21 0)
+			(at 236.22 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7957,7 +6938,7 @@
 		)
 	)
 	(wire
-		(pts (xy 81.28 156.21) (xy 78.74 156.21))
+		(pts (xy 231.14 118.11) (xy 228.6 118.11))
 		(stroke
 			(width 0)
 			(type default)
@@ -7966,7 +6947,7 @@
 	)
 	(global_label "CHG_TS"
 		(shape bidirectional)
-		(at 78.74 156.21 180)
+		(at 228.6 118.11 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -7976,7 +6957,7 @@
 		)
 		(uuid "4536bbf7-77b1-5a8e-b27d-a5e98ff91a36")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 78.74 156.21 0)
+			(at 228.6 118.11 0)
 			(effects
 				(font
 					(size 1 1)
@@ -7986,7 +6967,7 @@
 		)
 	)
 	(wire
-		(pts (xy 81.28 158.75) (xy 78.74 158.75))
+		(pts (xy 231.14 120.65) (xy 228.6 120.65))
 		(stroke
 			(width 0)
 			(type default)
@@ -7995,15 +6976,15 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 78.74 158.75 270)
+		(at 228.6 120.65 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "152a2dbe-b2a1-5d88-8a9a-3542982781d7")
-		(property "Reference" "#PWR4027"
-			(at 78.74 158.75 0)
+		(property "Reference" "#PWR4025"
+			(at 228.6 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8012,7 +6993,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 78.74 161.95 90)
+			(at 228.6 123.85 90)
 			(effects
 				(font
 					(size 1 1)
@@ -8021,7 +7002,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 78.74 158.75 0)
+			(at 228.6 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8030,7 +7011,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 78.74 158.75 0)
+			(at 228.6 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8039,7 +7020,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 78.74 158.75 0)
+			(at 228.6 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8053,14 +7034,14 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4027")
+					(reference "#PWR4025")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(wire
-		(pts (xy 86.36 163.83) (xy 86.36 166.37))
+		(pts (xy 236.22 125.73) (xy 236.22 128.27))
 		(stroke
 			(width 0)
 			(type default)
@@ -8069,15 +7050,15 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 86.36 166.37 0)
+		(at 236.22 128.27 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "db064506-4ca4-536e-af2e-c9ab9b78ce87")
-		(property "Reference" "#PWR4028"
-			(at 86.36 166.37 0)
+		(property "Reference" "#PWR4026"
+			(at 236.22 128.27 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8086,7 +7067,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 86.36 169.57 0)
+			(at 236.22 131.47 0)
 			(effects
 				(font
 					(size 1 1)
@@ -8095,7 +7076,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 86.36 166.37 0)
+			(at 236.22 128.27 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8104,7 +7085,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 86.36 166.37 0)
+			(at 236.22 128.27 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8113,7 +7094,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 86.36 166.37 0)
+			(at 236.22 128.27 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8127,7 +7108,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4028")
+					(reference "#PWR4026")
 					(unit 1)
 				)
 			)
@@ -8255,7 +7236,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "5122c306-91c0-5b14-8672-1c39f2d1f240")
-		(property "Reference" "#PWR4029"
+		(property "Reference" "#PWR4027"
 			(at 231.14 30.48 0)
 			(effects
 				(font
@@ -8305,7 +7286,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4029")
+					(reference "#PWR4027")
 					(unit 1)
 				)
 			)
@@ -8328,7 +7309,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "38549b90-372f-5d5c-8598-a6ffa20ba7e1")
-		(property "Reference" "#PWR4030"
+		(property "Reference" "#PWR4028"
 			(at 231.14 33.02 0)
 			(effects
 				(font
@@ -8379,7 +7360,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4030")
+					(reference "#PWR4028")
 					(unit 1)
 				)
 			)
@@ -8402,7 +7383,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "24fa99c8-2b5c-5227-80f7-42f4cc2ee7ea")
-		(property "Reference" "#PWR4031"
+		(property "Reference" "#PWR4029"
 			(at 231.14 35.56 0)
 			(effects
 				(font
@@ -8453,7 +7434,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4031")
+					(reference "#PWR4029")
 					(unit 1)
 				)
 			)
@@ -8592,7 +7573,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "b6ffaed8-e596-5c50-9060-d19f289ff1ca")
-		(property "Reference" "#PWR4032"
+		(property "Reference" "#PWR4030"
 			(at 238.76 53.34 0)
 			(effects
 				(font
@@ -8643,7 +7624,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4032")
+					(reference "#PWR4030")
 					(unit 1)
 				)
 			)
@@ -8657,8 +7638,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "b87e3b1c-4c31-590f-a1f9-606b5dc72288")
-		(property "Reference" "R414"
+		(uuid "263b1811-942e-55de-84de-1a067240286d")
+		(property "Reference" "R411"
 			(at 250.19 27.464 270)
 			(effects
 				(font
@@ -8722,15 +7703,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "5d6c8e21-6f73-5d9d-a88b-ab07f9dd8ae7")
+			(uuid "3479b0e9-54a6-531b-9268-2a6a69832d5b")
 		)
 		(pin "2"
-			(uuid "383f782f-e8c5-5940-a18a-d2f04b7a5db7")
+			(uuid "10d35aa9-2c0a-54bf-9954-b6412bc19362")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "R414")
+					(reference "R411")
 					(unit 1)
 				)
 			)
@@ -8742,7 +7723,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "8d1a6961-36bf-5db1-893c-287d117e3833")
+		(uuid "832a966f-46f8-5557-92a3-d92c12bbd13b")
 	)
 	(symbol
 		(lib_id "power:+3V3")
@@ -8752,8 +7733,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "0b0317f6-4e76-5ba1-ad09-4c157448d110")
-		(property "Reference" "#PWR4033"
+		(uuid "43e9c05f-847c-5e8a-8541-1d3bea6d84db")
+		(property "Reference" "#PWR4031"
 			(at 247.65 30.48 0)
 			(effects
 				(font
@@ -8798,12 +7779,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "ce2364dd-55e4-5002-90fa-08466ee4d569")
+			(uuid "ac168e7b-645f-52ba-bfdf-d27a7b9f02f9")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4033")
+					(reference "#PWR4031")
 					(unit 1)
 				)
 			)
@@ -8815,7 +7796,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "a12ee4c6-d374-5142-bceb-f1808426dd7f")
+		(uuid "6e8afe76-03dc-5cc6-9421-882f24b91399")
 	)
 	(global_label "IMU_SDA"
 		(shape bidirectional)
@@ -8827,7 +7808,7 @@
 			)
 			(justify left)
 		)
-		(uuid "44f0ea6b-0397-5f0c-86ad-dae6d47a3990")
+		(uuid "ea42fcdd-827c-5934-84c3-aa42881d11d3")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 260.35 30.48 0)
 			(effects
@@ -8846,8 +7827,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "7c6782fe-3ed3-56f3-b0c5-f652cc18a0ea")
-		(property "Reference" "R415"
+		(uuid "34b23e1e-83b8-5eb5-8634-d6af0e3d63b7")
+		(property "Reference" "R412"
 			(at 278.13 27.464 270)
 			(effects
 				(font
@@ -8911,15 +7892,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "f4498599-ebfa-5968-ac14-e7d15a78ef2d")
+			(uuid "197e1895-0c89-515d-85e4-60d9a6124dfc")
 		)
 		(pin "2"
-			(uuid "df76907e-c040-50c8-9c1c-fdb3466a4851")
+			(uuid "566d878a-1681-5487-9c18-470554486237")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "R415")
+					(reference "R412")
 					(unit 1)
 				)
 			)
@@ -8931,7 +7912,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "c9a57e7a-228e-53e2-89fa-5ff3552e0671")
+		(uuid "dc3d85c9-def3-5d38-8043-4b2c2263e771")
 	)
 	(symbol
 		(lib_id "power:+3V3")
@@ -8941,8 +7922,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "4ee0ab46-3109-5699-8c6f-d56fd380cb66")
-		(property "Reference" "#PWR4034"
+		(uuid "12ecf172-23d8-5e4c-a421-38fa264c7e4e")
+		(property "Reference" "#PWR4032"
 			(at 275.59 30.48 0)
 			(effects
 				(font
@@ -8987,12 +7968,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "1d516685-f5ef-5644-ac25-5d93d3d89880")
+			(uuid "5a09ce36-6ae1-53c1-a859-b699302bc285")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/befe428c-d30b-5a76-ab51-0453c74e9d6b"
-					(reference "#PWR4034")
+					(reference "#PWR4032")
 					(unit 1)
 				)
 			)
@@ -9004,7 +7985,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "1e9d469d-d63a-5ef3-b032-ec6c059a9634")
+		(uuid "a6a2b914-bdfc-51da-b8a1-f72f82087708")
 	)
 	(global_label "IMU_SCL"
 		(shape bidirectional)
@@ -9016,7 +7997,7 @@
 			)
 			(justify left)
 		)
-		(uuid "c643ced4-8a39-52a7-bc16-d29bb9c7cd17")
+		(uuid "01d0dd99-acb1-5526-b972-7826c4133526")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 288.29 30.48 0)
 			(effects
@@ -9077,7 +8058,7 @@
 	)
 	(rectangle
 		(start 12.7 105.41)
-		(end 292.1 180.34)
+		(end 243.84 152.4)
 		(stroke
 			(width 0.1524)
 			(type dash)

@@ -204,7 +204,7 @@
    "etiqueta": "Chasis deslizable de la placa principal y la carrier",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 12.15,
+   "volumen_cm3": 12.08,
    "caja": [
     51.0,
     19.17,
@@ -248,5 +248,5 @@
    ]
   }
  ],
- "volumen_total_cm3": 177.87
+ "volumen_total_cm3": 177.8
 }

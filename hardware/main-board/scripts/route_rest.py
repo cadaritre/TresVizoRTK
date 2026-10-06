@@ -617,6 +617,7 @@ def shapes_conflict(p, q):
 
 class Router:
     def __init__(self, board, layer_names, pairs, netclass, positions):
+        self.removed = []
         self.board = board
         self.pairs = pairs
         self.positions = positions
@@ -731,6 +732,9 @@ class Router:
         self.used.pop(idx, None)
         for it in items:
             self.board.Remove(it)
+            # Que Python no libere las pistas y vías quitadas mientras KiCad pueda guardar punteros a
+            # ellas (conectividad, caché por KIID): con muchos arranques, Fill se caía con -11.
+            self.removed.append(it)
         xs1, ys1, xs2, ys2 = zip(*[shape_bbox(s) for s in shapes])
         bb = (min(xs1), min(ys1), max(xs2), max(ys2))
         clip = self.g.clip_of(bb, INFL)

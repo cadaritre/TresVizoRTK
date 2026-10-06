@@ -141,8 +141,9 @@ for k, sh in assembly:
         over.append({'objeto': k, 'mm3_fuera': round(c.Volume, 3)})
 report['collar'] = {'radio_limite': r_lim, 'radio_max_vertices': round(rmax, 3), 'fuera': over}
 
-# Antena del ESP32: nada del chasis en x 16.8-23 (y su prolongacion hasta el riel), z 54.2-70.2, y -6..12.
-ant = Part.makeBox(26.0 - 16.8, 18, 70.2 - 54.2, App.Vector(16.8, -6, 54.2))
+# Antena del ESP32: nada del chasis en la zona de chasis.antena_esp32 (y su prolongacion hasta el riel), y -6..12.
+_az = CH.get('antena_esp32', {'x': [16.8, 23.0], 'z': [54.2, 70.2]})
+ant = Part.makeBox(26.0 - _az['x'][0], 18, _az['z'][1] - _az['z'][0], App.Vector(_az['x'][0], -6, _az['z'][0]))
 c = parts['08-sled'].common(ant)
 report['antena_plastico_mm3'] = round(c.Volume, 3) if c.Solids else 0.0
 

@@ -449,6 +449,10 @@ def build_sled():
     plate = box(-xe, xe, py0, py1, pz0, pz1)
     wx, wz = ps['ventana']['x'], ps['ventana']['z']
     plate = plate.cut(box(wx[0], wx[1], py0 - 1, py1 + 1, wz[0], wz[1]))
+    # Sin plastico frente a la antena del ESP32: la esquina +X de abajo de la placa superior se recorta.
+    az = CH.get('antena_esp32')
+    if az:
+        plate = plate.cut(box(az['x'][0] - 0.3, xe + 1, py0 - 1, py1 + 1, pz0 - 1, az['z'][1] + 0.4))
     parts.append(plate)
     rb = ps['boss_diametro'] / 2.0
     pilots = []

@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-kicad/hardware/main-board/kicad/tresvizo-main.kicad_sch")
-		(date "2026-10-05T14:38:34")
+		(date "2026-10-06T05:36:23")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")
@@ -20,7 +20,7 @@
 				)
 				(comment
 					(number "2")
-					(value "ESP32-S3-MINI-1-N4R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
 				)
 				(comment
 					(number "3")
@@ -68,7 +68,7 @@
 				)
 				(comment
 					(number "2")
-					(value "ESP32-S3-MINI-1-N4R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
 				)
 				(comment
 					(number "3")
@@ -116,7 +116,7 @@
 				)
 				(comment
 					(number "2")
-					(value "ESP32-S3-MINI-1-N4R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
 				)
 				(comment
 					(number "3")
@@ -164,7 +164,7 @@
 				)
 				(comment
 					(number "2")
-					(value "ESP32-S3-MINI-1-N4R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
 				)
 				(comment
 					(number "3")
@@ -212,7 +212,7 @@
 				)
 				(comment
 					(number "2")
-					(value "ESP32-S3-MINI-1-N4R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
 				)
 				(comment
 					(number "3")
@@ -2188,7 +2188,7 @@
 			(ref "R101")
 			(value "10k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(description "ILIM_HIZ: con 22k da ~2.9 A de techo de entrada")
+			(description "ILIM_HIZ: con 8.2k da ~1.45 A de techo de entrada (1S); 22k da ~2.9 A (2S)")
 			(fields
 				(field
 					(name "MPN") "0402WGF1002TCE")
@@ -2200,7 +2200,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "ILIM_HIZ: con 22k da ~2.9 A de techo de entrada")
+					(name "Description") "ILIM_HIZ: con 8.2k da ~1.45 A de techo de entrada (1S); 22k da ~2.9 A (2S)")
 			)
 			(libsource
 				(lib "Device")
@@ -2714,72 +2714,6 @@
 		)
 		(comp
 			(ref "R109")
-			(value "1k")
-			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(description "LED de carga del panel (ánodo a +3V3)")
-			(fields
-				(field
-					(name "MPN") "0402WGF1001TCE")
-				(field
-					(name "LCSC") "C11702")
-				(field
-					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "LED de carga del panel (ánodo a +3V3)")
-			)
-			(libsource
-				(lib "Device")
-				(part "R")
-				(description "Resistor")
-			)
-			(property
-				(name "MPN")
-				(value "0402WGF1001TCE")
-			)
-			(property
-				(name "LCSC")
-				(value "C11702")
-			)
-			(property
-				(name "Sheetname")
-				(value "Alimentación, carga y batería")
-			)
-			(property
-				(name "Sheetfile")
-				(value "power.kicad_sch")
-			)
-			(property
-				(name "ki_keywords")
-				(value "R res resistor")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "R_*")
-			)
-			(sheetpath
-				(names "/Alimentación, carga y batería/")
-				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
-			)
-			(tstamps "1ae34a1b-a007-5b80-99f4-47fe553eba91")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-					)
-				)
-			)
-		)
-		(comp
-			(ref "R110")
 			(value "1M")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(fields
@@ -2829,7 +2763,7 @@
 				(names "/Alimentación, carga y batería/")
 				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
 			)
-			(tstamps "0e8575e1-c670-53b7-a9e4-2d775fb247bb")
+			(tstamps "1ae34a1b-a007-5b80-99f4-47fe553eba91")
 			(units
 				(unit
 					(name "A")
@@ -2845,7 +2779,7 @@
 			)
 		)
 		(comp
-			(ref "R111")
+			(ref "R110")
 			(value "100k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(fields
@@ -2895,7 +2829,7 @@
 				(names "/Alimentación, carga y batería/")
 				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
 			)
-			(tstamps "bccb83c7-6ed7-5f08-a1c6-bed1575a008c")
+			(tstamps "0e8575e1-c670-53b7-a9e4-2d775fb247bb")
 			(units
 				(unit
 					(name "A")
@@ -2911,7 +2845,7 @@
 			)
 		)
 		(comp
-			(ref "R112")
+			(ref "R111")
 			(value "1M")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(fields
@@ -2961,7 +2895,7 @@
 				(names "/Alimentación, carga y batería/")
 				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
 			)
-			(tstamps "f8d90c54-cd49-5c5b-adee-c1afb3786f71")
+			(tstamps "bccb83c7-6ed7-5f08-a1c6-bed1575a008c")
 			(units
 				(unit
 					(name "A")
@@ -2977,7 +2911,7 @@
 			)
 		)
 		(comp
-			(ref "R113")
+			(ref "R112")
 			(value "0")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(description "1S: VDD del medidor desde VPACK (2S: sin montar)")
@@ -3027,7 +2961,7 @@
 				(names "/Alimentación, carga y batería/")
 				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
 			)
-			(tstamps "65b4c371-5705-50e9-b691-7dd27f044cb3")
+			(tstamps "f8d90c54-cd49-5c5b-adee-c1afb3786f71")
 			(units
 				(unit
 					(name "A")
@@ -3043,7 +2977,7 @@
 			)
 		)
 		(comp
-			(ref "R114")
+			(ref "R113")
 			(value "10k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(fields
@@ -3093,7 +3027,7 @@
 				(names "/Alimentación, carga y batería/")
 				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
 			)
-			(tstamps "224da021-a837-56be-85cc-3b53d44545e0")
+			(tstamps "65b4c371-5705-50e9-b691-7dd27f044cb3")
 			(units
 				(unit
 					(name "A")
@@ -3109,7 +3043,7 @@
 			)
 		)
 		(comp
-			(ref "R115")
+			(ref "R114")
 			(value "0")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(description "Solo 2S: VDD del MAX17049 desde +3V3 (pierde el estado en cada apagado)")
@@ -3162,7 +3096,7 @@
 				(names "/Alimentación, carga y batería/")
 				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
 			)
-			(tstamps "0555a789-6967-50c4-a4ea-3240150dafc4")
+			(tstamps "224da021-a837-56be-85cc-3b53d44545e0")
 			(units
 				(unit
 					(name "A")
@@ -3178,7 +3112,7 @@
 			)
 		)
 		(comp
-			(ref "R116")
+			(ref "R115")
 			(value "22k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(description "EN: enciende ~3.24 V, apaga ~2.88 V (1S). 2S: 3.9k abajo")
@@ -3228,7 +3162,7 @@
 				(names "/Alimentación, carga y batería/")
 				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
 			)
-			(tstamps "ec645fc2-2f2f-5130-9a00-600e618f3d64")
+			(tstamps "0555a789-6967-50c4-a4ea-3240150dafc4")
 			(units
 				(unit
 					(name "A")
@@ -3244,7 +3178,7 @@
 			)
 		)
 		(comp
-			(ref "R117")
+			(ref "R116")
 			(value "10k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(fields
@@ -3294,7 +3228,7 @@
 				(names "/Alimentación, carga y batería/")
 				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
 			)
-			(tstamps "c2e67193-a376-5cdd-8323-7f360e8748bd")
+			(tstamps "ec645fc2-2f2f-5130-9a00-600e618f3d64")
 			(units
 				(unit
 					(name "A")
@@ -3310,7 +3244,7 @@
 			)
 		)
 		(comp
-			(ref "R118")
+			(ref "R117")
 			(value "100k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(description "FB: 0.6 V x (1 + 100k/22k) = 3.33 V")
@@ -3360,7 +3294,7 @@
 				(names "/Alimentación, carga y batería/")
 				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
 			)
-			(tstamps "944496d1-2c85-5ed1-b3ca-2e99ed220d4c")
+			(tstamps "c2e67193-a376-5cdd-8323-7f360e8748bd")
 			(units
 				(unit
 					(name "A")
@@ -3376,7 +3310,7 @@
 			)
 		)
 		(comp
-			(ref "R119")
+			(ref "R118")
 			(value "22k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(fields
@@ -3426,7 +3360,7 @@
 				(names "/Alimentación, carga y batería/")
 				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
 			)
-			(tstamps "e8631686-79af-5c09-aa89-23d73103a2e9")
+			(tstamps "944496d1-2c85-5ed1-b3ca-2e99ed220d4c")
 			(units
 				(unit
 					(name "A")
@@ -4586,7 +4520,7 @@
 		)
 		(comp
 			(ref "TP203")
-			(value "IO14")
+			(value "IO35")
 			(footprint "TestPoint:TestPoint_Pad_D1.0mm")
 			(fields
 				(field
@@ -4640,7 +4574,7 @@
 		)
 		(comp
 			(ref "TP204")
-			(value "IO42")
+			(value "IO36")
 			(footprint "TestPoint:TestPoint_Pad_D1.0mm")
 			(fields
 				(field
@@ -4694,7 +4628,7 @@
 		)
 		(comp
 			(ref "TP205")
-			(value "TXD0")
+			(value "IO37")
 			(footprint "TestPoint:TestPoint_Pad_D1.0mm")
 			(fields
 				(field
@@ -4856,34 +4790,34 @@
 		)
 		(comp
 			(ref "U201")
-			(value "ESP32-S3-MINI-1-N4R2")
-			(footprint "tresvizo_lcsc:BULETM-SMD_ESP32-S3-MINI-1-N8")
-			(description "4 MB flash, 2 MB PSRAM quad; mismos GPIO que la Thing Plus")
+			(value "ESP32-S3-WROOM-1-N16R2")
+			(footprint "tresvizo_lcsc:WIRELM-SMD_ESP32-S3-WROOM-1")
+			(description "16 MB flash, 2 MB PSRAM quad (GPIO35-37 libres); SD_MMC CMD/D3 en GPIO15/16 (el WROOM-1 no saca GPIO33/34)")
 			(fields
 				(field
-					(name "MPN") "ESP32-S3-MINI-1-N4R2")
+					(name "MPN") "ESP32-S3-WROOM-1-N16R2")
 				(field
-					(name "LCSC") "C3013941")
+					(name "LCSC") "C2913205")
 				(field
-					(name "Footprint") "tresvizo_lcsc:BULETM-SMD_ESP32-S3-MINI-1-N8")
+					(name "Footprint") "tresvizo_lcsc:WIRELM-SMD_ESP32-S3-WROOM-1")
 				(field
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "4 MB flash, 2 MB PSRAM quad; mismos GPIO que la Thing Plus")
+					(name "Description") "16 MB flash, 2 MB PSRAM quad (GPIO35-37 libres); SD_MMC CMD/D3 en GPIO15/16 (el WROOM-1 no saca GPIO33/34)")
 			)
 			(libsource
-				(lib "tresvizo")
-				(part "ESP32-S3-MINI-1_LCSC")
-				(description "RF Module, ESP32-S3 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 3.3V, SMD, onboard antenna")
+				(lib "RF_Module")
+				(part "ESP32-S3-WROOM-1")
+				(description "RF Module, ESP32-S3 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 3.3V, onboard antenna, SMD")
 			)
 			(property
 				(name "MPN")
-				(value "ESP32-S3-MINI-1-N4R2")
+				(value "ESP32-S3-WROOM-1-N16R2")
 			)
 			(property
 				(name "LCSC")
-				(value "C3013941")
+				(value "C2913205")
 			)
 			(property
 				(name "Sheetname")
@@ -4895,11 +4829,11 @@
 			)
 			(property
 				(name "ki_keywords")
-				(value "RF Radio BT ESP ESP32-S3 Espressif")
+				(value "RF Radio BT ESP ESP32-S3 Espressif onboard PCB antenna")
 			)
 			(property
 				(name "ki_fp_filters")
-				(value "ESP32?S*MINI?1")
+				(value "ESP32?S3?WROOM?1*")
 			)
 			(sheetpath
 				(names "/ESP32-S3/")
@@ -4911,7 +4845,19 @@
 					(name "A")
 					(pins
 						(pin
-							(num "45")
+							(num "3")
+						)
+						(pin
+							(num "27")
+						)
+						(pin
+							(num "39")
+						)
+						(pin
+							(num "38")
+						)
+						(pin
+							(num "15")
 						)
 						(pin
 							(num "4")
@@ -4926,31 +4872,7 @@
 							(num "7")
 						)
 						(pin
-							(num "8")
-						)
-						(pin
-							(num "9")
-						)
-						(pin
-							(num "10")
-						)
-						(pin
-							(num "11")
-						)
-						(pin
 							(num "12")
-						)
-						(pin
-							(num "13")
-						)
-						(pin
-							(num "14")
-						)
-						(pin
-							(num "15")
-						)
-						(pin
-							(num "16")
 						)
 						(pin
 							(num "17")
@@ -4971,91 +4893,52 @@
 							(num "22")
 						)
 						(pin
-							(num "3")
+							(num "8")
 						)
 						(pin
-							(num "GND")
+							(num "9")
 						)
 						(pin
 							(num "2")
 						)
 						(pin
-							(num "60")
-						)
-						(pin
-							(num "59")
-						)
-						(pin
-							(num "58")
-						)
-						(pin
-							(num "57")
-						)
-						(pin
-							(num "56")
-						)
-						(pin
-							(num "55")
-						)
-						(pin
-							(num "54")
-						)
-						(pin
 							(num "1")
-						)
-						(pin
-							(num "53")
-						)
-						(pin
-							(num "52")
-						)
-						(pin
-							(num "51")
-						)
-						(pin
-							(num "50")
-						)
-						(pin
-							(num "49")
-						)
-						(pin
-							(num "48")
-						)
-						(pin
-							(num "47")
-						)
-						(pin
-							(num "46")
-						)
-						(pin
-							(num "42")
-						)
-						(pin
-							(num "43")
-						)
-						(pin
-							(num "39")
 						)
 						(pin
 							(num "40")
 						)
 						(pin
+							(num "41")
+						)
+						(pin
+							(num "37")
+						)
+						(pin
+							(num "36")
+						)
+						(pin
+							(num "10")
+						)
+						(pin
+							(num "11")
+						)
+						(pin
+							(num "13")
+						)
+						(pin
+							(num "14")
+						)
+						(pin
 							(num "23")
-						)
-						(pin
-							(num "24")
-						)
-						(pin
-							(num "25")
-						)
-						(pin
-							(num "26")
 						)
 						(pin
 							(num "28")
 						)
 						(pin
 							(num "29")
+						)
+						(pin
+							(num "30")
 						)
 						(pin
 							(num "31")
@@ -5073,25 +4956,16 @@
 							(num "35")
 						)
 						(pin
-							(num "36")
+							(num "26")
 						)
 						(pin
-							(num "37")
+							(num "16")
 						)
 						(pin
-							(num "38")
+							(num "24")
 						)
 						(pin
-							(num "41")
-						)
-						(pin
-							(num "44")
-						)
-						(pin
-							(num "27")
-						)
-						(pin
-							(num "30")
+							(num "25")
 						)
 					)
 				)
@@ -5914,7 +5788,7 @@
 			(ref "R304")
 			(value "1k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(description "GPIO43 (U0TXD) -> RXD2 de la carrier")
+			(description "GPIO8 (TX de la UART del GNSS) -> RXD2 de la carrier")
 			(fields
 				(field
 					(name "MPN") "0402WGF1001TCE")
@@ -5926,7 +5800,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "GPIO43 (U0TXD) -> RXD2 de la carrier")
+					(name "Description") "GPIO8 (TX de la UART del GNSS) -> RXD2 de la carrier")
 			)
 			(libsource
 				(lib "Device")
@@ -5980,7 +5854,7 @@
 			(ref "R305")
 			(value "100")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(description "TXD2 de la carrier -> GPIO44 (U0RXD)")
+			(description "TXD2 de la carrier -> GPIO9 (RX de la UART del GNSS)")
 			(fields
 				(field
 					(name "MPN") "0402WGF1000TCE")
@@ -5992,7 +5866,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "TXD2 de la carrier -> GPIO44 (U0RXD)")
+					(name "Description") "TXD2 de la carrier -> GPIO9 (RX de la UART del GNSS)")
 			)
 			(libsource
 				(lib "Device")
@@ -6046,7 +5920,7 @@
 			(ref "R306")
 			(value "100")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(description "PPS -> GPIO1")
+			(description "PPS -> GPIO10")
 			(fields
 				(field
 					(name "MPN") "0402WGF1000TCE")
@@ -6058,7 +5932,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "PPS -> GPIO1")
+					(name "Description") "PPS -> GPIO10")
 			)
 			(libsource
 				(lib "Device")
@@ -6112,7 +5986,7 @@
 			(ref "R307")
 			(value "1k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(description "GPIO5 -> EVENT")
+			(description "GPIO11 -> EVENT")
 			(fields
 				(field
 					(name "MPN") "0402WGF1001TCE")
@@ -6124,7 +5998,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "GPIO5 -> EVENT")
+					(name "Description") "GPIO11 -> EVENT")
 			)
 			(libsource
 				(lib "Device")
@@ -6244,7 +6118,7 @@
 			(ref "R309")
 			(value "1k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(description "GPIO4 en drenador abierto; la BDLX no saca RESET_N")
+			(description "GPIO12 en drenador abierto; la BDLX no saca RESET_N")
 			(fields
 				(field
 					(name "MPN") "0402WGF1001TCE")
@@ -6256,7 +6130,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "GPIO4 en drenador abierto; la BDLX no saca RESET_N")
+					(name "Description") "GPIO12 en drenador abierto; la BDLX no saca RESET_N")
 			)
 			(libsource
 				(lib "Device")
@@ -6809,7 +6683,7 @@
 			(ref "D402")
 			(value "1N4148W")
 			(footprint "tresvizo_lcsc:SOD-123F_L2.7-W1.6-LS3.8-RD")
-			(description "Aísla QON (pull-up interno a 3.2-3.8 V) del GPIO10; silicio, no Schottky")
+			(description "Aísla QON (pull-up interno a 3.2-3.8 V) del GPIO18; silicio, no Schottky")
 			(fields
 				(field
 					(name "MPN") "1N4148W")
@@ -6821,7 +6695,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "Aísla QON (pull-up interno a 3.2-3.8 V) del GPIO10; silicio, no Schottky")
+					(name "Description") "Aísla QON (pull-up interno a 3.2-3.8 V) del GPIO18; silicio, no Schottky")
 			)
 			(libsource
 				(lib "Device")
@@ -7266,88 +7140,10 @@
 			)
 		)
 		(comp
-			(ref "J406")
-			(value "LEDS")
-			(footprint "tresvizo_lcsc:CONN-SMD_SM05B-SRSS-TB-LF-SN")
-			(description "SH 5 lateral a los LEDs del panel: ánodo común (3V3), cátodos R, G, B y de carga")
-			(fields
-				(field
-					(name "MPN") "SM05B-SRSS-TB(LF)(SN)")
-				(field
-					(name "LCSC") "C136657")
-				(field
-					(name "Footprint") "tresvizo_lcsc:CONN-SMD_SM05B-SRSS-TB-LF-SN")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "SH 5 lateral a los LEDs del panel: ánodo común (3V3), cátodos R, G, B y de carga")
-			)
-			(libsource
-				(lib "Connector_Generic_MountingPin")
-				(part "Conn_01x05_MountingPin")
-				(description "Generic connectable mounting pin connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)")
-			)
-			(property
-				(name "MPN")
-				(value "SM05B-SRSS-TB(LF)(SN)")
-			)
-			(property
-				(name "LCSC")
-				(value "C136657")
-			)
-			(property
-				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
-			)
-			(property
-				(name "Sheetfile")
-				(value "io.kicad_sch")
-			)
-			(property
-				(name "ki_keywords")
-				(value "connector")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "Connector*:*_1x??-1MP*")
-			)
-			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
-				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
-			)
-			(tstamps "2d51ff64-2fe1-5f62-9817-464ac4ec340e")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-						(pin
-							(num "3")
-						)
-						(pin
-							(num "4")
-						)
-						(pin
-							(num "5")
-						)
-						(pin
-							(num "MP")
-						)
-					)
-				)
-			)
-		)
-		(comp
 			(ref "Q401")
 			(value "AO3401A")
 			(footprint "tresvizo_lcsc:SOT-23_L2.9-W1.3-P1.90-LS2.4-BR")
-			(description "Invierte la detección: GPIO48 HIGH con tarjeta, como espera el firmware")
+			(description "Invierte la detección: GPIO17 HIGH con tarjeta")
 			(fields
 				(field
 					(name "MPN") "AO3401A")
@@ -7359,7 +7155,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "Invierte la detección: GPIO48 HIGH con tarjeta, como espera el firmware")
+					(name "Description") "Invierte la detección: GPIO17 HIGH con tarjeta")
 			)
 			(libsource
 				(lib "Transistor_FET")
@@ -8011,204 +7807,6 @@
 		)
 		(comp
 			(ref "R409")
-			(value "1k")
-			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(fields
-				(field
-					(name "MPN") "0402WGF1001TCE")
-				(field
-					(name "LCSC") "C11702")
-				(field
-					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description")
-				)
-			)
-			(libsource
-				(lib "Device")
-				(part "R")
-				(description "Resistor")
-			)
-			(property
-				(name "MPN")
-				(value "0402WGF1001TCE")
-			)
-			(property
-				(name "LCSC")
-				(value "C11702")
-			)
-			(property
-				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
-			)
-			(property
-				(name "Sheetfile")
-				(value "io.kicad_sch")
-			)
-			(property
-				(name "ki_keywords")
-				(value "R res resistor")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "R_*")
-			)
-			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
-				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
-			)
-			(tstamps "52c129dd-e964-52ef-b35d-20da23f26aa9")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-					)
-				)
-			)
-		)
-		(comp
-			(ref "R410")
-			(value "100")
-			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(fields
-				(field
-					(name "MPN") "0402WGF1000TCE")
-				(field
-					(name "LCSC") "C25076")
-				(field
-					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description")
-				)
-			)
-			(libsource
-				(lib "Device")
-				(part "R")
-				(description "Resistor")
-			)
-			(property
-				(name "MPN")
-				(value "0402WGF1000TCE")
-			)
-			(property
-				(name "LCSC")
-				(value "C25076")
-			)
-			(property
-				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
-			)
-			(property
-				(name "Sheetfile")
-				(value "io.kicad_sch")
-			)
-			(property
-				(name "ki_keywords")
-				(value "R res resistor")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "R_*")
-			)
-			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
-				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
-			)
-			(tstamps "1145db06-177f-5fbf-a066-8c9d8a43c231")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-					)
-				)
-			)
-		)
-		(comp
-			(ref "R411")
-			(value "100")
-			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(fields
-				(field
-					(name "MPN") "0402WGF1000TCE")
-				(field
-					(name "LCSC") "C25076")
-				(field
-					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description")
-				)
-			)
-			(libsource
-				(lib "Device")
-				(part "R")
-				(description "Resistor")
-			)
-			(property
-				(name "MPN")
-				(value "0402WGF1000TCE")
-			)
-			(property
-				(name "LCSC")
-				(value "C25076")
-			)
-			(property
-				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
-			)
-			(property
-				(name "Sheetfile")
-				(value "io.kicad_sch")
-			)
-			(property
-				(name "ki_keywords")
-				(value "R res resistor")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "R_*")
-			)
-			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
-				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
-			)
-			(tstamps "263b1811-942e-55de-84de-1a067240286d")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-					)
-				)
-			)
-		)
-		(comp
-			(ref "R412")
 			(value "100")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(description "Anillo del botón: usar la versión de 3-6 V (la de 12 V no enciende)")
@@ -8258,7 +7856,7 @@
 				(names "/microSD, IMU por conector y panel/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
-			(tstamps "34b23e1e-83b8-5eb5-8634-d6af0e3d63b7")
+			(tstamps "52c129dd-e964-52ef-b35d-20da23f26aa9")
 			(units
 				(unit
 					(name "A")
@@ -8274,7 +7872,7 @@
 			)
 		)
 		(comp
-			(ref "R413")
+			(ref "R410")
 			(value "100k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(fields
@@ -8324,7 +7922,7 @@
 				(names "/microSD, IMU por conector y panel/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
-			(tstamps "6a1f78be-d6c2-51ff-abf0-6cc2e11e171b")
+			(tstamps "1145db06-177f-5fbf-a066-8c9d8a43c231")
 			(units
 				(unit
 					(name "A")
@@ -8340,7 +7938,7 @@
 			)
 		)
 		(comp
-			(ref "R414")
+			(ref "R411")
 			(value "4.7k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(description "Pull-ups del bus del IMU (400 kHz por ~15 cm de cable)")
@@ -8390,7 +7988,7 @@
 				(names "/microSD, IMU por conector y panel/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
-			(tstamps "b87e3b1c-4c31-590f-a1f9-606b5dc72288")
+			(tstamps "263b1811-942e-55de-84de-1a067240286d")
 			(units
 				(unit
 					(name "A")
@@ -8406,7 +8004,7 @@
 			)
 		)
 		(comp
-			(ref "R415")
+			(ref "R412")
 			(value "4.7k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
 			(fields
@@ -8456,7 +8054,7 @@
 				(names "/microSD, IMU por conector y panel/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
-			(tstamps "7c6782fe-3ed3-56f3-b0c5-f652cc18a0ea")
+			(tstamps "34b23e1e-83b8-5eb5-8634-d6af0e3d63b7")
 			(units
 				(unit
 					(name "A")
@@ -8752,60 +8350,6 @@
 				(pin
 					(num "4")
 					(name "Pin_4")
-					(type "passive")
-				)
-				(pin
-					(num "MP")
-					(name "MountPin")
-					(type "passive")
-				)
-			)
-		)
-		(libpart
-			(lib "Connector_Generic_MountingPin")
-			(part "Conn_01x05_MountingPin")
-			(description "Generic connectable mounting pin connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)")
-			(footprints
-				(fp "Connector*:*_1x??-1MP*")
-			)
-			(fields
-				(field
-					(name "Reference") "J")
-				(field
-					(name "Value") "Conn_01x05_MountingPin")
-				(field
-					(name "Footprint")
-				)
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "Generic connectable mounting pin connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)")
-			)
-			(pins
-				(pin
-					(num "1")
-					(name "Pin_1")
-					(type "passive")
-				)
-				(pin
-					(num "2")
-					(name "Pin_2")
-					(type "passive")
-				)
-				(pin
-					(num "3")
-					(name "Pin_3")
-					(type "passive")
-				)
-				(pin
-					(num "4")
-					(name "Pin_4")
-					(type "passive")
-				)
-				(pin
-					(num "5")
-					(name "Pin_5")
 					(type "passive")
 				)
 				(pin
@@ -9256,6 +8800,234 @@
 			)
 		)
 		(libpart
+			(lib "RF_Module")
+			(part "ESP32-S3-WROOM-1")
+			(description "RF Module, ESP32-S3 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 3.3V, onboard antenna, SMD")
+			(docs "https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_en.pdf")
+			(footprints
+				(fp "ESP32?S3?WROOM?1*")
+			)
+			(fields
+				(field
+					(name "Reference") "U")
+				(field
+					(name "Value") "ESP32-S3-WROOM-1")
+				(field
+					(name "Footprint") "RF_Module:ESP32-S3-WROOM-1")
+				(field
+					(name "Datasheet") "https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_en.pdf")
+				(field
+					(name "Description") "RF Module, ESP32-S3 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 3.3V, onboard antenna, SMD")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "GND")
+					(type "power_in")
+				)
+				(pin
+					(num "2")
+					(name "3V3")
+					(type "power_in")
+				)
+				(pin
+					(num "3")
+					(name "EN")
+					(type "input")
+				)
+				(pin
+					(num "4")
+					(name "IO4")
+					(type "bidirectional")
+				)
+				(pin
+					(num "5")
+					(name "IO5")
+					(type "bidirectional")
+				)
+				(pin
+					(num "6")
+					(name "IO6")
+					(type "bidirectional")
+				)
+				(pin
+					(num "7")
+					(name "IO7")
+					(type "bidirectional")
+				)
+				(pin
+					(num "8")
+					(name "IO15")
+					(type "bidirectional")
+				)
+				(pin
+					(num "9")
+					(name "IO16")
+					(type "bidirectional")
+				)
+				(pin
+					(num "10")
+					(name "IO17")
+					(type "bidirectional")
+				)
+				(pin
+					(num "11")
+					(name "IO18")
+					(type "bidirectional")
+				)
+				(pin
+					(num "12")
+					(name "IO8")
+					(type "bidirectional")
+				)
+				(pin
+					(num "13")
+					(name "USB_D-")
+					(type "bidirectional")
+				)
+				(pin
+					(num "14")
+					(name "USB_D+")
+					(type "bidirectional")
+				)
+				(pin
+					(num "15")
+					(name "IO3")
+					(type "bidirectional")
+				)
+				(pin
+					(num "16")
+					(name "IO46")
+					(type "bidirectional")
+				)
+				(pin
+					(num "17")
+					(name "IO9")
+					(type "bidirectional")
+				)
+				(pin
+					(num "18")
+					(name "IO10")
+					(type "bidirectional")
+				)
+				(pin
+					(num "19")
+					(name "IO11")
+					(type "bidirectional")
+				)
+				(pin
+					(num "20")
+					(name "IO12")
+					(type "bidirectional")
+				)
+				(pin
+					(num "21")
+					(name "IO13")
+					(type "bidirectional")
+				)
+				(pin
+					(num "22")
+					(name "IO14")
+					(type "bidirectional")
+				)
+				(pin
+					(num "23")
+					(name "IO21")
+					(type "bidirectional")
+				)
+				(pin
+					(num "24")
+					(name "IO47")
+					(type "bidirectional")
+				)
+				(pin
+					(num "25")
+					(name "IO48")
+					(type "bidirectional")
+				)
+				(pin
+					(num "26")
+					(name "IO45")
+					(type "bidirectional")
+				)
+				(pin
+					(num "27")
+					(name "IO0")
+					(type "bidirectional")
+				)
+				(pin
+					(num "28")
+					(name "IO35")
+					(type "bidirectional")
+				)
+				(pin
+					(num "29")
+					(name "IO36")
+					(type "bidirectional")
+				)
+				(pin
+					(num "30")
+					(name "IO37")
+					(type "bidirectional")
+				)
+				(pin
+					(num "31")
+					(name "IO38")
+					(type "bidirectional")
+				)
+				(pin
+					(num "32")
+					(name "IO39")
+					(type "bidirectional")
+				)
+				(pin
+					(num "33")
+					(name "IO40")
+					(type "bidirectional")
+				)
+				(pin
+					(num "34")
+					(name "IO41")
+					(type "bidirectional")
+				)
+				(pin
+					(num "35")
+					(name "IO42")
+					(type "bidirectional")
+				)
+				(pin
+					(num "36")
+					(name "RXD0")
+					(type "bidirectional")
+				)
+				(pin
+					(num "37")
+					(name "TXD0")
+					(type "bidirectional")
+				)
+				(pin
+					(num "38")
+					(name "IO2")
+					(type "bidirectional")
+				)
+				(pin
+					(num "39")
+					(name "IO1")
+					(type "bidirectional")
+				)
+				(pin
+					(num "40")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "41")
+					(name "GND")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
 			(lib "Switch")
 			(part "SW_Push")
 			(description "Push button switch, generic, two pins")
@@ -9358,334 +9130,6 @@
 				(pin
 					(num "3")
 					(name "D")
-					(type "passive")
-				)
-			)
-		)
-		(libpart
-			(lib "tresvizo")
-			(part "ESP32-S3-MINI-1_LCSC")
-			(description "RF Module, ESP32-S3 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 3.3V, SMD, onboard antenna")
-			(docs "https://www.espressif.com/sites/default/files/documentation/esp32-s3-mini-1_mini-1u_datasheet_en.pdf")
-			(footprints
-				(fp "ESP32?S*MINI?1")
-			)
-			(fields
-				(field
-					(name "Reference") "U")
-				(field
-					(name "Value") "ESP32-S3-MINI-1")
-				(field
-					(name "Footprint") "tresvizo_lcsc:BULETM-SMD_ESP32-S3-MINI-1-N8")
-				(field
-					(name "Datasheet") "https://www.espressif.com/sites/default/files/documentation/esp32-s3-mini-1_mini-1u_datasheet_en.pdf")
-				(field
-					(name "Description") "RF Module, ESP32-S3 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 3.3V, SMD, onboard antenna")
-			)
-			(pins
-				(pin
-					(num "1")
-					(name "GND")
-					(type "power_in")
-				)
-				(pin
-					(num "2")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "3")
-					(name "3V3")
-					(type "power_in")
-				)
-				(pin
-					(num "4")
-					(name "IO0")
-					(type "bidirectional")
-				)
-				(pin
-					(num "5")
-					(name "IO1")
-					(type "bidirectional")
-				)
-				(pin
-					(num "6")
-					(name "IO2")
-					(type "bidirectional")
-				)
-				(pin
-					(num "7")
-					(name "IO3")
-					(type "bidirectional")
-				)
-				(pin
-					(num "8")
-					(name "IO4")
-					(type "bidirectional")
-				)
-				(pin
-					(num "9")
-					(name "IO5")
-					(type "bidirectional")
-				)
-				(pin
-					(num "10")
-					(name "IO6")
-					(type "bidirectional")
-				)
-				(pin
-					(num "11")
-					(name "IO7")
-					(type "bidirectional")
-				)
-				(pin
-					(num "12")
-					(name "IO8")
-					(type "bidirectional")
-				)
-				(pin
-					(num "13")
-					(name "IO9")
-					(type "bidirectional")
-				)
-				(pin
-					(num "14")
-					(name "IO10")
-					(type "bidirectional")
-				)
-				(pin
-					(num "15")
-					(name "IO11")
-					(type "bidirectional")
-				)
-				(pin
-					(num "16")
-					(name "IO12")
-					(type "bidirectional")
-				)
-				(pin
-					(num "17")
-					(name "IO13")
-					(type "bidirectional")
-				)
-				(pin
-					(num "18")
-					(name "IO14")
-					(type "bidirectional")
-				)
-				(pin
-					(num "19")
-					(name "IO15")
-					(type "bidirectional")
-				)
-				(pin
-					(num "20")
-					(name "IO16")
-					(type "bidirectional")
-				)
-				(pin
-					(num "21")
-					(name "IO17")
-					(type "bidirectional")
-				)
-				(pin
-					(num "22")
-					(name "IO18")
-					(type "bidirectional")
-				)
-				(pin
-					(num "23")
-					(name "USB_D-")
-					(type "bidirectional")
-				)
-				(pin
-					(num "24")
-					(name "USB_D+")
-					(type "bidirectional")
-				)
-				(pin
-					(num "25")
-					(name "IO21")
-					(type "bidirectional")
-				)
-				(pin
-					(num "26")
-					(name "IO26")
-					(type "bidirectional")
-				)
-				(pin
-					(num "27")
-					(name "IO47")
-					(type "bidirectional")
-				)
-				(pin
-					(num "28")
-					(name "IO33")
-					(type "bidirectional")
-				)
-				(pin
-					(num "29")
-					(name "IO34")
-					(type "bidirectional")
-				)
-				(pin
-					(num "30")
-					(name "IO48")
-					(type "bidirectional")
-				)
-				(pin
-					(num "31")
-					(name "IO35")
-					(type "bidirectional")
-				)
-				(pin
-					(num "32")
-					(name "IO36")
-					(type "bidirectional")
-				)
-				(pin
-					(num "33")
-					(name "IO37")
-					(type "bidirectional")
-				)
-				(pin
-					(num "34")
-					(name "IO38")
-					(type "bidirectional")
-				)
-				(pin
-					(num "35")
-					(name "IO39")
-					(type "bidirectional")
-				)
-				(pin
-					(num "36")
-					(name "IO40")
-					(type "bidirectional")
-				)
-				(pin
-					(num "37")
-					(name "IO41")
-					(type "bidirectional")
-				)
-				(pin
-					(num "38")
-					(name "IO42")
-					(type "bidirectional")
-				)
-				(pin
-					(num "39")
-					(name "TXD0")
-					(type "bidirectional")
-				)
-				(pin
-					(num "40")
-					(name "RXD0")
-					(type "bidirectional")
-				)
-				(pin
-					(num "41")
-					(name "IO45")
-					(type "bidirectional")
-				)
-				(pin
-					(num "42")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "43")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "44")
-					(name "IO46")
-					(type "bidirectional")
-				)
-				(pin
-					(num "45")
-					(name "EN")
-					(type "input")
-				)
-				(pin
-					(num "46")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "47")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "48")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "49")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "50")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "51")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "52")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "53")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "54")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "55")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "56")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "57")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "58")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "59")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "60")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "GND")
-					(name "GND")
 					(type "passive")
 				)
 			)
@@ -10017,6 +9461,10 @@
 			(uri "${KICAD10_SYMBOL_DIR}/Power_Protection.kicad_sym")
 		)
 		(library
+			(logical "RF_Module")
+			(uri "${KICAD10_SYMBOL_DIR}/RF_Module.kicad_sym")
+		)
+		(library
 			(logical "Switch")
 			(uri "${KICAD10_SYMBOL_DIR}/Switch.kicad_sym")
 		)
@@ -10088,12 +9536,6 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "J406")
-				(pin "1")
-				(pinfunction "Pin_1_1")
-				(pintype "passive")
-			)
-			(node
 				(ref "L102")
 				(pin "2")
 				(pinfunction "2_2")
@@ -10111,17 +9553,17 @@
 				(pintype "passive")
 			)
 			(node
+				(ref "R113")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
 				(ref "R114")
 				(pin "1")
 				(pintype "passive")
 			)
 			(node
-				(ref "R115")
-				(pin "1")
-				(pintype "passive")
-			)
-			(node
-				(ref "R118")
+				(ref "R117")
 				(pin "1")
 				(pintype "passive")
 			)
@@ -10181,12 +9623,12 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R414")
+				(ref "R411")
 				(pin "1")
 				(pintype "passive")
 			)
 			(node
-				(ref "R415")
+				(ref "R412")
 				(pin "1")
 				(pintype "passive")
 			)
@@ -10210,8 +9652,8 @@
 			)
 			(node
 				(ref "U201")
-				(pin "3")
-				(pinfunction "3V3_3")
+				(pin "2")
+				(pinfunction "3V3_2")
 				(pintype "power_in")
 			)
 			(node
@@ -10244,7 +9686,7 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R110")
+				(ref "R109")
 				(pin "2")
 				(pintype "passive")
 			)
@@ -10260,12 +9702,12 @@
 				(pintype "input")
 			)
 			(node
-				(ref "R111")
+				(ref "R110")
 				(pin "2")
 				(pintype "passive")
 			)
 			(node
-				(ref "R112")
+				(ref "R111")
 				(pin "1")
 				(pintype "passive")
 			)
@@ -10275,12 +9717,12 @@
 			(name "/Alimentación, carga y batería/BUCK_EN")
 			(class "Default")
 			(node
-				(ref "R116")
+				(ref "R115")
 				(pin "2")
 				(pintype "passive")
 			)
 			(node
-				(ref "R117")
+				(ref "R116")
 				(pin "1")
 				(pintype "passive")
 			)
@@ -10296,12 +9738,12 @@
 			(name "/Alimentación, carga y batería/BUCK_FB")
 			(class "Default")
 			(node
-				(ref "R118")
+				(ref "R117")
 				(pin "2")
 				(pintype "passive")
 			)
 			(node
-				(ref "R119")
+				(ref "R118")
 				(pin "1")
 				(pintype "passive")
 			)
@@ -10449,22 +9891,6 @@
 		)
 		(net
 			(code "14")
-			(name "/Alimentación, carga y batería/CHG_STAT")
-			(class "Default")
-			(node
-				(ref "R109")
-				(pin "1")
-				(pintype "passive")
-			)
-			(node
-				(ref "U102")
-				(pin "1")
-				(pinfunction "STAT_1")
-				(pintype "open_collector")
-			)
-		)
-		(net
-			(code "15")
 			(name "/Alimentación, carga y batería/CHG_SW1")
 			(class "Switch,Default")
 			(node
@@ -10486,7 +9912,7 @@
 			)
 		)
 		(net
-			(code "16")
+			(code "15")
 			(name "/Alimentación, carga y batería/CHG_SW2")
 			(class "Switch,Default")
 			(node
@@ -10508,7 +9934,7 @@
 			)
 		)
 		(net
-			(code "17")
+			(code "16")
 			(name "/Alimentación, carga y batería/CHG_TS_FIJA")
 			(class "Default")
 			(node
@@ -10524,7 +9950,7 @@
 			)
 		)
 		(net
-			(code "18")
+			(code "17")
 			(name "/Alimentación, carga y batería/FG_VDD")
 			(class "Default")
 			(node
@@ -10533,12 +9959,12 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R113")
+				(ref "R112")
 				(pin "2")
 				(pintype "passive")
 			)
 			(node
-				(ref "R115")
+				(ref "R114")
 				(pin "2")
 				(pintype "passive")
 			)
@@ -10550,7 +9976,7 @@
 			)
 		)
 		(net
-			(code "19")
+			(code "18")
 			(name "/Alimentación, carga y batería/PMID")
 			(class "Power,Default")
 			(node
@@ -10576,7 +10002,7 @@
 			)
 		)
 		(net
-			(code "20")
+			(code "19")
 			(name "/Alimentación, carga y batería/REGN")
 			(class "Default")
 			(node
@@ -10602,7 +10028,7 @@
 			)
 		)
 		(net
-			(code "21")
+			(code "20")
 			(name "/Alimentación, carga y batería/VBATT_IN")
 			(class "Power,Default")
 			(node
@@ -10618,13 +10044,13 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R111")
+				(ref "R110")
 				(pin "1")
 				(pintype "passive")
 			)
 		)
 		(net
-			(code "22")
+			(code "21")
 			(name "/Alimentación, carga y batería/VBAT_CHG")
 			(class "Power,Default")
 			(node
@@ -10652,7 +10078,7 @@
 			)
 		)
 		(net
-			(code "23")
+			(code "22")
 			(name "/Alimentación, carga y batería/VBUS")
 			(class "Power,Default")
 			(node
@@ -10715,7 +10141,7 @@
 			)
 		)
 		(net
-			(code "24")
+			(code "23")
 			(name "/Alimentación, carga y batería/VPACK")
 			(class "Power,Default")
 			(node
@@ -10736,12 +10162,12 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R110")
+				(ref "R109")
 				(pin "1")
 				(pintype "passive")
 			)
 			(node
-				(ref "R113")
+				(ref "R112")
 				(pin "1")
 				(pintype "passive")
 			)
@@ -10753,7 +10179,7 @@
 			)
 		)
 		(net
-			(code "25")
+			(code "24")
 			(name "/ESP32-S3/ESP_BOOT")
 			(class "Default")
 			(node
@@ -10769,13 +10195,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "4")
-				(pinfunction "IO0_4")
+				(pin "27")
+				(pinfunction "IO0_27")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "26")
+			(code "25")
 			(name "/ESP32-S3/ESP_EN")
 			(class "Default")
 			(node
@@ -10796,13 +10222,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "45")
-				(pinfunction "EN_45")
+				(pin "3")
+				(pinfunction "EN_3")
 				(pintype "input")
 			)
 		)
 		(net
-			(code "27")
+			(code "26")
 			(name "/ESP32-S3/ESP_IO3")
 			(class "Default")
 			(node
@@ -10812,14 +10238,14 @@
 			)
 			(node
 				(ref "U201")
-				(pin "7")
-				(pinfunction "IO3_7")
+				(pin "15")
+				(pinfunction "IO3_15")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "28")
-			(name "/ESP32-S3/ESP_IO14")
+			(code "27")
+			(name "/ESP32-S3/ESP_IO35")
 			(class "Default")
 			(node
 				(ref "TP203")
@@ -10829,14 +10255,14 @@
 			)
 			(node
 				(ref "U201")
-				(pin "18")
-				(pinfunction "IO14_18")
+				(pin "28")
+				(pinfunction "IO35_28")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "29")
-			(name "/ESP32-S3/ESP_IO42")
+			(code "28")
+			(name "/ESP32-S3/ESP_IO36")
 			(class "Default")
 			(node
 				(ref "TP204")
@@ -10846,8 +10272,25 @@
 			)
 			(node
 				(ref "U201")
-				(pin "38")
-				(pinfunction "IO42_38")
+				(pin "29")
+				(pinfunction "IO36_29")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "29")
+			(name "/ESP32-S3/ESP_IO37")
+			(class "Default")
+			(node
+				(ref "TP205")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U201")
+				(pin "30")
+				(pinfunction "IO37_30")
 				(pintype "bidirectional")
 			)
 		)
@@ -11104,7 +10547,7 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R412")
+				(ref "R409")
 				(pin "2")
 				(pintype "passive")
 			)
@@ -11128,54 +10571,6 @@
 		)
 		(net
 			(code "42")
-			(name "/microSD, IMU por conector y panel/LED_B_K")
-			(class "Default")
-			(node
-				(ref "J406")
-				(pin "4")
-				(pinfunction "Pin_4_4")
-				(pintype "passive")
-			)
-			(node
-				(ref "R411")
-				(pin "2")
-				(pintype "passive")
-			)
-		)
-		(net
-			(code "43")
-			(name "/microSD, IMU por conector y panel/LED_G_K")
-			(class "Default")
-			(node
-				(ref "J406")
-				(pin "3")
-				(pinfunction "Pin_3_3")
-				(pintype "passive")
-			)
-			(node
-				(ref "R410")
-				(pin "2")
-				(pintype "passive")
-			)
-		)
-		(net
-			(code "44")
-			(name "/microSD, IMU por conector y panel/LED_R_K")
-			(class "Default")
-			(node
-				(ref "J406")
-				(pin "2")
-				(pinfunction "Pin_2_2")
-				(pintype "passive")
-			)
-			(node
-				(ref "R409")
-				(pin "2")
-				(pintype "passive")
-			)
-		)
-		(net
-			(code "45")
 			(name "/microSD, IMU por conector y panel/SD_CD_N")
 			(class "Default")
 			(node
@@ -11197,7 +10592,7 @@
 			)
 		)
 		(net
-			(code "46")
+			(code "43")
 			(name "BTN_LED_EN")
 			(class "Default")
 			(node
@@ -11207,19 +10602,19 @@
 				(pintype "input")
 			)
 			(node
-				(ref "R413")
+				(ref "R410")
 				(pin "1")
 				(pintype "passive")
 			)
 			(node
 				(ref "U201")
-				(pin "33")
-				(pinfunction "IO37_33")
+				(pin "25")
+				(pinfunction "IO48_25")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "47")
+			(code "44")
 			(name "BTN_N")
 			(class "Default")
 			(node
@@ -11248,7 +10643,7 @@
 			)
 		)
 		(net
-			(code "48")
+			(code "45")
 			(name "BTN_SENSE_N")
 			(class "Default")
 			(node
@@ -11264,13 +10659,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "14")
-				(pinfunction "IO10_14")
+				(pin "11")
+				(pinfunction "IO18_11")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "49")
+			(code "46")
 			(name "CHG_INT_N")
 			(class "Default")
 			(node
@@ -11286,29 +10681,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "6")
-				(pinfunction "IO2_6")
+				(pin "23")
+				(pinfunction "IO21_23")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "50")
-			(name "CHG_LED_K")
-			(class "Default")
-			(node
-				(ref "J406")
-				(pin "5")
-				(pinfunction "Pin_5_5")
-				(pintype "passive")
-			)
-			(node
-				(ref "R109")
-				(pin "2")
-				(pintype "passive")
-			)
-		)
-		(net
-			(code "51")
+			(code "47")
 			(name "CHG_TS")
 			(class "Default")
 			(node
@@ -11340,33 +10719,11 @@
 			)
 		)
 		(net
-			(code "52")
-			(name "ESP_TX0")
-			(class "Default")
-			(node
-				(ref "R304")
-				(pin "1")
-				(pintype "passive")
-			)
-			(node
-				(ref "TP205")
-				(pin "1")
-				(pinfunction "1_1")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "39")
-				(pinfunction "TXD0_39")
-				(pintype "bidirectional")
-			)
-		)
-		(net
-			(code "53")
+			(code "48")
 			(name "FG_ALRT_N")
 			(class "Default")
 			(node
-				(ref "R114")
+				(ref "R113")
 				(pin "2")
 				(pintype "passive")
 			)
@@ -11378,13 +10735,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "31")
-				(pinfunction "IO35_31")
+				(pin "24")
+				(pinfunction "IO47_24")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "54")
+			(code "49")
 			(name "GND")
 			(class "Default")
 			(node
@@ -11688,12 +11045,6 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "J406")
-				(pin "MP")
-				(pinfunction "MountPin_MP")
-				(pintype "passive")
-			)
-			(node
 				(ref "JP101")
 				(pin "2")
 				(pinfunction "B_2")
@@ -11727,17 +11078,17 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R112")
+				(ref "R111")
 				(pin "2")
 				(pintype "passive")
 			)
 			(node
-				(ref "R117")
+				(ref "R116")
 				(pin "2")
 				(pintype "passive")
 			)
 			(node
-				(ref "R119")
+				(ref "R118")
 				(pin "2")
 				(pintype "passive")
 			)
@@ -11767,7 +11118,7 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R413")
+				(ref "R410")
 				(pin "2")
 				(pintype "passive")
 			)
@@ -11863,116 +11214,14 @@
 			)
 			(node
 				(ref "U201")
-				(pin "2")
-				(pinfunction "GND_2")
+				(pin "40")
+				(pinfunction "GND_40")
 				(pintype "passive")
 			)
 			(node
 				(ref "U201")
-				(pin "42")
-				(pinfunction "GND_42")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "43")
-				(pinfunction "GND_43")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "46")
-				(pinfunction "GND_46")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "47")
-				(pinfunction "GND_47")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "48")
-				(pinfunction "GND_48")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "49")
-				(pinfunction "GND_49")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "50")
-				(pinfunction "GND_50")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "51")
-				(pinfunction "GND_51")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "52")
-				(pinfunction "GND_52")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "53")
-				(pinfunction "GND_53")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "54")
-				(pinfunction "GND_54")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "55")
-				(pinfunction "GND_55")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "56")
-				(pinfunction "GND_56")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "57")
-				(pinfunction "GND_57")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "58")
-				(pinfunction "GND_58")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "59")
-				(pinfunction "GND_59")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "60")
-				(pinfunction "GND_60")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "GND")
-				(pinfunction "GND_GND")
+				(pin "41")
+				(pinfunction "GND_41")
 				(pintype "passive")
 			)
 			(node
@@ -12013,7 +11262,7 @@
 			)
 		)
 		(net
-			(code "55")
+			(code "50")
 			(name "GNSS_EVENT_MCU")
 			(class "Default")
 			(node
@@ -12028,13 +11277,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "9")
-				(pinfunction "IO5_9")
+				(pin "19")
+				(pinfunction "IO11_19")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "56")
+			(code "51")
 			(name "GNSS_PPS_MCU")
 			(class "Default")
 			(node
@@ -12044,13 +11293,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "5")
-				(pinfunction "IO1_5")
+				(pin "18")
+				(pinfunction "IO10_18")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "57")
+			(code "52")
 			(name "GNSS_PWR_EN")
 			(class "Default")
 			(node
@@ -12060,8 +11309,8 @@
 			)
 			(node
 				(ref "U201")
-				(pin "41")
-				(pinfunction "IO45_41")
+				(pin "26")
+				(pinfunction "IO45_26")
 				(pintype "bidirectional")
 			)
 			(node
@@ -12072,7 +11321,7 @@
 			)
 		)
 		(net
-			(code "58")
+			(code "53")
 			(name "GNSS_RESET_MCU")
 			(class "Default")
 			(node
@@ -12082,13 +11331,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "8")
-				(pinfunction "IO4_8")
+				(pin "20")
+				(pinfunction "IO12_20")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "59")
+			(code "54")
 			(name "GNSS_TXD2_MCU")
 			(class "Default")
 			(node
@@ -12098,13 +11347,29 @@
 			)
 			(node
 				(ref "U201")
-				(pin "40")
-				(pinfunction "RXD0_40")
+				(pin "17")
+				(pinfunction "IO9_17")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "60")
+			(code "55")
+			(name "GNSS_TX_MCU")
+			(class "Default")
+			(node
+				(ref "R304")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U201")
+				(pin "12")
+				(pinfunction "IO8_12")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "56")
 			(name "I2C_SCL")
 			(class "Default")
 			(node
@@ -12132,13 +11397,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "13")
-				(pinfunction "IO9_13")
+				(pin "22")
+				(pinfunction "IO14_22")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "61")
+			(code "57")
 			(name "I2C_SDA")
 			(class "Default")
 			(node
@@ -12166,13 +11431,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "12")
-				(pinfunction "IO8_12")
+				(pin "21")
+				(pinfunction "IO13_21")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "62")
+			(code "58")
 			(name "IMU_INT1")
 			(class "Default")
 			(node
@@ -12183,13 +11448,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "21")
-				(pinfunction "IO17_21")
+				(pin "38")
+				(pinfunction "IO2_38")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "63")
+			(code "59")
 			(name "IMU_INT3")
 			(class "Default")
 			(node
@@ -12200,13 +11465,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "22")
-				(pinfunction "IO18_22")
+				(pin "39")
+				(pinfunction "IO1_39")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "64")
+			(code "60")
 			(name "IMU_SCL")
 			(class "Default")
 			(node
@@ -12216,19 +11481,19 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R415")
+				(ref "R412")
 				(pin "2")
 				(pintype "passive")
 			)
 			(node
 				(ref "U201")
-				(pin "16")
-				(pinfunction "IO12_16")
+				(pin "35")
+				(pinfunction "IO42_35")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "65")
+			(code "61")
 			(name "IMU_SDA")
 			(class "Default")
 			(node
@@ -12238,67 +11503,19 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R414")
+				(ref "R411")
 				(pin "2")
 				(pintype "passive")
 			)
 			(node
 				(ref "U201")
-				(pin "15")
-				(pinfunction "IO11_15")
+				(pin "34")
+				(pinfunction "IO41_34")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "66")
-			(name "LED_B")
-			(class "Default")
-			(node
-				(ref "R411")
-				(pin "1")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "32")
-				(pinfunction "IO36_32")
-				(pintype "bidirectional")
-			)
-		)
-		(net
-			(code "67")
-			(name "LED_G")
-			(class "Default")
-			(node
-				(ref "R410")
-				(pin "1")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "25")
-				(pinfunction "IO21_25")
-				(pintype "bidirectional")
-			)
-		)
-		(net
-			(code "68")
-			(name "LED_R")
-			(class "Default")
-			(node
-				(ref "R409")
-				(pin "1")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "11")
-				(pinfunction "IO7_11")
-				(pintype "bidirectional")
-			)
-		)
-		(net
-			(code "69")
+			(code "62")
 			(name "SD_CLK")
 			(class "Default")
 			(node
@@ -12309,13 +11526,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "34")
-				(pinfunction "IO38_34")
+				(pin "6")
+				(pinfunction "IO6_6")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "70")
+			(code "63")
 			(name "SD_CMD")
 			(class "Default")
 			(node
@@ -12331,13 +11548,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "29")
-				(pinfunction "IO34_29")
+				(pin "7")
+				(pinfunction "IO7_7")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "71")
+			(code "64")
 			(name "SD_D0")
 			(class "Default")
 			(node
@@ -12353,13 +11570,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "35")
-				(pinfunction "IO39_35")
+				(pin "5")
+				(pinfunction "IO5_5")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "72")
+			(code "65")
 			(name "SD_D1")
 			(class "Default")
 			(node
@@ -12375,13 +11592,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "36")
-				(pinfunction "IO40_36")
+				(pin "4")
+				(pinfunction "IO4_4")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "73")
+			(code "66")
 			(name "SD_D2")
 			(class "Default")
 			(node
@@ -12397,13 +11614,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "27")
-				(pinfunction "IO47_27")
+				(pin "9")
+				(pinfunction "IO16_9")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "74")
+			(code "67")
 			(name "SD_D3")
 			(class "Default")
 			(node
@@ -12419,13 +11636,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "28")
-				(pinfunction "IO33_28")
+				(pin "8")
+				(pinfunction "IO15_8")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "75")
+			(code "68")
 			(name "SD_DET")
 			(class "Default")
 			(node
@@ -12441,13 +11658,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "30")
-				(pinfunction "IO48_30")
+				(pin "10")
+				(pinfunction "IO17_10")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "76")
+			(code "69")
 			(name "USB_DN")
 			(class "USB,Default")
 			(node
@@ -12476,13 +11693,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "23")
-				(pinfunction "USB_D-_23")
+				(pin "13")
+				(pinfunction "USB_D-_13")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "77")
+			(code "70")
 			(name "USB_DP")
 			(class "USB,Default")
 			(node
@@ -12511,13 +11728,13 @@
 			)
 			(node
 				(ref "U201")
-				(pin "24")
-				(pinfunction "USB_D+_24")
+				(pin "14")
+				(pinfunction "USB_D+_14")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "78")
+			(code "71")
 			(name "VSYS")
 			(class "Power,Default")
 			(node
@@ -12566,12 +11783,12 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R116")
+				(ref "R115")
 				(pin "1")
 				(pintype "passive")
 			)
 			(node
-				(ref "R412")
+				(ref "R409")
 				(pin "1")
 				(pintype "passive")
 			)
@@ -12595,7 +11812,7 @@
 			)
 		)
 		(net
-			(code "79")
+			(code "72")
 			(name "unconnected-(U102-D+-Pad6)")
 			(class "Default")
 			(node
@@ -12606,7 +11823,7 @@
 			)
 		)
 		(net
-			(code "80")
+			(code "73")
 			(name "unconnected-(U102-D--Pad7)")
 			(class "Default")
 			(node
@@ -12617,7 +11834,18 @@
 			)
 		)
 		(net
-			(code "81")
+			(code "74")
+			(name "unconnected-(U102-STAT-Pad1)")
+			(class "Default")
+			(node
+				(ref "U102")
+				(pin "1")
+				(pinfunction "STAT_1")
+				(pintype "open_collector+no_connect")
+			)
+		)
+		(net
+			(code "75")
 			(name "unconnected-(U105-PG-Pad1)")
 			(class "Default")
 			(node
@@ -12628,84 +11856,73 @@
 			)
 		)
 		(net
-			(code "82")
-			(name "unconnected-(U201-IO6-Pad10)")
+			(code "76")
+			(name "unconnected-(U201-IO38-Pad31)")
 			(class "Default")
 			(node
 				(ref "U201")
-				(pin "10")
-				(pinfunction "IO6_10")
+				(pin "31")
+				(pinfunction "IO38_31")
 				(pintype "bidirectional+no_connect")
 			)
 		)
 		(net
-			(code "83")
-			(name "unconnected-(U201-IO13-Pad17)")
+			(code "77")
+			(name "unconnected-(U201-IO39-Pad32)")
 			(class "Default")
 			(node
 				(ref "U201")
-				(pin "17")
-				(pinfunction "IO13_17")
+				(pin "32")
+				(pinfunction "IO39_32")
 				(pintype "bidirectional+no_connect")
 			)
 		)
 		(net
-			(code "84")
-			(name "unconnected-(U201-IO15-Pad19)")
+			(code "78")
+			(name "unconnected-(U201-IO40-Pad33)")
 			(class "Default")
 			(node
 				(ref "U201")
-				(pin "19")
-				(pinfunction "IO15_19")
+				(pin "33")
+				(pinfunction "IO40_33")
 				(pintype "bidirectional+no_connect")
 			)
 		)
 		(net
-			(code "85")
-			(name "unconnected-(U201-IO16-Pad20)")
+			(code "79")
+			(name "unconnected-(U201-IO46-Pad16)")
 			(class "Default")
 			(node
 				(ref "U201")
-				(pin "20")
-				(pinfunction "IO16_20")
+				(pin "16")
+				(pinfunction "IO46_16")
 				(pintype "bidirectional+no_connect")
 			)
 		)
 		(net
-			(code "86")
-			(name "unconnected-(U201-IO26-Pad26)")
+			(code "80")
+			(name "unconnected-(U201-RXD0-Pad36)")
 			(class "Default")
 			(node
 				(ref "U201")
-				(pin "26")
-				(pinfunction "IO26_26")
+				(pin "36")
+				(pinfunction "RXD0_36")
 				(pintype "bidirectional+no_connect")
 			)
 		)
 		(net
-			(code "87")
-			(name "unconnected-(U201-IO41-Pad37)")
+			(code "81")
+			(name "unconnected-(U201-TXD0-Pad37)")
 			(class "Default")
 			(node
 				(ref "U201")
 				(pin "37")
-				(pinfunction "IO41_37")
+				(pinfunction "TXD0_37")
 				(pintype "bidirectional+no_connect")
 			)
 		)
 		(net
-			(code "88")
-			(name "unconnected-(U201-IO46-Pad44)")
-			(class "Default")
-			(node
-				(ref "U201")
-				(pin "44")
-				(pinfunction "IO46_44")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "89")
+			(code "82")
 			(name "unconnected-(U301-FB2-Pad6)")
 			(class "Default")
 			(node
@@ -12716,7 +11933,7 @@
 			)
 		)
 		(net
-			(code "90")
+			(code "83")
 			(name "unconnected-(U301-PG-Pad2)")
 			(class "Default")
 			(node

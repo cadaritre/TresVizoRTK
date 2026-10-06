@@ -645,7 +645,7 @@
    "agujeros": [
     [
      11.0,
-     75.3
+     77.9
     ],
     [
      -17.4,
@@ -672,7 +672,7 @@
    ],
    "lengueta_z_mas_x": [
     [
-     71.0,
+     72.4,
      87.5
     ]
    ],
@@ -682,10 +682,10 @@
      87.5
     ]
    ],
-   "_nota": "Lenguetas delanteras solo en las franjas sin componentes de la placa (u 0-2.5 / 43.5-46, v 0-48.5). En +X solo de z 71 a 87.5: la placa entra en el chasis POR ABAJO y el modulo ESP32 (U201, hasta x 22.19 en z 54.5-69.9) chocaria con una lengueta baja; tambien se corta en z 54-71 por la antena. Por debajo de z 39 el riel queda detras del plano de la placa.",
+   "_nota": "Lenguetas delanteras solo en las franjas sin componentes de la placa (u 0-2.5 / 43.5-46). En +X solo de z 72.4 a 87.5 (v 0-15.1): la placa entra en el chasis POR ABAJO y el ESP32-S3-WROOM-1 (cuerpo en u 0.2-25.7, v 15.3-33.3; antena al canto) queda en el corte de z 53.7-72.4. Por debajo de z 39 el riel queda detras del plano de la placa.",
    "corte_antena_z": [
-    54.0,
-    71.0
+    53.7,
+    72.4
    ]
   },
   "carrier": {
@@ -703,13 +703,14 @@
    ],
    "pcb": 1.6,
    "sma": {
+    "_nota": "Medido en foto (05-10-2026, +-1 mm): cuerpo en x -10...-2.5, eje del canon en x -6.2, punta en z ~81. Sus patas asoman 1-2 mm por detras, hacia la 18650: cortarlas a ras.",
     "x": [
-     -10.5,
+     -11.0,
      0.5
     ],
     "alto": 13.0
    },
-   "_nota": "Envolvente SUPUESTA (32 x 52 x 11, componentes hacia la placa, SMA arriba). Sin plano de BDLX: medir la carrier y corregir aqui antes de imprimir. Su canto inferior va en z 19.0 para librar la cabeza del reten de la tuerca a 180 grados (z 18.36). Centrada en y entre la placa (1.1 mm) y la 18650 (1.0 mm)."
+   "_nota": "Envolvente de 32 x 52 x 11 (componentes hacia la placa, SMA arriba). Medida en foto el 05-10-2026 (+-1 mm, sin calibrador): mide ~8 mm de grueso, asi que la envolvente deja ~3 mm de reserva hacia la placa. El arnes de J301 va soldado a la carrier, sin clavijas. Su canto inferior va en z 19.0 para librar la cabeza del reten de la tuerca a 180 grados (z 18.36). Centrada en y entre la placa (1.1 mm) y la 18650 (1.0 mm)."
   },
   "ranuras_carrier": {
    "y": [
@@ -853,6 +854,17 @@
    "radio": 4.9,
    "z_techo": 18.9,
    "_nota": "El chasis se recorta alrededor de cada reten de la tuerca (cabeza hasta z 18.36)."
+  },
+  "antena_esp32": {
+   "x": [
+    16.3,
+    23.0
+   ],
+   "z": [
+    54.2,
+    72.2
+   ],
+   "_nota": "Zona de la antena del ESP32-S3-WROOM-1 (u 0-6.7, v 15.3-33.3): sin plastico del chasis hasta la pared."
   }
  },
  "cuna_18650": {

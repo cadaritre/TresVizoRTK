@@ -2,43 +2,41 @@
 
 Generado por `scripts/doc_tables.py`; no editar a mano.
 
-## ESP32-S3-MINI-1-N4R2 (U201)
+## ESP32-S3-WROOM-1-N16R2 (U201)
 
 | GPIO | Pin del módulo | Red | Uso |
 | --- | --- | --- | --- |
-| - | 45 (EN) | ESP_EN | EN (RC 10k/1uF y pulsador RESET) |
-| 0 | 4 (IO0) | ESP_BOOT | BOOT (pulsador a GND, 10k a 3V3) |
-| 1 | 5 (IO1) | GNSS_PPS_MCU | PPS de la carrier GNSS (100 ohm desde J301.5) |
-| 2 | 6 (IO2) | CHG_INT_N | INT del BQ25798 (drenador abierto, 10k a 3V3) |
-| 3 | 7 (IO3) | ESP_IO3 | Pin de arranque: 10k a GND |
-| 4 | 8 (IO4) | GNSS_RESET_MCU | RESET_N de la carrier (J301.7, 1k; usar en drenador abierto, pulso >= 5 ms). La BDLX no lo saca |
-| 5 | 9 (IO5) | GNSS_EVENT_MCU | EVENT de la carrier (J301.6, 1k; 100k a GND) |
-| 7 | 11 (IO7) | LED_R | Cátodo rojo del LED del panel (1k; J406.2) |
-| 8 | 12 (IO8) | I2C_SDA | I2C: OLED 0x3C/0x3D, MAX17048 0x36, BQ25798 0x6B (4.7k) |
-| 9 | 13 (IO9) | I2C_SCL | I2C |
-| 10 | 14 (IO10) | BTN_SENSE_N | Botón del panel (J402.2; activo bajo, por 1N4148W desde QON) |
-| 11 | 15 (IO11) | IMU_SDA | I2C del BMI088 de la tapa, segundo bus: SDA (4.7k; J405.4). Acelerómetro 0x18, giróscopo 0x68 |
-| 12 | 16 (IO12) | IMU_SCL | I2C del BMI088: SCL (4.7k; J405.5), 400 kHz |
-| 14 | 18 (IO14) | ESP_IO14 | Libre (antes OFF del Mk2); punto de prueba |
-| 17 | 21 (IO17) | IMU_INT1 | INT1 del acelerómetro (J405.6) |
-| 18 | 22 (IO18) | IMU_INT3 | INT3 del giróscopo (J405.7) |
-| 19 | 23 (USB_D-) | USB_DN | USB nativo D- (J101.7, a la placa del USB-C del panel) |
-| 20 | 24 (USB_D+) | USB_DP | USB nativo D+ (J101.8) |
-| 21 | 25 (IO21) | LED_G | Cátodo verde (100 ohm; J406.3) |
-| 33 | 28 (IO33) | SD_D3 | SD_MMC D3 (10k) |
-| 34 | 29 (IO34) | SD_CMD | SD_MMC CMD (10k) |
-| 35 | 31 (IO35) | FG_ALRT_N | ALRT del MAX17048 (10k) |
-| 36 | 32 (IO36) | LED_B | Cátodo azul (100 ohm; J406.4) |
-| 37 | 33 (IO37) | BTN_LED_EN | Anillo LED del botón (MOSFET N en J402.4, 100k a GND) |
-| 38 | 34 (IO38) | SD_CLK | SD_MMC CLK |
-| 39 | 35 (IO39) | SD_D0 | SD_MMC D0 (10k) |
-| 40 | 36 (IO40) | SD_D1 | SD_MMC D1 (10k) |
-| 42 | 38 (IO42) | ESP_IO42 | Libre; punto de prueba |
-| 43 | 39 (TXD0) | ESP_TX0 | U0TXD -> RXD2 de la carrier (1k, J301.3); la ROM escribe aquí al arrancar |
-| 44 | 40 (RXD0) | GNSS_TXD2_MCU | U0RXD <- TXD2 de la carrier (100 ohm, J301.4; COM2, 115200) |
-| 45 | 41 (IO45) | GNSS_PWR_EN | Enciende el 5 V de la carrier GNSS; 100k a GND (pin de arranque, LOW en reset = GNSS apagado) |
-| 47 | 27 (IO47) | SD_D2 | SD_MMC D2 (10k) |
-| 48 | 30 (IO48) | SD_DET | Detección de tarjeta: HIGH con tarjeta (inversor con AO3401A) |
+| - | 3 (EN) | ESP_EN | EN (RC 10k/1uF y pulsador RESET) |
+| 0 | 27 (IO0) | ESP_BOOT | BOOT (pulsador a GND, 10k a 3V3) |
+| 1 | 39 (IO1) | IMU_INT3 | INT3 del giróscopo (J405.7) |
+| 2 | 38 (IO2) | IMU_INT1 | INT1 del acelerómetro (J405.6) |
+| 3 | 15 (IO3) | ESP_IO3 | Pin de arranque: 10k a GND |
+| 4 | 4 (IO4) | SD_D1 | SD_MMC D1 (10k) |
+| 5 | 5 (IO5) | SD_D0 | SD_MMC D0 (10k) |
+| 6 | 6 (IO6) | SD_CLK | SD_MMC CLK |
+| 7 | 7 (IO7) | SD_CMD | SD_MMC CMD (10k) |
+| 8 | 12 (IO8) | GNSS_TX_MCU | TX de la UART del GNSS -> RXD2 de la carrier (1k, J301.3) |
+| 9 | 17 (IO9) | GNSS_TXD2_MCU | RX de la UART del GNSS <- TXD2 de la carrier (100 ohm, J301.4; COM2, 115200) |
+| 10 | 18 (IO10) | GNSS_PPS_MCU | PPS de la carrier GNSS (100 ohm desde J301.5) |
+| 11 | 19 (IO11) | GNSS_EVENT_MCU | EVENT de la carrier (J301.6, 1k; 100k a GND) |
+| 12 | 20 (IO12) | GNSS_RESET_MCU | RESET_N de la carrier (J301.7, 1k; usar en drenador abierto, pulso >= 5 ms). La BDLX no lo saca |
+| 13 | 21 (IO13) | I2C_SDA | I2C: OLED 0x3C/0x3D, MAX17048 0x36, BQ25798 0x6B (4.7k) |
+| 14 | 22 (IO14) | I2C_SCL | I2C |
+| 15 | 8 (IO15) | SD_D3 | SD_MMC D3 (10k) |
+| 16 | 9 (IO16) | SD_D2 | SD_MMC D2 (10k) |
+| 17 | 10 (IO17) | SD_DET | Detección de tarjeta: HIGH con tarjeta (inversor con AO3401A) |
+| 18 | 11 (IO18) | BTN_SENSE_N | Botón del panel (J402.2; activo bajo, por 1N4148W desde QON) |
+| 19 | 13 (USB_D-) | USB_DN | USB nativo D- (J101.7, a la placa del USB-C del panel) |
+| 20 | 14 (USB_D+) | USB_DP | USB nativo D+ (J101.8) |
+| 21 | 23 (IO21) | CHG_INT_N | INT del BQ25798 (drenador abierto, 10k a 3V3) |
+| 35 | 28 (IO35) | ESP_IO35 | Libre; punto de prueba |
+| 36 | 29 (IO36) | ESP_IO36 | Libre; punto de prueba |
+| 37 | 30 (IO37) | ESP_IO37 | Libre; punto de prueba |
+| 41 | 34 (IO41) | IMU_SDA | I2C del BMI088 de la tapa, segundo bus: SDA (4.7k; J405.4). Acelerómetro 0x18, giróscopo 0x68 |
+| 42 | 35 (IO42) | IMU_SCL | I2C del BMI088: SCL (4.7k; J405.5), 400 kHz |
+| 45 | 26 (IO45) | GNSS_PWR_EN | Enciende el 5 V de la carrier GNSS; 100k a GND (pin de arranque, LOW en reset = GNSS apagado) |
+| 47 | 24 (IO47) | FG_ALRT_N | ALRT del MAX17048 (10k) |
+| 48 | 25 (IO48) | BTN_LED_EN | Anillo LED del botón (MOSFET N en J402.4, 100k a GND) |
 
 ## JP101 NTC_CORTAR
 
@@ -156,17 +154,4 @@ SM07B-GHS-TB(LF)(SN) (LCSC C495552). GH 7 lateral al BMI088 de la tapa (I2C): 3V
 | 5 | IMU_SCL |
 | 6 | IMU_INT1 |
 | 7 | IMU_INT3 |
-| MP | GND |
-
-## J406 LEDS
-
-SM05B-SRSS-TB(LF)(SN) (LCSC C136657). SH 5 lateral a los LEDs del panel: ánodo común (3V3), cátodos R, G, B y de carga
-
-| Pin | Red |
-| --- | --- |
-| 1 | +3V3 |
-| 2 | LED_R_K |
-| 3 | LED_G_K |
-| 4 | LED_B_K |
-| 5 | CHG_LED_K |
 | MP | GND |

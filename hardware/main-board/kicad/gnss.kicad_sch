@@ -10,7 +10,7 @@
 		(rev "0.2")
 		(company "TresVizo")
 		(comment 1 "Exploratorio: no fabricado ni probado")
-		(comment 2 "ESP32-S3-MINI-1-N4R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+		(comment 2 "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
 		(comment 3 "JLCPCB 4 capas JLC04161H-7628")
 	)
 	(lib_symbols
@@ -5534,7 +5534,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 146.05 106.68 90)
+		(at 149.86 106.68 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5542,7 +5542,7 @@
 		(dnp no)
 		(uuid "7f0c8ae1-ad7e-5e3c-98b0-64244d64d482")
 		(property "Reference" "R304"
-			(at 142.24 103.664 270)
+			(at 146.05 103.664 270)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5551,7 +5551,7 @@
 			)
 		)
 		(property "Value" "1k"
-			(at 142.24 105.264 270)
+			(at 146.05 105.264 270)
 			(effects
 				(font
 					(size 1 1)
@@ -5560,7 +5560,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 146.05 106.68 0)
+			(at 149.86 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5569,7 +5569,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 146.05 106.68 0)
+			(at 149.86 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5577,8 +5577,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "GPIO43 (U0TXD) -> RXD2 de la carrier"
-			(at 146.05 106.68 0)
+		(property "Description" "GPIO8 (TX de la UART del GNSS) -> RXD2 de la carrier"
+			(at 149.86 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5587,7 +5587,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1001TCE"
-			(at 146.05 106.68 0)
+			(at 149.86 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5596,7 +5596,7 @@
 			)
 		)
 		(property "LCSC" "C11702"
-			(at 146.05 106.68 0)
+			(at 149.86 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5620,16 +5620,16 @@
 		)
 	)
 	(wire
-		(pts (xy 142.24 106.68) (xy 139.7 106.68))
+		(pts (xy 146.05 106.68) (xy 143.51 106.68))
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "3da78d95-d0de-5ab6-b9cf-e44bdb2e1964")
 	)
-	(global_label "ESP_TX0"
+	(global_label "GNSS_TX_MCU"
 		(shape bidirectional)
-		(at 139.7 106.68 180)
+		(at 143.51 106.68 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5639,7 +5639,7 @@
 		)
 		(uuid "f3b0d08b-6edd-5adc-b3cf-7b34bb9a2de3")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 139.7 106.68 0)
+			(at 143.51 106.68 0)
 			(effects
 				(font
 					(size 1 1)
@@ -5649,7 +5649,7 @@
 		)
 	)
 	(wire
-		(pts (xy 149.86 106.68) (xy 152.4 106.68))
+		(pts (xy 153.67 106.68) (xy 156.21 106.68))
 		(stroke
 			(width 0)
 			(type default)
@@ -5657,7 +5657,7 @@
 		(uuid "93f2b346-19b4-5cd5-a354-4aa11dbc1e4b")
 	)
 	(label "GNSS_RXD2"
-		(at 152.4 106.68 0)
+		(at 156.21 106.68 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5669,7 +5669,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 185.42 106.68 90)
+		(at 189.23 106.68 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5677,7 +5677,7 @@
 		(dnp no)
 		(uuid "e4c71196-8783-504a-99ab-0ddbde2a3684")
 		(property "Reference" "R305"
-			(at 181.61 103.664 270)
+			(at 185.42 103.664 270)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5686,7 +5686,7 @@
 			)
 		)
 		(property "Value" "100"
-			(at 181.61 105.264 270)
+			(at 185.42 105.264 270)
 			(effects
 				(font
 					(size 1 1)
@@ -5695,7 +5695,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 185.42 106.68 0)
+			(at 189.23 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5704,7 +5704,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 185.42 106.68 0)
+			(at 189.23 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5712,8 +5712,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "TXD2 de la carrier -> GPIO44 (U0RXD)"
-			(at 185.42 106.68 0)
+		(property "Description" "TXD2 de la carrier -> GPIO9 (RX de la UART del GNSS)"
+			(at 189.23 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5722,7 +5722,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1000TCE"
-			(at 185.42 106.68 0)
+			(at 189.23 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5731,7 +5731,7 @@
 			)
 		)
 		(property "LCSC" "C25076"
-			(at 185.42 106.68 0)
+			(at 189.23 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5755,7 +5755,7 @@
 		)
 	)
 	(wire
-		(pts (xy 181.61 106.68) (xy 179.07 106.68))
+		(pts (xy 185.42 106.68) (xy 182.88 106.68))
 		(stroke
 			(width 0)
 			(type default)
@@ -5763,7 +5763,7 @@
 		(uuid "761793b8-469a-5658-ae9a-a6e99119bd9e")
 	)
 	(label "GNSS_TXD2"
-		(at 179.07 106.68 180)
+		(at 182.88 106.68 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5774,7 +5774,7 @@
 		(uuid "fdfa9cf1-cd32-5df8-9274-6068adf97199")
 	)
 	(wire
-		(pts (xy 189.23 106.68) (xy 191.77 106.68))
+		(pts (xy 193.04 106.68) (xy 195.58 106.68))
 		(stroke
 			(width 0)
 			(type default)
@@ -5783,7 +5783,7 @@
 	)
 	(global_label "GNSS_TXD2_MCU"
 		(shape bidirectional)
-		(at 191.77 106.68 0)
+		(at 195.58 106.68 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5793,7 +5793,7 @@
 		)
 		(uuid "01bf74b9-3b90-555c-9c74-115996551903")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 191.77 106.68 0)
+			(at 195.58 106.68 0)
 			(effects
 				(font
 					(size 1 1)
@@ -5804,7 +5804,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 227.33 106.68 90)
+		(at 232.41 106.68 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5812,7 +5812,7 @@
 		(dnp no)
 		(uuid "b840add0-8ac8-516e-bd97-060f1a6be68d")
 		(property "Reference" "R306"
-			(at 223.52 103.664 270)
+			(at 228.6 103.664 270)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5821,7 +5821,7 @@
 			)
 		)
 		(property "Value" "100"
-			(at 223.52 105.264 270)
+			(at 228.6 105.264 270)
 			(effects
 				(font
 					(size 1 1)
@@ -5830,7 +5830,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 227.33 106.68 0)
+			(at 232.41 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5839,7 +5839,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 227.33 106.68 0)
+			(at 232.41 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5847,8 +5847,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "PPS -> GPIO1"
-			(at 227.33 106.68 0)
+		(property "Description" "PPS -> GPIO10"
+			(at 232.41 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5857,7 +5857,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1000TCE"
-			(at 227.33 106.68 0)
+			(at 232.41 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5866,7 +5866,7 @@
 			)
 		)
 		(property "LCSC" "C25076"
-			(at 227.33 106.68 0)
+			(at 232.41 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5890,7 +5890,7 @@
 		)
 	)
 	(wire
-		(pts (xy 223.52 106.68) (xy 220.98 106.68))
+		(pts (xy 228.6 106.68) (xy 226.06 106.68))
 		(stroke
 			(width 0)
 			(type default)
@@ -5898,7 +5898,7 @@
 		(uuid "20641f86-d948-5280-8267-47d5000342f7")
 	)
 	(label "GNSS_PPS"
-		(at 220.98 106.68 180)
+		(at 226.06 106.68 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5909,7 +5909,7 @@
 		(uuid "59f28de1-a6da-5158-afc7-2d8a125b5149")
 	)
 	(wire
-		(pts (xy 231.14 106.68) (xy 233.68 106.68))
+		(pts (xy 236.22 106.68) (xy 238.76 106.68))
 		(stroke
 			(width 0)
 			(type default)
@@ -5918,7 +5918,7 @@
 	)
 	(global_label "GNSS_PPS_MCU"
 		(shape bidirectional)
-		(at 233.68 106.68 0)
+		(at 238.76 106.68 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -5928,7 +5928,7 @@
 		)
 		(uuid "f3338508-c6c2-5dd0-9912-adceda3af750")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 233.68 106.68 0)
+			(at 238.76 106.68 0)
 			(effects
 				(font
 					(size 1 1)
@@ -5982,7 +5982,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "GPIO5 -> EVENT"
+		(property "Description" "GPIO11 -> EVENT"
 			(at 39.37 143.51 0)
 			(effects
 				(font
@@ -6307,7 +6307,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "GPIO4 en drenador abierto; la BDLX no saca RESET_N"
+		(property "Description" "GPIO12 en drenador abierto; la BDLX no saca RESET_N"
 			(at 121.92 143.51 0)
 			(effects
 				(font
@@ -6508,7 +6508,7 @@
 	)
 	(rectangle
 		(start 12.7 92.71)
-		(end 255.27 151.13)
+		(end 259.08 151.13)
 		(stroke
 			(width 0.1524)
 			(type dash)

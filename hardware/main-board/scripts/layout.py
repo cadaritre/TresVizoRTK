@@ -19,12 +19,12 @@ W, H = 46.0, 64.0
 Z_TOP = 87.5            # z del canto superior en la carcasa: v = Z_TOP - z
 # M2.5 sin metalizar Ø2.7, sin cobre en Ø5.2; se atornillan a dos brazos impresos detrás de la placa
 # (|x| >= 10 para no tocar el SMA de la carrier). H2 en la esquina superior derecha; H1 bajo el IMU.
-HOLES = [("H1", 12.0, 12.2), ("H2", 40.4, 3.7)]
+HOLES = [("H1", 12.0, 9.6), ("H2", 40.4, 3.7)]   # H1 subió 2.6 mm (WROOM-1): su aro sin cobre tapaba los pines de arriba
 HOLE_FREE_R = 2.6
 # Rieles de la carcasa: 2.5 mm libres en cada canto lateral desde arriba hasta v 48.5 (rieles en z 39-90);
-# el de la izquierda (+X) se corta frente a la antena del ESP32 (v 16.5-33.5, z 54-71). Por debajo de z 39
+# el de la izquierda (+X) se corta frente a la antena del ESP32-S3-WROOM-1 (v 15.1-34.0, z 53.5-72.4). Por debajo de z 39
 # no hay riel: ahí llegan al canto la microSD y la batería.
-RAIL_FREE, RAIL_V_END, RAIL_CUT = 2.5, 48.5, (16.5, 33.5)
+RAIL_FREE, RAIL_V_END, RAIL_CUT = 2.5, 48.5, (15.1, 34.0)
 # Botón del panel: nada frente a él (z 38-49, x ±5.5); su cuerpo (x ±8.1, z 35.4-51.6) deja 2.5 mm
 BUTTON_KEEPOUT = (17.5, Z_TOP - 49.0, 28.5, Z_TOP - 38.0)
 
@@ -94,13 +94,13 @@ CHG_TRACKS = [
     ("CHG_SW1", "B.Cu", 0.4, [(-5.075, 0.45), (-1.0, 0.45), (-1.0, 0.25)]),
     # Fila inferior (pines 17-24, paso 0.4): cada pin sale recto y se abre en abanico escalonado; el
     # bootstrap 2 baja recto a C102 y su lado SW sube por B.Cu a la columna de vías de SW2.
-    ("CHG_ILIM", "F.Cu", 0.2, [(2.2, 1.2), (2.45, 1.2), (2.85, 1.6), (3.6, 1.6)]),
+    ("CHG_ILIM", "F.Cu", 0.2, [(2.2, 1.2), (2.45, 1.2), (2.85, 1.6)]),
     ("CHG_BATP", "F.Cu", 0.2, [(2.2, 0.8), (2.85, 0.8), (3.25, 1.2), (7.09, 1.2)]),
     ("CHG_BTST2", "F.Cu", 0.2, [(2.2, 0.4), (3.77, 0.4)]),
     ("CHG_SW2", "F.Cu", 0.4, [(5.775, 0.4), (6.7, 0.4)]),
     ("CHG_SW2", "B.Cu", 0.4, [(6.7, 0.4), (1.0, 0.4)]),
     ("CHG_PROG", "F.Cu", 0.2, [(2.2, 0.0), (2.85, 0.0), (3.25, -0.4), (7.12, -0.4)]),
-    ("CHG_INT_N", "F.Cu", 0.2, [(2.2, -0.4), (2.45, -0.4), (2.85, -0.8), (4.6, -0.8), (5.0, -1.2), (6.2, -1.2)]),
+    ("CHG_INT_N", "F.Cu", 0.2, [(2.2, -0.4), (2.45, -0.4), (2.85, -0.8), (4.6, -0.8), (5.0, -1.2)]),
     ("CHG_SDRV", "F.Cu", 0.2, [(2.2, -1.6), (2.7, -1.6), (3.15, -2.05), (3.45, -2.05)]),
     # VBUS: los pines 2 y 3 se juntan fuera del chip y van al 100 nF y al 22 uF
     ("VBUS", "F.Cu", 0.2, [(-2.2, -1.2), (-2.6, -1.2)]),
@@ -149,12 +149,13 @@ G5_ORIGIN = (35.4, 43.6)
 
 # ---------------------------------------------------------------- resto de la placa
 PLACE = {
-    # ESP32-S3-MINI-1 con la antena en el canto izquierdo (+X del equipo), fuera de la sombra de la carrier
-    "U201": (13.6, 25.3, 90),
+    # ESP32-S3-WROOM-1 con la antena en el canto izquierdo (+X del equipo), fuera de la sombra de la carrier.
+    # Huella de LCSC con el origen a 3.6 mm del centro hacia los pines: cuerpo en u 0.2-25.7, v 15.7-33.7; sus pads almenados asoman 0.5 mm (u hasta 26.25, v 15.2-34.2)
+    "U201": (16.59, 24.7, 90),
     # ---- conectores de cable (todos de entrada lateral; ver SIDE_ENTRY y las zonas de clavija)
     # Canto superior, boca hacia arriba (la clavija sale por encima del canto): IMU, USB del panel (justo
     # bajo el conector de la placa panel-usb) y LEDs del panel.
-    "J405": (9.1, 3.45, 180), "J101": (22.7, 3.45, 180), "J406": (33.6, 3.45, 180),
+    "J405": (9.1, 3.45, 180), "J101": (22.7, 3.45, 180),
     # OLED: dentro de la placa, boca hacia la izquierda sobre una zona libre bajo los pines de la OLED
     "J403": (27.6, 11.0, 270),
     # Botón: a la izquierda del botón del panel, boca hacia la izquierda sobre una zona libre
@@ -162,28 +163,28 @@ PLACE = {
     # Canto inferior, boca hacia abajo: microSD, carrier GNSS, NTC (opcional) y batería
     "J401": (9.26, 54.4, 0), "J301": (24.57, 60.6, 0), "J404": (33.89, 60.8, 0), "J102": (40.59, 59.0, 0),
     # ---- entrada USB: ESD de D+/D- en el camino al ESP32 y TVS de VBUS junto al 22 uF de entrada
-    "U101": (23.4, 16.1, 90), "D101": (33.0, 12.8, 0),
+    "U101": (26.0, 36.0, 90), "D101": (33.0, 12.8, 0),
     "TP206": (17.6, 9.0, 0), "TP207": (17.6, 13.4, 0),
     # ---- alrededor del cargador (U102 en 30.5, 22.4; VBUS arriba, BAT abajo, I2C a la izquierda)
     "C103": (28.6, 18.4, 90),                       # REGN
-    "R101": (27.6, 26.6, 90), "R102": (26.5, 26.6, 90),   # ILIM
-    "R104": (25.4, 26.6, 90), "R105": (24.2, 26.8, 90),   # TS
+    "R101": (18.3, 35.4, 90), "R102": (20.3, 35.4, 90),   # ILIM
+    "R104": (30.3, 38.0, 180), "R105": (30.3, 39.4, 0),   # TS, bajo L102 y fuera del botón
     # 10k fijo de TS y su puente (cortar para usar NTC) junto a J404
     "R106": (32.1, 56.8, 0), "JP101": (34.9, 56.8, 0),
     "R103": (30.9, 30.0, 270),                      # PROG (1S 4.7k; 2S 8.2k), bajo su pin
     "R107": (29.3, 30.0, 90),                       # BATP, bajo su pin
-    "R108": (21.0, 37.4, 90),                       # INT pull-up, bajo el ESP32
+    "R108": (26.9, 16.3, 0),                        # INT pull-up, arriba del canal ESP32-cargador
     "Q101": (36.3, 29.2, 0),                        # FET de apagado (ship)
     # ---- 3.3 V: TPS62903 (bloque de v0.1 compactado); C111 es un 10 uF más de VSYS
     "U105": (33.0, 32.6, 0), "L102": (33.0, 35.6, 0), "C115": (29.8, 33.0, 90), "C116": (34.7, 32.2, 90),
-    "R116": (36.4, 31.6, 0), "R117": (36.4, 32.9, 0), "R118": (36.4, 34.2, 0), "R119": (36.4, 35.5, 0),
+    "R115": (36.4, 31.6, 0), "R116": (36.4, 32.9, 0), "R117": (36.4, 34.2, 0), "R118": (36.4, 35.5, 0),
     "C117": (38.4, 33.6, 90), "C118": (40.2, 33.8, 90), "C119": (42.2, 33.8, 90), "C120": (33.6, 38.2, 0),
     "C111": (41.2, 29.4, 0),
     # ---- medidor y protección de polaridad junto a la batería
-    "U103": (32.4, 49.4, 0), "R113": (32.4, 51.35, 0), "C114": (34.4, 51.35, 0), "R115": (32.4, 52.6, 0),
-    "R114": (34.6, 49.4, 90),
-    "Q102": (39.6, 48.3, 0), "Q103": (39.6, 51.8, 0), "R110": (42.4, 48.6, 90), "R111": (36.8, 51.8, 90),
-    "R112": (42.4, 51.8, 90),
+    "U103": (32.4, 49.4, 0), "R112": (32.4, 51.35, 0), "C114": (34.4, 51.35, 0), "R114": (32.4, 52.6, 0),
+    "R113": (34.6, 49.4, 90),
+    "Q102": (39.6, 48.3, 0), "Q103": (39.6, 51.8, 0), "R109": (42.4, 48.6, 90), "R110": (36.8, 51.8, 90),
+    "R111": (42.4, 51.8, 90),
     # ---- GNSS: ESD y resistencias serie sobre J301
     "U302": (22.2, 54.6, 0), "U303": (26.6, 54.6, 0),
     "R304": (20.0, 50.8, 90), "R305": (21.2, 50.8, 90), "R306": (22.4, 50.8, 90), "R307": (23.6, 50.8, 90),
@@ -191,20 +192,19 @@ PLACE = {
     # ---- ESP32: reset y arranque arriba a la izquierda (lejos del botón y de los conectores), desacoplo
     # bajo el pin de 3V3, pull-ups y puntos de prueba
     "SW201": (5.6, 9.2, 0), "SW202": (5.6, 13.4, 0), "R202": (15.6, 11.8, 90),
-    "R201": (8.0, 16.2, 90), "C203": (9.2, 16.2, 90),
-    "C201": (9.5, 34.8, 0), "C202": (6.0, 34.4, 0), "R203": (13.2, 34.6, 90),
+    "R201": (11.6, 35.4, 90), "C203": (12.7, 35.4, 90),
+    "C201": (9.2, 35.5, 0), "C202": (6.0, 35.4, 0), "R203": (13.8, 35.4, 90),
     # Pull-ups del bus I2C junto a la OLED (en el canal entre el ESP32 y el cargador el plano de 3V3
     # queda partido por las vías)
     "R204": (32.7, 11.3, 180), "R205": (32.7, 10.2, 180),
     # Pull-ups bajo el ESP32, en la franja sobre el botón (bajas; el plano de 3V3 está entero ahí)
-    "R414": (18.6, 37.4, 90), "R415": (19.8, 37.4, 90),
-    "TP201": (3.6, 16.1, 0), "TP202": (5.8, 16.1, 0), "TP203": (22.6, 29.8, 0),
-    "TP204": (14.8, 16.3, 0), "TP205": (12.4, 16.3, 0),
+    "R411": (15.6, 6.6, 90), "R412": (16.7, 6.6, 90),
+    "TP201": (3.8, 35.5, 0), "TP202": (15.7, 35.5, 0), "TP203": (31.0, 3.0, 0),
+    "TP204": (35.4, 3.0, 0), "TP205": (33.2, 3.0, 0),
     # ---- panel: resistencias de los LEDs y de la luz de carga bajo su conector; anillo del botón (Q402)
     # junto al ESP32; ESD y aislamiento del botón junto a J402
-    "R109": (32.3, 8.6, 90), "R411": (33.5, 8.6, 90), "R410": (34.7, 8.6, 90), "R409": (35.9, 8.6, 90),
-    "Q402": (23.0, 19.6, 0), "R413": (24.7, 19.6, 0),
-    "D402": (15.8, 38.6, 90), "D401": (15.6, 41.6, 0), "R408": (16.2, 42.5, 0), "R412": (16.2, 43.5, 0),
+    "Q402": (22.4, 36.2, 0), "R410": (28.6, 35.9, 90),
+    "D402": (15.8, 38.6, 90), "D401": (15.6, 41.6, 0), "R408": (16.2, 42.5, 0), "R409": (16.2, 43.5, 0),
     # ---- microSD: pull-ups, inversor de la detección y desacoplo, entre J402 y el zócalo
     "R401": (3.07, 46.4, 90), "R402": (4.2, 46.4, 90), "R403": (5.33, 46.4, 90), "C402": (6.46, 46.4, 90),
     "C401": (8.82, 46.3, 0), "R404": (11.18, 46.4, 90), "R405": (12.31, 46.4, 90), "R406": (13.44, 46.4, 90),
@@ -228,17 +228,30 @@ TRACKS += [
 TRACKS += [
     ("GND", "F.Cu", 0.2, [(28.45, 21.4), (28.45, 21.8)]),
     ("GND", "F.Cu", 0.25, [(28.45, 21.6), (27.75, 21.6)]),
-    ("GND", "F.Cu", 0.2, [(28.4, 22.6), (26.6, 22.6)]),
+    ("GND", "F.Cu", 0.2, [(28.4, 22.6), (27.0, 22.6)]),
 ]
-VIAS += [("GND", 27.75, 21.6), ("GND", 26.6, 22.6)]
-# Medidor: CELL y VDD bajan directo a R113 (VPACK -> FG_VDD); VDD sigue a C114 y baja a R115, que va justo
-# debajo de R113 para dejar libre la línea de serigrafía de JP101
+VIAS += [("GND", 27.75, 21.6), ("GND", 27.0, 22.6)]
+# Medidor: CELL y VDD bajan directo a R112 (VPACK -> FG_VDD); VDD sigue a C114 y baja a R114, que va justo
+# debajo de R112 para dejar libre la línea de serigrafía de JP101
 TRACKS += [
     ("VPACK", "F.Cu", 0.2, [(32.15, 50.4), (32.15, 51.2)]),
     ("FG_VDD", "F.Cu", 0.2, [(32.65, 50.4), (32.65, 51.2)]),
     ("FG_VDD", "F.Cu", 0.25, [(32.88, 51.35), (33.92, 51.35)]),
     ("FG_VDD", "F.Cu", 0.25, [(32.91, 51.35), (32.91, 52.6)]),
 ]
+# SW del TPS62903 (U105:2 -> L102:1): el pin de 3V3 lo encierra, así que baja por B.Cu a la izquierda de
+# C115. Prerruteado con el trazo que ya pasaba el DRC: la vía de 0.8 mm que ponía el ruteador junto a L102
+# hacía caer el relleno de zonas de KiCad 10 (-11, también en kicad-cli).
+TRACKS += [
+    ("BUCK_SW", "F.Cu", 0.2, [(32.1, 32.9), (31.9, 32.9)]),
+    ("BUCK_SW", "F.Cu", 0.4, [(31.9, 32.9), (30.9, 32.9), (30.8, 33.0), (28.8, 33.0)]),
+    ("BUCK_SW", "B.Cu", 0.4, [(28.8, 33.0), (29.0, 33.2), (29.0, 35.6), (30.0, 36.6), (30.0, 36.7)]),
+    ("BUCK_SW", "F.Cu", 0.4, [(30.0, 36.7), (30.1, 36.6), (31.1, 36.6)]),
+]
+VIAS += [("BUCK_SW", 28.8, 33.0), ("BUCK_SW", 30.0, 36.7)]
+# PGND del TPS62903 (U105:4) con su propia vía: las pistas que pasan junto a U105 aislaban ese pad del relleno
+TRACKS += [("GND", "F.Cu", 0.3, [(33.45, 33.44), (33.45, 34.0)])]
+VIAS += [("GND", 33.45, 34.0)]
 
 for _org, _rot, _parts, _tracks, _vias in ((CHG_ORIGIN, CHG_ROT, CHG_PARTS, CHG_TRACKS, CHG_VIAS),
                                            (G5_ORIGIN, 0, G5_PARTS, G5_TRACKS, G5_VIAS)):
@@ -252,7 +265,6 @@ for _org, _rot, _parts, _tracks, _vias in ((CHG_ORIGIN, CHG_ROT, CHG_PARTS, CHG_
 TEXTS = [
     ("IMU J405", "F.SilkS", 10.0, 6.9, 0.8, 0),
     ("USB J101", "F.SilkS", 22.7, 6.9, 0.8, 0),
-    ("LED J406", "F.SilkS", 33.6, 7.0, 0.8, 0),
     ("OLED", "F.SilkS", 21.8, 10.3, 0.8, 0),
     ("J403", "F.SilkS", 21.8, 11.7, 0.8, 0),
     ("BTN", "F.SilkS", 6.0, 40.1, 0.8, 0),
@@ -268,8 +280,8 @@ TEXTS = [
     ("www.tresvizo.com", "B.SilkS", 23.0, 31.0, 1.6, 0),
     ("TresVizo MeridianV - placa principal v0.2", "B.SilkS", 23.0, 35.0, 1.0, 0),
     ("2026-10 - 4 capas JLC04161H-7628", "B.SilkS", 23.0, 36.8, 0.8, 0),
-    ("1S: R103=4.7k R117=10k U103=MAX17048", "B.SilkS", 23.0, 40.0, 0.8, 0),
-    ("2S: R103=8.2k R117=3.9k U103=MAX17049 R113 NC R115 0R", "B.SilkS", 23.0, 41.6, 0.8, 0),
+    ("1S: R103=4.7k R116=10k U103=MAX17048", "B.SilkS", 23.0, 40.0, 0.8, 0),
+    ("2S: R103=8.2k R116=3.9k U103=MAX17049 R112 NC R114 0R", "B.SilkS", 23.0, 41.6, 0.8, 0),
 ]
 
 # Logotipo (scripts/logo.py, de los archivos del repositorio): completo atrás y el distintivo al frente,
@@ -285,7 +297,7 @@ LOGOS = [
 # una zona libre: delante de la boca se reserva, sin componentes, lo que asoma la clavija enchufada y el
 # doblez de sus cables, con 1 mm a cada lado para tomarla (DRC: áreas «clavija_*»; CAD: kicad/plugs.json).
 SIDE_ENTRY = {"J101": ("GH", 8, 3.10), "J301": ("GH", 8, 3.10), "J402": ("GH", 4, 2.95), "J405": ("GH", 7, 3.00),
-              "J403": ("SH", 4, 2.84), "J404": ("SH", 2, 2.84), "J406": ("SH", 5, 2.84), "J102": ("PH", 2, 4.63)}
+              "J403": ("SH", 4, 2.84), "J404": ("SH", 2, 2.84), "J102": ("PH", 2, 4.63)}
 # JST: GH enchufado asoma 7.15 - 4.05 = 3.1 mm de la boca y mide 4.35 de alto (eGH, «Assembly layout»);
 # carcasa GHR de (n-1)·1.25 + 2.5 de ancho. SH: carcasa SHR de 5.0 de largo, (n-1) + 2.0 de ancho y 2.8 de
 # alto (eSH); se toma 3.0 de asomo. PH: PHR de (n-1)·2.0 + 3.9 de ancho y 4.5 de alto; 3.5 de asomo
@@ -429,8 +441,8 @@ def write_board_json(design, kicad_dir, place=None):
         keepouts.append({"rule_area": True, "name": "hole_" + name, "polygon": circle_poly(u, v, HOLE_FREE_R),
                          "layers": ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"], "no_tracks": True, "no_vias": True,
                          "no_pour": True})
-    # Antena del ESP32-S3-MINI-1 en el canto izquierdo: sin cobre en ninguna capa (guía de Espressif)
-    keepouts.append({"rule_area": True, "name": "esp32_antena", "polygon": rect(0.0, 17.3, 6.2, 33.3),
+    # Antena del ESP32-S3-WROOM-1 en el canto izquierdo: sin cobre en ninguna capa (guía de Espressif)
+    keepouts.append({"rule_area": True, "name": "esp32_antena", "polygon": rect(0.0, 15.7, 6.7, 33.7),
                      "layers": ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"], "no_tracks": True, "no_vias": True,
                      "no_pour": True})
     # Frente al botón del panel no caben componentes (sus terminales con cables quedan a 2.5 mm de la

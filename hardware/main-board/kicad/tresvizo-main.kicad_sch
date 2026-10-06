@@ -10,7 +10,7 @@
 		(rev "0.2")
 		(company "TresVizo")
 		(comment 1 "Exploratorio: no fabricado ni probado")
-		(comment 2 "ESP32-S3-MINI-1-N4R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+		(comment 2 "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
 		(comment 3 "JLCPCB 4 capas JLC04161H-7628")
 	)
 	(lib_symbols)
@@ -193,7 +193,7 @@
 		)
 		(uuid "ea0621e8-3770-5b49-8c0d-de5d067fb41f")
 	)
-	(text "Variante 1S por defecto. Variante 2S: R103 = 8.2k (PROG), U103 = MAX17049G+T10, R113 sin montar,"
+	(text "Variante 1S por defecto. Variante 2S: R103 = 8.2k (PROG), U103 = MAX17049G+T10, R112 sin montar,"
 		(exclude_from_sim no)
 		(at 30.48 188.8 0)
 		(effects
@@ -204,7 +204,7 @@
 		)
 		(uuid "40cb071f-98c4-50bf-85fa-662f00cd3325")
 	)
-	(text "R115 montado (VDD del medidor desde +3V3) y R117 (EN del buck, abajo) = 3.9k."
+	(text "R114 montado (VDD del medidor desde +3V3) y R116 (EN del buck, abajo) = 3.9k."
 		(exclude_from_sim no)
 		(at 30.48 194.8 0)
 		(effects

@@ -10,7 +10,7 @@
 		(rev "0.2")
 		(company "TresVizo")
 		(comment 1 "Exploratorio: no fabricado ni probado")
-		(comment 2 "ESP32-S3-MINI-1-N4R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+		(comment 2 "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
 		(comment 3 "JLCPCB 4 capas JLC04161H-7628")
 	)
 	(lib_symbols
@@ -5082,24 +5082,9 @@
 			)
 		)
 	)
-	(wire
-		(pts (xy 133.35 62.23) (xy 135.89 62.23))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "cbf9a96f-9d35-5415-b142-d54e80dea5c0")
-	)
-	(label "CHG_STAT"
-		(at 135.89 62.23 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify left bottom)
-		)
-		(uuid "556562ef-c1ed-5682-9291-409b5c4d546c")
+	(no_connect
+		(at 133.35 62.23)
+		(uuid "51e75aab-5a75-5e5e-9321-7f8a822f065f")
 	)
 	(wire
 		(pts (xy 113.03 31.75) (xy 110.49 31.75))
@@ -8285,7 +8270,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "ILIM_HIZ: con 22k da ~2.9 A de techo de entrada"
+		(property "Description" "ILIM_HIZ: con 8.2k da ~1.45 A de techo de entrada (1S); 22k da ~2.9 A (2S)"
 			(at 148.59 106.68 0)
 			(effects
 				(font
@@ -9662,141 +9647,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R")
-		(at 255.27 137.16 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "1ae34a1b-a007-5b80-99f4-47fe553eba91")
-		(property "Reference" "R109"
-			(at 251.46 134.144 270)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Value" "1k"
-			(at 251.46 135.744 270)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 255.27 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 255.27 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "LED de carga del panel (ánodo a +3V3)"
-			(at 255.27 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "0402WGF1001TCE"
-			(at 255.27 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C11702"
-			(at 255.27 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "fc6f3726-128b-5150-be23-7ebb4af9a25a")
-		)
-		(pin "2"
-			(uuid "b14e2b1e-b0c5-513f-bb4a-84046e01c433")
-		)
-		(instances
-			(project "tresvizo-main"
-				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "R109")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts (xy 251.46 137.16) (xy 248.92 137.16))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "cf9541ef-7d52-52a7-87f0-a7c86fc13347")
-	)
-	(label "CHG_STAT"
-		(at 248.92 137.16 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right bottom)
-		)
-		(uuid "0753a642-e117-57db-b77f-04a98921d927")
-	)
-	(wire
-		(pts (xy 259.08 137.16) (xy 261.62 137.16))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "17ba6353-5657-5027-a901-3fcfaef0b86d")
-	)
-	(global_label "CHG_LED_K"
-		(shape bidirectional)
-		(at 261.62 137.16 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify left)
-		)
-		(uuid "61211515-5914-5a77-b87a-36baf9b5ed26")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 261.62 137.16 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(hide yes)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Transistor_FET:AO3400A")
 		(at 341.63 40.64 0)
 		(unit 1)
@@ -10098,8 +9948,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "0e8575e1-c670-53b7-a9e4-2d775fb247bb")
-		(property "Reference" "R110"
+		(uuid "1ae34a1b-a007-5b80-99f4-47fe553eba91")
+		(property "Reference" "R109"
 			(at 384.81 27.464 270)
 			(effects
 				(font
@@ -10163,15 +10013,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "83355664-56d3-5a64-a4a0-dd294c4c1d9e")
+			(uuid "fc6f3726-128b-5150-be23-7ebb4af9a25a")
 		)
 		(pin "2"
-			(uuid "2186444f-0c2b-5412-a203-418d7f3e5c2d")
+			(uuid "b14e2b1e-b0c5-513f-bb4a-84046e01c433")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "R110")
+					(reference "R109")
 					(unit 1)
 				)
 			)
@@ -10183,7 +10033,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "acf2137f-d891-56ef-9e8b-bc577ecff943")
+		(uuid "cf9541ef-7d52-52a7-87f0-a7c86fc13347")
 	)
 	(label "VPACK"
 		(at 382.27 30.48 180)
@@ -10194,7 +10044,7 @@
 			)
 			(justify right bottom)
 		)
-		(uuid "ee60f671-37cf-50f1-994d-ccb052dbdfdf")
+		(uuid "0753a642-e117-57db-b77f-04a98921d927")
 	)
 	(wire
 		(pts (xy 392.43 30.48) (xy 394.97 30.48))
@@ -10202,7 +10052,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "5c97e4a2-7d1e-544c-9a3b-0c5a778265ad")
+		(uuid "17ba6353-5657-5027-a901-3fcfaef0b86d")
 	)
 	(label "BATREV_G"
 		(at 394.97 30.48 0)
@@ -10213,7 +10063,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "f3faf160-651d-59bc-85be-60452b772af4")
+		(uuid "3b9bf64e-b2b3-505f-b17b-d91ba4f2c3f1")
 	)
 	(symbol
 		(lib_id "Transistor_FET:AO3400A")
@@ -10425,8 +10275,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "bccb83c7-6ed7-5f08-a1c6-bed1575a008c")
-		(property "Reference" "R111"
+		(uuid "0e8575e1-c670-53b7-a9e4-2d775fb247bb")
+		(property "Reference" "R110"
 			(at 452.12 27.464 270)
 			(effects
 				(font
@@ -10490,15 +10340,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "eda98744-d7ac-5ed1-8234-b9eb96f3d49d")
+			(uuid "83355664-56d3-5a64-a4a0-dd294c4c1d9e")
 		)
 		(pin "2"
-			(uuid "9d008cf8-136f-5263-8188-73860158333c")
+			(uuid "2186444f-0c2b-5412-a203-418d7f3e5c2d")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "R111")
+					(reference "R110")
 					(unit 1)
 				)
 			)
@@ -10510,7 +10360,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "4b4fa536-6cc7-559f-b3e1-3cd7dd272a50")
+		(uuid "acf2137f-d891-56ef-9e8b-bc577ecff943")
 	)
 	(label "VBATT_IN"
 		(at 449.58 30.48 180)
@@ -10521,7 +10371,7 @@
 			)
 			(justify right bottom)
 		)
-		(uuid "fe46b830-3dc5-567f-a597-0470327892e3")
+		(uuid "ee60f671-37cf-50f1-994d-ccb052dbdfdf")
 	)
 	(wire
 		(pts (xy 459.74 30.48) (xy 462.28 30.48))
@@ -10529,7 +10379,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "b19c2bee-3845-5156-ae7c-202da5697bde")
+		(uuid "5c97e4a2-7d1e-544c-9a3b-0c5a778265ad")
 	)
 	(label "BATREV_SENSE"
 		(at 462.28 30.48 0)
@@ -10540,7 +10390,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "97f000ce-6901-5ac5-a584-801b07ff16e4")
+		(uuid "f3faf160-651d-59bc-85be-60452b772af4")
 	)
 	(symbol
 		(lib_id "Device:R")
@@ -10550,8 +10400,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "f8d90c54-cd49-5c5b-adee-c1afb3786f71")
-		(property "Reference" "R112"
+		(uuid "bccb83c7-6ed7-5f08-a1c6-bed1575a008c")
+		(property "Reference" "R111"
 			(at 499.11 27.464 270)
 			(effects
 				(font
@@ -10615,15 +10465,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "bbe8aa0c-68b6-55d9-bceb-2f7d955d9b0f")
+			(uuid "eda98744-d7ac-5ed1-8234-b9eb96f3d49d")
 		)
 		(pin "2"
-			(uuid "ba0c92f7-b77b-5a9e-81ca-bfe7cbf95992")
+			(uuid "9d008cf8-136f-5263-8188-73860158333c")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "R112")
+					(reference "R111")
 					(unit 1)
 				)
 			)
@@ -10635,7 +10485,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "0b4e589d-efa9-5a61-b109-191afe3f077b")
+		(uuid "4b4fa536-6cc7-559f-b3e1-3cd7dd272a50")
 	)
 	(label "BATREV_SENSE"
 		(at 496.57 30.48 180)
@@ -10646,7 +10496,7 @@
 			)
 			(justify right bottom)
 		)
-		(uuid "5a31d8d7-75fe-5a86-8ca6-e4ca4978d706")
+		(uuid "fe46b830-3dc5-567f-a597-0470327892e3")
 	)
 	(wire
 		(pts (xy 506.73 30.48) (xy 509.27 30.48))
@@ -10654,7 +10504,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "bbeb7c2a-e5a7-588c-8f7d-c49f447dea50")
+		(uuid "b19c2bee-3845-5156-ae7c-202da5697bde")
 	)
 	(symbol
 		(lib_id "power:GND")
@@ -10664,7 +10514,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "e79dd891-ccf6-57d0-82ff-e34bec23d768")
+		(uuid "8f19d085-ef03-5f35-9902-19178b70ef07")
 		(property "Reference" "#PWR1029"
 			(at 509.27 30.48 0)
 			(effects
@@ -10711,7 +10561,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "c6a8b268-abb0-58fa-907c-9ea02e4d08ff")
+			(uuid "d0cead6d-c9cc-554e-92dc-6826fedb2277")
 		)
 		(instances
 			(project "tresvizo-main"
@@ -11696,8 +11546,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "65b4c371-5705-50e9-b691-7dd27f044cb3")
-		(property "Reference" "R113"
+		(uuid "f8d90c54-cd49-5c5b-adee-c1afb3786f71")
+		(property "Reference" "R112"
 			(at 417.83 64.294 270)
 			(effects
 				(font
@@ -11761,15 +11611,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "ac2a0aa2-c9c9-52f6-b3f1-4a327e0397e3")
+			(uuid "bbe8aa0c-68b6-55d9-bceb-2f7d955d9b0f")
 		)
 		(pin "2"
-			(uuid "46c903ca-a1d0-5f1d-a67e-504af91db7d0")
+			(uuid "ba0c92f7-b77b-5a9e-81ca-bfe7cbf95992")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "R113")
+					(reference "R112")
 					(unit 1)
 				)
 			)
@@ -11781,7 +11631,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "9ab75332-8e30-5960-9f00-3ad9437d0834")
+		(uuid "0b4e589d-efa9-5a61-b109-191afe3f077b")
 	)
 	(label "VPACK"
 		(at 415.29 67.31 180)
@@ -11792,7 +11642,7 @@
 			)
 			(justify right bottom)
 		)
-		(uuid "9b47a961-51c3-5915-917a-d9ca63f56fc0")
+		(uuid "5a31d8d7-75fe-5a86-8ca6-e4ca4978d706")
 	)
 	(wire
 		(pts (xy 425.45 67.31) (xy 427.99 67.31))
@@ -11800,7 +11650,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "273306ed-45b9-5fd3-82ab-21866b6ce306")
+		(uuid "bbeb7c2a-e5a7-588c-8f7d-c49f447dea50")
 	)
 	(label "FG_VDD"
 		(at 427.99 67.31 0)
@@ -11811,7 +11661,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "83e732f4-e788-54d6-ad54-5e1ee016ce51")
+		(uuid "7391a836-0236-5c6b-bb5b-c3412e35a91f")
 	)
 	(symbol
 		(lib_id "Device:R")
@@ -11821,8 +11671,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "224da021-a837-56be-85cc-3b53d44545e0")
-		(property "Reference" "R114"
+		(uuid "65b4c371-5705-50e9-b691-7dd27f044cb3")
+		(property "Reference" "R113"
 			(at 445.77 64.294 270)
 			(effects
 				(font
@@ -11886,15 +11736,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "0e6a847f-d779-5f7b-ab90-22ab79b74bf1")
+			(uuid "ac2a0aa2-c9c9-52f6-b3f1-4a327e0397e3")
 		)
 		(pin "2"
-			(uuid "340cb127-d8ab-5b76-933b-9d3714695186")
+			(uuid "46c903ca-a1d0-5f1d-a67e-504af91db7d0")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "R114")
+					(reference "R113")
 					(unit 1)
 				)
 			)
@@ -11906,7 +11756,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "7df1d6cb-e00f-5593-b574-0df69e1381f3")
+		(uuid "9ab75332-8e30-5960-9f00-3ad9437d0834")
 	)
 	(symbol
 		(lib_id "power:+3V3")
@@ -11916,7 +11766,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "03adf3ea-5099-5560-a167-d14384cd9d98")
+		(uuid "7e8ea6fe-c4ec-5582-8786-4f68ad2ea193")
 		(property "Reference" "#PWR1037"
 			(at 443.23 67.31 0)
 			(effects
@@ -11962,7 +11812,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "045c6b49-2aab-5804-950f-029eef71d044")
+			(uuid "8ba12c38-53cd-55fc-98e6-b8dc3f2c01ff")
 		)
 		(instances
 			(project "tresvizo-main"
@@ -11979,7 +11829,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "8215cc7b-771f-56ff-b93e-d25e455e0e22")
+		(uuid "273306ed-45b9-5fd3-82ab-21866b6ce306")
 	)
 	(global_label "FG_ALRT_N"
 		(shape bidirectional)
@@ -11991,7 +11841,7 @@
 			)
 			(justify left)
 		)
-		(uuid "9ca9f7a0-5041-5389-afd6-19f582f4760e")
+		(uuid "0af30321-4a3e-5a06-83a8-ede78fa66688")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 455.93 67.31 0)
 			(effects
@@ -12010,8 +11860,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp yes)
-		(uuid "0555a789-6967-50c4-a4ea-3240150dafc4")
-		(property "Reference" "R115"
+		(uuid "224da021-a837-56be-85cc-3b53d44545e0")
+		(property "Reference" "R114"
 			(at 477.52 64.294 270)
 			(effects
 				(font
@@ -12075,15 +11925,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "3e2e50f6-ab11-5cbc-a5df-0b222e8afbe5")
+			(uuid "0e6a847f-d779-5f7b-ab90-22ab79b74bf1")
 		)
 		(pin "2"
-			(uuid "fdccb6b8-f7f7-52eb-8e69-6d790972ea49")
+			(uuid "340cb127-d8ab-5b76-933b-9d3714695186")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "R115")
+					(reference "R114")
 					(unit 1)
 				)
 			)
@@ -12095,7 +11945,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "29d45747-8d94-5185-b675-e037ebd1b7b8")
+		(uuid "7df1d6cb-e00f-5593-b574-0df69e1381f3")
 	)
 	(symbol
 		(lib_id "power:+3V3")
@@ -12105,7 +11955,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "37b1a079-65ee-5083-bb1a-28f80fb66a78")
+		(uuid "03adf3ea-5099-5560-a167-d14384cd9d98")
 		(property "Reference" "#PWR1038"
 			(at 474.98 67.31 0)
 			(effects
@@ -12151,7 +12001,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "ed8f48da-dfda-5e16-a08a-38c1a9e9bce7")
+			(uuid "045c6b49-2aab-5804-950f-029eef71d044")
 		)
 		(instances
 			(project "tresvizo-main"
@@ -12168,7 +12018,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "ec30fb26-df4f-53be-b122-1d39f28823b8")
+		(uuid "8215cc7b-771f-56ff-b93e-d25e455e0e22")
 	)
 	(label "FG_VDD"
 		(at 487.68 67.31 0)
@@ -12179,7 +12029,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "97a325de-c2a4-5245-8891-98f115ae9a7a")
+		(uuid "d3b991fa-c421-5370-9599-a2c6d71420a8")
 	)
 	(symbol
 		(lib_id "tresvizo:TPS62903")
@@ -13007,8 +12857,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "ec645fc2-2f2f-5130-9a00-600e618f3d64")
-		(property "Reference" "R116"
+		(uuid "0555a789-6967-50c4-a4ea-3240150dafc4")
+		(property "Reference" "R115"
 			(at 92.71 160.814 270)
 			(effects
 				(font
@@ -13072,15 +12922,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "feea5f6b-ced9-5a6f-b05d-0b4d51d710f3")
+			(uuid "3e2e50f6-ab11-5cbc-a5df-0b222e8afbe5")
 		)
 		(pin "2"
-			(uuid "2f46811e-36cc-5822-9b34-f2a8e0acf3d7")
+			(uuid "fdccb6b8-f7f7-52eb-8e69-6d790972ea49")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "R116")
+					(reference "R115")
 					(unit 1)
 				)
 			)
@@ -13092,7 +12942,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "13490baf-e5fb-5192-8ff8-fe60dd798b67")
+		(uuid "29d45747-8d94-5185-b675-e037ebd1b7b8")
 	)
 	(global_label "VSYS"
 		(shape bidirectional)
@@ -13104,7 +12954,7 @@
 			)
 			(justify right)
 		)
-		(uuid "923afe47-f7aa-5fad-a0fe-9f42b47896b3")
+		(uuid "df3cc390-1498-59ee-bb37-9701513a7bcd")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 90.17 163.83 0)
 			(effects
@@ -13121,7 +12971,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "a4edd4dc-b02f-5488-9468-ca6b587cd4b0")
+		(uuid "ec30fb26-df4f-53be-b122-1d39f28823b8")
 	)
 	(label "BUCK_EN"
 		(at 102.87 163.83 0)
@@ -13132,7 +12982,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "04190a85-08d7-5215-bbc0-8c7952f9f227")
+		(uuid "97a325de-c2a4-5245-8891-98f115ae9a7a")
 	)
 	(symbol
 		(lib_id "Device:R")
@@ -13142,8 +12992,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "c2e67193-a376-5cdd-8323-7f360e8748bd")
-		(property "Reference" "R117"
+		(uuid "ec645fc2-2f2f-5130-9a00-600e618f3d64")
+		(property "Reference" "R116"
 			(at 128.27 160.814 270)
 			(effects
 				(font
@@ -13207,15 +13057,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "305d33bf-f1e1-5ae0-b0b8-3087816a31eb")
+			(uuid "feea5f6b-ced9-5a6f-b05d-0b4d51d710f3")
 		)
 		(pin "2"
-			(uuid "1b32f31e-45b3-5015-b1bf-51ca4dfad021")
+			(uuid "2f46811e-36cc-5822-9b34-f2a8e0acf3d7")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "R117")
+					(reference "R116")
 					(unit 1)
 				)
 			)
@@ -13227,7 +13077,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "92e1cad6-0e5c-5a34-98b6-c35e7dd772a4")
+		(uuid "13490baf-e5fb-5192-8ff8-fe60dd798b67")
 	)
 	(label "BUCK_EN"
 		(at 125.73 163.83 180)
@@ -13238,7 +13088,7 @@
 			)
 			(justify right bottom)
 		)
-		(uuid "5f2904dd-731d-59b9-9f65-4e1a90f40d24")
+		(uuid "23ae2a07-9eba-5720-9051-349dc14b9162")
 	)
 	(wire
 		(pts (xy 135.89 163.83) (xy 138.43 163.83))
@@ -13246,7 +13096,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "306ed8ad-afe2-5559-ba5b-a0d112d2c4d1")
+		(uuid "a4edd4dc-b02f-5488-9468-ca6b587cd4b0")
 	)
 	(symbol
 		(lib_id "power:GND")
@@ -13256,7 +13106,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "710b6a3d-0c95-56f2-bc55-1ec8c90056ef")
+		(uuid "66084b2c-7ace-52cf-8c0b-373156d17426")
 		(property "Reference" "#PWR1044"
 			(at 138.43 163.83 0)
 			(effects
@@ -13303,7 +13153,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "c875c861-5557-5beb-83e8-6137f9e44c84")
+			(uuid "85073f22-c0cd-5d74-9eec-7ad1a473a176")
 		)
 		(instances
 			(project "tresvizo-main"
@@ -13681,8 +13531,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "944496d1-2c85-5ed1-b3ca-2e99ed220d4c")
-		(property "Reference" "R118"
+		(uuid "c2e67193-a376-5cdd-8323-7f360e8748bd")
+		(property "Reference" "R117"
 			(at 50.8 191.294 270)
 			(effects
 				(font
@@ -13746,15 +13596,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "a6debb91-f924-523e-880c-42d40978ba2c")
+			(uuid "305d33bf-f1e1-5ae0-b0b8-3087816a31eb")
 		)
 		(pin "2"
-			(uuid "87b956f6-d8f5-5e46-b790-e536125aca8f")
+			(uuid "1b32f31e-45b3-5015-b1bf-51ca4dfad021")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "R118")
+					(reference "R117")
 					(unit 1)
 				)
 			)
@@ -13766,7 +13616,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "f7348976-096a-55f7-87a4-7ab33b24f89f")
+		(uuid "92e1cad6-0e5c-5a34-98b6-c35e7dd772a4")
 	)
 	(symbol
 		(lib_id "power:+3V3")
@@ -13776,7 +13626,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "15cb9302-e2b4-5497-a783-1e979a7d46bf")
+		(uuid "c37158e6-e5c0-51ab-af99-b7c6c6bee824")
 		(property "Reference" "#PWR1047"
 			(at 48.26 194.31 0)
 			(effects
@@ -13822,7 +13672,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "23452f4e-ea1b-593f-bb25-7a1ca1a1a445")
+			(uuid "c1189eae-7c0a-57a8-af53-b063d878857a")
 		)
 		(instances
 			(project "tresvizo-main"
@@ -13839,7 +13689,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "c67cfa13-5f50-5f79-9346-33f6e6a0b193")
+		(uuid "306ed8ad-afe2-5559-ba5b-a0d112d2c4d1")
 	)
 	(label "BUCK_FB"
 		(at 60.96 194.31 0)
@@ -13850,7 +13700,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "85f4023c-5c34-525f-9e6e-777373e47ad3")
+		(uuid "4e838e13-69ea-5879-9b94-9f25d309a4dc")
 	)
 	(symbol
 		(lib_id "Device:R")
@@ -13860,8 +13710,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "e8631686-79af-5c09-aa89-23d73103a2e9")
-		(property "Reference" "R119"
+		(uuid "944496d1-2c85-5ed1-b3ca-2e99ed220d4c")
+		(property "Reference" "R118"
 			(at 86.36 191.294 270)
 			(effects
 				(font
@@ -13925,15 +13775,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "ba8d9ec6-da70-5293-bb11-394632159bdc")
+			(uuid "a6debb91-f924-523e-880c-42d40978ba2c")
 		)
 		(pin "2"
-			(uuid "6d52e773-bcc8-5168-8358-206699fbfe80")
+			(uuid "87b956f6-d8f5-5e46-b790-e536125aca8f")
 		)
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "R119")
+					(reference "R118")
 					(unit 1)
 				)
 			)
@@ -13945,7 +13795,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "605374b2-90a7-59bc-bedd-7a1244c4a165")
+		(uuid "f7348976-096a-55f7-87a4-7ab33b24f89f")
 	)
 	(label "BUCK_FB"
 		(at 83.82 194.31 180)
@@ -13956,7 +13806,7 @@
 			)
 			(justify right bottom)
 		)
-		(uuid "dbbf940a-2f5e-5c3e-a616-042397762de8")
+		(uuid "465cdb0b-06f4-5ffa-a304-052a476714b8")
 	)
 	(wire
 		(pts (xy 93.98 194.31) (xy 96.52 194.31))
@@ -13964,7 +13814,7 @@
 			(width 0)
 			(type default)
 		)
-		(uuid "57e361c0-94a0-5b86-b8fb-bdc2276a477a")
+		(uuid "c67cfa13-5f50-5f79-9346-33f6e6a0b193")
 	)
 	(symbol
 		(lib_id "power:GND")
@@ -13974,7 +13824,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "3a65a521-fefb-56a1-88e8-716f94b834c8")
+		(uuid "39a2e00d-f7d4-56e1-8025-708600b1ae9a")
 		(property "Reference" "#PWR1048"
 			(at 96.52 194.31 0)
 			(effects
@@ -14021,7 +13871,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "61516a92-ba9e-5ce4-9061-2cf59a565cab")
+			(uuid "43039fbc-d405-569e-9977-c01baa106966")
 		)
 		(instances
 			(project "tresvizo-main"

@@ -93,7 +93,7 @@ CAP = {
 def build(libs):
     d = Design(libs, PROJECT, "TresVizo MeridianV — placa principal", "0.2", "2026-10-04", "TresVizo",
                comments=["Exploratorio: no fabricado ni probado",
-                         "ESP32-S3-MINI-1-N4R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector",
+                         "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector",
                          "JLCPCB 4 capas JLC04161H-7628"])
     d.sheet("power", "power.kicad_sch", "Alimentación, carga y batería")
     d.sheet("mcu", "mcu.kicad_sch", "ESP32-S3")
@@ -154,7 +154,7 @@ def build(libs):
            "REGN": "REGN", "D+": None, "D-": None, "~{QON}": "BTN_N", "~{CE}": "GND",
            "SCL": "I2C_SCL", "SDA": "I2C_SDA", "TS": "CHG_TS", "ILIM_HIZ": "CHG_ILIM", "BATP": "CHG_BATP",
            "PROG": "CHG_PROG", "~{INT}": "CHG_INT_N", "BAT": "VBAT_CHG", "SDRV": "CHG_SDRV", "SYS": "VSYS",
-           "GND": "GND", "STAT": "CHG_STAT"},
+           "GND": "GND", "STAT": None},
           footprint="Package_DFN_QFN:Texas_RQM0029A_VQFN-29_4x4mm_P0.4mm", lcsc="C2876593", mpn="BQ25798RQMR",
           datasheet="https://www.ti.com/lit/ds/symlink/bq25798.pdf",
           description="Cargador I2C 0x6B; compatible pin a pin con BQ25792 (ICHG por defecto 1 A en el 98)")
@@ -194,7 +194,6 @@ def build(libs):
           description="Puente cerrado de fábrica: cortarlo si se conecta una NTC en J404")
     R(s, "chg", "100", "VPACK", "CHG_BATP", note="BATP: 100 ohm en serie, Kelvin a VPACK")
     R(s, "chg", "10k", "+3V3", "CHG_INT_N")
-    R(s, "chg", "1k", "CHG_STAT", "CHG_LED_K", note="LED de carga del panel (ánodo a +3V3)")
 
     d.add("Q101", "Transistor_FET:AO3400A", "AO3400A", s, "bat",
           {"G": "CHG_SDRV", "S": "VBAT_CHG", "D": "VPACK"}, footprint=LC + "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR",
@@ -243,23 +242,26 @@ def build(libs):
 
     # ===================================================================== MCU
     s = "mcu"
-    d.group(s, "mod", "ESP32-S3-MINI-1-N4R2 (mismo módulo que la Thing Plus)", 230)
+    d.group(s, "mod", "ESP32-S3-WROOM-1-N16R2 (16 MB de flash, 2 MB de PSRAM quad)", 230)
     d.group(s, "boot", "Arranque, reset y pines de configuración", 160)
     d.group(s, "i2c", "Bus I2C (OLED 0x3C, MAX17048 0x36, BQ25798 0x6B)", 120)
     d.group(s, "tps", "Puntos de prueba", 200)
+    # Mapa de GPIO para el WROOM-1 (05-10-2026): cada grupo sale por el lado del módulo que mira a su
+    # destino. Orilla de abajo -> microSD y botón; punta derecha -> GNSS, I2C del cargador y medidor;
+    # orilla de arriba -> IMU. En el S3 la SD_MMC, las UART y el I2C van por la matriz de GPIO.
     esp = {
         "GND": "GND", "3V3": "+3V3", "EN": "ESP_EN",
-        "IO0": "ESP_BOOT", "IO1": "GNSS_PPS_MCU", "IO2": "CHG_INT_N", "IO3": "ESP_IO3",
-        "IO4": "GNSS_RESET_MCU", "IO5": "GNSS_EVENT_MCU", "IO6": None, "IO7": "LED_R",
-        "IO8": "I2C_SDA", "IO9": "I2C_SCL", "IO10": "BTN_SENSE_N", "IO11": "IMU_SDA", "IO12": "IMU_SCL",
-        "IO13": None, "IO14": "ESP_IO14", "IO15": None, "IO16": None,
-        "IO17": "IMU_INT1", "IO18": "IMU_INT3", "USB_D-": "USB_DN", "USB_D+": "USB_DP", "IO21": "LED_G",
-        "IO26": None, "IO33": "SD_D3", "IO34": "SD_CMD", "IO35": "FG_ALRT_N", "IO36": "LED_B",
-        "IO37": "BTN_LED_EN", "IO38": "SD_CLK", "IO39": "SD_D0", "IO40": "SD_D1", "IO41": None,
-        "IO42": "ESP_IO42", "TXD0": "ESP_TX0", "RXD0": "GNSS_TXD2_MCU", "IO45": "GNSS_PWR_EN",
-        "IO46": None, "IO47": "SD_D2", "IO48": "SD_DET",
+        "IO0": "ESP_BOOT", "IO1": "IMU_INT3", "IO2": "IMU_INT1", "IO3": "ESP_IO3",
+        "IO4": "SD_D1", "IO5": "SD_D0", "IO6": "SD_CLK", "IO7": "SD_CMD",
+        "IO15": "SD_D3", "IO16": "SD_D2", "IO17": "SD_DET", "IO18": "BTN_SENSE_N",
+        "IO8": "GNSS_TX_MCU", "USB_D-": "USB_DN", "USB_D+": "USB_DP",
+        "IO46": None, "IO9": "GNSS_TXD2_MCU", "IO10": "GNSS_PPS_MCU", "IO11": "GNSS_EVENT_MCU",
+        "IO12": "GNSS_RESET_MCU", "IO13": "I2C_SDA", "IO14": "I2C_SCL", "IO21": "CHG_INT_N",
+        "IO47": "FG_ALRT_N", "IO48": "BTN_LED_EN", "IO45": "GNSS_PWR_EN",
+        "IO35": "ESP_IO35", "IO36": "ESP_IO36", "IO37": "ESP_IO37", "IO38": None, "IO39": None, "IO40": None,
+        "IO41": "IMU_SDA", "IO42": "IMU_SCL", "RXD0": None, "TXD0": None,
     }
-    sym = libs.get("tresvizo:ESP32-S3-MINI-1_LCSC")
+    sym = libs.get("RF_Module:ESP32-S3-WROOM-1")
     pins = {}
     for p in sym.pins:
         if p.name in esp:
@@ -272,9 +274,9 @@ def build(libs):
             pass
     if missing:
         raise SystemExit("ESP32 sin asignar: %s" % missing)
-    d.add("U201", "tresvizo:ESP32-S3-MINI-1_LCSC", "ESP32-S3-MINI-1-N4R2", s, "mod", pins,
-          footprint=LC + "BULETM-SMD_ESP32-S3-MINI-1-N8", lcsc="C3013941", mpn="ESP32-S3-MINI-1-N4R2",
-          description="4 MB flash, 2 MB PSRAM quad; mismos GPIO que la Thing Plus")
+    d.add("U201", "RF_Module:ESP32-S3-WROOM-1", "ESP32-S3-WROOM-1-N16R2", s, "mod", pins,
+          footprint=LC + "WIRELM-SMD_ESP32-S3-WROOM-1", lcsc="C2913205", mpn="ESP32-S3-WROOM-1-N16R2",
+          description="16 MB flash, 2 MB PSRAM quad (GPIO35-37 libres); SD_MMC CMD/D3 en GPIO15/16 (el WROOM-1 no saca GPIO33/34)")
     C(s, "mod", "22uF", "+3V3")
     C(s, "mod", "100nF", "+3V3")
     R(s, "boot", "10k", "+3V3", "ESP_EN")
@@ -287,8 +289,8 @@ def build(libs):
     R(s, "boot", "10k", "ESP_IO3", "GND", note="GPIO3 (pin de arranque) sin dejar al aire")
     R(s, "i2c", "4.7k", "+3V3", "I2C_SDA")
     R(s, "i2c", "4.7k", "+3V3", "I2C_SCL")
-    for net, name in (("+3V3", "3V3"), ("GND", "GND"), ("ESP_IO14", "IO14"), ("ESP_IO42", "IO42"),
-                      ("ESP_TX0", "TXD0"), ("USB_DP", "D+"), ("USB_DN", "D-")):
+    for net, name in (("+3V3", "3V3"), ("GND", "GND"), ("ESP_IO35", "IO35"), ("ESP_IO36", "IO36"),
+                      ("ESP_IO37", "IO37"), ("USB_DP", "D+"), ("USB_DN", "D-")):
         TPt(s, "tps", net, name)
 
     # ==================================================================== GNSS
@@ -311,13 +313,13 @@ def build(libs):
               footprint=LC + "SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL", lcsc=USBLC6_LCSC, mpn="USBLC6-2SC6",
               description="ESD de las señales del GNSS (cable a la carrier)")
     # Hacia la carrier 1 k: con la carrier apagada limita a ~3 mA lo que el ESP32 le mete por sus entradas
-    # (la ROM escribe en GPIO43 al arrancar). Desde la carrier 100 ohm (amortiguan el cable).
-    R(s, "conn", "1k", "ESP_TX0", "GNSS_RXD2", note="GPIO43 (U0TXD) -> RXD2 de la carrier")
-    R(s, "conn", "100", "GNSS_TXD2", "GNSS_TXD2_MCU", note="TXD2 de la carrier -> GPIO44 (U0RXD)")
-    R(s, "conn", "100", "GNSS_PPS", "GNSS_PPS_MCU", note="PPS -> GPIO1")
-    R(s, "conn", "1k", "GNSS_EVENT_MCU", "GNSS_EVENT", note="GPIO5 -> EVENT")
+    # (la UART del GNSS va en GPIO8/9 por la matriz; GPIO43/44 quedan libres). Desde la carrier 100 ohm.
+    R(s, "conn", "1k", "GNSS_TX_MCU", "GNSS_RXD2", note="GPIO8 (TX de la UART del GNSS) -> RXD2 de la carrier")
+    R(s, "conn", "100", "GNSS_TXD2", "GNSS_TXD2_MCU", note="TXD2 de la carrier -> GPIO9 (RX de la UART del GNSS)")
+    R(s, "conn", "100", "GNSS_PPS", "GNSS_PPS_MCU", note="PPS -> GPIO10")
+    R(s, "conn", "1k", "GNSS_EVENT_MCU", "GNSS_EVENT", note="GPIO11 -> EVENT")
     R(s, "conn", "100k", "GNSS_EVENT_MCU", "GND", note="EVENT en bajo mientras el ESP32 arranca")
-    R(s, "conn", "1k", "GNSS_RESET_MCU", "GNSS_RESET_N", note="GPIO4 en drenador abierto; la BDLX no saca RESET_N")
+    R(s, "conn", "1k", "GNSS_RESET_MCU", "GNSS_RESET_N", note="GPIO12 en drenador abierto; la BDLX no saca RESET_N")
     TPt(s, "pwr", "GNSS_5V", "5V_GNSS")
 
     # ====================================================================== IO
@@ -334,7 +336,7 @@ def build(libs):
     C(s, "sd", "100nF", "+3V3")
     d.add("Q401", "Transistor_FET:AO3401A", "AO3401A", s, "sd", {"G": "SD_CD_N", "S": "+3V3", "D": "SD_DET"},
           footprint=LC + "SOT-23_L2.9-W1.3-P1.90-LS2.4-BR", lcsc="C15127", mpn="AO3401A",
-          description="Invierte la detección: GPIO48 HIGH con tarjeta, como espera el firmware")
+          description="Invierte la detección: GPIO17 HIGH con tarjeta")
     R(s, "sd", "100k", "SD_DET", "GND")
 
     # Panel en dos conectores de 8 pines o menos (kit de cables GH/SH del propietario); familias y números de
@@ -343,20 +345,13 @@ def build(libs):
           {"1": "GND", "2": "BTN_N", "3": "BTN_LED_A", "4": "BTN_LED_K", "MP": "GND"},
           footprint=LC + "CONN-SMD_4P-P1.25_SM04B-GHS-TB-LF-SN", lcsc="C189895", mpn="SM04B-GHS-TB(LF)(SN)",
           description="GH 4 lateral al botón del panel: GND, contacto, anillo LED ánodo y cátodo")
-    d.add("J406", "Connector_Generic_MountingPin:Conn_01x05_MountingPin", "LEDS", s, "ui",
-          {"1": "+3V3", "2": "LED_R_K", "3": "LED_G_K", "4": "LED_B_K", "5": "CHG_LED_K", "MP": "GND"},
-          footprint=LC + "CONN-SMD_SM05B-SRSS-TB-LF-SN", lcsc="C136657", mpn="SM05B-SRSS-TB(LF)(SN)",
-          description="SH 5 lateral a los LEDs del panel: ánodo común (3V3), cátodos R, G, B y de carga")
     d.add("D401", "Device:D_TVS", "PESD5V0F1BL", s, "ui", {"1": "BTN_N", "2": "GND"}, rot=90,
           footprint=LC + "SOD-882_L1.0-W0.6-BI", lcsc="C3001950", mpn="PESD5V0F1BL",
           description="ESD del botón metálico, UMW (fuga < 1 nA: QON tiene un pull-up de 200 kohm)")
     d.add("D402", "Device:D", "1N4148W", s, "ui", {"1": "BTN_N", "2": "BTN_SENSE_N"}, rot=90,
           footprint=LC + "SOD-123F_L2.7-W1.6-LS3.8-RD", lcsc="C81598", mpn="1N4148W",
-          description="Aísla QON (pull-up interno a 3.2-3.8 V) del GPIO10; silicio, no Schottky")
+          description="Aísla QON (pull-up interno a 3.2-3.8 V) del GPIO18; silicio, no Schottky")
     R(s, "ui", "10k", "+3V3", "BTN_SENSE_N")
-    R(s, "ui", "1k", "LED_R", "LED_R_K")
-    R(s, "ui", "100", "LED_G", "LED_G_K")
-    R(s, "ui", "100", "LED_B", "LED_B_K")
     R(s, "ui", "100", "VSYS", "BTN_LED_A", note="Anillo del botón: usar la versión de 3-6 V (la de 12 V no enciende)")
     d.add("Q402", "Transistor_FET:AO3400A", "AO3400A", s, "ui", {"G": "BTN_LED_EN", "S": "GND", "D": "BTN_LED_K"},
           footprint=LC + "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR", lcsc="C20917", mpn="AO3400A")
@@ -440,7 +435,7 @@ def main():
     libs = Libraries()
     for n in ("Device", "power", "Connector", "Connector_Generic_MountingPin", "Battery_Management", "Switch",
               "Sensor_Motion", "Power_Management", "Power_Protection", "Transistor_FET", "Regulator_Linear",
-              "Jumper"):
+              "Jumper", "RF_Module"):
         libs.add(os.path.join(sym_dir, n + ".kicad_sym"))
     libs.add(os.path.join(kicad_dir, "lib", "tresvizo.kicad_sym"), "tresvizo")
     d = build(libs)
