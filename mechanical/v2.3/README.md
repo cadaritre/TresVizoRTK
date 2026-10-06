@@ -67,7 +67,7 @@ Ejes de V2.2: z = eje del jalón hacia arriba, +Y = panel, +X a la izquierda mir
 **Pila de adelante hacia atrás:** placa principal (dorso en y 2.5, cara en y 4.1), carrier
 (y −7.4…1.6, con las patas del SMA hasta y −10.4) y 18650 (eje y −19.9, frente en y −10.6).
 - Holguras: **0.9 mm** entre placa y carrier y **0.32 mm** entre las patas del SMA y la 18650,
-  con la carrier medida en foto **más 1 mm** en todo (9 mm de grueso, patas de 3 mm). Las patas
+  con las medidas de la carrier (sacadas de una foto) **más 1 mm** (9 mm de grueso, patas de 3 mm). Las patas
   no se cortan: el hueco lo deja la carcasa.
 - La placa va 1.0 mm más hacia el panel que en `hardware/main-board/cad` (allí: dorso en y 1.5).
 - Su cara queda a 1.5 mm de los terminales del botón de V2.2; el botón ultracorto deja más.
@@ -136,8 +136,8 @@ Los valores salen de [parameters.json](parameters.json): bloques `chasis`, `cuna
     con la envolvente supuesta de 11 mm para dejarles aire.
   - Sus conectores (GH5 vertical y el de 8 pines) no caben con clavija: el arnés de J301 va
     **soldado** a las filas de agujeros de la carrier, plano.
-  - No se mide: el diseño ya trae el milímetro de holgura en todo. Si algún día se quiere ajustar,
-    se cambia `chasis.carrier` y se regenera.
+  - No se mide: la carrier es lo único sacado de una foto y ya lleva su milímetro de más. Si algún
+    día se quiere ajustar, se cambia `chasis.carrier` y se regenera.
 - **18650 protegida:** Ø18.6 × 69 mm.
 - **Cable de la 18650:** se supone que sale por su extremo de abajo, de Ø2.6 como máximo y de
   ~70 mm o más hasta J102. Si sale por arriba, baja por el costado −X de la cuna.
