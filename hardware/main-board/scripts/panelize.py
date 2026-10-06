@@ -40,6 +40,9 @@ import sys
 
 import pcbnew
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import kiid_seed  # noqa: E402
+
 mm = pcbnew.FromMM
 to_mm = pcbnew.ToMM
 
@@ -171,6 +174,7 @@ def copy_board(dst, src, dv, prefix, skip_edges=True):
 
 def main():
     spec_path, out = sys.argv[1:3]
+    kiid_seed.seed("panelize", spec_path)
     spec = json.load(open(spec_path, encoding="utf-8"))
     base_dir = os.path.dirname(os.path.abspath(spec_path))
     boards = spec["boards"]

@@ -1,5 +1,5 @@
 {
- "nota": "Recorridos de montaje de V2.3 con la placa v0.2 (cfc44c9). t = distancia a la posición final a lo largo del recorrido; los choques dan el volumen máximo y el tramo de t.",
+ "nota": "Recorridos de montaje de V2.3 con la placa v0.2 de cad/ (movida desplazamiento_placa_y). t = distancia a la posición final a lo largo del recorrido; los choques dan el volumen máximo y el tramo de t.",
  "1_bateria": {
   "corrimiento_para_el_collar_mm": 3.2,
   "eje_y_al_pasar": -16.4,
@@ -9,15 +9,100 @@
   "c_baja_a_la_repisa": {}
  },
  "2_carrier_al_chasis": {},
+ "2b_carrier_con_componentes": {
+  "choques": {},
+  "holguras_finales": {
+   "PCB": {
+    "chasis": 0.0,
+    "18650": 3.2
+   },
+   "USB-C (sobresale del canto +X)": {
+    "chasis": 1.4,
+    "18650": 5.56
+   },
+   "UM980 y su placa azul": {
+    "chasis": 0.86,
+    "18650": 4.8
+   },
+   "LEDs RTK/PVT": {
+    "chasis": 2.13,
+    "18650": 5.3
+   },
+   "pasivos C12-C14/L1": {
+    "chasis": 4.75,
+    "18650": 4.8
+   },
+   "SMA cuerpo": {
+    "chasis": 4.4,
+    "18650": 5.08
+   },
+   "u.FL P3": {
+    "chasis": 3.42,
+    "18650": 9.74
+   },
+   "IC de 8 pines": {
+    "chasis": 2.01,
+    "18650": 9.61
+   },
+   "pasivos del canto -X": {
+    "chasis": 0.9,
+    "18650": 13.8
+   },
+   "D6/R4": {
+    "chasis": 3.03,
+    "18650": 9.54
+   },
+   "GH8 vertical": {
+    "chasis": 1.4,
+    "18650": 11.73
+   },
+   "CON1 GH5 lateral": {
+    "chasis": 7.54,
+    "18650": 4.81
+   },
+   "electrónica central": {
+    "chasis": 4.94,
+    "18650": 4.8
+   },
+   "IC izquierdo y pasivos": {
+    "chasis": 1.77,
+    "18650": 4.94
+   },
+   "SMA cañón": {
+    "chasis": 4.6,
+    "18650": 5.97
+   },
+   "pila de botón": {
+    "chasis": 1.2,
+    "18650": 9.88
+   },
+   "patas del SMA (atrás)": {
+    "chasis": 5.83,
+    "18650": 0.32
+   },
+   "arnés J301: soldaduras atrás (8 agujeros)": {
+    "chasis": 0.0,
+    "18650": 13.25
+   },
+   "arnés J301: cables por delante (8 agujeros)": {
+    "chasis": 0.4,
+    "18650": 15.01
+   },
+   "arnés J301: soldaduras atrás (5 agujeros)": {
+    "chasis": 6.32,
+    "18650": 2.69
+   }
+  }
+ },
  "3a_placa_desde_arriba": {
   "pcb": {},
   "componentes": {
-   "U201 × chasis_frente_1": {
-    "mm3_max": 6.535,
-    "t_min": 2.0,
-    "t_max": 32.0
+   "U201 × chasis_frente_0": {
+    "mm3_max": 12.07,
+    "t_min": 1.0,
+    "t_max": 33.0
    },
-   "J102 × chasis_frente_2": {
+   "J102 × chasis_frente_1": {
     "mm3_max": 0.315,
     "t_min": 9.0,
     "t_max": 60.0
@@ -35,16 +120,16 @@
    "chasis-tubo": 0.0,
    "chasis-18650": 1.0,
    "carrier-tubo": 2.6,
-   "carrier-18650": 0.4
+   "carrier-18650": 0.318
   }
  },
  "5_J102_desde_abajo": {},
  "5_J404_desde_abajo": {},
  "6_tapa_del_panel": {
   "J502_cables × J101_cables": {
-   "mm3_max": 29.544,
+   "mm3_max": 45.75,
    "t_min": 0.0,
-   "t_max": 1.5
+   "t_max": 2.5
   }
  },
  "7a_plataforma": {},
@@ -110,30 +195,30 @@
    ],
    [
     -27.2,
-    4.0,
+    5.0,
     24.5
    ],
    [
     -23.1,
-    5.9,
+    6.9,
     24.6
    ],
    [
     -23.1,
-    5.9,
+    6.9,
     18.0
    ],
    [
     -20.0,
-    5.9,
+    6.9,
     17.3
    ]
   ],
-  "largo_mm": 65.4,
+  "largo_mm": 66.4,
   "choques": {},
   "holguras": {
-   "tubo": 0.155,
-   "chasis": 0.176,
+   "tubo": 0.167,
+   "chasis": 0.203,
    "18650": 0.0,
    "retenes_tuerca": 0.18,
    "comp_J102": 0.338

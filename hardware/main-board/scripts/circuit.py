@@ -304,8 +304,9 @@ def build(libs):
     d.add("J301", "Connector_Generic_MountingPin:Conn_01x08_MountingPin", "GNSS", s, "conn",
           {"1": "GNSS_5V", "2": "GND", "3": "GNSS_RXD2", "4": "GNSS_TXD2", "5": "GNSS_PPS", "6": "GNSS_EVENT",
            "7": "GNSS_RESET_N", "8": "GND", "MP": "GND"},
-          footprint=LC + GH_FP[8], lcsc=GH_LCSC[8], mpn=GH_MPN[8],
-          description="GH 8 lateral (XUNPU, huella JST SM08B-GHS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND")
+          footprint=LC + "CONN-TH_SM08B-SRSS-TB-LF-SN", lcsc="C160407", mpn="SM08B-SRSS-TB(LF)(SN)",
+          description="SH 8 lateral (JST SM08B-SRSS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND. "
+                      "SH y no GH, para que no se pueda cruzar con J101 (GH 8 con VBUS)")
     # ESD junto al conector (la carrier va por cable); el pin 5 a +3V3 como en U101
     for k, (a_net, b_net) in enumerate((("GNSS_RXD2", "GNSS_TXD2"), ("GNSS_PPS", "GNSS_EVENT"))):
         d.add("U%d" % (302 + k), "Power_Protection:USBLC6-2SC6", "USBLC6-2SC6", s, "conn",

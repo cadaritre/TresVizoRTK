@@ -17,6 +17,7 @@ import pcbnew
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+import kiid_seed  # noqa: E402
 from sexpr import find, findall, loads  # noqa: E402
 
 mm = pcbnew.FromMM
@@ -151,6 +152,7 @@ def add_zone(board, z, outline):
 
 def main():
     kicad_dir, netlist, spec_path, out, std_fp = sys.argv[1:6]
+    kiid_seed.seed("build_pcb", netlist, spec_path)
     spec = json.load(open(spec_path, encoding="utf-8"))
     comps, nets = read_netlist(netlist)
     extra_libs = {k: os.path.join(kicad_dir, v) for k, v in spec.get("libs", {}).items()}

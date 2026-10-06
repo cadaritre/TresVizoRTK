@@ -12,7 +12,8 @@ USB nativo del ESP32-S3). Es una placa de 4 capas y 1.6 mm, con todas las piezas
 
 Esquema en [fab/tresvizo-panel-usb-schematic.pdf](fab/tresvizo-panel-usb-schematic.pdf) y vistas en
 [fab/tresvizo-panel-usb-top.png](fab/tresvizo-panel-usb-top.png) /
-[fab/tresvizo-panel-usb-bottom.png](fab/tresvizo-panel-usb-bottom.png).
+[fab/tresvizo-panel-usb-bottom.png](fab/tresvizo-panel-usb-bottom.png). Los genera `build.py`, igual que el ZIP
+de Gerber: cambian en cada vuelta y solo se guardan en git en los hitos (`git add -f`).
 
 ## Circuito
 

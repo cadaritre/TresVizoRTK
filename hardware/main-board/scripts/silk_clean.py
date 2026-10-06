@@ -20,6 +20,9 @@ import tempfile
 
 import pcbnew
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import kiid_seed  # noqa: E402
+
 SILK_TYPES = {"silk_overlap", "silk_over_copper", "silk_edge_clearance"}
 
 
@@ -68,6 +71,7 @@ def pick(items, idx):
 
 def main():
     path, kcli = sys.argv[1:3]
+    kiid_seed.seed("silk_clean", path)
     pending = []
     for rnd in range(8):
         viol = drc(kcli, path)

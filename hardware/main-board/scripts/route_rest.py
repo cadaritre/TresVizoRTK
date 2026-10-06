@@ -13,8 +13,9 @@ En In2 (plano de +3V3) las pistas nuevas son válidas pero más caras: el rellen
 rodea al volver a rellenar. Se ejecuta con el Python de KiCad; no usa bibliotecas externas.
 
 Variables de entorno: SKIP_NETS=GND,... omite redes (salvo las conexiones a pines de CI, U*);
+ROUTE_FIRST=SD_,... rutea antes las redes que empiezan así (los pasos más estrechos);
 ROUTE_REST_LIMIT=N solo intenta N pares;
-ROUTE_REST_MINUTES=M tiempo máximo (por omisión 20).
+ROUTE_REST_MINUTES=M tiempo máximo (por omisión 30).
 """
 
 import heapq
@@ -27,6 +28,9 @@ from array import array
 from collections import Counter, deque
 
 import pcbnew
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import kiid_seed  # noqa: E402
 
 mm = pcbnew.FromMM
 to_mm = pcbnew.ToMM
@@ -42,6 +46,8 @@ INNER_COST = 1.8            # coste relativo de la capa interna (es el plano de 
 RIP_PENALTY = 40            # coste por celda ocupada por otra ruta al buscar con arranque
 HIST_STEP = 5.0             # coste histórico que se suma a cada celda disputada
 MAX_RIPS = 60               # veces que una conexión puede arrancar a otras
+PAIR_RIPS = 3               # veces que una conexión puede arrancar a la misma otra (corta los ciclos)
+TOTAL_RIPS_PER_PAIR = 20    # tope global de arranques: 20 por conexión pendiente
 ZONE_REACH = 3.0            # una zona se alcanza a menos de esto del punto que marca el DRC (mm)
 INFL = 1.3                  # alcance máximo de una marca alrededor del eje o centro de su forma (mm)
 BLOCK = -1
@@ -638,6 +644,8 @@ class Router:
         self.neck_cache = {}
         self.hist = array("f", [0.0]) * (len(layer_names) * self.fixed.nx * self.fixed.ny)
         self.routes = {}          # índice de par -> (formas, objetos de la placa)
+        self.pair_rips = Counter()  # (conexión que arranca, víctima) -> veces
+        self.total_rips = 0
         self.used = {}            # índice de par -> (ancho, vía)
         self.end_cache = {}
 
@@ -787,6 +795,14 @@ class Router:
             if not shapes:
                 continue
             victims = self.conflicts(shapes)
+            # Dos conexiones que se arrancan una a otra sin fin (el ruteo nunca termina): pasada la cuenta,
+            # esta se da por perdida y el DRC la muestra sin conectar.
+            if any(self.pair_rips[(idx, v)] >= PAIR_RIPS for v in victims) or \
+                    self.total_rips + len(victims) > TOTAL_RIPS_PER_PAIR * len(self.pairs):
+                return None
+            for v in victims:
+                self.pair_rips[(idx, v)] += 1
+            self.total_rips += len(victims)
             N = self.fixed.nx * self.fixed.ny
             for li, i, j in p:
                 k = j * self.fixed.nx + i
@@ -800,14 +816,57 @@ class Router:
         return None
 
 
+def anchors(item):
+    """Puntos donde una ruta puede empezar en un objeto, con su prioridad (pad, vía, pista) y una clave
+    propia del objeto que no depende del orden en que se lo encuentra."""
+    if item.Type() == pcbnew.PCB_PAD_T:
+        fp = item.GetParentFootprint()
+        key = (0, fp.GetReference() if fp else "", item.GetNumber())
+        return [(item.GetPosition(), key)]
+    if item.Type() == pcbnew.PCB_VIA_T:
+        p = item.GetPosition()
+        return [(p, (1, "", "", p.x, p.y))]
+    if item.Type() in (pcbnew.PCB_TRACE_T, pcbnew.PCB_ARC_T):
+        s, e = item.GetStart(), item.GetEnd()
+        ends = sorted([(s.x, s.y), (e.x, e.y)])
+        key = (2, "", "", ends[0][0], ends[0][1], ends[1][0], ends[1][1], item.GetLayer(), item.GetWidth())
+        return [(s, key), (e, key)]
+    return []
+
+
+def closest_ends(con, a, b):
+    """El DRC une dos islas de una red, pero no siempre nombra el mismo objeto de cada una (a veces el
+    pad, a veces la pista que sale de él, con la posición de su otro extremo). Para que el ruteo salga
+    igual en cada ejecución, se toma de cada isla el par de puntos más cercano, con desempates fijos:
+    distancia, pad antes que vía antes que pista, referencia y coordenadas."""
+    def island(x):
+        out = [x] + [i.Cast() for i in con.GetConnectedItems(x)]
+        return [i for i in out if i.GetNetCode() == x.GetNetCode()]
+    best = None
+    for ia in island(a):
+        for pa, ka in anchors(ia):
+            for ib in island(b):
+                for pb, kb in anchors(ib):
+                    d = round(math.hypot(pcbnew.ToMM(pa.x - pb.x), pcbnew.ToMM(pa.y - pb.y)), 4)
+                    key = (d, ka[0] + kb[0], ka, kb, pa.x, pa.y, pb.x, pb.y)
+                    if best is None or key < best[0]:
+                        best = (key, ia, pa, ib, pb)
+    if best is None:
+        return None
+    _, ia, pa, ib, pb = best
+    return [ia, ib], [(pcbnew.ToMM(pa.x), pcbnew.ToMM(pa.y)), (pcbnew.ToMM(pb.x), pcbnew.ToMM(pb.y))]
+
+
 def main():
     path, drc_json = sys.argv[1:3]
+    kiid_seed.seed("route_rest", path)
     layer_names = (sys.argv[3] if len(sys.argv) > 3 else "F.Cu,In2.Cu,B.Cu").split(",")
     skip = {n for n in os.environ.get("SKIP_NETS", "").split(",") if n}
     minutes = float(os.environ.get("ROUTE_REST_MINUTES", "30"))
     board = pcbnew.LoadBoard(path)
     pcbnew.ZONE_FILLER(board).Fill(board.Zones())   # las zonas sirven de extremo y de obstáculo
     rep = json.load(open(drc_json))
+    con = board.GetConnectivity()
     pairs = []
     for u in rep.get("unconnected_items", []):
         its = u.get("items", [])
@@ -829,6 +888,10 @@ def main():
             # posición del otro extremo.
             pos = [(it["pos"]["x"], it["pos"]["y"]) for it in its]
             zone = [x.Type() == pcbnew.PCB_ZONE_T for x in items]
+            if not any(zone):
+                ends = closest_ends(con, items[0], items[1])
+                if ends:
+                    items, pos = ends
             if zone[0] and not zone[1]:
                 pos[0] = pos[1]
             elif zone[1] and not zone[0]:
@@ -848,7 +911,8 @@ def main():
             return (1e9, p[0][0].GetNetname(), (0, 0))
         (ax, ay), (bx, by) = p[1]
         return (round(math.hypot(ax - bx, ay - by), 4), p[0][0].GetNetname(), p[1])
-    pairs.sort(key=plen)
+    first = tuple(n for n in os.environ.get("ROUTE_FIRST", "").split(",") if n)
+    pairs.sort(key=lambda p: (not p[0][0].GetNetname().startswith(first) if first else False, plen(p)))
     limit = int(os.environ.get("ROUTE_REST_LIMIT", "0")) or None
     pairs = pairs[:limit]
     positions = [pp for _, pp in pairs]
@@ -884,6 +948,10 @@ def main():
         if victims:
             print("  %s arranca %d" % (label(idx), len(victims)))
     pending = [i for i in range(len(pairs)) if i not in rt.routes]
+    # El rellenador de zonas de KiCad 10 se cae (señal 11) con ciertas geometrías: se guarda antes lo
+    # ruteado, para no perderlo, y se avisa, para que la caída no quede sin explicación.
+    pcbnew.SaveBoard(path, board)
+    print("ruteo guardado; rellenando zonas (si el proceso se cae aquí, es el rellenador de KiCad)", flush=True)
     filler = pcbnew.ZONE_FILLER(board)
     filler.Fill(board.Zones())
     pcbnew.SaveBoard(path, board)

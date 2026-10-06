@@ -18,3 +18,10 @@ fab/*.step
 
 # STEP de referencia para la carcasa (los exporta la comprobación en FreeCAD; pesados)
 cad/*.step
+
+# Salidas para revisar o fabricar que build.py rehace en cada vuelta (Gerber, vistas y esquema): se
+# guardan en git solo en los hitos (pedido a JLCPCB, versión cerrada) con «git add -f».
+fab/*-gerbers-jlcpcb.zip
+fab/*-top.png
+fab/*-bottom.png
+fab/*-schematic.pdf

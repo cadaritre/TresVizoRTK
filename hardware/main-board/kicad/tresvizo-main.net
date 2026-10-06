@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-kicad/hardware/main-board/kicad/tresvizo-main.kicad_sch")
-		(date "2026-10-06T05:36:23")
+		(date "2026-10-06T06:29:09")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")
@@ -5436,20 +5436,20 @@
 		(comp
 			(ref "J301")
 			(value "GNSS")
-			(footprint "tresvizo_lcsc:CONN-SMD_8P-P1.25_XUNPU-WAFER-GH1.25-8PWB")
-			(description "GH 8 lateral (XUNPU, huella JST SM08B-GHS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND")
+			(footprint "tresvizo_lcsc:CONN-TH_SM08B-SRSS-TB-LF-SN")
+			(description "SH 8 lateral (JST SM08B-SRSS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND. SH y no GH, para que no se pueda cruzar con J101 (GH 8 con VBUS)")
 			(fields
 				(field
-					(name "MPN") "WAFER-GH1.25-8PWB")
+					(name "MPN") "SM08B-SRSS-TB(LF)(SN)")
 				(field
-					(name "LCSC") "C3029383")
+					(name "LCSC") "C160407")
 				(field
-					(name "Footprint") "tresvizo_lcsc:CONN-SMD_8P-P1.25_XUNPU-WAFER-GH1.25-8PWB")
+					(name "Footprint") "tresvizo_lcsc:CONN-TH_SM08B-SRSS-TB-LF-SN")
 				(field
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "GH 8 lateral (XUNPU, huella JST SM08B-GHS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND")
+					(name "Description") "SH 8 lateral (JST SM08B-SRSS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND. SH y no GH, para que no se pueda cruzar con J101 (GH 8 con VBUS)")
 			)
 			(libsource
 				(lib "Connector_Generic_MountingPin")
@@ -5458,11 +5458,11 @@
 			)
 			(property
 				(name "MPN")
-				(value "WAFER-GH1.25-8PWB")
+				(value "SM08B-SRSS-TB(LF)(SN)")
 			)
 			(property
 				(name "LCSC")
-				(value "C3029383")
+				(value "C160407")
 			)
 			(property
 				(name "Sheetname")

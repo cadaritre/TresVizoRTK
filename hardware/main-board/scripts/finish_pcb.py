@@ -10,6 +10,9 @@ import sys
 
 import pcbnew
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import kiid_seed  # noqa: E402
+
 mm = pcbnew.FromMM
 to_mm = pcbnew.ToMM
 
@@ -151,6 +154,7 @@ def place_refs(board):
 
 def main():
     path, spec_path = sys.argv[1:3]
+    kiid_seed.seed("finish_pcb", path, spec_path)
     spec = json.load(open(spec_path, encoding="utf-8"))
     st = spec.get("stitching")
     board = pcbnew.LoadBoard(path)

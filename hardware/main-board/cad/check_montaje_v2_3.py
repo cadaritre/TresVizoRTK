@@ -5,12 +5,13 @@ choques con lo que ya está puesto en ese momento (orden de mechanical/v2.3/READ
 
   1. 18650 a su cuna: baja corrida hacia delante lo justo para pasar el collar, se empuja hacia
      atrás ya entera bajo el collar y baja recta a la repisa.
-  2. Carrier al chasis por el frente (-Y), sin la placa.
+  2. Carrier al chasis por el frente (-Y), sin la placa: la envolvente medida de V2.3 y, aparte, la
+     carrier aproximada con sus componentes (carrier_bdlx.py), que no tiene margen en los cantos.
   3. Placa al chasis por los rieles, desde arriba (-Z) y desde abajo (+Z), con la carrier puesta.
   4. Chasis armado (chasis, placa, carrier y la clavija de J301) al tubo desde arriba, con la 18650
      puesta.
   5. Clavijas de J102 y J404 desde abajo (+Z), sin la base.
-  6. Tapa del panel hacia dentro (-Y) con OLED, botón, LEDs, panel-usb y la clavija de J502.
+  6. Tapa del panel hacia dentro (-Y) con OLED, botón, panel-usb y la clavija de J502.
   7. Plataforma del IMU y tapa de antena desde arriba (-Z), sin el giro final de la bayoneta.
 
 Además dibuja cortes horizontales del fondo para buscar paso al cable de la 18650 hasta J102.
@@ -19,11 +20,12 @@ Uso:
     PYTHONPATH=/Applications/FreeCAD.app/Contents/Resources/lib \\
     /Applications/FreeCAD.app/Contents/Resources/bin/python check_montaje_v2_3.py
 
-Lee mechanical/v2.3/generated/TresVizo-V2.3.FCStd y los STEP de esta carpeta. Los LEDs del panel
-se suponen cilindros Ø4 × 15 desde la cara interior de la tapa (x ±13.5, z 93.5). La plataforma y la
-tapa de antena se comprueban solo contra lo de dentro (el encaje con el tubo es el de V2.2: uñas y
-bayoneta, que no bajan en línea recta). Escribe montaje-v2.3/resultado.json y los cortes en
-montaje-v2.3/. Comprueba geometría, no tolerancias ni rigidez.
+Lee mechanical/v2.3/generated/TresVizo-V2.3.FCStd y los STEP de esta carpeta. La placa y sus
+clavijas se mueven chasis.desplazamiento_placa_y hacia el panel: en V2.3 la placa va más adelante que
+en estos STEP (dorso en y 1.5). La plataforma y la tapa de antena se comprueban solo contra lo de
+dentro (el encaje con el tubo es el de V2.2: uñas y bayoneta, que no bajan en línea recta). Escribe
+montaje-v2.3/resultado.json y los cortes en montaje-v2.3/. Comprueba geometría, no tolerancias ni
+rigidez.
 """
 
 import json
@@ -60,11 +62,11 @@ keepers = P["ref_nut_keepers"]
 panel_refs = {"oled": P["ref_oled"], "boton": P["ref_button"]}
 imu = {"imu_pcb": P["ref_imu_pcb"], "imu_chip": P["ref_imu_chip"], "sma_antena": P["ref_sma"]}
 pm = json.loads((V23 / "parameters.json").read_text(encoding="utf-8"))
-leds = {}
-_l = pm["panel"]["leds"]
-for i, lx in enumerate((-_l["separacion"] / 2, _l["separacion"] / 2)):
-    y_in = math.sqrt(29.5 ** 2 - lx ** 2)          # cara interior de la tapa (r 29.5)
-    leds["led_%d" % i] = Part.makeCylinder(2.0, 15.0, V(lx, y_in, _l["z"]), V(0, -1, 0))
+CH = pm["chasis"]
+DY = CH.get("desplazamiento_placa_y", 0.0)
+sys.path.insert(0, str(HERE))
+import carrier_bdlx  # noqa: E402
+carrier_parts = carrier_bdlx.build(CH["carrier"])
 
 
 def load_step(name):
@@ -82,8 +84,10 @@ def load_step(name):
 board = load_step("placa-principal.step")
 plugs = load_step("clavijas.step")
 pusb = load_step("panel-usb.step")
-env = load_step("envolventes-supuestas.step")
-log("placa:", len(board), "objetos; clavijas:", len(plugs), "; panel-usb:", len(pusb))
+# La placa y sus clavijas van DY mm más hacia el panel que en los STEP; J502 es de la panel-usb.
+for _k, _s in list(board.items()) + [kv for kv in plugs.items() if not kv[0].startswith("J502")]:
+    _s.translate(V(0, DY, 0))
+log("placa:", len(board), "objetos; clavijas:", len(plugs), "; panel-usb:", len(pusb), "; placa movida", DY)
 bb = board["PCB_principal"].BoundBox
 log("PCB en x %.2f..%.2f y %.2f..%.2f z %.2f..%.2f" % (bb.XMin, bb.XMax, bb.YMin, bb.YMax, bb.ZMin, bb.ZMax))
 
@@ -153,8 +157,9 @@ def steps(a, b, d):
     return [round(a + i * d, 3) for i in range(n + 1)]
 
 
-R = {"nota": "Recorridos de montaje de V2.3 con la placa v0.2 (cfc44c9). t = distancia a la posición "
-             "final a lo largo del recorrido; los choques dan el volumen máximo y el tramo de t."}
+R = {"nota": "Recorridos de montaje de V2.3 con la placa v0.2 de cad/ (movida desplazamiento_placa_y). t = "
+             "distancia a la posición final a lo largo del recorrido; los choques dan el volumen máximo y "
+             "el tramo de t."}
 
 # ---------------------------------------------------------------- 1. 18650
 # Recorrido: (a) baja corrida hacia delante lo justo para pasar el collar (0.3 mm de holgura) hasta
@@ -182,11 +187,19 @@ R["1_bateria"] = {
 # ---------------------------------------------------------------- 2. carrier al chasis
 R["2_carrier_al_chasis"] = sweep("2 carrier -> chasis (-Y)", {"carrier": carrier}, {"chasis": sled},
                                  (0, 1, 0), steps(0.0, 30.0, 0.5))
+R["2b_carrier_con_componentes"] = {
+    "choques": sweep("2b carrier con componentes -> chasis (-Y)", carrier_parts, {"chasis": sled},
+                     (0, 1, 0), steps(0.0, 16.0, 0.25)),
+    "holguras_finales": {k: {"chasis": round(v.distToShape(sled)[0], 2),
+                             "18650": round(v.distToShape(battery)[0], 2)} for k, v in carrier_parts.items()},
+}
+log("2b holguras finales", R["2b_carrier_con_componentes"]["holguras_finales"])
 
 # ---------------------------------------------------------------- 3. placa al chasis
-sled_front = sled.common(Part.makeBox(80, 20, 120, V(-40, 3.1, 0)))
+sled_front = sled.common(Part.makeBox(80, 20, 120, V(-40, 3.1 + DY, 0)))   # delante de la cara de la placa
 board_obst = {"chasis_frente_%d" % i: s for i, s in enumerate(sled_front.Solids)}
 board_obst["carrier"] = carrier
+board_obst.update({"carrier: " + k: v for k, v in carrier_parts.items()})
 log("chasis por delante de la placa:", ["x %.1f..%.1f z %.1f..%.1f" % (s.BoundBox.XMin, s.BoundBox.XMax,
                                          s.BoundBox.ZMin, s.BoundBox.ZMax) for s in sled_front.Solids])
 comp = {k: v for k, v in board.items() if k != "PCB_principal"}
@@ -240,10 +253,8 @@ for ref in ("J102", "J404"):
 # ---------------------------------------------------------------- 6. tapa del panel
 cover_set = {"tapa_panel": cover}
 cover_set.update(panel_refs)
-cover_set.update(leds)
 cover_set.update({"pusb_" + k: v for k, v in pusb.items()})
 cover_set.update({k: v for k, v in plugs.items() if k.startswith("J502")})
-cover_set.update({"cabezas_M2": s for n, s in env.items() if "pusb_heads" in n})
 fixed_panel = {"tubo_frente": tube_front, "chasis": sled, "PCB_principal": board["PCB_principal"]}
 fixed_panel.update({"comp_" + k: v for k, v in comp.items()})
 fixed_panel.update({k: v for k, v in plugs.items() if not k.startswith("J502") and not k.startswith("J102")
@@ -252,7 +263,7 @@ R["6_tapa_del_panel"] = sweep("6 tapa del panel (-Y)", cover_set, fixed_panel, (
 
 # ---------------------------------------------------------------- 7. plataforma y tapa de antena
 top_fixed = {"chasis": sled, "carrier": carrier, "18650": battery, "tapa_panel": cover}
-top_fixed.update({k: v for k, v in plugs.items() if k[:4] in ("J101", "J405", "J406", "J502")})
+top_fixed.update({k: v for k, v in plugs.items() if k[:4] in ("J101", "J405", "J502")})
 top_fixed.update({"pusb_" + k: v for k, v in pusb.items()})
 plat_set = {"plataforma": plat}
 plat_set.update(imu)
@@ -272,11 +283,12 @@ R["7b_tapa_antena"] = sweep("7b tapa de antena (-Z)", {"tapa_antena": cap, "sma_
 # (z > 21; aquí aún no hay nervios), entra por delante del riel y baja junto a J102 hasta la salida de
 # su clavija. En la esquina del hueco el cable tiene que ir por encima de la arandela (centro en z >= 18.0)
 # y por debajo de la repisa (z <= 17.7): con el techo del canal en z 19.0 no pasa; con un rebaje hasta
-# z 20.0 en x -7...-3, y -18.6...-15.6 sí (comprobado aparte quitando ese volumen).
+# z 20.0 en x -7...-3, y -18.6...-15.6 sí (comprobado aparte quitando ese volumen). Desde que la placa va
+# 1 mm más adelante (desplazamiento_placa_y), el tramo que rodea el riel -X y baja a J102 va 1 mm más adelante.
 CABLE_R = 1.3
 ROUTE = [(0.0, -19.6, 21.0), (-2.6, -18.9, 19.9), (-3.8, -17.5, 18.3), (-6.0, -16.9, 17.6), (-7.8, -13.0, 17.5),
-         (-20.5, -12.8, 17.5), (-20.5, -12.8, 22.8), (-24.5, -12.6, 23.5), (-25.6, -9.0, 24.0), (-27.2, -3.5, 24.3), (-27.2, 4.0, 24.5),
-         (-23.1, 5.9, 24.6), (-23.1, 5.9, 18.0), (-20.0, 5.9, 17.3)]
+         (-20.5, -12.8, 17.5), (-20.5, -12.8, 22.8), (-24.5, -12.6, 23.5), (-25.6, -9.0, 24.0), (-27.2, -3.5, 24.3), (-27.2, 5.0, 24.5),
+         (-23.1, 6.9, 24.6), (-23.1, 6.9, 18.0), (-20.0, 6.9, 17.3)]
 pieces = []
 for (a1, a2) in zip(ROUTE, ROUTE[1:]):
     p1, p2 = V(*a1), V(*a2)

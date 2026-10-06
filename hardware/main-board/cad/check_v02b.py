@@ -980,6 +980,8 @@ for ref2, P2 in PLUGS.items():
 obst_axis['componentes_pusb'] = [c['shape'] for c in PU['comps']]
 R['B_largo_libre_eje'] = {}
 for ref, d in (('J101', 1), ('J405', 1), ('J406', 1), ('J102', -1), ('J301', -1), ('J404', -1)):
+    if ref not in PLUGS:   # J406 salió en la v0.2 con el WROOM (sin LEDs del panel)
+        continue
     ob = {k: v for k, v in obst_axis.items() if k != ref + ':reserva'}
     R['B_largo_libre_eje'][ref] = free_axis(ref, d, ob)
     # sin contar la reserva de la J502 (es el mismo cable J101-J502)

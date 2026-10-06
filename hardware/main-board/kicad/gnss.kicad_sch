@@ -4471,7 +4471,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" "tresvizo_lcsc:CONN-SMD_8P-P1.25_XUNPU-WAFER-GH1.25-8PWB"
+		(property "Footprint" "tresvizo_lcsc:CONN-TH_SM08B-SRSS-TB-LF-SN"
 			(at 38.1 114.3 0)
 			(effects
 				(font
@@ -4489,7 +4489,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "GH 8 lateral (XUNPU, huella JST SM08B-GHS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND"
+		(property "Description" "SH 8 lateral (JST SM08B-SRSS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND. SH y no GH, para que no se pueda cruzar con J101 (GH 8 con VBUS)"
 			(at 38.1 114.3 0)
 			(effects
 				(font
@@ -4498,7 +4498,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "WAFER-GH1.25-8PWB"
+		(property "MPN" "SM08B-SRSS-TB(LF)(SN)"
 			(at 38.1 114.3 0)
 			(effects
 				(font
@@ -4507,7 +4507,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C3029383"
+		(property "LCSC" "C160407"
 			(at 38.1 114.3 0)
 			(effects
 				(font

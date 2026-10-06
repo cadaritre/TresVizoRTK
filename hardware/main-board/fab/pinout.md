@@ -73,7 +73,7 @@ S2B-PH-SM4-TB(LF)(SN) (LCSC C295747). JST PH 2: 1 = BAT-, 2 = BAT+ (medir el pac
 
 ## J301 GNSS
 
-WAFER-GH1.25-8PWB (LCSC C3029383). GH 8 lateral (XUNPU, huella JST SM08B-GHS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND
+SM08B-SRSS-TB(LF)(SN) (LCSC C160407). SH 8 lateral (JST SM08B-SRSS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND. SH y no GH, para que no se pueda cruzar con J101 (GH 8 con VBUS)
 
 | Pin | Red |
 | --- | --- |

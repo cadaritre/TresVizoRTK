@@ -9,9 +9,13 @@ vías y el canto. Así el ruteador solo tiene que unir señales.
 
 import json
 import math
+import os
 import sys
 
 import pcbnew
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import kiid_seed  # noqa: E402
 
 mm = pcbnew.FromMM
 to_mm = pcbnew.ToMM
@@ -47,6 +51,7 @@ def rect_dist(px, py, r):
 
 def main():
     path, spec_path = sys.argv[1:3]
+    kiid_seed.seed("fanout", path, spec_path)
     spec = json.load(open(spec_path, encoding="utf-8"))
     fo = spec.get("fanout", {})
     nets = set(fo.get("nets", ["GND", "+3V3"]))

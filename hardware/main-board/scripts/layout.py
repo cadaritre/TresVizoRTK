@@ -161,7 +161,7 @@ PLACE = {
     # Botón: a la izquierda del botón del panel, boca hacia la izquierda sobre una zona libre
     "J402": (12.0, 40.8, 270),
     # Canto inferior, boca hacia abajo: microSD, carrier GNSS, NTC (opcional) y batería
-    "J401": (9.26, 54.4, 0), "J301": (24.57, 60.6, 0), "J404": (33.89, 60.8, 0), "J102": (40.59, 59.0, 0),
+    "J401": (9.26, 54.4, 0), "J301": (24.57, 60.7, 0), "J404": (33.89, 60.8, 0), "J102": (40.59, 59.0, 0),
     # ---- entrada USB: ESD de D+/D- en el camino al ESP32 y TVS de VBUS junto al 22 uF de entrada
     "U101": (26.0, 36.0, 90), "D101": (33.0, 12.8, 0),
     "TP206": (17.6, 9.0, 0), "TP207": (17.6, 13.4, 0),
@@ -296,7 +296,7 @@ LOGOS = [
 # (+y local: borde exterior de los pads de anclaje o del patio, el mayor). Cada uno apunta a un canto o a
 # una zona libre: delante de la boca se reserva, sin componentes, lo que asoma la clavija enchufada y el
 # doblez de sus cables, con 1 mm a cada lado para tomarla (DRC: áreas «clavija_*»; CAD: kicad/plugs.json).
-SIDE_ENTRY = {"J101": ("GH", 8, 3.10), "J301": ("GH", 8, 3.10), "J402": ("GH", 4, 2.95), "J405": ("GH", 7, 3.00),
+SIDE_ENTRY = {"J101": ("GH", 8, 3.10), "J301": ("SH", 8, 2.84), "J402": ("GH", 4, 2.95), "J405": ("GH", 7, 3.00),
               "J403": ("SH", 4, 2.84), "J404": ("SH", 2, 2.84), "J102": ("PH", 2, 4.63)}
 # JST: GH enchufado asoma 7.15 - 4.05 = 3.1 mm de la boca y mide 4.35 de alto (eGH, «Assembly layout»);
 # carcasa GHR de (n-1)·1.25 + 2.5 de ancho. SH: carcasa SHR de 5.0 de largo, (n-1) + 2.0 de ancho y 2.8 de

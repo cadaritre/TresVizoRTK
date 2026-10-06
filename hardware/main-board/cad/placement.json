@@ -1,5 +1,5 @@
 {
- "nota": "Posiciones de la v0.2 en ejes de la carcasa V2.2 (mm). z = eje del jalón hacia arriba, +Y hacia el panel, +X a la izquierda mirando el panel. Comprobadas en FreeCAD el 05-10-2026 con la placa del commit cfc44c9. Lo marcado como supuesto no tiene plano.",
+ "nota": "Posiciones de la placa v0.2 (ESP32-S3-WROOM-1, J301 SH 8) en los ejes de la carcasa, con el dorso de la placa en y 1.5 como los STEP de esta carpeta (mm). z = eje del jalón hacia arriba, +Y hacia el panel, +X a la izquierda mirando el panel. En V2.3 la placa va chasis.desplazamiento_placa_y (1.0 mm) más hacia el panel, y la carrier, la 18650 y el chasis los fija mechanical/v2.3/parameters.json. bateria_18650_1s, coaxial_supuesto, carcasa_v22 y holguras_medidas son del primer estudio, en V2.2.",
  "placa_principal": {
   "x": [
    -23.0,
@@ -12,12 +12,12 @@
    87.5
   ],
   "de_kicad": "x = 23 - u, z = 87.5 - v (u, v desde la esquina superior izquierda vista desde el panel)",
-  "radio_max_con_componentes": 23.21,
+  "radio_max_con_componentes": 23.208,
   "agujeros": [
    {
     "ref": "H1",
     "x": 11.0,
-    "z": 75.3,
+    "z": 77.9,
     "taladro": 2.7,
     "sin_cobre_d": 5.2,
     "tornillo": "M2.5"
@@ -33,31 +33,53 @@
   ],
   "franjas_sin_componentes_rieles": {
    "ancho": 2.5,
-   "x": [
-    [
-     20.5,
-     23.0
-    ],
-    [
-     -23.0,
-     -20.5
-    ]
+   "tramos": [
+    {
+     "x": [
+      20.5,
+      23.0
+     ],
+     "z": [
+      72.4,
+      87.5
+     ],
+     "area": "riel_1"
+    },
+    {
+     "x": [
+      20.5,
+      23.0
+     ],
+     "z": [
+      39.0,
+      53.5
+     ],
+     "area": "riel_2"
+    },
+    {
+     "x": [
+      -23.0,
+      -20.5
+     ],
+     "z": [
+      39.0,
+      87.5
+     ],
+     "area": "riel_3"
+    }
    ],
-   "z": [
-    39.0,
-    87.5
-   ]
+   "nota": "Áreas riel_* del DRC: sin componentes. El canto +X se corta frente al ESP32-S3-WROOM-1. En V2.3 las lengüetas de los rieles pisan solo +X en z 72.4-87.5 y -X en z 39-87.5, y la placa entra por abajo"
   },
   "antena_esp32_sin_cobre": {
    "x": [
-    16.8,
+    16.3,
     23.0
    ],
    "z": [
-    54.2,
-    70.2
+    53.8,
+    71.8
    ],
-   "nota": "sin plástico al lado en z 54-71"
+   "nota": "ESP32-S3-WROOM-1: sin cobre en ninguna capa; nada de plástico al lado"
   },
   "boton_nada_delante": {
    "x": [
@@ -121,16 +143,16 @@
    },
    {
     "ref": "J301",
-    "familia": "GH",
+    "familia": "SH",
     "pines": 8,
-    "alto_mm": 4.35,
+    "alto_mm": 2.95,
     "zona_x": [
-     -8.2,
-     5.05
+     -7.07,
+     3.93
     ],
     "zona_z": [
-     17.7,
-     23.8
+     17.96,
+     23.96
     ]
    },
    {
@@ -188,52 +210,9 @@
      87.05,
      93.15
     ]
-   },
-   {
-    "ref": "J406",
-    "familia": "SH",
-    "pines": 5,
-    "alto_mm": 2.95,
-    "zona_x": [
-     -14.6,
-     -6.6
-    ],
-    "zona_z": [
-     86.89,
-     92.89
-    ]
    }
   ],
   "clavijas_detalle": "kicad/plugs.json (coordenadas de placa) y cad/clavijas.step (en ejes de la carcasa)"
- },
- "carrier_bdlx_supuesto": {
-  "x": [
-   -21.0,
-   11.0
-  ],
-  "y": [
-   -9.9,
-   1.1
-  ],
-  "z": [
-   16.4,
-   68.4
-  ],
-  "nota": "32 x 52 x 11 publicado; 11 mm en todo el largo supuesto; componentes hacia la placa (0.4 mm); conectores GH8/GH5 sin ubicar",
-  "sma": {
-   "x": -2.6,
-   "y": -4.4,
-   "d": 9.2,
-   "z": [
-    68.4,
-    81.4
-   ],
-   "clavija_acodada_supuesta": [
-    9.0,
-    9.0,
-    11.0
-   ]
-  }
  },
  "bateria_18650_1s": {
   "eje_x": 0.0,
@@ -343,5 +322,22 @@
   "boton_cara_placa": 2.51,
   "sma_carrier_placa": 1.4,
   "collar_margen": 2.79
+ },
+ "carrier_bdlx": {
+  "medida": "Foto rectificada del propietario del 05-10-2026, con cinta métrica y sin calibrador: ±1 mm",
+  "pcb": [
+   32.0,
+   52.0,
+   1.6
+  ],
+  "grueso_total": 8.0,
+  "agujeros_d": 3.2,
+  "en_v2_3": "Envolvente de 9 mm (medida más 1 mm) en mechanical/v2.3/parameters.json, chasis.carrier",
+  "componentes": "carrier_bdlx.py (cara de componentes hacia la placa, SMA arriba)",
+  "cantos_sin_margen": [
+   "USB-C: sobresale ~0.9 mm del canto +X, z 23.0-32.4 en V2.3, 3.3 mm de alto sobre la cara",
+   "Columna de 8 agujeros pegada al canto -X (x -20.3, z 24.1-41.4 en V2.3): ahí se suelda el arnés de J301 y las soldaduras asoman ~1 mm por detrás",
+   "Pasivos a 0.7 mm del canto -X; pila de botón y conector de 8 pines a 1 mm; placa azul del UM980 a 0.5 mm del canto +X"
+  ]
  }
 }

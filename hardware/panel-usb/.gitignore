@@ -10,3 +10,10 @@ fab/gerbers-*/
 
 # Pesados y regenerables: modelos STEP de LCSC (los .wrl sí se guardan; mklib.py los vuelve a copiar)
 kicad/lib/lcsc.3dshapes/*.step
+
+# Salidas para revisar o fabricar que build.py rehace en cada vuelta (Gerber, vistas y esquema): se
+# guardan en git solo en los hitos (pedido a JLCPCB, versión cerrada) con «git add -f».
+fab/*-gerbers-jlcpcb.zip
+fab/*-top.png
+fab/*-bottom.png
+fab/*-schematic.pdf

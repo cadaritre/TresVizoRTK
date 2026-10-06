@@ -46,7 +46,10 @@ def run(cmd, **kw):
     if tail:
         print(tail)
     if r.returncode not in (0, 5):  # 5 = kicad-cli con violaciones
-        raise SystemExit("falló: %s (código %d)" % (cmd[0], r.returncode))
+        what = os.path.basename(str(cmd[1] if len(cmd) > 1 and str(cmd[1]).endswith(".py") else cmd[0]))
+        if r.returncode < 0:
+            raise SystemExit("falló: %s, se cayó con la señal %d" % (what, -r.returncode))
+        raise SystemExit("falló: %s (código %d)" % (what, r.returncode))
     return out
 
 
@@ -91,6 +94,7 @@ def main():
     os.makedirs(FAB, exist_ok=True)
     tmp = tempfile.mkdtemp(prefix="tresvizo-")
     env = dict(os.environ)
+    env["PYTHONUNBUFFERED"] = "1"   # si un paso se cae, sus últimas líneas igual salen
     env.setdefault("KICAD10_3DMODEL_DIR", os.path.join(SHARED, "3dmodels"))
     env.setdefault("KICAD10_FOOTPRINT_DIR", os.path.join(SHARED, "footprints"))
     env.setdefault("KICAD10_SYMBOL_DIR", os.path.join(SHARED, "symbols"))
@@ -121,7 +125,9 @@ def main():
         rep = os.path.join(tmp, "drc-%s.json" % tag)
         run([KCLI, "pcb", "drc", "--refill-zones", "--format", "json", "--severity-error", "-o", rep, pcb],
             env=env)
-        run([KPY, os.path.join(HERE, "route_rest.py"), pcb, rep], env=dict(env, SKIP_NETS=skip))
+        # El bus de la microSD primero: entre el ESP32, J402 y el zócalo no queda más que su paso, y si
+        # lo toman antes otras redes el ruteador no lo encuentra
+        run([KPY, os.path.join(HERE, "route_rest.py"), pcb, rep], env=dict(env, SKIP_NETS=skip, ROUTE_FIRST="SD_"))
     if not (a.no_route or a.fab_only):
         route("1", skip="GND")
     if not a.fab_only:
