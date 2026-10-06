@@ -489,6 +489,20 @@ def build_sled():
                                           V(rr * math.cos(math.radians(a)), rr * math.sin(math.radians(a)), 10)))
     # Hueco de la placa: los rieles la reciben con 0.15 mm por cara.
     body = body.cut(box(-pl['x'][1] - 0.3, pl['x'][1] + 0.3, yb - 0.15, yf + 0.2, pl['z'][0], pl['z'][1] + 5))
+    # Componentes de la carrier que salen de su envolvente de caja (medidos en foto, revisados con
+    # su modelo por componentes): USB-C y placa del UM980 en el canto +X, soldaduras del arnes en el -X.
+    rc = CH['ranuras_carrier']
+    face = cr['y'][0] + cr['pcb']
+    if 'rebaje_usb_mas_x' in rc:
+        r = rc['rebaje_usb_mas_x']
+        body = body.cut(box(r['x'][0], r['x'][1], rc['labio_y'][1], rl['y'][0] + 0.6, r['z'][0], r['z'][1]))
+    if 'alivio_um980_mas_x' in rc:
+        r = rc['alivio_um980_mas_x']
+        body = body.cut(box(r['x'][0], r['x'][1], face - 0.5, rl['y'][0] + 0.6, r['z'][0], r['z'][1]))
+    if 'corte_labio_menos_x' in rc:
+        r = rc['corte_labio_menos_x']
+        body = body.cut(box(cr['x'][0] - 1.0, cr['x'][0] + rc['labio_ancho'] + 0.1, rc['labio_y'][0] - 0.01,
+                            cr['y'][0], r['z'][0], r['z'][1]))
     body = body.common(Part.makeCylinder(CH['radio_paso'], 400, V(0, 0, -100)))
     return clean(body)
 

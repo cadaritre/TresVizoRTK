@@ -91,6 +91,15 @@ Ejes de V2.2: z = eje del jalón hacia arriba, +Y = panel, +X a la izquierda mir
     ranuras.
 - **Ranuras de la carrier:** labios detrás de su PCB (y −8.1…−7.6), pisos bajo su canto inferior
   (z 18–19). La de +X llega solo a z 50, lejos de la antena.
+  - Con los componentes de la carrier modelados desde la foto (con 1 mm de más) aparecieron dos choques
+    que la caja no veía, y se abrió la ranura:
+    - **USB-C de la carrier**, que sobresale ~0.9 mm de su canto +X: rebaje del muro +X en
+      x 11.1…13.3, z 21.5…34. Queda a 1.40 mm.
+    - **Soldaduras del arnés de J301**, junto al canto −X: sin labio en z 22.5…43, y el muro se abre
+      0.8 mm por detrás del PCB.
+    - Además, el muro +X se retrasa 1 mm en z 34…50 frente a la placa del UM980, que queda a 0.86 mm.
+  - Comprobado con `carrier_check.py` de la otra sesión: 0 choques en su sitio y en toda la entrada
+    por el frente.
 - **Zapatas** sobre cada riel, bajo el cuello de la tapa: r 24.2–25.5, ±14° (12 mm de arco por
   lado), z 97.0–99.2.
   - Apoyan en la cara plana del cuello; por dentro de r 24.4 está su chaflán de entrada.

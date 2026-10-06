@@ -738,7 +738,36 @@
     17.0,
     50.0
    ],
-   "_nota": "La carrier entra por el frente (sin la placa puesta) hasta los labios traseros y apoya en dos pisos; la placa, delante, y dos topes arriba la dejan presa."
+   "_nota": "La carrier entra por el frente (sin la placa puesta) hasta los labios traseros y apoya en dos pisos; la placa, delante, y dos topes arriba la dejan presa.",
+   "rebaje_usb_mas_x": {
+    "_nota": "USB-C de la carrier: sobresale ~0.9 mm de su canto +X (x 4.7-11.9, z 23-32.4, de la cara a +3.3 mm). El muro de la ranura +X se rebaja aqui desde la cara del labio hasta su frente; la ranura sigue guiando el canto en z 17-21.5 y 34-50.",
+    "x": [
+     11.1,
+     13.3
+    ],
+    "z": [
+     21.5,
+     34.0
+    ]
+   },
+   "alivio_um980_mas_x": {
+    "_nota": "Desde 0.5 mm detras de la cara de la carrier hacia delante, el muro +X se retrasa 1 mm en z 34-50: margen para la placa del UM980 (0.70 mm con medidas de foto). El canto del PCB sigue guiado en el resto de su espesor.",
+    "x": [
+     11.1,
+     12.2
+    ],
+    "z": [
+     34.0,
+     50.0
+    ]
+   },
+   "corte_labio_menos_x": {
+    "_nota": "Soldaduras del arnes de J301 en la columna de 8 agujeros junto al canto -X de la carrier (x ~ -20.3, z 24.1-41.4; asoman ~1 mm por detras): ahi se quita el labio -X y el muro se abre 0.8 mm por detras del PCB.",
+    "z": [
+     22.5,
+     43.0
+    ]
+   }
   },
   "lengua_bateria": {
    "x": [
