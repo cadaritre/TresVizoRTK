@@ -124,7 +124,7 @@ Ejes de V2.2: z = eje del jalón hacia arriba, +Y = panel, +X a la izquierda mir
 Los valores salen de [parameters.json](parameters.json): bloques `chasis`, `cuna_18650`,
 `panel.usb_c`, `tuerca_jalon.retenes`, `bandas` y `logo`.
 
-## Supuestos que hay que medir antes de imprimir
+## Medidas supuestas (con holgura; no hay que medir nada)
 
 - **Carrier BDLX:** envolvente de 32 × 52 × 9 mm, componentes hacia la placa, SMA arriba. BDLX no
   publica plano. Medida en foto el 05-10-2026 (±1 mm, sin calibrador):
@@ -136,7 +136,8 @@ Los valores salen de [parameters.json](parameters.json): bloques `chasis`, `cuna
     con la envolvente supuesta de 11 mm para dejarles aire.
   - Sus conectores (GH5 vertical y el de 8 pines) no caben con clavija: el arnés de J301 va
     **soldado** a las filas de agujeros de la carrier, plano.
-  - Medir con calibrador antes de imprimir y corregir `chasis.carrier`.
+  - No se mide: el diseño ya trae el milímetro de holgura en todo. Si algún día se quiere ajustar,
+    se cambia `chasis.carrier` y se regenera.
 - **18650 protegida:** Ø18.6 × 69 mm.
 - **Cable de la 18650:** se supone que sale por su extremo de abajo, de Ø2.6 como máximo y de
   ~70 mm o más hasta J102. Si sale por arriba, baja por el costado −X de la cuna.

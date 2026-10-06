@@ -364,7 +364,7 @@ cotización):
 | Cable USB entre J101 y la panel-usb | No | Los dos conectores quedan casi enfrentados: usar el cable GH8 más corto del kit, pin 1 con pin 1, y doblar el sobrante sobre el canto |
 | Rebabas de los puentes del panel | No | Lijar las de los cantos laterales de la placa madre antes de meterla en los rieles |
 | NTC (J404 montado, JP101 cerrado) | No | Sin NTC no hay que hacer nada. Para la protección térmica de la celda: cortar JP101 y enchufar en J404 una NTC 10k B3435 pegada a la celda. Con JP101 cortado y sin NTC, el cargador no carga |
-| Carrier: espesor real y acceso a sus conectores | No para la PCB | El estudio supuso 11 mm en todo el largo y la carrier de cara a la placa. Medirla |
+| Carrier: espesor y acceso a sus conectores | No | Resuelto en la carcasa V2.3 con las medidas de la foto más 1 mm de holgura (9 mm de grueso, aire para las patas del SMA); el arnés de J301 va soldado a la carrier |
 | 2S | No para 1S | No cabe sin recorte frente al botón; decidirlo antes de rehacer la carcasa |
 | Antena del ESP32 a 6.8 mm de la carrier | No | Medir RSSI en el primer prototipo |
 | Firmware para esta placa | No para fabricar | Todavía no existe; ver [Firmware](#firmware-qué-tiene-que-cambiar) |
