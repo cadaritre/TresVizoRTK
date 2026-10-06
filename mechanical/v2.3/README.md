@@ -17,12 +17,12 @@ cambia; cambian el interior, la base, la tapa del panel y las bandas, para la pl
 | --- | --- |
 | 01 Base | **Cuatro retenes M3 en cruz** sobre la tuerca del jalón (antes dos). Ranura de 3 mm bajo J102 (x −21.5…−13.5, y 3.5…9.5) para el cable de la batería |
 | 02 Tubo | Fuera el respaldo de amarre y los toalleros. Dos pares de **nervios guía** (desde x ±23.6, z 30–95) donde corren los rieles del chasis; dos **topes** sobre el collar inferior (z 15.95–17); **cuna de la 18650** en la pared trasera: nervios guía a todo lo alto, labios abajo y repisa con hueco y canal para el cable |
-| 05 Tapa del panel | Hueco con la **forma exacta del USB-C** de la placa panel-usb y, por dentro, una **cuna tipo cajón** que la abraza sin tornillos. Fuera el bolsillo del JST-XH y **fuera los dos LEDs** (la OLED ya muestra el estado; J406 de la placa queda sin usar). El bolsillo de los pines de la OLED queda **abierto hacia arriba**, para no encerrar pines ni cables. El botón de 12 mm no cambia |
+| 05 Tapa del panel | Hueco con la **forma exacta del USB-C** de la placa panel-usb y, por dentro, **dos ménsulas** donde se atornilla por sus agujeros M2 (H501/H502) con autorroscantes M2×5. Fuera el bolsillo del JST-XH y **fuera los dos LEDs** (la OLED ya muestra el estado; J406 de la placa queda sin usar). El bolsillo de los pines de la OLED queda **abierto hacia arriba**, para no encerrar pines ni cables. El botón de 12 mm no cambia |
 | 06 / 07 Bandas de TPU | Más altas para **tapar los tornillos de la tapa del panel** (z 29.0 y 102.9): la de abajo va de z 0 a 34 y la de arriba de 98.0 a 129.91, por encima del hueco del USB-C. Por dentro, ranura para la cabeza |
 | 08 Chasis (nueva) | Se arma **fuera del tubo**: dos rieles donde corre la placa, una placa superior con ventana grande que los une y lleva H1/H2, ranuras de la carrier, lengua sobre la 18650 y zapatas bajo el cuello de la tapa. Entra por arriba entre los nervios |
 | 09 Logo de TPU (nueva) | Incrustación **plana** del logo para imprimir en TPU, desenrollada de la curva del tubo para llenar su grabado |
 
-El tubo lleva además **líneas verticales decorativas en los dos costados del panel**: además de 144–180° y 205–241°, ahora 0–36° y 312–348° (espejo respecto al panel, hasta 5.5° del logo), en z 34–98, entre las bandas.
+El tubo lleva además **líneas verticales decorativas**, simétricas respecto al eje panel (90°)–logo (270°): 0–36° y 144–180° a los lados del panel, y 198–234° y 306–342° a los lados del logo (a 6° de él), en z 34–98, entre las bandas. Entre los grupos de cada costado quedan 18°.
 
 Tapa de antena y plataforma del IMU son las de V2.2.
 
@@ -53,8 +53,8 @@ Tapa de antena y plataforma del IMU son las de V2.2.
    Al cerrar la tapa de antena, su cuello (z 99.41) queda 0.21 mm sobre las zapatas del chasis:
    el chasis no puede subir.
 8. **Panel:**
-   - La placa panel-usb entra en su cuna deslizando hacia la tapa hasta que el USB-C asoma por el
-     hueco; los dos dedos de atrás la retienen.
+   - La placa panel-usb se pone con el USB-C en su hueco y la lengüeta en su bolsillo, y se atornilla
+     a las dos ménsulas con dos autorroscantes M2×5 por sus agujeros H501/H502.
    - Se enchufan OLED (J403), botón (J402) y USB (J502 ↔ J101) por la ventana, y se atornilla la
      tapa del panel.
    - Las bandas de TPU tapan sus tornillos. Para abrir la tapa del panel o una bayoneta hay que
@@ -119,9 +119,9 @@ Ejes de V2.2: z = eje del jalón hacia arriba, +Y = panel, +X a la izquierda mir
 - Hueco de 9.1 × 3.36 mm, esquinas R1.1, más 0.12 mm por lado. Es la envolvente de la carcasa del
   HRO TYPE-C-31-M-12 medida en el STEP de la panel-usb.
 - Bolsillo de la lengüeta del PCB en la cara interior de la tapa.
-- Cuna: piso de 1.2 mm bajo el PCB, paredes laterales en x ±10.55…11.3 con labios sobre sus cantos,
-  y dos dedos flexibles (x ±7.2…9.6, a los lados de J502) con un diente en rampa que detiene el
-  canto trasero del PCB.
+- **Dos ménsulas** en x ±5.9…10.2, desde y 22 hasta la tapa, con la cara de apoyo en z 90.17 (cara
+  inferior del PCB) y la de abajo a 45°. Agujeros guía de Ø1.6 × 4.5 mm en (x ±7.9, y 25.0) para
+  autorroscantes M2×5, bajo H501/H502 de la panel-usb.
 
 **Logo de TPU (09-logo-inlay-tpu):**
 - Seis piezas de 0.8 mm, el fondo del grabado.
@@ -155,7 +155,7 @@ Los valores salen de [parameters.json](parameters.json): bloques `chasis`, `cuna
 
 ## Impresión
 
-Pensada para **MJF (PA12 o PA11)**: el chasis y la cuna de la tapa del panel tienen salientes en
+Pensada para **MJF (PA12 o PA11)**: el chasis y las ménsulas de la tapa del panel tienen salientes en
 varias direcciones, y la repisa de la batería tiene un voladizo plano de unos 8 mm. En FDM
 necesitan soportes. Tolerancias de MJF: ±0.3 mm. Las holguras de deslizamiento son de 0.2 a
 0.3 mm: imprimir primero el chasis y un tramo de tubo y probar el ajuste. Bandas y logo, en TPU.
@@ -201,6 +201,6 @@ Hechas el 05-10-2026 con FreeCAD 1.1.3 sobre los archivos de esta carpeta
 | Contactos intencionados (holgura 0) | pie de los rieles sobre los topes del collar; carrier sobre sus pisos; 18650 tangente a los labios de su cuna (la retención es geométrica, no por interferencia) |
 
 **No verificado:** tolerancias de impresión; rigidez del chasis, de los nervios de la cuna y de los
-dedos de la cuna del USB-C; el giro de la bayoneta de la tapa de antena (sin cambio desde V2.2);
+agarre de los autorroscantes M2 en las ménsulas del USB-C; el giro de la bayoneta de la tapa de antena (sin cambio desde V2.2);
 la carrier real (envolvente supuesta); el cable real de la pila; el ajuste del logo de TPU en su
 grabado.

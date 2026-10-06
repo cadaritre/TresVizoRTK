@@ -39,11 +39,11 @@
      180.0
     ],
     [
-     205.0,
-     214.0,
-     223.0,
-     232.0,
-     241.0
+     198.0,
+     207.0,
+     216.0,
+     225.0,
+     234.0
     ],
     [
      0.0,
@@ -53,11 +53,11 @@
      36.0
     ],
     [
-     312.0,
-     321.0,
-     330.0,
-     339.0,
-     348.0
+     306.0,
+     315.0,
+     324.0,
+     333.0,
+     342.0
     ]
    ],
    "z": [
@@ -66,7 +66,7 @@
    ],
    "ancho": 1.3,
    "profundidad": 0.5,
-   "_nota": "Entre las dos bandas de TPU (z 34-98), en los sectores libres: los dos grupos de 144-180 y 205-241 (entre el panel, el seguro a 193 y el logo) y, del otro lado del panel, 0-36 (espejo del primero respecto al panel) y 312-348 (hasta 5.5 grados del logo, que ocupa 246.5-306.5). El rebaje del panel va de 47 a 133."
+   "_nota": "Entre las dos bandas de TPU (z 34-98), simetricas respecto al eje panel (90) - logo (270): 0-36 y 144-180 a 11 grados del rebaje del panel (47-133); 198-234 y 306-342 a 6 grados del logo (240-300). Entre los grupos de cada costado quedan 18 grados."
   },
   "chaflan_voladizos": true,
   "_nota_chaflan": "Chaflan a 45 grados en la cara inferior de los salientes interiores: collar superior de bayoneta y engrosamiento de los paneles. Imprimiendo el tubo de pie esas caras cuelgan."
@@ -479,7 +479,7 @@
    "_nota_activo": "Sin LEDs en el panel (decision del propietario del 05-10-2026: la OLED ya muestra el estado). J406 se queda en la placa principal, sin usar."
   },
   "usb_c": {
-   "_que_es": "Placa panel-usb (hardware/panel-usb) sin tornillos: el hueco de la tapa tiene la forma exacta del receptaculo USB-C y por dentro una cuna tipo cajon abraza la placa (piso, paredes con labios sobre los cantos, bolsillo de la lengueta en la cara interior de la tapa) y un reten flexible atras le impide salir. Por fuera solo se ve el USB-C, a ras.",
+   "_que_es": "Placa panel-usb (hardware/panel-usb) atornillada a la tapa con sus dos agujeros M2 (H501 y H502, a los lados del USB-C) en dos mensulas que nacen de la tapa, con autorroscantes M2 x 5. El hueco de la tapa tiene la forma exacta del receptaculo USB-C y la lengueta del PCB entra en un bolsillo de la cara interior. Por fuera solo se ve el USB-C, a ras.",
    "receptaculo": {
     "ancho": 9.1,
     "alto": 3.36,
@@ -512,27 +512,27 @@
     ],
     "holgura": 0.15
    },
-   "piso": {
-    "espesor": 1.2,
-    "y0": 10.0
-   },
-   "pared": {
+   "mensulas": {
+    "_nota": "De hardware/panel-usb/README.md: agujeros en (x +-7.9, y 25.0); cara de apoyo = cara inferior del PCB (z 90.17). Cara de abajo a 45 grados desde la tapa.",
     "x": [
-     10.55,
-     11.3
+     5.9,
+     10.2
     ],
-    "alto_sobre_pcb": 0.9,
-    "labio_x": 9.7,
-    "labio_espesor": 0.7
-   },
-   "reten": {
-    "x": [
-     7.2,
-     9.6
+    "y0": 22.0,
+    "alto": 4.0,
+    "agujeros": [
+     [
+      7.9,
+      25.0
+     ],
+     [
+      -7.9,
+      25.0
+     ]
     ],
-    "largo": 8.0,
-    "diente": 0.85,
-    "_nota": "Dedo flexible del piso, a cada lado de J502 (llega a x +-6.63): la placa pasa por encima y el diente la detiene por su canto trasero (y 11.5)."
+    "piloto": 1.6,
+    "piloto_hondo": 4.5,
+    "tornillo": "M2 x 5 autorroscante"
    }
   }
  },
@@ -559,11 +559,12 @@
   "_nota_max": "Tope de ancho: el logo es una proyeccion plana y a mas de +-30 grados se estira. 32 mm a radio 32 es la misma proporcion que 35.5 a radio 34.5 en V2.1.",
   "profundidad_grabado": 0.8,
   "z_centro": 65.0,
-  "angulo": 276.5,
+  "angulo": 270.0,
   "_nota": "GRABADO, no en relieve. Lo coloca layout_check.py en el mayor hueco libre.",
   "_nota_posicion": "Colocado por layout_check.py en el mayor hueco libre: 242 a 40 grados y 28 a 102 mm, con 3.0 mm de margen por lado.",
-  "angulo_preferido": 276.5,
-  "_nota_preferido": "En la espalda, opuesta al panel, como en V2.1. Sin el panel auxiliar el hueco libre va de 242 a 49 grados y su centro caeria en una esquina trasera."
+  "angulo_preferido": 270.0,
+  "_nota_preferido": "En la espalda, opuesta al panel, como en V2.1. Sin el panel auxiliar el hueco libre va de 242 a 49 grados y su centro caeria en una esquina trasera.",
+  "_nota_simetria": "06-10-2026: en 270, justo opuesto al panel (90), para que logo y lineas verticales queden simetricos respecto al eje panel-espalda."
  },
  "impresion": {
   "holgura_general": 0.35,

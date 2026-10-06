@@ -807,16 +807,15 @@ def button_features():
 
 
 def usb_features():
-    """Placa panel-usb sin tornillos (ver panel.usb_c en parameters.json).
+    """Placa panel-usb atornillada (ver panel.usb_c en parameters.json).
 
-    - Hueco de la tapa con la forma exacta del receptaculo USB-C (estadio de
-      8.94 x 3.2 mas holgura): por fuera solo se ve el conector, a ras.
+    - Hueco de la tapa con la forma exacta del receptaculo USB-C mas holgura: por
+      fuera solo se ve el conector, a ras.
     - Bolsillo de la lengueta del PCB en la cara interior de la tapa.
-    - Cuna tipo cajon: piso bajo el PCB, paredes laterales con labios sobre sus
-      cantos y un dedo flexible a cada lado de J502 que la retiene por su canto
-      trasero. La placa entra deslizando hacia la tapa (+Y)."""
+    - Dos mensulas que nacen de la tapa, con la cara de abajo a 45 grados, donde
+      apoya la placa y se atornilla por sus agujeros M2 (autorroscantes M2 x 5)."""
     u = USBP
-    rc, pc, fl, wl, rt = u['receptaculo'], u['pcb'], u['piso'], u['pared'], u['reten']
+    rc, pc, ms = u['receptaculo'], u['pcb'], u['mensulas']
     g = rc['holgura']
     hw = rc['ancho'] / 2.0 + g
     r = rc['alto'] / 2.0 + g
@@ -828,29 +827,15 @@ def usb_features():
     z0, z1 = pc['z']
     tab = box(pc['lengueta_x'][0] - hp, pc['lengueta_x'][1] + hp, pc['y'][1] - 1.0,
               pc['lengueta_y'][1] + hp, z0 - hp, z1 + hp)
-    # Cuna.
-    xin = pc['x'][1] + hp
-    y0 = fl['y0']
-    zf0 = z0 - fl['espesor']
-    floor = box(-wl['x'][1], wl['x'][1], y0, RO, zf0, z0)
-    adds = [floor]
-    zw1 = z1 + wl['alto_sobre_pcb']
+    adds, cuts = [], [hole, tab]
+    y0 = ms['y0']
     for sx in (-1, 1):
-        x0, x1 = sorted((sx * wl['x'][0], sx * wl['x'][1]))
-        adds.append(box(x0, x1, y0, RO, zf0, zw1))
-        lx0, lx1 = sorted((sx * wl['labio_x'], sx * wl['x'][1]))
-        adds.append(box(lx0, lx1, y0, RO, zw1 - wl['labio_espesor'], zw1))
-    cuts = [hole, tab,
-            box(-xin, xin, pc['y'][0] - hp, pc['y'][1] + 0.01, z0 - 0.01, z1 + hp)]
-    # Retenes: dedo del piso (dos ranuras a sus lados, libre en el canto de atras
-    # del piso) con un diente en rampa: la placa lo dobla hacia abajo al entrar y
-    # su cara vertical detiene el canto trasero del PCB.
-    yb = pc['y'][0] - hp
-    for sx in (-1, 1):
-        x0, x1 = sorted((sx * rt['x'][0], sx * rt['x'][1]))
-        for xa, xb in ((x0 - 0.5, x0), (x1, x1 + 0.5)):
-            cuts.append(box(xa, xb, y0 - 1, yb + rt['largo'], zf0 - 1, z0 + 0.01))
-        adds.append(yz_prism([(y0 + 0.3, z0), (yb, z0), (yb, z0 + rt['diente'])], x0, x1))
+        x0, x1 = sorted((sx * ms['x'][0], sx * ms['x'][1]))
+        prof = [(y0, z0), (RO, z0), (RO, z0 - ms['alto'] - (RO - y0)), (y0, z0 - ms['alto'])]
+        adds.append(yz_prism(prof, x0, x1))
+    for hx, hy in ms['agujeros']:
+        cuts.append(Part.makeCylinder(ms['piloto'] / 2.0, ms['piloto_hondo'] + 0.1,
+                                      V(hx, hy, z0 - ms['piloto_hondo'])))
     return adds, cuts
 
 

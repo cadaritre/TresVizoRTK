@@ -188,10 +188,10 @@
    "etiqueta": "Tapa del panel principal",
    "solidos": 1,
    "valido": true,
-   "volumen_cm3": 9.37,
+   "volumen_cm3": 9.11,
    "caja": [
     42.53,
-    22.0,
+    10.24,
     82.3
    ],
    "z": [
@@ -248,5 +248,5 @@
    ]
   }
  ],
- "volumen_total_cm3": 176.42
+ "volumen_total_cm3": 176.16
 }
