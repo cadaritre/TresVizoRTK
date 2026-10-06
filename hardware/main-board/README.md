@@ -366,7 +366,7 @@ cotización):
 | Breakout BMI088 | Sí, para el cable | El orden del header (1 VCC … 9 INT3) salió de fotos del vendedor. Comprobarlo con multímetro, poner el selector en IIC y confirmar que SDO va a la hilera |
 | Cable GH de 8 pines de J101 | Sí | Con el pinout de J101 un cable en espejo pone VBUS contra GND: medirlo pin a pin. J301 es SH 8 y no se confunde con él |
 | Anillo del botón | Sí, si es el de 12 V | La placa lo alimenta con VSYS (3.5–4.2 V en 1S): usar el de 3–6 V |
-| Carcasa (rieles en z 39–90, brazos de H1/H2, ranura en la base bajo J102, topes, ménsulas y hueco del USB-C) | No para la PCB | Hacerla en el CAD antes de imprimir. La placa va 2.5 mm más arriba que en el primer estudio (z 23.5–87.5); ver [Mecánica](#mecánica) |
+| Carcasa | No | Hecha: [V2.3](../../mechanical/v2.3/README.md), con chasis deslizable para esta placa (rieles, H1/H2, corte frente a la antena del WROOM, ranuras de la carrier y ménsulas atornilladas de la panel-usb). Comprobada en CAD con la placa final: 0 choques en su sitio y en el montaje paso a paso; nada impreso todavía |
 | Cable USB entre J101 y la panel-usb | No | Los dos conectores quedan casi enfrentados: usar el cable GH8 más corto del kit, pin 1 con pin 1, y doblar el sobrante sobre el canto |
 | Rebabas de los puentes del panel | No | Lijar las de los cantos laterales de la placa madre antes de meterla en los rieles |
 | NTC (J404 montado, JP101 cerrado) | No | Sin NTC no hay que hacer nada. Para la protección térmica de la celda: cortar JP101 y enchufar en J404 una NTC 10k B3435 pegada a la celda. Con JP101 cortado y sin NTC, el cargador no carga |
