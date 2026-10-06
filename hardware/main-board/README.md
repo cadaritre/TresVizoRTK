@@ -406,10 +406,11 @@ impresa con los cambios propuestos.
   es la única protección para una computadora. Para v0.3: llevar CC1/CC2 de la panel-usb (OR con
   diodos) por uno de los GND de J101/J502 a un ADC del ESP32 y fijar IINDPM según lo que anuncie la
   fuente (0.5 / 1.5 / 3 A).
-- **D+/D− (revisión del 05-10-2026):** D+ mide 22.4 mm y cambia de cara por dos vías; D− mide
-  31.3 mm por arriba.
-  - Para USB Full Speed (12 Mb/s, lo único que tiene el ESP32-S3) la diferencia, unos 60 ps, es
-    despreciable frente a un bit de 83 ns, y el tramo es corto.
+- **D+/D− (revisión del 06-10-2026):** D+ mide 37.6 mm con 3 vías (F.Cu, B.Cu e In2.Cu); D− mide
+  34.3 mm con 4 vías (F.Cu y B.Cu). No van juntos como par.
+  - Para USB Full Speed (12 Mb/s, lo único que tiene el ESP32-S3) la diferencia, unos 22 ps, es
+    despreciable frente a un bit de 83 ns. La pista entera equivale a ~0.25 ns, frente a flancos de
+    4 ns o más.
   - Aun así, Espressif recomienda par diferencial con referencia continua.
   - El cruce viene del orden de pines: D− va a la izquierda de D+ en J101 y al revés en U101 y el
     ESP32. Corregirlo pide invertir los pines 7/8 de J101 y de J502 (la panel-usb también) y
@@ -432,6 +433,10 @@ impresa con los cambios propuestos.
 - **Ruteo automático** con `route_rest.py`, un ruteador propio (A* en rejilla con arranque y
   reruteo). Las pistas críticas están prerruteadas en `layout.py`:
   - lazos del cargador, nodos SW, *bootstrap*, BAT y la salida en abanico de su fila inferior;
+  - el TPS62903 según su hoja de datos: SW a L102 en 0.9 mm por F.Cu sin vías, C115 (10 µF de entrada)
+    a 0.4 mm de VIN y de GND con EN saliendo entre sus pads, C118 y C119 (salida) junto a L102 y GND,
+    y FB con su divisor a 1.5 mm. Antes el SW daba un rodeo de 8.7 mm con dos vías y pasaba entre los
+    pads de C115;
   - el lazo del TPS63070 y su EN;
   - CELL y VDD del medidor;
   - las GND cercadas del cargador y de C303.
