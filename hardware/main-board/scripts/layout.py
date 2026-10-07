@@ -402,7 +402,9 @@ PANEL = {
     "cuts": [{"board": "usb", "edge": "top", "offset": 3.2, "width": 14.4, "depth": 3.0}],
     "mousebite": {"drill": 0.6, "pitch": 0.9, "offset": 0.0},
     "keepout": 1.0,
-    "marks": {"tooling_drill": 2.0, "tooling_inset": [2.5, 2.5], "fiducial_inset": [6.0, 2.5]},
+    # JLCPCB: rieles de 5 mm, agujeros de herramienta de 2 mm y fiduciales de 1 mm con el centro a 3.85 mm del
+    # canto del panel, para que no los tapen los rieles guía de la máquina
+    "marks": {"tooling_drill": 2.0, "tooling_inset": [2.5, 2.5], "fiducial_inset": [6.0, 3.85]},
     "texts": [{"text": "JLCJLCJLCJLC", "layer": "B.SilkS", "at": [140.0, 175.5], "size": 1.0}],
 }
 

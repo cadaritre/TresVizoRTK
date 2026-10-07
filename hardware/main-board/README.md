@@ -315,10 +315,11 @@ separado.
    - PCBA **Standard** (la estimación de costo la usa; si el cotizador ofrece Economic para el
      ESP32-S3-WROOM-1, también sirve).
    - Una cara (top).
-   - El panel ya trae rieles de 5 mm, 3 fiduciales y 4 agujeros de herramienta de 2 mm, como pide
-     JLCPCB. Las placas van unidas con puentes de 5 mm con *mouse bites* (agujeros de 0.6 mm): dos en
-     cada canto lateral de la placa madre (uno de ellos la une a la panel-usb) y uno a cada lado de la
-     panel-usb. Arriba y abajo de la placa madre no hay puentes porque esos cantos llevan conectores.
+   - El panel ya trae rieles de 5 mm, 3 fiduciales de 1 mm con el centro a 3.85 mm del canto y 4
+     agujeros de herramienta de 2 mm, como pide JLCPCB. Las placas van unidas con puentes de 5 mm con
+     *mouse bites* (agujeros de 0.6 mm): dos en cada canto lateral de la placa madre (uno de ellos la
+     une a la panel-usb) y uno a cada lado de la panel-usb. Arriba y abajo de la placa madre no hay
+     puentes porque esos cantos llevan conectores.
    - Los puentes de la placa madre a v 10.5 y 15.1 caen donde van los rieles: **lijar la rebaba** al
      separar las placas.
    - El USB-C de la panel-usb sobresale 1.29 mm del canto de su placa. Frente a él la fresa se
