@@ -185,13 +185,11 @@ def build(libs):
     v2s["prog"] = R(s, "chg", "4.7k", "CHG_PROG", "GND", note="PROG: 4.7k = 1S a 750 kHz; 2S: 8.2k")
     R(s, "chg", "5.1k", "REGN", "CHG_TS")
     R(s, "chg", "30k", "CHG_TS", "GND")
-    # 10k fijo en lugar de la NTC (el cargador ve ~25 C) mientras JP101 esté cerrado. JP101 es un puente de
-    # cobre cerrado de fábrica: al conectar una NTC 10k B3435 en J404 se corta con un cúter (se vuelve a
-    # cerrar con estaño), sin desoldar nada.
-    R(s, "chg", "10k", "CHG_TS", "CHG_TS_FIJA", note="Sustituye a la NTC (~25 C) con JP101 cerrado")
-    d.add("JP101", "Jumper:SolderJumper_2_Bridged", "NTC_CORTAR", s, "chg", {"1": "CHG_TS_FIJA", "2": "GND"},
-          footprint=LC + "SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm", in_bom=False,
-          description="Puente cerrado de fábrica: cortarlo si se conecta una NTC en J404")
+    # NTC 10k B3435 obligatoria en J404, en paralelo con los 30k (07-10-2026, decisión del propietario). Con
+    # 5.1k/30k y una 103AT el BQ25798 ve T1 ~2 C, T2 ~11 C, T3 ~45 C y T5 ~61 C (hoja de datos: VT1 73.3 %,
+    # TS_COOL 68.4 %, TS_WARM 44.8 % y VT5 34.2 % de REGN). Sin NTC enchufada TS queda en ~85 %: frío, no carga.
+    # Ya no hay 10k fijo ni puente; el número R106 queda reservado para no renumerar las demás resistencias.
+    ref("R", s)
     R(s, "chg", "100", "VPACK", "CHG_BATP", note="BATP: 100 ohm en serie, Kelvin a VPACK")
     R(s, "chg", "10k", "+3V3", "CHG_INT_N")
 
@@ -364,7 +362,7 @@ def build(libs):
     d.add("J404", "Connector_Generic_MountingPin:Conn_01x02_MountingPin", "NTC", s, "ui",
           {"1": "CHG_TS", "2": "GND", "MP": "GND"}, footprint=LC + "CONN-SMD_2P-P1.00_SM02B-SRSS-TB-LF-SN",
           lcsc="C160402", mpn="SM02B-SRSS-TB(LF)(SN)",
-          description="NTC 10k B3435 opcional, pegada a la celda: al conectarla, cortar JP101")
+          description="NTC 10k B3435 (103AT) obligatoria, pegada a la celda: sin ella el cargador no carga")
     # IMU de la tapa por I2C en un segundo bus (GPIO11 SDA, GPIO12 SCL) con sus dos interrupciones. El GH7 sigue
     # el orden del header de 9 pines del breakout BMI088 V1.0 (research/constraints.md §4) sin CSB1/CSB2:
     # cable n -> pin [1, 2, 3, 4, 5, 8, 9][n-1] del breakout. El pin 3 (SDO1/SDO2) a GND fija las direcciones

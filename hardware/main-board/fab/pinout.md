@@ -38,13 +38,6 @@ Generado por `scripts/doc_tables.py`; no editar a mano.
 | 47 | 24 (IO47) | FG_ALRT_N | ALRT del MAX17048 (10k) |
 | 48 | 25 (IO48) | BTN_LED_EN | Anillo LED del botón (MOSFET N en J402.4, 100k a GND) |
 
-## JP101 NTC_CORTAR
-
-| Pin | Red |
-| --- | --- |
-| 1 | CHG_TS_FIJA |
-| 2 | GND |
-
 ## J101 PANEL_USB
 
 WAFER-GH1.25-8PWB (LCSC C3029383). GH 8 lateral a la placa del USB-C del panel: VBUS x3, GND x3, D-, D+ (cable 1 a 1)
@@ -133,7 +126,7 @@ SM04B-SRSS-TB(LF)(SN) (LCSC C160404). JST SH 4 lateral con el orden Qwiic: GND, 
 
 ## J404 NTC
 
-SM02B-SRSS-TB(LF)(SN) (LCSC C160402). NTC 10k B3435 opcional, pegada a la celda: al conectarla, cortar JP101
+SM02B-SRSS-TB(LF)(SN) (LCSC C160402). NTC 10k B3435 (103AT) obligatoria, pegada a la celda: sin ella el cargador no carga
 
 | Pin | Red |
 | --- | --- |

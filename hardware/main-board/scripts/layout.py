@@ -160,7 +160,7 @@ PLACE = {
     "J403": (27.6, 11.0, 270),
     # Botón: a la izquierda del botón del panel, boca hacia la izquierda sobre una zona libre
     "J402": (12.0, 40.8, 270),
-    # Canto inferior, boca hacia abajo: microSD, carrier GNSS, NTC (opcional) y batería
+    # Canto inferior, boca hacia abajo: microSD, carrier GNSS, NTC de la celda y batería
     "J401": (9.26, 54.4, 0), "J301": (24.57, 60.7, 0), "J404": (33.89, 60.8, 0), "J102": (40.59, 59.0, 0),
     # ---- entrada USB: ESD de D+/D- en el camino al ESP32 y TVS de VBUS junto al 22 uF de entrada
     "U101": (26.0, 36.0, 90), "D101": (33.0, 12.8, 0),
@@ -169,8 +169,6 @@ PLACE = {
     "C103": (28.6, 18.4, 90),                       # REGN
     "R101": (18.3, 35.4, 90), "R102": (20.3, 35.4, 90),   # ILIM
     "R104": (30.3, 38.0, 180), "R105": (30.3, 39.4, 0),   # TS, bajo L102 y fuera del botón
-    # 10k fijo de TS y su puente (cortar para usar NTC) junto a J404
-    "R106": (32.1, 56.8, 0), "JP101": (34.9, 56.8, 0),
     "R103": (30.9, 30.0, 270),                      # PROG (1S 4.7k; 2S 8.2k), bajo su pin
     "R107": (29.3, 30.0, 90),                       # BATP, bajo su pin
     "R108": (26.9, 16.3, 0),                        # INT pull-up, arriba del canal ESP32-cargador
@@ -232,7 +230,7 @@ TRACKS += [
 ]
 VIAS += [("GND", 27.75, 21.6), ("GND", 27.0, 22.6)]
 # Medidor: CELL y VDD bajan directo a R112 (VPACK -> FG_VDD); VDD sigue a C114 y baja a R114, que va justo
-# debajo de R112 para dejar libre la línea de serigrafía de JP101
+# debajo de R112
 TRACKS += [
     ("VPACK", "F.Cu", 0.2, [(32.15, 50.4), (32.15, 51.2)]),
     ("FG_VDD", "F.Cu", 0.2, [(32.65, 50.4), (32.65, 51.2)]),
@@ -276,7 +274,6 @@ TEXTS = [
     ("BTN", "F.SilkS", 6.0, 40.1, 0.8, 0),
     ("J402", "F.SilkS", 6.0, 41.5, 0.8, 0),
     ("GNSS J301", "F.SilkS", 24.57, 57.0, 0.8, 0),
-    ("cortar JP101", "F.SilkS", 33.6, 53.75, 0.8, 0),
     ("NTC J404", "F.SilkS", 33.6, 54.95, 0.8, 0),
     ("BAT", "F.SilkS", 44.2, 54.0, 0.8, 0),
     ("J102", "F.SilkS", 44.2, 55.0, 0.8, 0),

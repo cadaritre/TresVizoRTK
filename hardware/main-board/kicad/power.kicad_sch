@@ -2312,191 +2312,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Jumper:SolderJumper_2_Bridged"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom no)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "JP"
-				(at 0 2.032 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "SolderJumper_2_Bridged"
-				(at 0 -2.54 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 -6.35 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Solder Jumper, 2-pole, closed/bridged"
-				(at 0 -5.08 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "solder jumper SPST"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "SolderJumper*Bridged*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "SolderJumper_2_Bridged_0_1"
-				(rectangle
-					(start -0.508 0.508)
-					(end 0.508 -0.508)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts (xy -0.254 1.016) (xy -0.254 -1.016))
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start -0.254 -1.016)
-					(mid -1.2656 0)
-					(end -0.254 1.016)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(arc
-					(start 0.254 1.016)
-					(mid 1.2656 0)
-					(end 0.254 -1.016)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts (xy 0.254 1.016) (xy 0.254 -1.016))
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "SolderJumper_2_Bridged_1_1"
-				(pin passive line
-					(at -5.08 0 0)
-					(length 3.81)
-					(name "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 3.81)
-					(name "B"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Transistor_FET:AO3400A"
 			(pin_names
 				(offset 0)
@@ -9037,304 +8852,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 113.03 137.16 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "37bd55ff-012b-57b4-b1e0-0954781f46ba")
-		(property "Reference" "R106"
-			(at 109.22 134.144 270)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Value" "10k"
-			(at 109.22 135.744 270)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 113.03 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 113.03 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Sustituye a la NTC (~25 C) con JP101 cerrado"
-			(at 113.03 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "0402WGF1002TCE"
-			(at 113.03 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C25744"
-			(at 113.03 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "7fb07be9-a49c-5e88-acce-627049113205")
-		)
-		(pin "2"
-			(uuid "e3b51a15-9282-53bd-9230-05f38da58a8a")
-		)
-		(instances
-			(project "tresvizo-main"
-				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "R106")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts (xy 109.22 137.16) (xy 106.68 137.16))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "313e79ff-0717-5b4f-a921-cacad77ae692")
-	)
-	(global_label "CHG_TS"
-		(shape bidirectional)
-		(at 106.68 137.16 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right)
-		)
-		(uuid "f675af31-8e40-55a9-b927-479807b773d5")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 106.68 137.16 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(hide yes)
-			)
-		)
-	)
-	(wire
-		(pts (xy 116.84 137.16) (xy 119.38 137.16))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5d0b762b-a661-5a8e-aa0d-de8e055669ab")
-	)
-	(label "CHG_TS_FIJA"
-		(at 119.38 137.16 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify left bottom)
-		)
-		(uuid "de1b11ba-dc14-579a-be09-8c1233ed0d1b")
-	)
-	(symbol
-		(lib_id "Jumper:SolderJumper_2_Bridged")
-		(at 158.75 137.16 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(dnp no)
-		(uuid "b2f2af20-54f9-56e7-afbb-54cdbb1b55aa")
-		(property "Reference" "JP101"
-			(at 153.67 134.144 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Value" "NTC_CORTAR"
-			(at 153.67 135.744 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Footprint" "tresvizo_lcsc:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm"
-			(at 158.75 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 158.75 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Puente cerrado de fábrica: cortarlo si se conecta una NTC en J404"
-			(at 158.75 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "703bb559-6eeb-510b-801f-d46cc8e7d9a6")
-		)
-		(pin "2"
-			(uuid "10353edd-5c2f-5153-8d44-cd8aae3ca774")
-		)
-		(instances
-			(project "tresvizo-main"
-				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "JP101")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts (xy 153.67 137.16) (xy 151.13 137.16))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "46b0994f-9d8b-57e9-954a-ed0420bed00d")
-	)
-	(label "CHG_TS_FIJA"
-		(at 151.13 137.16 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1 1)
-			)
-			(justify right bottom)
-		)
-		(uuid "95321561-b775-5f1f-9f7d-6aeeb75a72f3")
-	)
-	(wire
-		(pts (xy 163.83 137.16) (xy 166.37 137.16))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "752bc4b7-5975-51f3-ac43-281f15ea1e4f")
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 166.37 137.16 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "00ee82a7-6b7a-5e99-a259-64095d1086d1")
-		(property "Reference" "#PWR1026"
-			(at 166.37 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 166.37 140.36 270)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 166.37 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 166.37 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 166.37 137.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "0147a62f-489e-5043-b651-ec1b0c3f7c0c")
-		)
-		(instances
-			(project "tresvizo-main"
-				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1026")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 186.69 137.16 90)
+		(at 111.76 137.16 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -9342,7 +8860,7 @@
 		(dnp no)
 		(uuid "8dd6d150-6723-58c5-8244-5a43dfa83928")
 		(property "Reference" "R107"
-			(at 182.88 134.144 270)
+			(at 107.95 134.144 270)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9351,7 +8869,7 @@
 			)
 		)
 		(property "Value" "100"
-			(at 182.88 135.744 270)
+			(at 107.95 135.744 270)
 			(effects
 				(font
 					(size 1 1)
@@ -9360,7 +8878,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 186.69 137.16 0)
+			(at 111.76 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9369,7 +8887,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 186.69 137.16 0)
+			(at 111.76 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9378,7 +8896,7 @@
 			)
 		)
 		(property "Description" "BATP: 100 ohm en serie, Kelvin a VPACK"
-			(at 186.69 137.16 0)
+			(at 111.76 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9387,7 +8905,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1000TCE"
-			(at 186.69 137.16 0)
+			(at 111.76 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9396,7 +8914,7 @@
 			)
 		)
 		(property "LCSC" "C25076"
-			(at 186.69 137.16 0)
+			(at 111.76 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9420,7 +8938,7 @@
 		)
 	)
 	(wire
-		(pts (xy 182.88 137.16) (xy 180.34 137.16))
+		(pts (xy 107.95 137.16) (xy 105.41 137.16))
 		(stroke
 			(width 0)
 			(type default)
@@ -9428,7 +8946,7 @@
 		(uuid "bd4c00f7-bfec-5630-acf8-ee5502d124be")
 	)
 	(label "VPACK"
-		(at 180.34 137.16 180)
+		(at 105.41 137.16 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -9439,7 +8957,7 @@
 		(uuid "83e39a0f-061f-557b-acee-973f02931305")
 	)
 	(wire
-		(pts (xy 190.5 137.16) (xy 193.04 137.16))
+		(pts (xy 115.57 137.16) (xy 118.11 137.16))
 		(stroke
 			(width 0)
 			(type default)
@@ -9447,7 +8965,7 @@
 		(uuid "06429a9b-245c-529e-9868-f50042331857")
 	)
 	(label "CHG_BATP"
-		(at 193.04 137.16 0)
+		(at 118.11 137.16 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -9459,7 +8977,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 217.17 137.16 90)
+		(at 142.24 137.16 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -9467,7 +8985,7 @@
 		(dnp no)
 		(uuid "e198ba40-001a-5b82-bcab-531e16dceb6d")
 		(property "Reference" "R108"
-			(at 213.36 134.144 270)
+			(at 138.43 134.144 270)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9476,7 +8994,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 213.36 135.744 270)
+			(at 138.43 135.744 270)
 			(effects
 				(font
 					(size 1 1)
@@ -9485,7 +9003,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 217.17 137.16 0)
+			(at 142.24 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9494,7 +9012,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 217.17 137.16 0)
+			(at 142.24 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9503,7 +9021,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 217.17 137.16 0)
+			(at 142.24 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9512,7 +9030,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1002TCE"
-			(at 217.17 137.16 0)
+			(at 142.24 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9521,7 +9039,7 @@
 			)
 		)
 		(property "LCSC" "C25744"
-			(at 217.17 137.16 0)
+			(at 142.24 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9545,7 +9063,7 @@
 		)
 	)
 	(wire
-		(pts (xy 213.36 137.16) (xy 210.82 137.16))
+		(pts (xy 138.43 137.16) (xy 135.89 137.16))
 		(stroke
 			(width 0)
 			(type default)
@@ -9554,15 +9072,15 @@
 	)
 	(symbol
 		(lib_id "power:+3V3")
-		(at 210.82 137.16 90)
+		(at 135.89 137.16 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(uuid "fa162cf7-91a5-505a-8fcb-28a07654b4ba")
-		(property "Reference" "#PWR1027"
-			(at 210.82 137.16 0)
+		(property "Reference" "#PWR1026"
+			(at 135.89 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9571,7 +9089,7 @@
 			)
 		)
 		(property "Value" "+3V3"
-			(at 210.82 133.96 270)
+			(at 135.89 133.96 270)
 			(effects
 				(font
 					(size 1 1)
@@ -9579,7 +9097,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 210.82 137.16 0)
+			(at 135.89 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9588,7 +9106,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 210.82 137.16 0)
+			(at 135.89 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9597,7 +9115,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 210.82 137.16 0)
+			(at 135.89 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9611,14 +9129,14 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1027")
+					(reference "#PWR1026")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(wire
-		(pts (xy 220.98 137.16) (xy 223.52 137.16))
+		(pts (xy 146.05 137.16) (xy 148.59 137.16))
 		(stroke
 			(width 0)
 			(type default)
@@ -9627,7 +9145,7 @@
 	)
 	(global_label "CHG_INT_N"
 		(shape bidirectional)
-		(at 223.52 137.16 0)
+		(at 148.59 137.16 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -9637,7 +9155,7 @@
 		)
 		(uuid "aec78486-e2b7-50fc-951b-b5775c7a9eea")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 223.52 137.16 0)
+			(at 148.59 137.16 0)
 			(effects
 				(font
 					(size 1 1)
@@ -10191,7 +9709,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "1592cdff-a9c7-54dd-be99-d9f6ede2016e")
-		(property "Reference" "#PWR1028"
+		(property "Reference" "#PWR1027"
 			(at 434.34 52.07 0)
 			(effects
 				(font
@@ -10242,7 +9760,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1028")
+					(reference "#PWR1027")
 					(unit 1)
 				)
 			)
@@ -10515,7 +10033,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "8f19d085-ef03-5f35-9902-19178b70ef07")
-		(property "Reference" "#PWR1029"
+		(property "Reference" "#PWR1028"
 			(at 509.27 30.48 0)
 			(effects
 				(font
@@ -10566,7 +10084,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1029")
+					(reference "#PWR1028")
 					(unit 1)
 				)
 			)
@@ -10679,7 +10197,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "6dcdda8e-1560-56f9-975f-e6bf921df282")
-		(property "Reference" "#PWR1030"
+		(property "Reference" "#PWR1029"
 			(at 334.01 67.31 0)
 			(effects
 				(font
@@ -10730,7 +10248,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1030")
+					(reference "#PWR1029")
 					(unit 1)
 				)
 			)
@@ -10772,7 +10290,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "0c80d0c9-fa19-5f01-87af-76c1a8271d0a")
-		(property "Reference" "#PWR1031"
+		(property "Reference" "#PWR1030"
 			(at 341.63 77.47 0)
 			(effects
 				(font
@@ -10823,7 +10341,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1031")
+					(reference "#PWR1030")
 					(unit 1)
 				)
 			)
@@ -10992,7 +10510,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "9598d310-2a1b-50cb-b3be-7cd33ed8fa21")
-		(property "Reference" "#PWR1032"
+		(property "Reference" "#PWR1031"
 			(at 354.33 74.93 0)
 			(effects
 				(font
@@ -11043,7 +10561,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1032")
+					(reference "#PWR1031")
 					(unit 1)
 				)
 			)
@@ -11066,7 +10584,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "d5c909ef-920d-59c4-9c06-18ec43a0c630")
-		(property "Reference" "#PWR1033"
+		(property "Reference" "#PWR1032"
 			(at 354.33 77.47 0)
 			(effects
 				(font
@@ -11117,7 +10635,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1033")
+					(reference "#PWR1032")
 					(unit 1)
 				)
 			)
@@ -11227,7 +10745,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "a55d0ddf-2950-5197-acd5-d0e976aee990")
-		(property "Reference" "#PWR1034"
+		(property "Reference" "#PWR1033"
 			(at 365.76 86.36 0)
 			(effects
 				(font
@@ -11278,7 +10796,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1034")
+					(reference "#PWR1033")
 					(unit 1)
 				)
 			)
@@ -11301,7 +10819,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "9684a4ec-5c1f-58b1-aef3-e237a6e42c99")
-		(property "Reference" "#PWR1035"
+		(property "Reference" "#PWR1034"
 			(at 368.3 86.36 0)
 			(effects
 				(font
@@ -11352,7 +10870,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1035")
+					(reference "#PWR1034")
 					(unit 1)
 				)
 			)
@@ -11481,7 +10999,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "7ceaf60a-8086-5290-a1d6-295dde70d083")
-		(property "Reference" "#PWR1036"
+		(property "Reference" "#PWR1035"
 			(at 397.51 83.82 0)
 			(effects
 				(font
@@ -11532,7 +11050,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1036")
+					(reference "#PWR1035")
 					(unit 1)
 				)
 			)
@@ -11767,7 +11285,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "7e8ea6fe-c4ec-5582-8786-4f68ad2ea193")
-		(property "Reference" "#PWR1037"
+		(property "Reference" "#PWR1036"
 			(at 443.23 67.31 0)
 			(effects
 				(font
@@ -11817,7 +11335,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1037")
+					(reference "#PWR1036")
 					(unit 1)
 				)
 			)
@@ -11956,7 +11474,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "03adf3ea-5099-5560-a167-d14384cd9d98")
-		(property "Reference" "#PWR1038"
+		(property "Reference" "#PWR1037"
 			(at 474.98 67.31 0)
 			(effects
 				(font
@@ -12006,7 +11524,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1038")
+					(reference "#PWR1037")
 					(unit 1)
 				)
 			)
@@ -12204,7 +11722,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "75034ac5-3c7a-5d3b-b3b6-6777831ec07d")
-		(property "Reference" "#PWR1039"
+		(property "Reference" "#PWR1038"
 			(at 25.4 171.45 0)
 			(effects
 				(font
@@ -12255,7 +11773,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1039")
+					(reference "#PWR1038")
 					(unit 1)
 				)
 			)
@@ -12316,7 +11834,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "8283f5a3-af1f-5bed-bce3-02af8a397cf2")
-		(property "Reference" "#PWR1040"
+		(property "Reference" "#PWR1039"
 			(at 45.72 168.91 0)
 			(effects
 				(font
@@ -12366,7 +11884,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1040")
+					(reference "#PWR1039")
 					(unit 1)
 				)
 			)
@@ -12412,7 +11930,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "269474d0-08fc-510b-be87-05e89daf3c6d")
-		(property "Reference" "#PWR1041"
+		(property "Reference" "#PWR1040"
 			(at 35.56 182.88 0)
 			(effects
 				(font
@@ -12463,7 +11981,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1041")
+					(reference "#PWR1040")
 					(unit 1)
 				)
 			)
@@ -12602,7 +12120,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "19dea27d-333a-5870-b1fa-165c19c592db")
-		(property "Reference" "#PWR1042"
+		(property "Reference" "#PWR1041"
 			(at 60.96 177.8 0)
 			(effects
 				(font
@@ -12653,7 +12171,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1042")
+					(reference "#PWR1041")
 					(unit 1)
 				)
 			)
@@ -12792,7 +12310,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "220b5f90-5aa1-5cf5-b640-c5ad2db5f176")
-		(property "Reference" "#PWR1043"
+		(property "Reference" "#PWR1042"
 			(at 73.66 177.8 0)
 			(effects
 				(font
@@ -12843,7 +12361,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1043")
+					(reference "#PWR1042")
 					(unit 1)
 				)
 			)
@@ -13107,7 +12625,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "66084b2c-7ace-52cf-8c0b-373156d17426")
-		(property "Reference" "#PWR1044"
+		(property "Reference" "#PWR1043"
 			(at 138.43 163.83 0)
 			(effects
 				(font
@@ -13158,7 +12676,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1044")
+					(reference "#PWR1043")
 					(unit 1)
 				)
 			)
@@ -13287,7 +12805,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c2fa39ba-967d-5034-baa5-f882ee3a9e0b")
-		(property "Reference" "#PWR1045"
+		(property "Reference" "#PWR1044"
 			(at 147.32 181.61 0)
 			(effects
 				(font
@@ -13338,7 +12856,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1045")
+					(reference "#PWR1044")
 					(unit 1)
 				)
 			)
@@ -13467,7 +12985,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "75947b07-e1ba-5983-b7b8-a4cf67941b64")
-		(property "Reference" "#PWR1046"
+		(property "Reference" "#PWR1045"
 			(at 38.1 194.31 0)
 			(effects
 				(font
@@ -13517,7 +13035,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1046")
+					(reference "#PWR1045")
 					(unit 1)
 				)
 			)
@@ -13627,7 +13145,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c37158e6-e5c0-51ab-af99-b7c6c6bee824")
-		(property "Reference" "#PWR1047"
+		(property "Reference" "#PWR1046"
 			(at 48.26 194.31 0)
 			(effects
 				(font
@@ -13677,7 +13195,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1047")
+					(reference "#PWR1046")
 					(unit 1)
 				)
 			)
@@ -13825,7 +13343,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "39a2e00d-f7d4-56e1-8025-708600b1ae9a")
-		(property "Reference" "#PWR1048"
+		(property "Reference" "#PWR1047"
 			(at 96.52 194.31 0)
 			(effects
 				(font
@@ -13876,7 +13394,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1048")
+					(reference "#PWR1047")
 					(unit 1)
 				)
 			)
@@ -13986,7 +13504,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c183073a-7060-5526-a34f-30b4aeb1f720")
-		(property "Reference" "#PWR1049"
+		(property "Reference" "#PWR1048"
 			(at 105.41 193.04 0)
 			(effects
 				(font
@@ -14036,7 +13554,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1049")
+					(reference "#PWR1048")
 					(unit 1)
 				)
 			)
@@ -14059,7 +13577,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "5a8b9e2a-9716-5027-97ef-0350bf5cb6ae")
-		(property "Reference" "#PWR1050"
+		(property "Reference" "#PWR1049"
 			(at 105.41 205.74 0)
 			(effects
 				(font
@@ -14110,7 +13628,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1050")
+					(reference "#PWR1049")
 					(unit 1)
 				)
 			)
@@ -14220,7 +13738,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "2cd45244-ffbc-5872-a432-97b3b9df079d")
-		(property "Reference" "#PWR1051"
+		(property "Reference" "#PWR1050"
 			(at 116.84 193.04 0)
 			(effects
 				(font
@@ -14270,7 +13788,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1051")
+					(reference "#PWR1050")
 					(unit 1)
 				)
 			)
@@ -14293,7 +13811,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "a9f7a770-db61-5ad2-a847-f84d3f378b83")
-		(property "Reference" "#PWR1052"
+		(property "Reference" "#PWR1051"
 			(at 116.84 205.74 0)
 			(effects
 				(font
@@ -14344,7 +13862,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1052")
+					(reference "#PWR1051")
 					(unit 1)
 				)
 			)
@@ -14454,7 +13972,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "d17912e8-0776-55e2-b5b4-2847bb668a65")
-		(property "Reference" "#PWR1053"
+		(property "Reference" "#PWR1052"
 			(at 129.54 193.04 0)
 			(effects
 				(font
@@ -14504,7 +14022,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1053")
+					(reference "#PWR1052")
 					(unit 1)
 				)
 			)
@@ -14527,7 +14045,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "657ae4ee-76f4-5bc8-bc76-04c738c6a15e")
-		(property "Reference" "#PWR1054"
+		(property "Reference" "#PWR1053"
 			(at 129.54 205.74 0)
 			(effects
 				(font
@@ -14578,7 +14096,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1054")
+					(reference "#PWR1053")
 					(unit 1)
 				)
 			)
@@ -15017,7 +14535,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "d8cc6c5f-2cbb-5749-bac5-fea2abae4f45")
-		(property "Reference" "#PWR1055"
+		(property "Reference" "#PWR1054"
 			(at 195.58 167.64 0)
 			(effects
 				(font
@@ -15067,7 +14585,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1055")
+					(reference "#PWR1054")
 					(unit 1)
 				)
 			)
@@ -15158,7 +14676,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "a9526581-f68e-5a4e-898c-b3e8ffc605f0")
-		(property "Reference" "#PWR1056"
+		(property "Reference" "#PWR1055"
 			(at 200.66 167.64 0)
 			(effects
 				(font
@@ -15209,7 +14727,7 @@
 		(instances
 			(project "tresvizo-main"
 				(path "/9a83bcba-5afe-57b6-aafc-7b297421890f/e680a61f-2584-5531-b79e-1aca3f5bfe2f"
-					(reference "#PWR1056")
+					(reference "#PWR1055")
 					(unit 1)
 				)
 			)

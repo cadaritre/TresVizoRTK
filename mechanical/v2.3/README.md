@@ -36,7 +36,14 @@ Tapa de antena y plataforma del IMU son las de V2.2.
    - El cable baja por el hueco de la repisa y sale por un **canal a ras del piso hacia −X** que
      rodea el retén de la tuerca. Sigue por el piso, sube junto al collar, pasa por fuera del riel
      −X (x −27, z 24; ahí no hay nervios) y por delante del riel baja a J102.
-   - Con el chasis puesto, la carrier (1.0 mm delante) y la lengua (arriba) no la dejan salir.
+   - **NTC de la celda** (obligatoria desde el 07-10-2026; la placa no carga sin ella): antes de
+     meter la celda, pegarla con cinta kapton al **frente** de la celda (el lado que mira a la
+     carrier), en x 0…+4 y z 25–35. Ahí hay ~3.2 mm hasta el dorso de la carrier; las patas del SMA
+     y las soldaduras de la carrier quedan lejos (z 63–72, x −20 y fila de abajo en z ~19.6,
+     x −11…−1). Sus dos hilos bajan por la celda y salen con el cable de la batería por el hueco de
+     la repisa y el canal hasta J404, junto a J102.
+   - Con el chasis puesto, la carrier (3.2 mm delante, salvo las patas del SMA) y la lengua
+     (arriba) no la dejan salir.
 2. **Carrier en el chasis, fuera del tubo.** Entra por el frente, sin la placa puesta, hasta los
    labios traseros de sus dos ranuras, y apoya en sus dos pisos (z 18–19).
 3. **Placa en el chasis, fuera del tubo: entra POR ABAJO.** Sube por los rieles y se atornilla

@@ -285,20 +285,6 @@
    "side": "F",
    "show_ref": false
   },
-  "R106": {
-   "x": 132.1,
-   "y": 156.8,
-   "rot": 0,
-   "side": "F",
-   "show_ref": false
-  },
-  "JP101": {
-   "x": 134.9,
-   "y": 156.8,
-   "rot": 0,
-   "side": "F",
-   "show_ref": true
-  },
   "R107": {
    "x": 129.3,
    "y": 130.0,
@@ -3046,14 +3032,6 @@
    "layer": "F.SilkS",
    "x": 124.57,
    "y": 157.0,
-   "size": 0.8,
-   "angle": 0
-  },
-  {
-   "text": "cortar JP101",
-   "layer": "F.SilkS",
-   "x": 133.6,
-   "y": 153.75,
    "size": 0.8,
    "angle": 0
   },

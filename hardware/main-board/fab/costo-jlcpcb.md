@@ -30,7 +30,7 @@ Precios, existencias y clase de la API pública de JLCPCB consultada al generar 
 | C720477 | BOOT/RESET (TS-1088-AR02016) | 2 | base | no | 778138 | 0.0522 | 10 | 0.52 |
 | C307331 | 100nF (CL05B104KB54PNC) | 10 | base | no | 15286372 | 0.0091 | 50 | 0.46 |
 | C19077509 | SMF15A (SMF15A) | 2 | expand | no | 267569 | 0.0301 | 15 | 0.45 |
-| C25744 | 10k (0402WGF1002TCE) | 15 | base | no | 21531210 | 0.0034 | 75 | 0.26 |
+| C25744 | 10k (0402WGF1002TCE) | 14 | base | no | 21531210 | 0.0034 | 70 | 0.24 |
 | C52923 | 1uF (CL05A105KA5NQNC) | 1 | base | no | 8331287 | 0.0107 | 20 | 0.21 |
 | C81598 | 1N4148W (1N4148W) | 1 | base | no | 5132285 | 0.0123 | 15 | 0.18 |
 | C1622 | 47nF (CL10B473KB8NNNC) | 3 | base | no | 817628 | 0.0073 | 20 | 0.15 |
@@ -49,22 +49,22 @@ Precios, existencias y clase de la API pública de JLCPCB consultada al generar 
 
 | Concepto | USD |
 | --- | ---: |
-| Piezas | 102.61 |
+| Piezas | 102.59 |
 | Preparación Standard | 25.56 |
 | Plantilla | 8.21 |
 | Panel con 2 diseños | 8.21 |
 | Alimentadores: 40 piezas distintas x 1.53 | 61.20 |
-| Juntas: 2080 x 0.0016 | 3.33 |
+| Juntas: 2070 x 0.0016 | 3.31 |
 | Rayos X: 0 componentes | 0.00 |
-| **Montaje + piezas** | **209.11** |
+| **Montaje + piezas** | **209.08** |
 | Por juego | 41.82 |
 
 ## (B) Dos pedidos: principal en Standard y placa del USB-C en Economic
 
 | Pedido | Montaje | Piezas | Montaje + piezas |
 | --- | --- | ---: | ---: |
-| tresvizo-main-bom-jlcpcb.csv | Standard | 100.51 | 196.94 |
+| tresvizo-main-bom-jlcpcb.csv | Standard | 100.49 | 196.91 |
 | tresvizo-panel-usb-bom-jlcpcb.csv | Economic (4 piezas Extended distintas) | 2.60 | 24.92 |
-| **Total** | | | **221.86** |
+| **Total** | | | **221.83** |
 
 Diferencia (B) − (A): **12.75 USD** a favor del panel único, sin contar el PCB desnudo: en (B) hay dos PCB y dos envíos; en (A) un solo PCB más grande con cargo por diseño distinto.

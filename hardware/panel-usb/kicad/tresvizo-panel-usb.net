@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-kicad/hardware/panel-usb/kicad/tresvizo-panel-usb.kicad_sch")
-		(date "2026-10-07T08:02:08")
+		(date "2026-10-07T16:55:24")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")

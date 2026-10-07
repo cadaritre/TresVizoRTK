@@ -6892,7 +6892,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "NTC 10k B3435 opcional, pegada a la celda: al conectarla, cortar JP101"
+		(property "Description" "NTC 10k B3435 (103AT) obligatoria, pegada a la celda: sin ella el cargador no carga"
 			(at 236.22 118.11 0)
 			(effects
 				(font

@@ -104,15 +104,15 @@ precrimpados GH y SH (8 pines como máximo). Lo que resultó al aplicarlas, con 
 10. **Serigrafía sin solapes**: cada conector lleva su función y su referencia («IMU J405»,
     «NTC J404»…); `silk_clean.py` revisa con el DRC de KiCad que ninguna referencia ni trazo pise
     pads u otra serigrafía, y las huellas cuya serigrafía pisaba sus propios pads se recortaron en
-    la biblioteca (`fp_silk_trim.py`: L2520, SOD-882 y el puente de soldadura de JP101).
+    la biblioteca (`fp_silk_trim.py`: L2520 y SOD-882).
 11. **Logotipo de TresVizo** (el de www.tresvizo.com, tomado del SVG del firmware,
     `firmware/esp32/assets/tresvizo-logo.svg`): completo, de 30 mm, con «www.tresvizo.com» en la
     cara trasera; y el distintivo (hexágono con el 3, de `mechanical/v2.2/logo.json`) en la cara
     de componentes, en el hueco frente al botón, donde no hay piezas.
-12. **J404 (NTC) montado de fábrica, con la NTC opcional** (decisión del propietario del
-    05-10-2026): sin NTC el cargador tiene que ver 25 °C, así que la resistencia fija R106 (10 kΩ)
-    va a GND por **JP101, un puente de soldadura cerrado de fábrica**. Para usar la NTC se corta
-    JP101 y se enchufa en J404. Ver [Conectores](#conectores).
+12. **NTC de la celda obligatoria en J404** (decisión del propietario del 07-10-2026; antes era
+    opcional con una resistencia fija R106 y el puente JP101, que se quitaron). El cargador deja de
+    cargar fuera de ~2–61 °C y baja el voltaje de carga arriba de ~45 °C; sin NTC enchufada no carga.
+    El número R106 queda libre para no renumerar las demás resistencias. Ver [Conectores](#conectores).
 
 ## Mecánica
 
@@ -208,20 +208,28 @@ También van en `kicad/plugs.json` para la comprobación en CAD.
 | J402 | Botón: GND, contacto, anillo LED A, K | A la izquierda del botón; boca hacia la izquierda, sobre una zona libre de 6.1 × 8.3 mm (el cable da la vuelta hacia el botón) | GH 4 lateral SM04B-GHS-TB (C189895) | GHR-04V-S (C160418) | SSHL-002T-P0.2 (C189897) | «cable JST GH 1.25 4 pines una cabeza» |
 | J401 | microSD (zócalo push-push) | Canto inferior, a la izquierda; la tarjeta entra por abajo quitando la base | TF-015 (C113206) | — | — | — |
 | J301 | Carrier GNSS (arnés en Y) | Canto inferior, al centro; boca hacia abajo | **SH 8** lateral SM08B-SRSS-TB (C160407) | SHR-08V-S (C265412); en la carrier, **soldado** a sus filas de agujeros (sin clavijas) | SSH-003T-P0.2-H (C263995) | «cable JST SH 1.0 8 pines una cabeza» |
-| J404 | NTC de la celda (el conector va montado; la NTC es opcional) | Canto inferior, entre J301 y J102; boca hacia abajo | SH 2 lateral SM02B-SRSS-TB (C160402) | SHR-02V-S (C398472) | SSH-003T-P0.2-H (C263995) | «cable JST SH 1.0 2 pines una cabeza» |
+| J404 | NTC 10k B3435 de la celda (obligatoria) | Canto inferior, entre J301 y J102; boca hacia abajo | SH 2 lateral SM02B-SRSS-TB (C160402) | SHR-02V-S (C398472) | SSH-003T-P0.2-H (C263995) | «cable JST SH 1.0 2 pines una cabeza» |
 | J102 | Batería: 1 = BAT−, 2 = BAT+ | Canto inferior, a la derecha; boca hacia abajo | **JST PH 2.0 mm**, 2 pines, lateral S2B-PH-SM4-TB (C295747) | PHR-2 (C157955) | SPH-002T-P0.5S (C111515) | La del pack: **confirmar paso y polaridad** |
 
-- **J404 viene montado; la NTC es opcional.** TS del cargador es un divisor de REGN (5.1 kΩ
-  arriba, 30 kΩ abajo) con la NTC en paralelo con los 30 kΩ:
-  - **Sin NTC** no hay que hacer nada: R106 (10 kΩ, lo que mide una NTC 10k a 25 °C) va a GND por
-    **JP101**, un puente de soldadura **cerrado de fábrica**, y el cargador ve 25 °C (TS ≈ 60 % de
-    REGN).
-  - **Con NTC** (10k B3435, pegada a la celda): **cortar JP101** con un cúter (la pista fina entre
-    sus dos pads; comprobar con el multímetro que quedó abierto) y enchufar la NTC en J404. Sobre
-    JP101 la serigrafía dice «cortar JP101» y, debajo, «NTC J404». Si no se corta, la NTC queda en
-    paralelo con R106 y la temperatura que ve el cargador sale mal.
-  - **JP101 cortado y sin NTC**: TS sube a ~85 % de REGN, el cargador lo toma como frío extremo y
-    no carga. Para volver a la resistencia fija, unir los pads de JP101 con una gota de estaño.
+- **NTC obligatoria en J404.** TS del cargador es un divisor de REGN (5.1 kΩ arriba, 30 kΩ abajo)
+  con la NTC en paralelo con los 30 kΩ. Con una NTC 10k B3435 (tipo 103AT) y los umbrales por
+  omisión del BQ25798 (hoja de datos: VT1 73.3 %, TS_COOL 68.4 %, TS_WARM 44.8 %, VT5 34.2 % de REGN):
+
+  | Temperatura de la celda | Qué hace el cargador |
+  | --- | --- |
+  | < ~2 °C o > ~61 °C | No carga |
+  | ~2–11 °C | Carga al 20 % de la corriente (JEITA_ISETC) |
+  | ~11–45 °C | Carga normal |
+  | ~45–61 °C | Carga con el voltaje 400 mV más bajo (JEITA_VSET): una celda casi llena ya no sube |
+
+  - **En todos los casos el sistema sigue encendido con el USB**: el cargador solo suspende la
+    carga; VSYS sigue saliendo de VBUS.
+  - El firmware puede ajustar los umbrales por I2C (REG17/REG18), por ejemplo TS_WARM a 40 °C.
+  - **Sin NTC enchufada**, TS sube a ~85 % de REGN: frío extremo y no carga.
+  - **Ojo al comprarla:** 10 kΩ a 25 °C con B = 3435 (tipo 103AT o «NTC 10K 3435»). Las de las
+    impresoras 3D son de 100 kΩ (B3950): con esas el cargador cree que siempre hace frío y nunca
+    carga.
+  - Se pega a la celda con cinta kapton y su cable va con el de la batería; ver la carcasa V2.3.
 - **J101 va justo bajo la placa panel-usb.** El cable entre J101 y J502 queda muy corto en línea
   recta: usar el más corto del kit y dejar el sobrante doblado en el hueco sobre el canto.
 
@@ -328,25 +336,25 @@ separado.
 3. Subir BOM y CPL del panel y elegir «Complete File, just proceed with my own files».
    **Revisar la orientación de cada pieza en la vista previa** (sobre todo U201 con la antena hacia el canto
    izquierdo, U102, U105, U301, Q1xx, D1xx y los conectores).
-4. La única pieza sin montar (DNP) es R114 (0 Ω de 2S) y queda fuera del BOM. JP101 es un puente
-   de cobre de la propia placa: no va en el BOM ni en el CPL. J404 sí se monta.
+4. La única pieza sin montar (DNP) es R114 (0 Ω de 2S) y queda fuera del BOM. J404 sí se monta;
+   la NTC va aparte, con su cable.
 
 ## Costo
 
 Estimación de [fab/costo-jlcpcb.md](fab/costo-jlcpcb.md) para **5 juegos**, con precios y
-existencias de la API pública de JLCPCB del 06-10-2026 y las tarifas de su página (no es una
+existencias de la API pública de JLCPCB del 07-10-2026 y las tarifas de su página (no es una
 cotización):
 
 | Pedido | Montaje + piezas | Por juego |
 | --- | ---: | ---: |
-| (A) Un panel con las dos placas, PCBA Standard | 209.11 USD | 41.82 USD |
-| (B) Dos pedidos: principal Standard + panel-usb Economic | 221.86 USD | 44.37 USD |
+| (A) Un panel con las dos placas, PCBA Standard | 209.08 USD | 41.82 USD |
+| (B) Dos pedidos: principal Standard + panel-usb Economic | 221.83 USD | 44.37 USD |
 
 - El panel único ahorra **12.75 USD** en montaje, y además es un solo envío.
 - **No incluye el PCB desnudo** (4 capas, panel con dos diseños): JLCPCB no publica ese precio ni
   el cargo por diseño distinto; sale en el cotizador.
 - Lo que más pesa: los alimentadores de PCBA Standard (40 piezas distintas × 1.53 USD = 61.20 USD)
-  y las piezas (102.61 USD, sobre todo el ESP32-S3-WROOM-1-N16R2 a 5.80 USD, el BQ25798 y el MAX17048).
+  y las piezas (102.59 USD, sobre todo el ESP32-S3-WROOM-1-N16R2 a 5.80 USD, el BQ25798 y el MAX17048).
 - J301 en SH 8 suma 2.25 USD a los 5 juegos frente al GH 8 compartido con J101: un alimentador más
   (1.53 USD) y 5 conectores de 0.33 USD en lugar de 0.19.
 - J404, ahora montado, suma 2.22 USD a los 5 juegos: su alimentador (1.53 USD), 5 conectores
@@ -370,7 +378,7 @@ cotización):
 | Carcasa | No | Hecha: [V2.3](../../mechanical/v2.3/README.md), con chasis deslizable para esta placa (rieles, H1/H2, corte frente a la antena del WROOM, ranuras de la carrier y ménsulas atornilladas de la panel-usb). Comprobada en CAD con la placa final: 0 choques en su sitio y en el montaje paso a paso; nada impreso todavía |
 | Cable USB entre J101 y la panel-usb | No | Los dos conectores quedan casi enfrentados: usar el cable GH8 más corto del kit, pin 1 con pin 1, y doblar el sobrante sobre el canto |
 | Rebabas de los puentes del panel | No | Lijar las de los cantos laterales de la placa madre antes de meterla en los rieles |
-| NTC (J404 montado, JP101 cerrado) | No | Sin NTC no hay que hacer nada. Para la protección térmica de la celda: cortar JP101 y enchufar en J404 una NTC 10k B3435 pegada a la celda. Con JP101 cortado y sin NTC, el cargador no carga |
+| NTC de la celda | Sí, para cargar | Comprar una NTC 10k B3435 con cable (no las de 100k de impresora 3D) y crimpar o comprar un cable SH 1.0 de 2 pines. Sin ella el cargador no carga (el GPS sí funciona con el USB) |
 | Carrier: espesor, cantos y acceso a sus conectores | No | Resuelto en la carcasa V2.3 con las medidas de la foto más 1 mm de holgura (9 mm de grueso, aire para las patas del SMA). La carrier no tiene margen en los cantos: las ranuras del chasis dejan sitio a su USB-C, que sobresale ~0.9 mm, y a las soldaduras del arnés de J301 en la columna de agujeros pegada al otro canto (modelo por componentes en [cad/carrier_bdlx.py](cad/carrier_bdlx.py)). El arnés va soldado a la carrier |
 | 2S | No para 1S | No cabe sin recorte frente al botón; decidirlo antes de rehacer la carcasa |
 | Antena del ESP32 a 6.8 mm de la carrier | No | Medir RSSI en el primer prototipo |
@@ -428,8 +436,6 @@ impresa con los cambios propuestos.
   (el DRC no encuentra cuellos bajo 0.127 mm, pero conviene mirarlo a mano antes de pedir). Los
   planos internos van con 0.12 mm de margen a otras redes (JLCPCB admite 0.09 mm en capas internas)
   para que las vías dejen menos tiras.
-- **TS sin NTC**: con JP101 cerrado, R106 pone 25 °C y la celda no tiene protección térmica de
-  carga dentro de un tubo al sol. Recomendado: NTC en J404 y JP101 cortado.
 - **Hoja del BQ2579x rev D**: la copia pública dice «TI Confidential»; pedir la oficial.
 - **Ruteo automático** con `route_rest.py`, un ruteador propio (A* en rejilla con arranque y
   reruteo). Las pistas críticas están prerruteadas en `layout.py`:

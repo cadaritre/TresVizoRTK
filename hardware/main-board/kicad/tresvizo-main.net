@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-kicad/hardware/main-board/kicad/tresvizo-main.kicad_sch")
-		(date "2026-10-07T07:58:04")
+		(date "2026-10-07T16:51:04")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")
@@ -1789,63 +1789,6 @@
 			)
 		)
 		(comp
-			(ref "JP101")
-			(value "NTC_CORTAR")
-			(footprint "tresvizo_lcsc:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm")
-			(description "Puente cerrado de fábrica: cortarlo si se conecta una NTC en J404")
-			(fields
-				(field
-					(name "Footprint") "tresvizo_lcsc:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "Puente cerrado de fábrica: cortarlo si se conecta una NTC en J404")
-			)
-			(libsource
-				(lib "Jumper")
-				(part "SolderJumper_2_Bridged")
-				(description "Solder Jumper, 2-pole, closed/bridged")
-			)
-			(property
-				(name "Sheetname")
-				(value "Alimentación, carga y batería")
-			)
-			(property
-				(name "Sheetfile")
-				(value "power.kicad_sch")
-			)
-			(property
-				(name "exclude_from_bom")
-			)
-			(property
-				(name "ki_keywords")
-				(value "solder jumper SPST")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "SolderJumper*Bridged*")
-			)
-			(sheetpath
-				(names "/Alimentación, carga y batería/")
-				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
-			)
-			(tstamps "b2f2af20-54f9-56e7-afbb-54cdbb1b55aa")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-					)
-				)
-			)
-		)
-		(comp
 			(ref "L101")
 			(value "2.2uH")
 			(footprint "tresvizo_lcsc:IND-SMD_L5.4-W5.2")
@@ -2500,72 +2443,6 @@
 				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
 			)
 			(tstamps "0f6b577e-2247-543f-91d0-26176bf89042")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-					)
-				)
-			)
-		)
-		(comp
-			(ref "R106")
-			(value "10k")
-			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(description "Sustituye a la NTC (~25 C) con JP101 cerrado")
-			(fields
-				(field
-					(name "MPN") "0402WGF1002TCE")
-				(field
-					(name "LCSC") "C25744")
-				(field
-					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "Sustituye a la NTC (~25 C) con JP101 cerrado")
-			)
-			(libsource
-				(lib "Device")
-				(part "R")
-				(description "Resistor")
-			)
-			(property
-				(name "MPN")
-				(value "0402WGF1002TCE")
-			)
-			(property
-				(name "LCSC")
-				(value "C25744")
-			)
-			(property
-				(name "Sheetname")
-				(value "Alimentación, carga y batería")
-			)
-			(property
-				(name "Sheetfile")
-				(value "power.kicad_sch")
-			)
-			(property
-				(name "ki_keywords")
-				(value "R res resistor")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "R_*")
-			)
-			(sheetpath
-				(names "/Alimentación, carga y batería/")
-				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
-			)
-			(tstamps "37bd55ff-012b-57b4-b1e0-0954781f46ba")
 			(units
 				(unit
 					(name "A")
@@ -6990,7 +6867,7 @@
 			(ref "J404")
 			(value "NTC")
 			(footprint "tresvizo_lcsc:CONN-SMD_2P-P1.00_SM02B-SRSS-TB-LF-SN")
-			(description "NTC 10k B3435 opcional, pegada a la celda: al conectarla, cortar JP101")
+			(description "NTC 10k B3435 (103AT) obligatoria, pegada a la celda: sin ella el cargador no carga")
 			(fields
 				(field
 					(name "MPN") "SM02B-SRSS-TB(LF)(SN)")
@@ -7002,7 +6879,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "NTC 10k B3435 opcional, pegada a la celda: al conectarla, cortar JP101")
+					(name "Description") "NTC 10k B3435 (103AT) obligatoria, pegada a la celda: sin ella el cargador no carga")
 			)
 			(libsource
 				(lib "Connector_Generic_MountingPin")
@@ -8713,40 +8590,6 @@
 			)
 		)
 		(libpart
-			(lib "Jumper")
-			(part "SolderJumper_2_Bridged")
-			(description "Solder Jumper, 2-pole, closed/bridged")
-			(footprints
-				(fp "SolderJumper*Bridged*")
-			)
-			(fields
-				(field
-					(name "Reference") "JP")
-				(field
-					(name "Value") "SolderJumper_2_Bridged")
-				(field
-					(name "Footprint")
-				)
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "Solder Jumper, 2-pole, closed/bridged")
-			)
-			(pins
-				(pin
-					(num "1")
-					(name "A")
-					(type "passive")
-				)
-				(pin
-					(num "2")
-					(name "B")
-					(type "passive")
-				)
-			)
-		)
-		(libpart
 			(lib "Power_Protection")
 			(part "USBLC6-2SC6")
 			(description "Very low capacitance ESD protection diode, 2 data-line, SOT-23-6")
@@ -9453,10 +9296,6 @@
 			(uri "${KICAD10_SYMBOL_DIR}/Device.kicad_sym")
 		)
 		(library
-			(logical "Jumper")
-			(uri "${KICAD10_SYMBOL_DIR}/Jumper.kicad_sym")
-		)
-		(library
 			(logical "Power_Protection")
 			(uri "${KICAD10_SYMBOL_DIR}/Power_Protection.kicad_sym")
 		)
@@ -9935,22 +9774,6 @@
 		)
 		(net
 			(code "16")
-			(name "/Alimentación, carga y batería/CHG_TS_FIJA")
-			(class "Default")
-			(node
-				(ref "JP101")
-				(pin "1")
-				(pinfunction "A_1")
-				(pintype "passive")
-			)
-			(node
-				(ref "R106")
-				(pin "2")
-				(pintype "passive")
-			)
-		)
-		(net
-			(code "17")
 			(name "/Alimentación, carga y batería/FG_VDD")
 			(class "Default")
 			(node
@@ -9976,7 +9799,7 @@
 			)
 		)
 		(net
-			(code "18")
+			(code "17")
 			(name "/Alimentación, carga y batería/PMID")
 			(class "Power,Default")
 			(node
@@ -10002,7 +9825,7 @@
 			)
 		)
 		(net
-			(code "19")
+			(code "18")
 			(name "/Alimentación, carga y batería/REGN")
 			(class "Default")
 			(node
@@ -10028,7 +9851,7 @@
 			)
 		)
 		(net
-			(code "20")
+			(code "19")
 			(name "/Alimentación, carga y batería/VBATT_IN")
 			(class "Power,Default")
 			(node
@@ -10050,7 +9873,7 @@
 			)
 		)
 		(net
-			(code "21")
+			(code "20")
 			(name "/Alimentación, carga y batería/VBAT_CHG")
 			(class "Power,Default")
 			(node
@@ -10078,7 +9901,7 @@
 			)
 		)
 		(net
-			(code "22")
+			(code "21")
 			(name "/Alimentación, carga y batería/VBUS")
 			(class "Power,Default")
 			(node
@@ -10141,7 +9964,7 @@
 			)
 		)
 		(net
-			(code "23")
+			(code "22")
 			(name "/Alimentación, carga y batería/VPACK")
 			(class "Power,Default")
 			(node
@@ -10179,7 +10002,7 @@
 			)
 		)
 		(net
-			(code "24")
+			(code "23")
 			(name "/ESP32-S3/ESP_BOOT")
 			(class "Default")
 			(node
@@ -10201,7 +10024,7 @@
 			)
 		)
 		(net
-			(code "25")
+			(code "24")
 			(name "/ESP32-S3/ESP_EN")
 			(class "Default")
 			(node
@@ -10228,7 +10051,7 @@
 			)
 		)
 		(net
-			(code "26")
+			(code "25")
 			(name "/ESP32-S3/ESP_IO3")
 			(class "Default")
 			(node
@@ -10244,7 +10067,7 @@
 			)
 		)
 		(net
-			(code "27")
+			(code "26")
 			(name "/ESP32-S3/ESP_IO35")
 			(class "Default")
 			(node
@@ -10261,7 +10084,7 @@
 			)
 		)
 		(net
-			(code "28")
+			(code "27")
 			(name "/ESP32-S3/ESP_IO36")
 			(class "Default")
 			(node
@@ -10278,7 +10101,7 @@
 			)
 		)
 		(net
-			(code "29")
+			(code "28")
 			(name "/ESP32-S3/ESP_IO37")
 			(class "Default")
 			(node
@@ -10295,7 +10118,7 @@
 			)
 		)
 		(net
-			(code "30")
+			(code "29")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_5V")
 			(class "Power,Default")
 			(node
@@ -10338,7 +10161,7 @@
 			)
 		)
 		(net
-			(code "31")
+			(code "30")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_EVENT")
 			(class "Default")
 			(node
@@ -10366,7 +10189,7 @@
 			)
 		)
 		(net
-			(code "32")
+			(code "31")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_FB")
 			(class "Default")
 			(node
@@ -10387,7 +10210,7 @@
 			)
 		)
 		(net
-			(code "33")
+			(code "32")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_L1")
 			(class "Power,Default")
 			(node
@@ -10404,7 +10227,7 @@
 			)
 		)
 		(net
-			(code "34")
+			(code "33")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_L2")
 			(class "Power,Default")
 			(node
@@ -10421,7 +10244,7 @@
 			)
 		)
 		(net
-			(code "35")
+			(code "34")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_PPS")
 			(class "Default")
 			(node
@@ -10449,7 +10272,7 @@
 			)
 		)
 		(net
-			(code "36")
+			(code "35")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_RESET_N")
 			(class "Default")
 			(node
@@ -10465,7 +10288,7 @@
 			)
 		)
 		(net
-			(code "37")
+			(code "36")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_RXD2")
 			(class "Default")
 			(node
@@ -10493,7 +10316,7 @@
 			)
 		)
 		(net
-			(code "38")
+			(code "37")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_TXD2")
 			(class "Default")
 			(node
@@ -10521,7 +10344,7 @@
 			)
 		)
 		(net
-			(code "39")
+			(code "38")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_VAUX")
 			(class "Default")
 			(node
@@ -10537,7 +10360,7 @@
 			)
 		)
 		(net
-			(code "40")
+			(code "39")
 			(name "/microSD, IMU por conector y panel/BTN_LED_A")
 			(class "Default")
 			(node
@@ -10553,7 +10376,7 @@
 			)
 		)
 		(net
-			(code "41")
+			(code "40")
 			(name "/microSD, IMU por conector y panel/BTN_LED_K")
 			(class "Default")
 			(node
@@ -10570,7 +10393,7 @@
 			)
 		)
 		(net
-			(code "42")
+			(code "41")
 			(name "/microSD, IMU por conector y panel/SD_CD_N")
 			(class "Default")
 			(node
@@ -10592,7 +10415,7 @@
 			)
 		)
 		(net
-			(code "43")
+			(code "42")
 			(name "BTN_LED_EN")
 			(class "Default")
 			(node
@@ -10614,7 +10437,7 @@
 			)
 		)
 		(net
-			(code "44")
+			(code "43")
 			(name "BTN_N")
 			(class "Default")
 			(node
@@ -10643,7 +10466,7 @@
 			)
 		)
 		(net
-			(code "45")
+			(code "44")
 			(name "BTN_SENSE_N")
 			(class "Default")
 			(node
@@ -10665,7 +10488,7 @@
 			)
 		)
 		(net
-			(code "46")
+			(code "45")
 			(name "CHG_INT_N")
 			(class "Default")
 			(node
@@ -10687,7 +10510,7 @@
 			)
 		)
 		(net
-			(code "47")
+			(code "46")
 			(name "CHG_TS")
 			(class "Default")
 			(node
@@ -10707,11 +10530,6 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R106")
-				(pin "1")
-				(pintype "passive")
-			)
-			(node
 				(ref "U102")
 				(pin "16")
 				(pinfunction "TS_16")
@@ -10719,7 +10537,7 @@
 			)
 		)
 		(net
-			(code "48")
+			(code "47")
 			(name "FG_ALRT_N")
 			(class "Default")
 			(node
@@ -10741,7 +10559,7 @@
 			)
 		)
 		(net
-			(code "49")
+			(code "48")
 			(name "GND")
 			(class "Default")
 			(node
@@ -11045,12 +10863,6 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "JP101")
-				(pin "2")
-				(pinfunction "B_2")
-				(pintype "passive")
-			)
-			(node
 				(ref "Q103")
 				(pin "2")
 				(pinfunction "S_2")
@@ -11262,7 +11074,7 @@
 			)
 		)
 		(net
-			(code "50")
+			(code "49")
 			(name "GNSS_EVENT_MCU")
 			(class "Default")
 			(node
@@ -11283,7 +11095,7 @@
 			)
 		)
 		(net
-			(code "51")
+			(code "50")
 			(name "GNSS_PPS_MCU")
 			(class "Default")
 			(node
@@ -11299,7 +11111,7 @@
 			)
 		)
 		(net
-			(code "52")
+			(code "51")
 			(name "GNSS_PWR_EN")
 			(class "Default")
 			(node
@@ -11321,7 +11133,7 @@
 			)
 		)
 		(net
-			(code "53")
+			(code "52")
 			(name "GNSS_RESET_MCU")
 			(class "Default")
 			(node
@@ -11337,7 +11149,7 @@
 			)
 		)
 		(net
-			(code "54")
+			(code "53")
 			(name "GNSS_TXD2_MCU")
 			(class "Default")
 			(node
@@ -11353,7 +11165,7 @@
 			)
 		)
 		(net
-			(code "55")
+			(code "54")
 			(name "GNSS_TX_MCU")
 			(class "Default")
 			(node
@@ -11369,7 +11181,7 @@
 			)
 		)
 		(net
-			(code "56")
+			(code "55")
 			(name "I2C_SCL")
 			(class "Default")
 			(node
@@ -11403,7 +11215,7 @@
 			)
 		)
 		(net
-			(code "57")
+			(code "56")
 			(name "I2C_SDA")
 			(class "Default")
 			(node
@@ -11437,7 +11249,7 @@
 			)
 		)
 		(net
-			(code "58")
+			(code "57")
 			(name "IMU_INT1")
 			(class "Default")
 			(node
@@ -11454,7 +11266,7 @@
 			)
 		)
 		(net
-			(code "59")
+			(code "58")
 			(name "IMU_INT3")
 			(class "Default")
 			(node
@@ -11471,7 +11283,7 @@
 			)
 		)
 		(net
-			(code "60")
+			(code "59")
 			(name "IMU_SCL")
 			(class "Default")
 			(node
@@ -11493,7 +11305,7 @@
 			)
 		)
 		(net
-			(code "61")
+			(code "60")
 			(name "IMU_SDA")
 			(class "Default")
 			(node
@@ -11515,7 +11327,7 @@
 			)
 		)
 		(net
-			(code "62")
+			(code "61")
 			(name "SD_CLK")
 			(class "Default")
 			(node
@@ -11532,7 +11344,7 @@
 			)
 		)
 		(net
-			(code "63")
+			(code "62")
 			(name "SD_CMD")
 			(class "Default")
 			(node
@@ -11554,7 +11366,7 @@
 			)
 		)
 		(net
-			(code "64")
+			(code "63")
 			(name "SD_D0")
 			(class "Default")
 			(node
@@ -11576,7 +11388,7 @@
 			)
 		)
 		(net
-			(code "65")
+			(code "64")
 			(name "SD_D1")
 			(class "Default")
 			(node
@@ -11598,7 +11410,7 @@
 			)
 		)
 		(net
-			(code "66")
+			(code "65")
 			(name "SD_D2")
 			(class "Default")
 			(node
@@ -11620,7 +11432,7 @@
 			)
 		)
 		(net
-			(code "67")
+			(code "66")
 			(name "SD_D3")
 			(class "Default")
 			(node
@@ -11642,7 +11454,7 @@
 			)
 		)
 		(net
-			(code "68")
+			(code "67")
 			(name "SD_DET")
 			(class "Default")
 			(node
@@ -11664,7 +11476,7 @@
 			)
 		)
 		(net
-			(code "69")
+			(code "68")
 			(name "USB_DN")
 			(class "USB,Default")
 			(node
@@ -11699,7 +11511,7 @@
 			)
 		)
 		(net
-			(code "70")
+			(code "69")
 			(name "USB_DP")
 			(class "USB,Default")
 			(node
@@ -11734,7 +11546,7 @@
 			)
 		)
 		(net
-			(code "71")
+			(code "70")
 			(name "VSYS")
 			(class "Power,Default")
 			(node
@@ -11812,7 +11624,7 @@
 			)
 		)
 		(net
-			(code "72")
+			(code "71")
 			(name "unconnected-(U102-D+-Pad6)")
 			(class "Default")
 			(node
@@ -11823,7 +11635,7 @@
 			)
 		)
 		(net
-			(code "73")
+			(code "72")
 			(name "unconnected-(U102-D--Pad7)")
 			(class "Default")
 			(node
@@ -11834,7 +11646,7 @@
 			)
 		)
 		(net
-			(code "74")
+			(code "73")
 			(name "unconnected-(U102-STAT-Pad1)")
 			(class "Default")
 			(node
@@ -11845,7 +11657,7 @@
 			)
 		)
 		(net
-			(code "75")
+			(code "74")
 			(name "unconnected-(U105-PG-Pad1)")
 			(class "Default")
 			(node
@@ -11856,7 +11668,7 @@
 			)
 		)
 		(net
-			(code "76")
+			(code "75")
 			(name "unconnected-(U201-IO38-Pad31)")
 			(class "Default")
 			(node
@@ -11867,7 +11679,7 @@
 			)
 		)
 		(net
-			(code "77")
+			(code "76")
 			(name "unconnected-(U201-IO39-Pad32)")
 			(class "Default")
 			(node
@@ -11878,7 +11690,7 @@
 			)
 		)
 		(net
-			(code "78")
+			(code "77")
 			(name "unconnected-(U201-IO40-Pad33)")
 			(class "Default")
 			(node
@@ -11889,7 +11701,7 @@
 			)
 		)
 		(net
-			(code "79")
+			(code "78")
 			(name "unconnected-(U201-IO46-Pad16)")
 			(class "Default")
 			(node
@@ -11900,7 +11712,7 @@
 			)
 		)
 		(net
-			(code "80")
+			(code "79")
 			(name "unconnected-(U201-RXD0-Pad36)")
 			(class "Default")
 			(node
@@ -11911,7 +11723,7 @@
 			)
 		)
 		(net
-			(code "81")
+			(code "80")
 			(name "unconnected-(U201-TXD0-Pad37)")
 			(class "Default")
 			(node
@@ -11922,7 +11734,7 @@
 			)
 		)
 		(net
-			(code "82")
+			(code "81")
 			(name "unconnected-(U301-FB2-Pad6)")
 			(class "Default")
 			(node
@@ -11933,7 +11745,7 @@
 			)
 		)
 		(net
-			(code "83")
+			(code "82")
 			(name "unconnected-(U301-PG-Pad2)")
 			(class "Default")
 			(node
