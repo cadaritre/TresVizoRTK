@@ -1,0 +1,142 @@
+{
+ "piezas": [
+  {
+   "pieza": "01-base",
+   "etiqueta": "Base con la tuerca del baston",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 5436,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 8.37,
+   "stl": "01-base.stl",
+   "step": "01-base.step"
+  },
+  {
+   "pieza": "02-tube",
+   "etiqueta": "Tubo",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 5302,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 27.78,
+   "stl": "02-tube.stl",
+   "step": "02-tube.step"
+  },
+  {
+   "pieza": "03-antenna-cap",
+   "etiqueta": "Tapa de antena",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 6110,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 7.71,
+   "stl": "03-antenna-cap.stl",
+   "step": "03-antenna-cap.step"
+  },
+  {
+   "pieza": "04-chassis",
+   "etiqueta": "Chasis",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 1928,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 4.76,
+   "stl": "04-chassis.stl",
+   "step": "04-chassis.step"
+  },
+  {
+   "pieza": "05-key-tpu",
+   "etiqueta": "Tecla de TPU",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 812,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 0.08,
+   "stl": "05-key-tpu.stl",
+   "step": "05-key-tpu.step"
+  },
+  {
+   "pieza": "06-usb-plug-tpu",
+   "etiqueta": "Tapon de TPU del USB-C",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 124,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 0.51,
+   "stl": "06-usb-plug-tpu.stl",
+   "step": "06-usb-plug-tpu.step"
+  },
+  {
+   "pieza": "07-sd-plug-tpu",
+   "etiqueta": "Tapon de TPU de la microSD",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 100,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 0.11,
+   "stl": "07-sd-plug-tpu.stl",
+   "step": "07-sd-plug-tpu.step"
+  }
+ ],
+ "todas_cerradas": true,
+ "interferencias": [],
+ "sin_interferencias": true,
+ "limite_mm3": 0.05,
+ "guarda_pared_tubo": {
+  "cara_plana": {
+   "puntos": 2604,
+   "en_aberturas": 426,
+   "sin_material": 0,
+   "ejemplos": [],
+   "ok": true
+  },
+  "anillo": {
+   "puntos": 12175,
+   "en_aberturas": 766,
+   "sin_material": 0,
+   "ejemplos": [],
+   "ok": true
+  },
+  "paso_mm": 1.0,
+  "zonas": [
+   [
+    6,
+    94,
+    21.23,
+    25.1,
+    25.6
+   ],
+   [
+    4.2,
+    5.5,
+    21.68,
+    25.55,
+    25.55
+   ],
+   [
+    94.5,
+    95.5,
+    21.68,
+    25.55,
+    25.55
+   ]
+  ]
+ },
+ "guarda_pared_ok": true,
+ "deflexion_lineal": 0.05,
+ "deflexion_angular": 0.25
+}

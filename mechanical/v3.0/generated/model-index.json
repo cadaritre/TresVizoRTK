@@ -1,0 +1,163 @@
+{
+ "piezas": [
+  {
+   "nombre": "01-base",
+   "etiqueta": "Base con la tuerca del baston",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 8.37,
+   "caja": [
+    -26.0,
+    26.0,
+    -26.0,
+    22.13,
+    -0.0,
+    15.9
+   ]
+  },
+  {
+   "nombre": "02-tube",
+   "etiqueta": "Tubo",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 27.78,
+   "caja": [
+    -26.0,
+    26.0,
+    -26.0,
+    22.13,
+    4.0,
+    96.0
+   ]
+  },
+  {
+   "nombre": "03-antenna-cap",
+   "etiqueta": "Tapa de antena",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 7.71,
+   "caja": [
+    -26.0,
+    26.0,
+    -26.0,
+    22.13,
+    87.8,
+    100.0
+   ]
+  },
+  {
+   "nombre": "04-chassis",
+   "etiqueta": "Chasis",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 4.76,
+   "caja": [
+    -20.86,
+    20.86,
+    2.0,
+    16.35,
+    9.5,
+    95.7
+   ]
+  },
+  {
+   "nombre": "05-key-tpu",
+   "etiqueta": "Tecla de TPU",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 0.08,
+   "caja": [
+    -4.4,
+    4.4,
+    17.3,
+    23.13,
+    17.6,
+    26.4
+   ]
+  },
+  {
+   "nombre": "06-usb-plug-tpu",
+   "etiqueta": "Tapon de TPU del USB-C",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 0.51,
+   "caja": [
+    14.03,
+    23.85,
+    11.51,
+    22.39,
+    13.6,
+    32.4
+   ]
+  },
+  {
+   "nombre": "07-sd-plug-tpu",
+   "etiqueta": "Tapon de TPU de la microSD",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 0.11,
+   "caja": [
+    17.03,
+    21.99,
+    14.63,
+    20.1,
+    33.05,
+    50.95
+   ]
+  }
+ ],
+ "referencias": [
+  "placa: PCB",
+  "placa: componentes (envolvente h(x))",
+  "placa: SW401",
+  "placa: J101 USB-C",
+  "placa: J401 microSD",
+  "placa: OLED PCB",
+  "placa: OLED separador y componentes de atras",
+  "placa: OLED vidrio",
+  "placa: OLED cinta flexible",
+  "placa: OLED pines",
+  "placa: OLED tornillos M2",
+  "carrier: PCB",
+  "carrier: USB-C (sobresale del canto +X)",
+  "carrier: UM980 y su placa azul",
+  "carrier: LEDs RTK/PVT",
+  "carrier: pasivos C12-C14/L1",
+  "carrier: SMA cuerpo",
+  "carrier: u.FL P3",
+  "carrier: IC de 8 pines",
+  "carrier: pasivos del canto -X",
+  "carrier: D6/R4",
+  "carrier: GH8 vertical",
+  "carrier: CON1 GH5 lateral",
+  "carrier: electrónica central",
+  "carrier: IC izquierdo y pasivos",
+  "carrier: SMA cañón",
+  "carrier: pila de botón",
+  "carrier: patas del SMA (atrás)",
+  "carrier: arnés J301: soldaduras atrás (8 agujeros)",
+  "carrier: arnés J301: cables por delante (8 agujeros)",
+  "carrier: arnés J301: soldaduras atrás (5 agujeros)",
+  "celdas: celda 1",
+  "celdas: celda 2",
+  "tuerca: tuerca 5/8-11",
+  "tuerca: reten M2 con arandela",
+  "tuerca: perno del baston (rosca maxima)",
+  "antena: antena HA-901A",
+  "antena: tornillos M2.5 de la antena",
+  "coaxial: clavija SMA de la carrier",
+  "coaxial: coaxial (curva en S)",
+  "coaxial: coaxial: bucle de servicio",
+  "clavijas: clavija J102",
+  "clavijas: clavija J301",
+  "clavijas: clavija J404",
+  "cables: cable arnes_j301",
+  "cables: cable bateria_pos_ntc",
+  "cables: cable bateria_neg",
+  "tornillos: tornillos M2.5 de base y tapa",
+  "usb: funda de la clavija",
+  "microsd: tarjeta puesta"
+ ],
+ "coaxial_radio_curva": 5.25,
+ "clavijas_origen": "kicad/plugs.json (v0.3)"
+}

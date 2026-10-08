@@ -9,6 +9,7 @@
 | [v2.2/generated/stl](v2.2/generated/stl/) | Imprimir: cinco piezas rígidas y dos bandas de TPU. |
 | [v2.2/generated/step](v2.2/generated/step/) | STEP por pieza para otros CAD, en posición cerrada. |
 | [v2.2/SCREW-BOM.md](v2.2/SCREW-BOM.md) | Compra: 13 tornillos y el inserto del jalón. Los dos del IMU, avellanados. |
+| [v3.0](v3.0/README.md) | **Exploratoria** (rama `hw/compact-v03`): tubo de Ø52 × 100 con una cara plana, para la placa principal v0.3. No se ha impreso. |
 | [v2.1](v2.1/README.md) | Anterior. Se conserva como estaba. |
 | [option-oem-dome](option-oem-dome/README.md) | **Otra posibilidad, no una V3:** antena de topografía ArduSimple dentro de un domo. Es para V2.1 (Ø69): no está adaptada a V2.2. |
 | [v2](v2/README.md) | Anterior a V2.1. |

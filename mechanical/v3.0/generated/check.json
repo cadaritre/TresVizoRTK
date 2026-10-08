@@ -1,0 +1,257 @@
+{
+ "placa_origen": "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-v03/hardware/main-board/cad/placa-principal.step",
+ "clavijas_origen": "kicad/plugs.json (v0.3)",
+ "paso_barridos_mm": 0.5,
+ "guarda_pared_tubo": {
+  "sondas": {
+   "cara_plana": {
+    "puntos": 10120,
+    "en_aberturas": 1793,
+    "sin_material": 0,
+    "ejemplos": [],
+    "ok": true
+   },
+   "anillo": {
+    "puntos": 48371,
+    "en_aberturas": 3042,
+    "sin_material": 0,
+    "ejemplos": [],
+    "ok": true
+   },
+   "paso_mm": 0.5,
+   "zonas": [
+    [
+     6,
+     94,
+     21.23,
+     25.1,
+     25.6
+    ],
+    [
+     4.2,
+     5.5,
+     21.68,
+     25.55,
+     25.55
+    ],
+    [
+     94.5,
+     95.5,
+     21.68,
+     25.55,
+     25.55
+    ]
+   ]
+  },
+  "volumen": {
+   "tubo_mm3": 27780.5,
+   "esperado_mm3": 27779.4,
+   "anillo_solido_mm3": 25856.1,
+   "diferencia_mm3": 1.1,
+   "diferencia_pct": 0.004,
+   "tolerancia_pct": 0.5,
+   "ok": true,
+   "_nota": "esperado = anillo solido (circulo R26 con la cara plana en y 22.13, hueco R24.2 con la cara plana interior en y 20.33 para |x| <= 13.65, z 4-96) - ranuras de los rieles - rebajes de las uniones + repisas + cuna - ventana con su bolsillo, tecla con su rebaje, LED, tunel USB-C, ranura microSD, rebaje de la una y tornillos."
+  },
+  "espesor_minimo": {
+   "tunel USB-C": {
+    "mm": 0.881,
+    "donde": [
+     14.6,
+     19.94,
+     28.0
+    ]
+   },
+   "ranura microSD y rebaje": {
+    "mm": 0.652,
+    "donde": [
+     18.86,
+     17.9,
+     45.0
+    ]
+   },
+   "ventana OLED (bolsillo y chaflan)": {
+    "mm": 0.72,
+    "donde": [
+     -11.81,
+     20.41,
+     73.0
+    ]
+   },
+   "tecla y LED": {
+    "mm": 1.2,
+    "donde": [
+     1.44,
+     21.53,
+     18.0
+    ]
+   },
+   "uniones (rebajes)": {
+    "mm": 0.9,
+    "donde": [
+     -21.57,
+     14.51,
+     4.5
+    ]
+   },
+   "pared normal (z 60)": {
+    "mm": 1.2,
+    "donde": [
+     21.47,
+     14.66,
+     60.0
+    ]
+   }
+  },
+  "espesor_minimo_ok": true,
+  "ok": true
+ },
+ "choques_entre_piezas": [],
+ "choques_piezas_referencias": [],
+ "choques_entre_referencias": [],
+ "llave_holgura_chasis": {
+  "-30": 0.5,
+  "0": 1.03,
+  "30": 0.5
+ },
+ "barridos": {
+  "celdas_por_arriba": [],
+  "carrier_al_chasis_por_abajo": [],
+  "clavija_sma_por_arriba_sin_placa": [],
+  "llave_por_delante_sin_placa": [],
+  "placa_al_chasis_por_abajo": [],
+  "chasis_armado_por_arriba_sin_tecla": [],
+  "base_por_abajo": [],
+  "tapa_por_arriba": [],
+  "tecla_por_fuera": [],
+  "tarjeta_por_el_costado": [],
+  "tapones_por_fuera": []
+ },
+ "holguras": {
+  "chasis-tubo (contacto: pie de los rieles en sus repisas, z 9.5)": 0.0,
+  "chasis-tubo por encima de las repisas (z > 9.6)": 0.271,
+  "chasis-celdas": 0.6,
+  "chasis-PCB de la placa": 0.0,
+  "chasis-componentes de la placa y OLED": 0.294,
+  "chasis-carrier (contactos: topes z 69 y ganchos z 17)": 0.15,
+  "chasis-base": 0.3,
+  "chasis-tapa": 0.3,
+  "tubo-celdas (contacto: repisas, z 17.5)": 0.0,
+  "tubo-celdas por encima de las repisas (nervios)": 0.3,
+  "tubo-PCB de la placa": 0.3,
+  "tubo-componentes de la placa y OLED": 0.3,
+  "tubo-funda USB-C": 0.3,
+  "tubo-tarjeta microSD": 0.515,
+  "tapa-OLED": 0.3,
+  "tapa-coaxial": 2.044,
+  "tapa-celdas": 0.3,
+  "base-clavijas": 0.58,
+  "base-PCB de la placa": 0.3,
+  "base-celdas": 1.6,
+  "base-carrier": 1.1,
+  "reten-celdas": 0.268,
+  "tecla-SW401 (juego del embolo)": 0.355,
+  "tecla-componentes de la placa": 1.802,
+  "carrier-PCB de la placa": 0.4,
+  "carrier (patas del SMA)-celdas": 2.925,
+  "cables (reservas)-piezas": 0.1,
+  "tuerca SMA (barrido Ø9.2)-chasis (pedido >= 0.5)": 0.6,
+  "tuerca SMA-PCB con la muesca": 1.0,
+  "coaxial (bucle de servicio)-piezas": 2.7,
+  "perno del baston (15.5)-soldaduras de la carrier": 1.2,
+  "perno del baston (15.5)-celdas": 2.0,
+  "guia de luz-componentes de la placa": 0.345,
+  "tapones TPU-chasis": 0.35,
+  "tapon microSD-tarjeta": 0.5
+ },
+ "antena_wroom": {
+  "zona_antena": {
+   "x": [
+    -15.15,
+    -9.15
+   ],
+   "y": [
+    15.4,
+    18.5
+   ],
+   "z": [
+    49.9,
+    67.9
+   ]
+  },
+  "chasis_a_menos_de_5_mm_mm3": 45.1,
+  "piezas_dentro": [
+   [
+    -14.25,
+    -9.25,
+    10.4,
+    13.8,
+    67.7,
+    72.64,
+    45.1
+   ]
+  ],
+  "chasis_a_la_antena_mm": 1.6,
+  "tubo_a_la_antena_mm": 0.288,
+  "U201_en_el_STEP": [
+   -15.15,
+   10.35,
+   49.9,
+   67.9
+  ],
+  "_nota": "Lo que queda dentro de los 5 mm es el saliente M2 de la OLED del lado -X, detras de la placa (y 8-13.8, z 67.7-72.7): no se puede mover. El tubo (la pared) no cuenta."
+ },
+ "placa_detras_del_dorso_frente_al_SMA": {
+  "zona": {
+   "x": [
+    -6.0,
+    3.0
+   ],
+   "y": [
+    0.0,
+    13.8
+   ],
+   "z": [
+    60.0,
+    80.0
+   ],
+   "_nota": "Delante del SMA de la carrier (cuerpo x -4.6...2.2, z 62.2-69.6; canon hasta z 79.5) nada de la placa puede asomar por detras de su dorso (y 13.8)."
+  },
+  "piezas": [],
+  "ok": true,
+  "step": "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-v03/hardware/main-board/cad/placa-principal.step",
+  "step_fecha": "2026-10-08 06:36"
+ },
+ "holguras_cara_plana": {
+  "vidrio OLED (y 20.0)": 0.33,
+  "OLED: PCB, cinta y tornillos": 0.73,
+  "componentes de la placa (envolvente o STEP)": 0.674,
+  "clavijas (y 19.8)": 0.58,
+  "tecla: pestana contra la cara interior (contacto)": 0.0,
+  "tecla: volumen dentro de la pared (mm3)": 0.0,
+  "chasis (lo mas cercano: labio de un riel, |x| 17.1)": 5.267
+ },
+ "chasis_armado": {
+  "radio_max": 24.5,
+  "radio_max_fuera_de_ranuras": 24.046,
+  "radio_interior_tubo": 24.2,
+  "radio_fondo_ranuras": 24.8,
+  "holgura_minima_al_tubo_por_encima_de_las_repisas": 0.271,
+  "_nota": "Radio sobre vertices y aristas discretizadas cada 0.5 mm. Dentro de las ranuras (31-47 y 133-149 grados) el limite es 24.8; en |x| <= 13.65 el interior llega a la cara plana (y 20.33), por eso el vidrio de la OLED (r 24.05) cabe."
+ },
+ "coaxial": {
+  "radio_curva_disponible": 5.25,
+  "radio_curva_pedido": 10.0,
+  "cumple": false
+ },
+ "bloqueos_al_sacar_el_chasis_con_la_tecla_puesta": [
+  {
+   "movil": "placa: J102",
+   "obstaculo": "05-key-tpu",
+   "mm3_max": 7.635,
+   "a_mm": 10.0
+  }
+ ],
+ "total_choques": 0,
+ "guarda_pared_ok": true
+}

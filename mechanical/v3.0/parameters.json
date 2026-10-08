@@ -1,0 +1,893 @@
+{
+ "units": "mm",
+ "_version": "3.0",
+ "_que_es": "Carcasa V3.0 (exploratoria) para la placa principal compacta v0.3: tubo de 52 x 100 con cara plana al frente, base con la tuerca del baston, tapa de antena, chasis que entra por arriba y tecla de TPU. Especificacion: hardware/main-board/research/v03-compacta.md.",
+ "_ejes": "z = eje del baston hacia arriba (z 0 en la cara de apoyo de abajo), +Y al frente (cara plana), +X a la izquierda mirando el frente.",
+ "holguras": {
+  "general": 0.3,
+  "deslizamiento": 0.2,
+  "riel_placa": 0.15,
+  "_nota": "general: entre piezas que no se tocan; deslizamiento: piezas que entran guiadas; riel_placa: canto de la placa en su riel, por cara (como V2.3)."
+ },
+ "tubo": {
+  "radio_exterior": 26.0,
+  "pared": 1.8,
+  "alto_total": 100.0,
+  "redondeo": 4.0,
+  "_nota_redondeo": "Redondeo exterior R4 en el canto de abajo (lo lleva la base y el arranque del tubo) y en el de arriba (lo lleva la tapa).",
+  "plano_y_exterior": 22.13,
+  "plano_y_interior": 20.33,
+  "plano_x": 13.65,
+  "_nota_plano": "Cara plana al frente. Por dentro la cara plana (y 20.33) llega hasta |x| 13.65, no solo hasta donde la corta el circulo de r 24.2 (|x| 13.13): asi el vidrio de la OLED (|x| 13.35, frente en y 20.0) queda con 0.33 de aire.",
+  "z_base": 4.0,
+  "z_tapa": 96.0,
+  "_nota_z": "El tubo va de z 4 a 96. La base es un disco de 2 mm (delante de la tuerca bajan las clavijas hasta z 2.4) con el anillo del redondeo de abajo hasta z 4; la tapa es un disco de 4 mm con todo el redondeo de arriba.",
+  "ranuras_rieles": {
+   "angulos": [
+    [
+     31.0,
+     47.0
+    ],
+    [
+     133.0,
+     149.0
+    ]
+   ],
+   "radio": 24.8,
+   "z": [
+    8.0,
+    96.0
+   ],
+   "_nota": "Dos ranuras de 0.6 mm en la pared (queda 1.2) donde corren las esquinas exteriores de los rieles del chasis: alrededor del canto de la placa solo hay 0.5 mm hasta r 24.2. Guian el chasis al bajar."
+  },
+  "repisas_rieles": {
+   "r": [
+    23.0,
+    24.8
+   ],
+   "z": [
+    8.0,
+    9.5
+   ],
+   "_nota": "Pie de cada riel del chasis: repisa en el fondo de su ranura, recortada alrededor de la placa. El chasis apoya aqui y la tapa no lo deja subir."
+  },
+  "laberinto": {
+   "ancho": 0.8,
+   "holgura": 0.1,
+   "alto_base": 1.5,
+   "alto_tapa": 1.5,
+   "_nota": "Uniones base-tubo (z 4) y tapa-tubo (z 96) con escalon en vez de tope plano: la pieza de abajo o de arriba lleva un labio de 0.8 pegado a la cara interior de la pared y el tubo un rebaje de 0.9 por dentro (le queda 0.9 por fuera)."
+  },
+  "_nota_esquina": "En la esquina interior de la cara plana (x +-13.65, y 20.33) la pared mide 1.51 hasta el circulo exterior, no 1.8."
+ },
+ "base": {
+  "_que_es": "Disco de 2 mm con la tuerca 5/8-11 de laton en el eje, en un alojamiento hexagonal que no la deja girar, sobre un anillo de 2 mm que apoya en el hombro del baston (como V2.3). Se quita por abajo para enchufar la bateria y la NTC.",
+  "espesor": 2.0,
+  "tuerca": {
+   "entre_caras": 23.8125,
+   "alto": 13.89,
+   "alto_minimo": 13.49,
+   "holgura_caras": 0.3,
+   "anillo_asiento": 2.0,
+   "paso_perno_diametro": 16.6,
+   "chaflan_paso": 0.6,
+   "_nota": "ASME B18.2.2 5/8-11, estandar, de V2.3. Caras hacia +-Y: su frente queda en y 11.9 (12.06 con la holgura). Alojamiento de z 2.0 a 15.9.",
+   "perno_max": 15.5,
+   "_nota_perno": "Rosca maxima del perno del baston desde el asiento (z 0): 15.5. Por encima de la tuerca (z 15.89) las soldaduras de la fila de 5 de la carrier quedan en z 16.7: un perno mas largo las toca. Poner kapton en esa fila."
+  },
+  "saliente_tuerca": {
+   "radio": 16.0,
+   "y_max": 13.5,
+   "z_sup": 15.9,
+   "_nota": "Saliente cilindrico alrededor del alojamiento, recortado en y 13.5: la placa (dorso en y 13.8) baja hasta z 8.5 justo delante."
+  },
+  "reten": {
+   "angulo": 270.0,
+   "radio": 14.5,
+   "metrica": "M2",
+   "piloto": 1.6,
+   "profundidad": 8.0,
+   "arandela_diametro": 9.0,
+   "arandela_espesor": 0.8,
+   "cabeza_diametro": 4.0,
+   "cabeza_alto": 1.6,
+   "_nota": "M2 x 8 de cabeza alomada (ISO 7045) o boton, con arandela DIN 9021 de M3 (9 x 0.8, agujero 3.2): llega a r 10.0 y pisa 1.9 mm de la cara trasera de la tuerca (no solo su chaflan). Los retenes M3 de V2.3 suben hasta z 18.35 y no caben: las celdas empiezan en z 17.5 y la carrier en z 17 en todo el contorno de la tuerca salvo el frente. En r 14.5 la cabeza (hasta z 18.3) queda fuera de la planta de las celdas (0.27 mm) y la arandela pasa por debajo de ellas con 0.8.",
+   "refuerzo_diametro": 4.6
+  },
+  "lenguetas": {
+   "angulos": [
+    210.0,
+    270.0,
+    330.0
+   ],
+   "r": [
+    21.0,
+    23.9
+   ],
+   "ancho": 7.0,
+   "z": [
+    2.0,
+    11.0
+   ],
+   "_nota": "Lenguetas que suben por dentro de la pared, lejos del frente (clavijas) y de los costados (cables). Cada una recibe un tornillo radial."
+  },
+  "tornillos": {
+   "metrica": "M2.5",
+   "z": 8.0,
+   "paso": 2.9,
+   "piloto": 2.1,
+   "avellanado_diametro": 5.0,
+   "_nota": "M2.5 x 6 avellanados ISO 14581 (Torx) o ISO 7046 (cruz), radiales desde fuera: pasan la pared de 1.8 y roscan 2.9 mm en la lengueta. ISO 10642 y DIN 7991 empiezan en M3. En z 8, encima del escalon de la union."
+  },
+  "desague": {
+   "x": 0.0,
+   "y": 19.2,
+   "diametro": 1.5,
+   "_nota": "Desague en el frente, abajo: por aqui sale el agua que entre."
+  },
+  "nervios": {
+   "angulos": [
+    210.0,
+    270.0,
+    330.0
+   ],
+   "ancho": 2.0,
+   "r": [
+    15.5,
+    21.5
+   ],
+   "z": [
+    2.0,
+    6.0
+   ],
+   "_nota": "Nervios del saliente de la tuerca a las lenguetas de los tornillos."
+  }
+ },
+ "tapa": {
+  "_que_es": "Disco de 4 mm (z 96 a 100) con el redondeo R4, la antena atornillada encima y tres lenguetas que bajan por dentro de la pared para los tornillos radiales.",
+  "bolsillo_oled": {
+   "x": 14.1,
+   "y": [
+    15.1,
+    21.0
+   ],
+   "z_techo": 97.3,
+   "_nota": "La OLED y su cinta flexible llegan a z 97 en x +-13.75, y 16.7-20.0: la cara de abajo de la tapa sube a 97.3 sobre ellas."
+  },
+  "lenguetas": {
+   "angulos": [
+    0.0,
+    180.0,
+    270.0
+   ],
+   "r": [
+    21.0,
+    23.9
+   ],
+   "ancho": 6.0,
+   "z": [
+    88.0,
+    96.0
+   ]
+  },
+  "tornillos_z": 92.0,
+  "_nota_tornillos": "Mismos M2.5 avellanados radiales que la base.",
+  "topes_celdas": {
+   "puntos": [
+    [
+     7.0,
+     -12.0
+    ],
+    [
+     -7.0,
+     -12.0
+    ]
+   ],
+   "diametro": 6.0,
+   "holgura": 0.3,
+   "_nota": "Topes bajo la tapa, sobre las celdas (arriba en z 87.5), a 0.3: no las dejan subir. Fuera de los tornillos de la antena (210 y 330 grados, r 13.3), que caen casi sobre los ejes de las celdas."
+  }
+ },
+ "antena": {
+  "_que_es": "HA-901A del propietario (datos de mechanical/v2.3/parameters.json, antena).",
+  "diametro": 43.5,
+  "altura": 40.8,
+  "circulo_pernos": 26.6,
+  "numero_pernos": 3,
+  "angulo_inicial": 90.0,
+  "metrica": "M2.5",
+  "perno_paso": 2.9,
+  "rosca_profundidad": 6.0,
+  "paso_coaxial": 12.0,
+  "cabeza_diametro": 5.0,
+  "cabeza_alto": 1.75,
+  "avellanado_cabeza": 2.4,
+  "_nota": "Tres M2.5 x 6 de cabeza alomada ISO 7045 con arandela ISO 7089 desde dentro, en un circulo de 26.6, empezando en 90 grados. Rebaje de 5.4 x 2.4: sobre la arandela quedan 1.6 de tapa y el tornillo entra 3.9 en la antena (rosca supuesta de 6). El modelo de antena y su conector NO estan confirmados (hardware/bom.md: Helix, modelo exacto por confirmar): la tapa es parametrica; si cambia la antena se cambian estos numeros y se reimprime solo la tapa.",
+  "paso_coaxial_alargado": 4.0,
+  "_nota_paso": "Paso de 12 en el eje, alargado 4 mm hacia el SMA de la carrier: el coaxial llega en S desde la clavija (x -1.2, y 10.2) y a z 96 todavia va a ~5 mm del eje. Queda bajo la base de la antena.",
+  "avellanado_diametro": 5.4,
+  "arandela_espesor": 0.5
+ },
+ "frente": {
+  "ventana_oled": {
+   "x": 12.122,
+   "z": [
+    73.32,
+    86.684
+   ],
+   "_nota": "Area visible del modulo girado 180 grados mas 0.25 por lado. Por fuera, bolsillo 0.8 mas grande por lado y 1.0 de hondo para una lamina pegada de PC o acrilico de 1.0 (0.1 menos por lado): quedan 0.8 de pared. Chaflan de entrada de 0.4 en los cantos de dentro, para que el vidrio no se enganche al bajar el chasis.",
+   "bolsillo": {
+    "margen": 0.8,
+    "hondo": 1.0
+   },
+   "chaflan_interior": 0.4,
+   "mica": {
+    "espesor": 1.0,
+    "holgura": 0.1
+   }
+  },
+  "tecla": {
+   "x": 0.0,
+   "z": 22.0,
+   "agujero": 6.4,
+   "_nota": "Agujero de 6.4 sobre SW401 (el mismo que el hueco de la pestana: la membrana flexa sin tocar la pared) y rebaje exterior de 9 x 0.6 donde se pega la pestana.",
+   "rebaje": {
+    "diametro": 9.0,
+    "hondo": 0.6
+   }
+  },
+  "led": {
+   "x": -6.0,
+   "z": 22.0,
+   "agujero": 2.0,
+   "_nota": "Ventanita de D403 (0603 rojo, centro x -6, z 22): agujero pasante de 2 mm; admite una guia de luz de 2 mm.",
+   "guia_luz": {
+    "diametro": 2.0,
+    "y0": 16.45,
+    "_nota": "Guia de luz de 2 mm pegada en el agujero, de y 16.45 (0.34 sobre D403, que llega a y 16.11) a la cara exterior. Pide a la placa nada mas que el LED en r 1.5 alrededor."
+   }
+  }
+ },
+ "costado": {
+  "usb_c": {
+   "x0": 14.6,
+   "y": [
+    12.4,
+    30.0
+   ],
+   "z_centro": 25.0,
+   "medio_alto": 6.5,
+   "_nota": "Tunel de la funda de la clavija USB-C (hasta 12.35 x 6.5, centrada en y 17.0) desde x 14.6 (boca de J101 en x 14.9, u 3.1: 0.3 de aire). Abajo llega a y 12.4: con 13.4 quedaba una cuna de 0.74 a 0.01 contra el lado de la ranura del riel (31 grados); arriba sale hasta la cara exterior: con 20.6 quedaba una cuna de 0.85 a 0 sobre el tunel.",
+   "tapon": {
+    "y": [
+     13.5,
+     20.5
+    ],
+    "x0": 15.3
+   }
+  },
+  "microsd": {
+   "z_centro": 40.0,
+   "ancho": 12.0,
+   "y": [
+    15.45,
+    17.45
+   ],
+   "una": {
+    "radio": 1.9,
+    "hondo": 1.2,
+    "alto": 8.0
+   },
+   "_nota": "Ranura de la tarjeta (1.0 de grueso) en el costado +X, centro en z 40 (J401 de la placa real: boca en u 1.5, v 32-48). Rebaje para la una: cilindro R1.9 centrado en el canto DELANTERO de la ranura (y 17.45), 1.2 de hondo: queda dentro del alto de la ranura por abajo y deja >= 0.6 de pared (con R2.5 bajaba a 0.59 bajo la ranura).",
+   "tapon": {
+    "x0": 18.0
+   }
+  },
+  "tapones_tpu": {
+   "espesor_ala": 0.6,
+   "margen_ala": 1.0,
+   "lengueta": [
+    4.0,
+    3.0,
+    0.8
+   ],
+   "_nota": "Tapones de TPU para el tunel del USB-C y la ranura de la microSD: cuerpo a ras (ajuste a presion) y ala curva 1.0 mas grande que la abertura sobre la pared, con una lengueta para tirar (abajo en el del USB-C, arriba en el de la microSD: entre las dos aberturas solo hay 2.5 mm)."
+  }
+ },
+ "placa": {
+  "_que_es": "Envolvente de la placa v0.3 mientras no exista su STEP (hardware/main-board/cad/placa-principal.step).",
+  "x": 18.0,
+  "y_dorso": 13.8,
+  "y_cara": 15.4,
+  "z": [
+   8.5,
+   80.0
+  ],
+  "franja": 1.0,
+  "h_max": 4.63,
+  "_nota_h": "Alto de componentes h(x) = min(4.63, sqrt(24.2^2 - x^2) - 15.7), fuera de las franjas de 1 mm de los cantos.",
+  "muesca_usb": {
+   "x": [
+    14.9,
+    18.0
+   ],
+   "z": [
+    18.5,
+    31.5
+   ]
+  },
+  "muesca_sma": {
+   "x": [
+    -6.2,
+    3.8
+   ],
+   "z": [
+    73.5,
+    80.0
+   ],
+   "activa": true,
+   "_nota": "Muesca del canto de arriba para la tuerca de la clavija SMA de la carrier (u 14.2-24.2, v 0-6.5), ya en la placa real segun la coordinacion."
+  },
+  "boton": {
+   "x": 0.0,
+   "z": 22.0,
+   "lado": 5.1,
+   "alto": 1.55,
+   "radio_bajo": 5.0,
+   "alto_bajo": 1.0
+  },
+  "led": {
+   "x": -6.0,
+   "z": 22.0,
+   "lado": [
+    1.6,
+    0.8
+   ],
+   "alto": 0.71,
+   "radio_bajo": 1.5,
+   "alto_bajo": 0.71
+  },
+  "usb_c": {
+   "ancho": 8.94,
+   "fondo": 7.9,
+   "alto": 3.25,
+   "boca_x": 14.9,
+   "z": 25.0
+  },
+  "funda_usb": {
+   "ancho": 12.35,
+   "alto": 6.5,
+   "y_centro": 17.0,
+   "largo": 20.0
+  },
+  "microsd": {
+   "ancho": 16.0,
+   "fondo": 15.3,
+   "alto": 1.95,
+   "boca_x": 16.5
+  },
+  "tarjeta": {
+   "ancho": 11.0,
+   "largo": 15.0,
+   "espesor": 1.0,
+   "y0": 15.95,
+   "x_fuera": 17.5,
+   "_nota": "Tarjeta puesta: su canto queda en x 17.5, unos 2.7 mm dentro de la cara exterior (x 20.2 en y 16.35)."
+  },
+  "clavijas": {
+   "zona_y": [
+    15.4,
+    19.8
+   ],
+   "z_min": 2.4,
+   "x_respaldo": [
+    [
+     -15.5,
+     15.5
+    ]
+   ],
+   "_nota": "Si kicad/plugs.json no es todavia el de v0.3 (z_top 80), se usa una zona que cubre todo el canto de abajo salvo los cantos: clavijas de J102, J404 y J301 con sus cables doblados."
+  },
+  "oled": {
+   "pcb": [
+    27.5,
+    27.8,
+    1.6
+   ],
+   "z0": 68.2,
+   "y_pcb": 16.7,
+   "vidrio": {
+    "x": 13.35,
+    "z": [
+     72.47,
+     91.73
+    ],
+    "espesor": 1.7
+   },
+   "pines": {
+    "x": 5.25,
+    "z": [
+     68.2,
+     71.0
+    ],
+    "_nota": "J403 pasa a pads SMD por la cara de arriba: los pines del modulo se cortan a la altura del separador (1.3) y se sueldan en los pads. No atraviesan la placa: acaban en y 15.4."
+   },
+   "flex": {
+    "x": 7.5,
+    "z_max": 97.0
+   },
+   "agujeros": {
+    "x": 11.75,
+    "z": 70.2,
+    "z_arriba": 94.0
+   },
+   "tornillo": {
+    "cabeza_diametro": 3.5,
+    "cabeza_alto": 1.3,
+    "diametro": 2.0,
+    "largo": 8.0
+   },
+   "_nota": "Modulo de 4 pines girado 180 grados, separado 1.3 mm de la placa: PCB en y 16.7-18.3, vidrio hasta y 20.0. M2 x 8 por los agujeros de abajo."
+  },
+  "_nota_real": "Valores de la placa real (cad/placa-principal.step, 08-10-2026): SW401 1.55 de alto, D403 0.71, boca de J101 en x 14.9, J401 en z 32-48. La envolvente solo se usa si no esta el STEP."
+ },
+ "carrier": {
+  "x": [
+   -16.0,
+   16.0
+  ],
+  "y": [
+   5.3,
+   6.9
+  ],
+  "z": [
+   17.0,
+   69.0
+  ],
+  "pcb": 1.6,
+  "sma": {
+   "patas": {
+    "x": [
+     -4.6,
+     2.2
+    ],
+    "atras": 2.0,
+    "z": [
+     63.0,
+     72.0
+    ]
+   }
+  },
+  "_nota": "Para hardware/main-board/cad/carrier_bdlx.py: build(carrier). Eje del canon del SMA en x -1.2, y 10.2, z 69-79.5."
+ },
+ "celdas": {
+  "ejes": [
+   [
+    9.5,
+    -7.9
+   ],
+   [
+    -9.5,
+    -7.9
+   ]
+  ],
+  "diametro": 18.6,
+  "z": [
+   17.5,
+   87.5
+  ],
+  "holgura": 0.3,
+  "_nota": "2 x 18650 protegidas en paralelo (1S2P). Bajan por arriba antes que el chasis."
+ },
+ "cuna": {
+  "nervios": {
+   "angulos_rel": [
+    0.0,
+    -90.0,
+    40.0
+   ],
+   "espesor": 1.6,
+   "z": [
+    17.5,
+    86.0
+   ],
+   "_nota": "Por celda, tres nervios de la pared hacia la celda (angulos medidos desde su eje, 0 = hacia fuera en x): costado, atras y un labio delante-fuera que no la deja ir hacia delante. Terminan a 0.3 de la celda."
+  },
+  "repisas": {
+   "angulos": [
+    [
+     300.0,
+     340.0
+    ],
+    [
+     200.0,
+     240.0
+    ]
+   ],
+   "r0": 16.6,
+   "z": [
+    16.3,
+    17.5
+   ],
+   "_nota": "La celda apoya en una repisa bajo su parte de fuera, lejos del saliente de la tuerca (r 16) y de los cables."
+  }
+ },
+ "chasis": {
+  "_que_es": "Se arma fuera del tubo (carrier y placa entran por abajo; la OLED se atornilla con la placa a dos salientes) y baja por arriba con la tapa quitada y las celdas puestas.",
+  "r_max": 23.9,
+  "r_max_ranura": 24.5,
+  "riel": {
+   "x_labio": 17.1,
+   "x_fondo": 18.15,
+   "y_ranura": [
+    13.65,
+    15.55
+   ],
+   "y_labio": [
+    15.55,
+    16.35
+   ],
+   "y_dorso": [
+    12.85,
+    13.65
+   ],
+   "x_dorso": 16.6,
+   "z": [
+    9.5,
+    81.0
+   ],
+   "z_tope": 80.0,
+   "cortes_mas_x": [
+    [
+     18.2,
+     46.3
+    ]
+   ],
+   "_nota": "Riel en C sobre la franja de 1 mm del canto de la placa (0.15 por cara). Labio delantero desde x 17.1, dentro de la franja. Su esquina de fuera llega a r 24.5 y corre por la ranura del tubo. En +X se corta de z 18.2 a 46.3, frente a la funda del USB-C (z 18.5-31.5) y a la tarjeta microSD (z 34-46). Tope de la placa en z 80."
+  },
+  "pared_lateral": {
+   "x": [
+    19.0,
+    20.0
+   ],
+   "y": [
+    4.3,
+    12.86
+   ],
+   "z": [
+    9.5,
+    95.7
+   ]
+  },
+  "ranura_carrier": {
+   "x_pared": [
+    16.15,
+    17.3
+   ],
+   "y": [
+    4.5,
+    7.7
+   ],
+   "labio_atras_y": [
+    4.5,
+    5.15
+   ],
+   "labio_atras_x": 14.6,
+   "labio_delante_y": [
+    7.05,
+    7.7
+   ],
+   "labio_delante_x": 15.0,
+   "z": [
+    16.2,
+    70.0
+   ],
+   "tope_z": [
+    69.2,
+    70.2
+   ],
+   "pared_atras_menos_x": 16.5,
+   "_nota": "La carrier entra por abajo (los salientes de la OLED, detras de la placa, no la dejan entrar por delante ni por arriba) hasta los topes de arriba (z 69-70) y la sostienen dos ganchos abajo. Ningun labio puede estar donde pasan sus componentes al subir: el USB-C sobresale 0.9 mm hacia +X (z 21-30.4): en +X la pared delante del PCB se quita por debajo de z 30.7. Las soldaduras del arnes (x -15.3, z 22.1-39.4) asoman detras del PCB: en -X el labio trasero empieza en z 40.6 y la pared se aparta a x -16.5. Delante del PCB hay componentes a menos de 1 mm de los cantos hasta z 59.2 (UM980, pasivos, pila, cables del arnes): los labios delanteros solo van de z 59.5 a 69.",
+   "labio_delante_z": [
+    59.5,
+    69.0
+   ],
+   "labio_atras_menos_x_desde_z": 40.6,
+   "sin_pared_delante_mas_x_hasta_z": 30.7,
+   "sin_pared_delante_mas_x_y": 6.6
+  },
+  "ganchos": {
+   "z": [
+    16.2,
+    26.0
+   ],
+   "x": [
+    15.3,
+    16.95
+   ],
+   "y": [
+    5.5,
+    6.6
+   ],
+   "labio_z": [
+    16.0,
+    16.8
+   ],
+   "_nota": "Gancho flexible al pie de cada ranura: brazo de 0.8 x 1.2 y ~10 mm, separado de la pared por ranuras de 0.6 (minimo de MJF) y 1.3 libres detras. Se abre 0.85 mm al subir la carrier. Topes y labios con 0.2 de juego vertical: la carrier sale de una foto (+-1 mm); medirla con calibre antes de imprimir.",
+   "hueco_detras": 1.3,
+   "ranura": 0.6
+  },
+  "salientes": {
+   "x": 11.75,
+   "z": 70.2,
+   "diametro": 5.0,
+   "y": [
+    8.0,
+    13.8
+   ],
+   "piloto": 1.6,
+   "piloto_hondo": 5.0,
+   "_nota": "M2 x 8 autorroscantes por los agujeros de abajo de la OLED: atraviesan el modulo, su separador de 1.3 y la placa, y muerden 3.5 mm. La placa apoya en la cara del saliente (contacto en y 13.8)."
+  },
+  "brazos": {
+   "x": [
+    9.5,
+    14.0
+   ],
+   "y": [
+    5.9,
+    8.2
+   ],
+   "z": [
+    70.0,
+    74.0
+   ]
+  },
+  "puente": {
+   "x": 19.5,
+   "y": [
+    2.0,
+    5.9
+   ],
+   "z": [
+    72.3,
+    84.0
+   ],
+   "_nota": "Une los dos lados por detras de la clavija SMA (y 6.2) y por delante de las celdas (y 1.4), encima de las patas del SMA (z 72). Llega a |x| 19.5: mas afuera pasaria a 0.04 mm del labio de la cuna.",
+   "muesca": {
+    "x": [
+     -6.5,
+     4.1
+    ],
+    "y_max": 5.0,
+    "_nota": "Hueco para la tuerca de la clavija SMA (9.2 entre esquinas, gira al apretar): >= 0.5 alrededor."
+   },
+   "ventana_llave": {
+    "x": [
+     -10.5,
+     8.5
+    ],
+    "z": [
+     75.5,
+     80.0
+    ],
+    "_nota": "Ventana en el puente a la altura de la llave fija de 8 (z 76-79.5): al girar la llave +-30 grados para cambiar de cara, sus bocas llegan hasta 6.7 detras del eje de la tuerca. El puente queda en dos barras (z 72.3-75.5 y 80-84) unidas por los lados."
+   }
+  },
+  "tirador": {
+   "x": [
+    18.0,
+    20.0
+   ],
+   "z": [
+    91.0,
+    95.7
+   ],
+   "agujero": 2.5,
+   "z_agujero": 93.5,
+   "y_agujero": 8.5,
+   "_nota": "Lengueta engrosada en lo alto de cada pared lateral, con un agujero para un gancho o un alambre: para sacar el chasis."
+  },
+  "antena_wroom": {
+   "x": [
+    -15.15,
+    -9.15
+   ],
+   "y": [
+    15.4,
+    18.5
+   ],
+   "z": [
+    49.9,
+    67.9
+   ],
+   "margen": 5.0,
+   "corte": {
+    "x": [
+     -21.0,
+     -15.5
+    ],
+    "y": [
+     11.5,
+     17.0
+    ],
+    "z": [
+     44.5,
+     73.0
+    ]
+   },
+   "_nota": "Antena del ESP32-S3-WROOM-1 (U201): los ultimos 6 mm del modulo, u 27.15-33.15, v 12.1-30.1. Como en V2.3, sin plastico del chasis delante: se quitan el riel -X (labio, dorso y pared) y la punta de la pared lateral en z 44.5-73, todo lo que quedaba a menos de 5 mm. La placa sigue guiada por el resto del riel -X (z 9.5-44.5 y 73-81), el riel +X y los dos M2. Queda dentro de los 5 mm el saliente M2 de la OLED del lado -X (detras de la placa): no se puede mover."
+  }
+ },
+ "tecla": {
+  "cabeza_diametro": 5.0,
+  "sobresale": 1.0,
+  "pestana": {
+   "diametro": 8.8,
+   "agujero": 6.4,
+   "espesor": 0.6
+  },
+  "membrana": 0.4,
+  "embolo_diametro": 3.0,
+  "juego_boton": 0.35,
+  "_nota": "TPU. Pestana pegada (o a presion) en el rebaje exterior: sella y se saca por fuera. Membrana de 0.4 hasta la cabeza, que asoma 1.0. Embolo a 0.35 de SW401 (recorrido del pulsador 0.25)."
+ },
+ "coaxial": {
+  "clavija": {
+   "x": -1.2,
+   "y": 10.2,
+   "tuerca": {
+    "entre_caras": 7.94,
+    "entre_esquinas": 9.2,
+    "largo": 5.5,
+    "z0": 74.5
+   },
+   "cuerpo": {
+    "diametro": 6.5,
+    "largo": 9.5
+   }
+  },
+  "cable_diametro": 1.8,
+  "radio_curva_minimo": 10.0,
+  "_nota": "Clavija SMA recta: tuerca hexagonal de 5/16 (7.94 entre caras, 9.2 entre esquinas, 5.5 de largo) en el canon (z 74.5-80) y cuerpo de 6.5 encima. Coaxial fino (RG178 de 1.8 o de 1.13) hasta el paso de 12 de la tapa, con un bucle de servicio. El radio de curva que admite hay que sacarlo de la hoja del cable.",
+  "bucle": {
+   "radio": 7.0,
+   "centro": [
+    0.0,
+    2.0
+   ],
+   "z": 92.4,
+   "_nota": "Bucle de servicio del coaxial sobre la placa: la tapa con la antena cuelga del cable mientras baja el chasis."
+  },
+  "detras_placa": {
+   "x": [
+    -6.0,
+    3.0
+   ],
+   "y": [
+    0.0,
+    13.8
+   ],
+   "z": [
+    60.0,
+    80.0
+   ],
+   "_nota": "Delante del SMA de la carrier (cuerpo x -4.6...2.2, z 62.2-69.6; canon hasta z 79.5) nada de la placa puede asomar por detras de su dorso (y 13.8)."
+  }
+ },
+ "cables": {
+  "arnes_j301": {
+   "diametro": 3.0,
+   "puntos": [
+    [
+     -8.0,
+     16.9,
+     3.8
+    ],
+    [
+     -15.5,
+     15.6,
+     3.8
+    ],
+    [
+     -17.4,
+     11.0,
+     4.5
+    ],
+    [
+     -17.4,
+     10.0,
+     30.0
+    ],
+    [
+     -16.5,
+     9.4,
+     30.0
+    ]
+   ],
+   "_nota": "Arnes de J301 (x -13.5...-2.5 en la placa real): sale de la clavija por abajo, va por el piso bajo el canto de la placa hacia -X y sube detras de la placa por -X hasta la columna de 8 agujeros de la carrier."
+  },
+  "bateria_pos_ntc": {
+   "diametro": 1.5,
+   "puntos": [
+    [
+     0.0,
+     0.05,
+     88.0
+    ],
+    [
+     0.0,
+     0.05,
+     19.5
+    ],
+    [
+     0.0,
+     2.35,
+     19.5
+    ],
+    [
+     17.5,
+     2.35,
+     19.5
+    ],
+    [
+     17.5,
+     2.35,
+     5.0
+    ],
+    [
+     17.5,
+     12.0,
+     4.5
+    ],
+    [
+     15.0,
+     16.6,
+     3.8
+    ],
+    [
+     8.9,
+     17.0,
+     3.8
+    ],
+    [
+     2.1,
+     17.0,
+     3.8
+    ]
+   ],
+   "_nota": "Cable + del pack e hilos de la NTC: bajan por el valle de delante entre las celdas, pasan por el pasillo y 1.7-3.0 bajo z 72 hasta x 17.5, junto al canto de la carrier, bajan al piso y van por delante, bajo el canto de la placa, a J404 (x 6.4-11.4) y J102 (x -2.0...6.2), cuyas clavijas bajan hasta z 2.75 (kicad/plugs.json). Nada pasa bajo las celdas."
+  },
+  "bateria_neg": {
+   "diametro": 1.5,
+   "puntos": [
+    [
+     17.0,
+     -4.0,
+     16.6
+    ],
+    [
+     18.0,
+     -0.5,
+     6.0
+    ],
+    [
+     17.8,
+     11.0,
+     4.5
+    ],
+    [
+     15.0,
+     16.0,
+     3.8
+    ],
+    [
+     2.1,
+     17.0,
+     3.8
+    ]
+   ],
+   "_nota": "Cable - del pack desde una lengueta bajo la celda +X, mas alla de r 16 (fuera del saliente de la tuerca), hasta J102 por el mismo camino que el +."
+  }
+ }
+}
