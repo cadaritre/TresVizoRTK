@@ -131,6 +131,10 @@ def main():
             for tnet, a, b, c, d, thw, layer in tracks:
                 if tnet != net and layer == pcbnew.F_Cu and seg_dist(px, py, a, b, c, d) < hw + thw + CLR:
                     return False
+            # Vías de otras redes (prerruteos): también están en F.Cu
+            for vnet, vx, vy, vr in vias:
+                if vnet != net and math.hypot(px - vx, py - vy) < hw + vr + CLR:
+                    return False
         return True
 
     added = 0

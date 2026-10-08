@@ -1,6 +1,10 @@
 """Remates después del ruteo: vías de cosido a GND en huecos libres y relleno final de zonas.
 
-    python3 finish_pcb.py <placa.kicad_pcb> <board.json>
+    python3 finish_pcb.py <placa.kicad_pcb> <board.json> [--final]
+
+Con --final (la última pasada, después del último ruteo) quita además las vías que solo tocan cobre de su red en
+una capa: el ruteador a veces sigue por la misma capa desde la vía de salida de un prerruteo y la vía queda sin
+uso (el DRC la marca como colgada).
 """
 
 import json
@@ -101,6 +105,43 @@ def join_tangents(board):
     print("contactos de canto unidos:", added)
 
 
+def drop_unused_vias(board):
+    """Quita las vías cuyo cobre de la misma red (pistas, pads y rellenos) está en una sola capa y que, en esa capa,
+    unen al menos dos objetos (sin la vía siguen unidos por el mismo punto) o no tocan nada."""
+    tracks = [t for t in board.GetTracks() if t.Type() != pcbnew.PCB_VIA_T]
+    pads = [p for fp in board.GetFootprints() for p in fp.Pads()]
+    zones = [z for z in board.Zones() if not z.GetIsRuleArea()]
+    removed = []
+    for v in sorted([t for t in board.GetTracks() if t.Type() == pcbnew.PCB_VIA_T],
+                    key=lambda t: (t.GetPosition().x, t.GetPosition().y)):
+        net = v.GetNetCode()
+        pos = v.GetPosition()
+        r = v.GetWidth(pcbnew.F_Cu) / 2
+        x, y = to_mm(pos.x), to_mm(pos.y)
+        hits = {}
+        for t in tracks:
+            if t.GetNetCode() != net:
+                continue
+            a, b = t.GetStart(), t.GetEnd()
+            if seg_dist(x, y, to_mm(a.x), to_mm(a.y), to_mm(b.x), to_mm(b.y)) <= to_mm(r) + to_mm(t.GetWidth()) / 2:
+                hits[t.GetLayer()] = hits.get(t.GetLayer(), 0) + 1
+        for p in pads:
+            if p.GetNetCode() == net and p.HitTest(pos, int(r)):
+                for lid in p.GetLayerSet().CuStack():
+                    hits[lid] = hits.get(lid, 0) + 1
+        for z in zones:
+            if z.GetNetCode() != net:
+                continue
+            for lid in z.GetLayerSet().CuStack():
+                if z.HitTestFilledArea(lid, pos, int(r)):
+                    hits[lid] = hits.get(lid, 0) + 1
+        if len(hits) == 0 or (len(hits) == 1 and list(hits.values())[0] >= 2):
+            removed.append("%s(%.2f,%.2f)" % (v.GetNetname().split("/")[-1], x - 100, y - 100))
+            board.Remove(v)
+    print("vías sin uso quitadas:", ", ".join(removed) or "ninguna")
+    return len(removed)
+
+
 def place_refs(board):
     """Pone cada referencia visible donde no pise pads, serigrafía ni el canto; si no cabe, la oculta
     (sigue en la capa de fabricación)."""
@@ -116,14 +157,23 @@ def place_refs(board):
     for d in board.GetDrawings():
         if d.GetLayer() == pcbnew.F_SilkS:
             obstacles.append(d.GetBoundingBox())
-    edge = board.GetBoardEdgesBoundingBox()
     m = mm(0.4)
-    inner = pcbnew.BOX2I(pcbnew.VECTOR2I(edge.GetLeft() + m, edge.GetTop() + m),
-                         pcbnew.VECTOR2I(edge.GetWidth() - 2 * m, edge.GetHeight() - 2 * m))
+    # Contorno real (con muescas): la caja de la referencia, con 0.4 mm de margen, dentro de él y sin ninguna
+    # esquina del contorno dentro de la caja
+    outline = pcbnew.SHAPE_POLY_SET()
+    board.GetBoardPolygonOutlines(outline, False)
+    corners_ol = [outline.Outline(i).CPoint(k) for i in range(outline.OutlineCount())
+                  for k in range(outline.Outline(i).PointCount())]
     gap = mm(0.1)
 
+    def on_board(bb):
+        x1, y1, x2, y2 = bb.GetLeft() - m, bb.GetTop() - m, bb.GetRight() + m, bb.GetBottom() + m
+        if not all(outline.Contains(pcbnew.VECTOR2I(int(x), int(y))) for x, y in ((x1, y1), (x2, y1), (x2, y2), (x1, y2))):
+            return False
+        return not any(x1 <= p.x <= x2 and y1 <= p.y <= y2 for p in corners_ol)
+
     def free(bb):
-        if not (inner.Contains(bb.GetOrigin()) and inner.Contains(bb.GetEnd())):
+        if not on_board(bb):
             return False
         big = pcbnew.BOX2I(pcbnew.VECTOR2I(bb.GetLeft() - gap, bb.GetTop() - gap),
                            pcbnew.VECTOR2I(bb.GetWidth() + 2 * gap, bb.GetHeight() + 2 * gap))
@@ -283,6 +333,8 @@ def main():
     place_refs(board)
     filler = pcbnew.ZONE_FILLER(board)
     filler.Fill(board.Zones())
+    if "--final" in sys.argv[3:] and drop_unused_vias(board):
+        filler.Fill(board.Zones())
     pcbnew.SaveBoard(path, board)
 
 

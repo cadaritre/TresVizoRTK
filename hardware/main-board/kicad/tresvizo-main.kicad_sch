@@ -6,12 +6,13 @@
 	(paper "A4")
 	(title_block
 		(title "TresVizo MeridianV — placa principal")
-		(date "2026-10-04")
-		(rev "0.2")
+		(date "2026-10-07")
+		(rev "0.3")
 		(company "TresVizo")
 		(comment 1 "Exploratorio: no fabricado ni probado")
-		(comment 2 "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
-		(comment 3 "JLCPCB 4 capas JLC04161H-7628")
+		(comment 2 "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS por conector")
+		(comment 3 "v0.3 compacta: USB-C, OLED, botón, LED y BMI088 en la placa")
+		(comment 4 "JLCPCB 4 capas JLC04161H-7628")
 	)
 	(lib_symbols)
 	(sheet
@@ -156,7 +157,7 @@
 			(color 0 0 0 0)
 		)
 		(uuid "befe428c-d30b-5a76-ab51-0453c74e9d6b")
-		(property "Sheetname" "microSD, IMU por conector y panel"
+		(property "Sheetname" "microSD, IMU, OLED, botón y LED"
 			(at 157.48 113.6 0)
 			(effects
 				(font

@@ -6,12 +6,13 @@
 	(paper "A3")
 	(title_block
 		(title "GNSS: carrier UM980 por conector y su 5 V")
-		(date "2026-10-04")
-		(rev "0.2")
+		(date "2026-10-07")
+		(rev "0.3")
 		(company "TresVizo")
 		(comment 1 "Exploratorio: no fabricado ni probado")
-		(comment 2 "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
-		(comment 3 "JLCPCB 4 capas JLC04161H-7628")
+		(comment 2 "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS por conector")
+		(comment 3 "v0.3 compacta: USB-C, OLED, botón, LED y BMI088 en la placa")
+		(comment 4 "JLCPCB 4 capas JLC04161H-7628")
 	)
 	(lib_symbols
 		(symbol "Device:R"
@@ -4489,7 +4490,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "SH 8 lateral (JST SM08B-SRSS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND. SH y no GH, para que no se pueda cruzar con J101 (GH 8 con VBUS)"
+		(property "Description" "SH 8 lateral (JST SM08B-SRSS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND. SH y no GH, para que no se pueda cruzar con J102 (GH 4 de la batería)"
 			(at 38.1 114.3 0)
 			(effects
 				(font

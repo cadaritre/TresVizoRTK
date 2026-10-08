@@ -1,5 +1,8 @@
 # Placa del USB-C del panel (TresVizo MeridianV, exploratoria v0.1)
 
+> **En la v0.3 (rama `hw/compact-v03`) esta placa no se usa:** el USB-C va en la placa principal
+> ([../main-board](../main-board/README.md)).
+
 > **Estado:** diseño generado con scripts y revisado con el ERC y el DRC de KiCad 10.0.6.
 > **No se ha fabricado ni probado.** Vive en la rama `hw/main-board-kicad`, junto a la placa principal
 > ([../main-board](../main-board/README.md)), y se pide en el mismo panel de JLCPCB que ella.

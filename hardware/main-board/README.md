@@ -1,215 +1,254 @@
-# Placa principal TresVizo MeridianV (exploratoria, v0.2)
+# Placa principal TresVizo MeridianV (exploratoria, v0.3 compacta)
 
-> **Estado:** diseño generado con scripts y revisado con el ERC y el DRC de KiCad 10.0.6.
-> **No se ha fabricado ni probado.** Vive en la rama `hw/main-board-kicad`, fuera de `main`,
-> porque el propietario la pidió como exploración. Los resultados de las comprobaciones están en
+> **Estado:** diseño generado con scripts y revisado con el ERC y el DRC de KiCad 10.0.6 y con una
+> auditoría eléctrica independiente (08-10-2026), cuyos cambios ya están aplicados. **No se ha
+> fabricado ni probado.** Vive en la rama `hw/compact-v03`, fuera de `main`, porque el propietario la
+> pidió como exploración (07-10-2026). Los resultados de las comprobaciones están en
 > [Verificaciones](#verificaciones).
+>
+> La v0.2 (placa de 46 × 64 mm más la panel-usb, para la carcasa V2.3) sigue en la rama
+> `hw/main-board-kicad`.
 
-La v0.2 (decisión del propietario del 04-10-2026) deja el UM980 en su carrier BDLX y el IMU en la
-tapa, los dos por cable, y achica la placa madre de 50 × 76 a **46 × 64 mm** (4 capas, 1.6 mm). Se
-agrega una placa pequeña para el USB-C del panel ([../panel-usb](../panel-usb/README.md)). Las dos
-se piden juntas en **un solo panel** de JLCPCB, con un BOM y un CPL.
+La v0.3 es la versión compacta del receptor. Mantiene el concepto de la v0.2: el UM980 en su
+carrier BDLX, por cable, y el ESP32-S3-WROOM-1 en la placa. Pero va en un tubo de **Ø52 × 100** con
+una cara plana al frente ([carcasa V3.0](../../mechanical/v3.0/README.md)). La placa mide
+**36 × 71.5 mm** (4 capas, 1.6 mm, componentes solo por la cara de arriba) y lleva lo que en la v0.2
+iba en el panel: el USB-C, la OLED (soldada a la placa), un pulsador y un LED de estado. El BMI088
+vuelve a la placa. No hay panel-usb: la placa se pide sola, en un panel de JLCPCB con un BOM y un
+CPL. La batería pasa a un pack 1S2P de dos 18650.
 
 | Bloque | Pieza | Notas |
 | --- | --- | --- |
-| GNSS | Carrier BDLX RTK_UM98_V1.0.1, fuera de la placa | J301 (SH de 8 pines): COM2 a 115200, PPS, EVENT, RESET_N y su 5 V |
-| 5 V del GNSS | TI TPS63070 (buck-boost) | 4.88 V desde VSYS en 1S y en 2S; GPIO45 lo enciende; apagado desconecta la carga |
-| MCU | ESP32-S3-WROOM-1-N16R2 | 16 MB de flash y 2 MB de PSRAM quad (05-10-2026: el firmware ya llenaba el 93 % de las ranuras OTA de 4 MB). Mismo chip que la Thing Plus, pero con **GPIO nuevos** (ver [Firmware](#firmware-qué-tiene-que-cambiar)) para rutear el módulo en la misma placa |
-| IMU | Breakout BMI088 V1.0 de la tapa, fuera de la placa | J405 (GH de 7 pines): I2C en un segundo bus, con sus dos interrupciones |
-| Registro | microSD push-push (SD_MMC 4 bits) | CLK GPIO6, CMD 7, D0 5, D1 4, D2 16, D3 15 y detección en 17 (HIGH con tarjeta) |
-| Carga | TI BQ25798 (buck-boost NVDC) | USB-C 5 V a 1 A; 1S por defecto, 2S cambiando resistencias; usar y cargar a la vez |
-| Apagado | Modo *ship* del cargador + FET externo | El botón del panel despierta la placa (QON) |
+| GNSS | Carrier BDLX RTK_UM98_V1.0.1, fuera de la placa | J301 (SH de 8 pines): COM2 a 115200, PPS, EVENT, RESET_N y su 5 V. Arnés soldado a la carrier |
+| 5 V del GNSS | TI TPS63070 (buck-boost) | 4.88 V desde VSYS; GPIO45 lo enciende; apagado desconecta la carga |
+| MCU | ESP32-S3-WROOM-1-N16R2 | 16 MB de flash y 2 MB de PSRAM quad. Antena hacia el canto −X. Mismos GPIO que la v0.2, salvo GPIO48 (ver [Firmware](#firmware-qué-tiene-que-cambiar)) |
+| IMU | Bosch BMI088 en la placa (U401) | I2C en un segundo bus (GPIO41/42), INT1 en GPIO2 e INT3 en GPIO1; 0x18 y 0x68 |
+| Registro | microSD de empuje TF-015 (J401), SD_MMC 4 bits | CLK GPIO6, CMD 7, D0 5, D1 4, D2 16, D3 15 y detección en 17 (HIGH con tarjeta). Boca hacia el costado +X |
+| USB-C | HRO TYPE-C-31-M-12 (J101) | Rd de 5.1 kΩ en CC1 y CC2, TVS SMF15A en VBUS y USBLC6 (U101) en D+/D−. Boca hacia el costado +X |
+| Carga | TI BQ25798 (buck-boost NVDC) | USB-C a 5 V, techo de entrada ~1.45 A; 1S; usar y cargar a la vez. Carga de 1 A por omisión, como mucho ~1.5 A |
+| Apagado | Modo *ship* del cargador + FET externo | El pulsador despierta la placa (QON) |
 | 3.3 V | TI TPS62903 | 3–17 V, 3 A, modo 100 % |
-| Medidor | MAX17048 (MAX17049 en 2S) | I2C 0x36 |
-| USB del panel | Placa `panel-usb` | USB-C con datos a ras de la tapa del panel; GH de 8 pines a J101 |
+| Medidor | MAX17048 | I2C 0x36 |
+| Interfaz | OLED 0.96" de 4 pines (J403), pulsador SW401 y LED rojo D403 | La OLED es la del propietario y la suelda él sobre pads SMD. El LED va en GPIO48 |
+| Batería | Pack 1S2P (2 × 18650 en paralelo) por J102 (GH de 4 pines) | NTC 10k B3435 obligatoria por J404 (SH de 2 pines) |
 
 Esquema en [fab/tresvizo-main-schematic.pdf](fab/tresvizo-main-schematic.pdf), mapa de pines y
-conectores en [fab/pinout.md](fab/pinout.md), vistas en `fab/*-top.png` / `fab/*-bottom.png` y la
-investigación de esta versión en [research/v02.md](research/v02.md). El esquema en PDF, las vistas y
-los Gerber los genera `build.py` y solo se guardan en git en los hitos (ver [Regenerar](#regenerar)).
+conectores en [fab/pinout.md](fab/pinout.md) y vistas en `fab/*-top.png` / `fab/*-bottom.png`. La
+especificación de la v0.3, la colocación, las desviaciones, el ruteo y la auditoría eléctrica están
+en [research/v03-compacta.md](research/v03-compacta.md); la investigación de la v0.2, en
+[research/v02.md](research/v02.md). El esquema en PDF, las vistas y los Gerber los genera
+`build.py` y solo se guardan en git en los hitos (ver [Regenerar](#regenerar)).
 
 ## Decisiones
 
-Decisiones del propietario para la v0.2 (04-10-2026): sin UM980 ni BMI088 en la placa, conectores
-GNSS e IMU de entrada lateral, 5 V conmutable para la carrier, placa más chica, placa del USB-C del
-panel, un solo pedido, piezas Basic donde las haya y todos los cables con el kit de cables
-precrimpados GH y SH (8 pines como máximo). Lo que resultó al aplicarlas, con su motivo:
+### De la v0.3 (07-10-2026 y auditoría del 08-10-2026)
 
-1. **GNSS por conector (J301).** Pinout del propietario: 1 5V, 2 GND, 3 RXD2 (TX del ESP32),
+Pedido del propietario: un receptor más chico, con el panel dentro de la placa principal, dos 18650
+y la carrier tal cual. Lo que resultó al aplicarlo, con su motivo:
+
+1. **Tubo de Ø52 × 100 y placa de 36 × 71.5 mm.** Menos de la mitad del volumen de V2.3.
+   - Los cantos laterales corren por los rieles del chasis, con una franja de 1 mm sin componentes.
+   - Componentes solo por la cara de arriba: el dorso mira a la carrier a 0.5 mm.
+   - El alto de cada pieza lo limitan la curva del tubo y la cara plana.
+   - Dos muescas en el contorno: la clavija del SMA de la carrier y la funda de la clavija del USB-C.
+   - Ver [Mecánica](#mecánica).
+2. **El panel entra en la placa.** Motivos: no hay cables al panel y el botón metálico de 12 mm de
+   la v0.2 es difícil de conseguir.
+   - USB-C J101 (TYPE-C-31-M-12, C165948, el de la panel-usb): Rd de 5.1 kΩ en CC1 y CC2 (R119,
+     R120), TVS SMF15A en VBUS y USBLC6 (U101) junto al conector.
+   - Pulsador táctil SW401 (TS-1187A-B-A-B, 5.1 × 5.1 × 1.5 mm) a BTN_N: despierta al cargador (QON)
+     y llega a GPIO18 por D402. Conserva la ESD D401, porque la tecla deja llegar descargas a su botón
+     de latón.
+   - LED de estado D403 (0603 rojo) directo desde GPIO48, con 330 Ω: unos 4.4 mA. Con 1 kΩ quedaba
+     tenue detrás de la guía de luz (auditoría). R409 era la resistencia del anillo del botón.
+   - Se van J101 GH 8 (USB del panel), J402 (botón), J405 (IMU por cable), Q402 y R410 (anillo del
+     botón). J403 sigue, ahora como huella del módulo OLED. Los números R106 y R410 quedan sin usar,
+     para no renumerar.
+3. **OLED soldada a la placa (J403).** Es el mismo módulo I2C de 4 pines que ya tiene el propietario.
+   - Va girado 180° (pines abajo), sobre separadores de 1.3 mm, con el vidrio detrás de la ventana de
+     la cara plana. Sobresale por encima del canto de arriba de la placa.
+   - **Pads SMD de 1.7 × 2.4 mm, sin agujeros** (auditoría). Detrás de la fila de pines está el SMA
+     de la carrier, a 0.4 mm del dorso, y una soldadura pasante recortada podía cortocircuitar +3V3 y
+     SCL con su carcasa (GND).
+   - La única unión pasante de la placa son las cuatro patas de la carcasa del USB-C (GND), que no
+     salen por detrás.
+   - JLCPCB no monta la OLED: sus pads llevan pasta y salen estañados. El propietario corta los pines
+     a la altura del separador y los suelda sobre los pads calentando desde el frente del módulo.
+4. **BMI088 en la placa (U401)**, como en v0.1, en el bus que usaba J405. No hacen falta cable ni
+   plataforma, y queda rígido con el resto del equipo.
+   - Conexión según la hoja de Bosch (BST-BMI088-DS001 rev 1.9): PS a VDDIO (I2C), CSB1 a VDDIO y
+     CSB2 al aire.
+   - SDO1 y SDO2 a GND: acelerómetro 0x18 y giróscopo 0x68, las direcciones del breakout de la v0.2.
+   - INT2 e INT4 sin conectar, 100 nF en VDD y en VDDIO, pull-ups de 4.7 kΩ y sin cobre de la cara
+     de arriba bajo el encapsulado (DS §8.2).
+   - Sigue en un **segundo bus** (GPIO41 SDA, GPIO42 SCL, 400 kHz), aparte del de la OLED, el
+     cargador y el medidor, y con sus dos interrupciones.
+   - Va en la esquina de abajo a la izquierda, lejos de L101, del botón y de los puentes del panel.
+5. **Pack 1S2P por un GH 4 (J102).** El PH 2 lateral de la v0.2 mide 5.5 mm sobre la placa y aquí
+   caben 4.63.
+   - JST GH 4 lateral (SM04B-GHS-TB, C189895, unos 4.25 mm de alto) con dos contactos por polo: 1 y
+     2 a GND, 3 y 4 a VBATT_IN.
+   - JST da 1 A por contacto con cable AWG #26: unos 2 A por polo. El firmware limita la carga a
+     ~1.5 A (ver [Firmware](#firmware-qué-tiene-que-cambiar)).
+6. **Conectores de cable solo en el canto de abajo**, con la boca hacia abajo: a los lados no hay
+   sitio para las clavijas. Son J404 (NTC), J102 (batería) y J301 (GNSS), y se alcanzan quitando la
+   base.
+7. **La carrier BDLX tal cual**, con el arnés soldado a sus filas de agujeros, como en la v0.2. Sus
+   agujeros solo se conocen a ±1 mm (foto): una mezzanine pediría medidas exactas.
+8. **Antena del ESP32 hacia el canto −X**, con un área sin pistas, vías ni rellenos en las cuatro
+   capas que la auditoría amplió (ver
+   [research/v03-compacta.md](research/v03-compacta.md#colocación)).
+9. **Resto de la auditoría eléctrica** (detalle en
+   [research/v03-compacta.md](research/v03-compacta.md#auditoría-eléctrica-08-10-2026)):
+   - puentes del panel lejos de U401 y de los condensadores de potencia;
+   - relleno de GND de J102 con cuatro vías, y dos vías en cada cambio de capa de VPACK;
+   - cuatro vías de GND en el pad central del WROOM;
+   - puntos de prueba de UART0 (TP208 y TP209).
+
+### De la v0.2 que siguen valiendo
+
+Decisiones del propietario del 04-10-2026 (sin UM980 en la placa, 5 V conmutable para la carrier,
+piezas Basic donde las haya y cables del kit precrimpado GH y SH) que la v0.3 conserva:
+
+1. **GNSS por conector (J301, SH 8).** Pinout del propietario: 1 5V, 2 GND, 3 RXD2 (TX del ESP32),
    4 TXD2, 5 PPS, 6 EVENT, 7 RESET_N, 8 GND. La carrier reparte esas señales en **dos** conectores
    (5 pines: 5V_IN, GND, PPS_OUT; 8 pines: TTL_RXD2, TTL_TXD2, GND, EVENT), así que el cable es un
    **arnés en Y** ([research/v02.md](research/v02.md) §1). **La BDLX no saca RESET_N**: J301.7 queda
    para otra carrier o para soldarlo a mano.
-   - Resistencias en serie: **1 kΩ hacia la carrier y 100 Ω desde ella**. El encargo pedía 33 Ω
-     «como en v0.1», pero v0.1 usaba 1 kΩ/100 Ω. Se conserva eso porque con la carrier apagada 1 kΩ
-     limita a ~3 mA lo que GPIO8 le mete por sus entradas si queda en alto. Con el WROOM-1 el TX ya no
-     es U0TXD, así que la ROM no escribe ahí al arrancar. Además,
-     33 Ω sería una pieza distinta más.
-   - ESD: dos USBLC6 (las de U101) en RXD2, TXD2, PPS y EVENT; RESET_N solo lleva 1 kΩ.
-2. **5 V de la carrier: TPS63070** en lugar de un elevador simple. Sirve en 1S y en 2S con el mismo
-   BOM, desconecta la carga apagado (un boost común deja la carrier unida a VSYS) y solo suma una
-   pieza nueva al BOM. Salida 4.88 V; la carrier pide 4.0–5.5 V (160 mA a 5 V).
-3. **IMU por I2C en un GH de 7 pines** (J405), en el orden del header del breakout sin CSB1/CSB2:
-   3V3, GND, SDO a GND, SDA, SCL, INT1, INT3. Por qué I2C:
-   - Con el tope de 8 pines por conector, SPI perdía una de las dos interrupciones; I2C las conserva.
-   - Va en un **segundo bus** (GPIO41 SDA, GPIO42 SCL, 400 kHz), separado del de la OLED.
-   - 400 kHz alcanzan para leer acelerómetro y giróscopo a varios cientos de Hz.
-   - Necesita menos hilos en el cable que pasa por la tapa que gira.
-   - Direcciones: 0x18 (acelerómetro) y 0x68 (giróscopo), con SDO a GND. El selector del breakout
-     va en IIC.
-4. **Placa de 46 × 64 mm**, la que dejó el estudio mecánico con al menos 2400 mm² útiles. Va de
-   frente: panel, placa, carrier y 18650, con rieles en los cantos laterales. Detalles en
-   [Mecánica](#mecánica).
-5. **Lazos del cargador como en el ejemplo de TI** (hoja del BQ25798, 8.4), corrigiendo la
-   auditoría de v0.1:
+   - Resistencias en serie: **1 kΩ hacia la carrier y 100 Ω desde ella**, como en v0.1. Con la
+     carrier apagada, 1 kΩ limita a ~3 mA lo que GPIO8 le mete por sus entradas si queda en alto.
+     Con el WROOM-1 el TX ya no es U0TXD, así que la ROM no escribe ahí al arrancar.
+   - ESD: dos USBLC6 (U302 y U303) en RXD2, TXD2, PPS y EVENT; RESET_N solo lleva 1 kΩ.
+   - SH y no GH, para que no se pueda cruzar con J102 (GH 4).
+2. **5 V de la carrier: TPS63070** en lugar de un elevador simple. Desconecta la carga apagado (un
+   boost común deja la carrier unida a VSYS) y sirve igual en 1S y en 2S. Salida 4.88 V; la carrier
+   pide 4.0–5.5 V (160 mA a 5 V).
+3. **Lazos del cargador como en el ejemplo de TI** (hoja del BQ25798, 8.4). El bloque se conserva
+   de la v0.2:
    - Los 100 nF de PMID (C108) y de SYS (C112) van sobre los pines 29/27 y 25/27, con la GND en T
-     al pin 27.
-   - PMID lleva 2 × 22 µF y SYS 2 × 22 µF, en columnas a cada lado con cobre ancho, sin cuellos.
+     al pin 27. PMID lleva 2 × 22 µF y SYS 2 × 22 µF, en columnas a cada lado, sin cuellos.
    - **SW1 y SW2 bajan por 3 vías cada uno bajo el chip** y van por B.Cu (1 mm) a la bobina. Bajo
-     esa zona, la capa interna 3 es GND en lugar de +3V3.
+     el chip, la bobina y esas pistas, la capa interna 3 es GND en lugar de +3V3 (en la v0.2 era bajo
+     todo el bloque).
    - *Bootstrap* en la cara superior, cada condensador recto bajo su pin: BTST1 → C101 en 0.9 mm y
-     BTST2 → C102 en 1.6 mm (en v0.1, 9 mm). El lado SW de cada uno baja por una vía y llega por B.Cu
-     (4.3 y 5.7 mm) a la columna de vías de su nodo SW bajo el chip.
+     BTST2 → C102 en 1.6 mm. El lado SW de cada uno baja por una vía y llega por B.Cu (4.3 y 5.7 mm)
+     a la columna de vías de su nodo SW bajo el chip.
    - La fila inferior del cargador (pines 17–24, paso 0.4) sale en abanico prerruteado: ILIM, BATP,
-     PROG, INT, BAT y SDRV, con R103 (PROG) y R107 (BATP) justo debajo de sus pines y C113 (BAT)
-     abajo a la derecha.
-   - Potencia solo por capas externas, nunca por las internas de 0.5 oz: VBUS prerruteado de J101
-     al 22 µF de entrada con 0.8–1.0 mm (aguanta los ~2.2 A de 2S); VSYS, PMID y BAT con 0.4–0.5 mm
-     y cuellos de 0.2 mm junto a pads finos.
-6. **Conectores de cable de 8 pines o menos, GH o SH de entrada lateral** (kit del propietario):
-   - El panel lleva el botón (J402, GH4). Los LEDs (J406) se quitaron el 05-10-2026: la carcasa V2.3 no los lleva y la OLED ya muestra el estado.
-   - La OLED pasa a SH4 lateral.
-   - El USB del panel pasa a GH8 (J101) con el pinout del propietario: 1-3 VBUS, 4-6 GND, 7 D−,
-     8 D+.
-   - La batería conserva su PH de 2 pines.
-   - **Cada conector apunta a un canto o a una zona libre** (revisión del propietario sobre el
-     borrador): delante de cada boca queda, sin componentes, lo que asoma la clavija enchufada y el
-     doblez de sus cables, con 1 mm a cada lado para tomarla. Ver [Conectores](#conectores).
-7. **TVS de VBUS SMF15A** (limita a 24.4 V, por debajo de los 30 V de VBUS del BQ25798) en lugar
-   de la SMF20A (32.4 V).
-8. **D+/D− del cargador sin conectar y techo de entrada de 1.45 A** (05-10-2026): las resistencias de D+/D− de v0.1 (entonces R101/R102)
-   nunca se montaban (detección BC1.2), y el ESP32-S3 activa el pull-up de D+ desde el reset, lo que
-   confundiría esa detección. Con D+/D− al aire el BQ25798 ve un «adaptador desconocido» y el
-   límite lo pone ILIM.
-   - Antes era ~2.9 A (10k/22k): demasiado para un puerto de computadora.
-   - Ahora **R102 = 8.2 kΩ** (10k/8.2k desde REGN, 4.6–5.0 V): techo de **1.34–1.56 A**, que
-     alcanza para cargar 1S a 1 A con el equipo encendido (~1.3 A de entrada).
-   - La placa sigue sin saber cuánto da el puerto. Con un puerto USB-A de 0.5/0.9 A, el cargador
-     baja la corriente si VBUS se cae (VINDPM), y el firmware puede bajar IINDPM por I2C (modo de
-     carga lenta).
-   - La detección real (CC del USB-C hacia un ADC del ESP32) queda para v0.3; ver
-     [Pendientes y riesgos](#pendientes-y-riesgos).
-9. **Un solo pedido en JLCPCB** con las dos placas en un panel. Ver
-   [Pedido en JLCPCB](#pedido-en-jlcpcb) y [Costo](#costo).
-10. **Serigrafía sin solapes**: cada conector lleva su función y su referencia («IMU J405»,
-    «NTC J404»…); `silk_clean.py` revisa con el DRC de KiCad que ninguna referencia ni trazo pise
-    pads u otra serigrafía, y las huellas cuya serigrafía pisaba sus propios pads se recortaron en
-    la biblioteca (`fp_silk_trim.py`: L2520 y SOD-882).
-11. **Logotipo de TresVizo** (el de www.tresvizo.com, tomado del SVG del firmware,
-    `firmware/esp32/assets/tresvizo-logo.svg`): completo, de 30 mm, con «www.tresvizo.com» en la
-    cara trasera; y el distintivo (hexágono con el 3, de `mechanical/v2.2/logo.json`) en la cara
-    de componentes, en el hueco frente al botón, donde no hay piezas.
-12. **NTC de la celda obligatoria en J404** (decisión del propietario del 07-10-2026; antes era
-    opcional con una resistencia fija R106 y el puente JP101, que se quitaron). El cargador deja de
-    cargar fuera de ~2–61 °C y baja el voltaje de carga arriba de ~45 °C; sin NTC enchufada no carga.
-    El número R106 queda libre para no renumerar las demás resistencias. Ver [Conectores](#conectores).
+     PROG, INT, BAT y SDRV, con R103 (PROG) y R107 (BATP) junto a sus pines y C113 (BAT) a la derecha.
+   - Potencia por las capas externas: VBUS va de J101 a la TVS por F.Cu de 0.6 mm y al 22 µF de
+     entrada (C104) por B.Cu de 0.8 mm; VPACK va de Q102 al cargador por B.Cu de 1.0 y 0.8 mm.
+   - Dos excepciones nuevas de la v0.3: VSYS al TPS62903 (0.6 mm) y GNSS_5V (0.4 mm) van por
+     In2.Cu, de 0.5 oz, porque por fuera ya no había paso (ver
+     [Pendientes y riesgos](#pendientes-y-riesgos)).
+4. **TVS de VBUS SMF15A** (limita a 24.4 V, por debajo de los 30 V de VBUS del BQ25798) en lugar de
+   la SMF20A (32.4 V).
+5. **D+/D− del cargador sin conectar y techo de entrada de ~1.45 A** (05-10-2026). El ESP32-S3
+   activa el pull-up de D+ desde el reset, lo que confundiría la detección BC1.2. Con D+/D− al aire,
+   el BQ25798 ve un «adaptador desconocido» y el límite lo pone ILIM.
+   - **R102 = 8.2 kΩ** (10k/8.2k desde REGN, 4.6–5.0 V): techo de **1.34–1.56 A**, que alcanza para
+     cargar 1S a 1 A con el equipo encendido (~1.3 A de entrada).
+   - La placa sigue sin saber cuánto da el puerto: CC1 y CC2 solo llevan Rd. La detección por CC hacia
+     un ADC del ESP32, prevista para la v0.3, **no se hizo** (ver
+     [Pendientes y riesgos](#pendientes-y-riesgos)).
+6. **Serigrafía sin solapes.** `silk_clean.py` revisa con el DRC de KiCad que ningún texto ni trazo
+   pise pads u otra serigrafía; las huellas cuya serigrafía pisaba sus propios pads se recortaron en
+   la biblioteca (`fp_silk_trim.py`). En la v0.3 la cara de componentes no tiene sitio para rótulos:
+   la función de cada conector («BAT J102», «NTC J404», «GNSS J301») y las notas de variante van en
+   la cara trasera, detrás de cada pieza.
+7. **Logotipo de TresVizo** (el de www.tresvizo.com, tomado del SVG del firmware,
+   `firmware/esp32/assets/tresvizo-logo.svg`): completo, de 26 mm, con «www.tresvizo.com» en la cara
+   trasera, detrás del WROOM. El distintivo de la cara de componentes de la v0.2 no cabe.
+8. **NTC de la celda obligatoria en J404** (decisión del propietario del 07-10-2026). El cargador
+   deja de cargar fuera de ~2–61 °C y baja el voltaje de carga arriba de ~45 °C; sin NTC enchufada no
+   carga. Ver [Conectores](#conectores).
 
 ## Mecánica
 
-Primer estudio en FreeCAD 1.1.3 sobre una copia de V2.2 ([research/v02.md](research/v02.md) §7) y
-comprobación de la placa terminada, con sus modelos 3D y las clavijas enchufadas, contra esa misma
-carcasa ([research/v02.md](research/v02.md) §8). Ejes de V2.2: z = eje del jalón hacia arriba,
-+Y = panel, +X a la izquierda mirando el panel.
+Carcasa [V3.0](../../mechanical/v3.0/README.md), exploratoria y sin imprimir: tubo de Ø52 × 100 con
+una cara plana al frente, base desmontable con la tuerca 5/8"-11 del bastón y tapa de antena sujeta
+con tres M2.5 radiales. Dentro, un chasis que se arma fuera del tubo y entra por arriba lleva los
+rieles de la placa, las ranuras de la carrier y dos salientes para los tornillos de la OLED. Ejes:
+**z = eje del bastón hacia arriba** (z 0 en la cara de apoyo), **+Y hacia la cara plana**, **+X a
+la izquierda mirando el frente**; medidas en mm. Especificación y contrato con la placa en
+[research/v03-compacta.md](research/v03-compacta.md).
 
-- **Placa:** 46 × 64 mm, FR-4 de 1.6 mm, 4 capas (JLC04161H-7628).
-  - Va en el plano x = −23…+23, **z = 23.5…87.5**, con la cara de componentes en y = 3.1 mirando
-    al panel. Sube 2.5 mm respecto del primer estudio para dejar 7.6 mm entre el canto inferior y la
-    base: ahí asoman las clavijas de la carrier, del NTC y de la batería (la PH de la batería asoma
-    3.5 mm y su cable tiene que doblar).
-  - Coordenadas en la placa: u = 23 − x, v = 87.5 − z, desde la esquina superior izquierda vista
-    desde el panel.
-  - Rieles impresos en los dos cantos laterales, **de z 39 a 90**, con 2.5 mm sin componentes en
-    cada canto (u 0–2.5 y 43.5–46, v 0–48.5). El de +X se corta en z 53.5–72.4 frente a la antena. Por
-    debajo de z 39 no hay riel: ahí llegan a los cantos la microSD y la batería.
-  - **2 × M2.5** en agujeros sin metalizar Ø2.7 (sin cobre en Ø5.2): H1 en (u, v) = (12.0, 9.6),
-    es decir (x, z) = (11.0, 77.9), y H2 en (40.4, 3.7) = (−17.4, 83.8). Se atornillan desde el
-    frente, antes de poner la tapa del panel, a dos brazos impresos detrás de la placa (|x| ≥ 10
-    para no tocar el SMA de la carrier).
-- **Detrás de la placa:** la carrier BDLX (x −21…+11, y −9.9…+1.1, z 16.4–68.4) con sus
-  componentes hacia la placa (0.4 mm de holgura) y el SMA arriba; detrás, la 18650 (eje (0, −19.6),
-  z 22–91).
-  - Coaxial: SMA acodado ↔ SMA acodado de 100–120 mm por el paso trasero de la plataforma del IMU.
-  - Orden de montaje: 18650 por arriba, carrier por abajo y placa por arriba.
-- **Alturas de la cara frontal:**
-  - 10 mm en general.
-  - **Nada frente al botón** (u 17.5–28.5, v 38.5–49.5; solo pistas y el distintivo en
-    serigrafía) y como mucho 2 mm bajo el cuerpo del botón (u 14.9–31.1, v 35.9–52.1).
-  - 8.15 mm bajo los cables de la OLED (u 15.75–30.25, v 2.5–9.0).
-  - Cara trasera sin componentes.
-- **Cantos y clavijas** (detalle en [Conectores](#conectores)):
-  - Superior (hacia la tapa), boca hacia arriba: IMU (J405), USB del panel (J101, justo bajo el
-    J502 de la placa panel-usb). Sobre el canto hay 12 mm libres hasta la plataforma
-    del IMU, salvo bajo la placa panel-usb, donde baja el cable del USB.
-  - Inferior, boca hacia abajo: microSD (J401), carrier (J301), NTC (J404) y batería (J102); se
-    alcanzan quitando la base.
-  - Dentro de la placa, boca hacia una zona libre: OLED (J403) hacia la izquierda, bajo los pines de
-    la OLED, y botón (J402) hacia la izquierda, junto al botón.
-  - Antena del ESP32-S3-WROOM-1 en el canto izquierdo (+X), u 0–6.7, v 15.7–33.7 sin cobre en
-    ninguna capa; el módulo sobresale de ahí hacia dentro hasta u 26.
-- **La carcasa necesita cambios** (propuesta, no aplicada al CAD): quitar la placa del respaldo y
-  los toalleros; recortar los nervios a y ≤ −10.5; rieles en z 39–90 (cortado en z 53.5–72.4 el de
-  +X); brazos detrás de la placa en (x, z) = (11.0, 77.9) y (−17.4, 83.8); **una ranura de 3 mm
-  de hondo en la base bajo J102** (x −21.5…−13.5, y 2.5…8.5), para que la base no pellizque los
-  cables de la batería; topes del carrier; repisa de la 18650; y en la tapa del panel, el hueco y
-  las ménsulas del USB-C (ver [../panel-usb](../panel-usb/README.md)).
-- **2S** no cabe en este orden sin un recorte de 11 × 11 mm frente al botón; ver
-  [Antes de mandar a fabricar](#antes-de-mandar-a-fabricar).
+- **Placa:** 36 × 71.5 mm, FR-4 de 1.6 mm, 4 capas (JLC04161H-7628).
+  - Va en x −18…+18, z 8.5…80, con el dorso en y 13.8 y la cara de componentes en y 15.4, mirando a
+    la cara plana.
+  - Coordenadas de KiCad: u = 18 − x, v = 80 − z (u de 0 a 36 de izquierda a derecha mirando el
+    frente; v de 0 a 71.5 hacia abajo).
+  - Alto máximo de los componentes: h(x) = min(4.63, √(24.2² − x²) − 15.7), que ya deja 0.3 de aire
+    hasta el tubo: 4.63 hasta |x| 13.6, 3.29 en |x| 15 y 1.52 en |x| 17.
+  - Franjas de 1.0 sin componentes en los cantos laterales (áreas `canto_*` del DRC), para los
+    rieles en C del chasis.
+  - Muescas: la del SMA de la carrier en el canto de arriba (u 14.2–24.2, v 0–6.5; x −6.2…3.8,
+    z 73.5–80) y la de la funda de la clavija USB-C en el canto +X (u 0–3.1, v 48.5–61.5).
+  - Se sujeta con dos M2 × 8 autorroscantes. Pasan por los agujeros de abajo del módulo OLED, sus
+    separadores de 1.3 y dos agujeros sin metalizar de Ø2.2 de la placa (x ±11.75, z 70.2), y
+    roscan en dos salientes del chasis detrás de la placa. **El del lado de la antena del WROOM
+    (x −11.75) conviene que sea de nailon** (auditoría).
+- **Pila de adelante hacia atrás (y):** cara plana por dentro 20.33; vidrio de la OLED hasta 20.0;
+  componentes de la placa hasta 15.4 + h(x); PCB 13.8–15.4; aire de 0.5; componentes de la carrier
+  6.9–13.3; PCB de la carrier 5.3–6.9; patas del SMA hasta 3.3; celdas hasta 1.4.
+- **Carrier BDLX** detrás de la placa, centrada (x −16…+16, z 17…69), con los componentes hacia la
+  placa y el SMA arriba (eje en x −1.2, y 10.2). Entra al chasis por abajo y la sostienen dos
+  ganchos.
+- **Celdas:** 2 × 18650 protegidas en paralelo (ejes en x ±9.5, y −7.9; z 17.5–87.5), en una cuna
+  detrás de la carrier. La NTC va pegada entre las dos y los cables bajan al canto de abajo de la
+  placa (J102, J404).
+- **Antena GNSS** atornillada sobre la tapa, con su coaxial por un paso de 12 mm en el eje hasta el
+  SMA de la carrier. La tapa está hecha para la HA-901A, pero el modelo no está confirmado. Entre la
+  clavija SMA recta y el paso solo cabe una curva en S de R 5.25: hace falta un coaxial de 1.13 mm o
+  RG178 (Ø1.8); un RG316 (Ø2.5) pide más radio.
+- **Frente:** ventana de la OLED, tecla de TPU sobre SW401 (x 0, z 22) y guía de luz de Ø2 sobre
+  D403 (x −6, z 22). **Costado +X:** túnel del USB-C (z ≈ 25) y ranura de la microSD (z ≈ 40).
+- **Orden de montaje** (detalle en V3.0):
+  1. celdas por arriba;
+  2. carrier al chasis por abajo, con el arnés de J301 ya soldado;
+  3. clavija SMA en la carrier, antes que la placa;
+  4. placa al chasis por abajo, con la OLED soldada, y sus dos M2;
+  5. chasis al tubo por arriba y tapa con la antena;
+  6. batería y NTC por abajo, con la base quitada;
+  7. tecla, lámina de la ventana y guía de luz por fuera.
 
-**Comprobación de la placa terminada** (FreeCAD, [research/v02.md](research/v02.md) §8):
+**Comprobación en CAD** (FreeCAD 1.1.3, `mechanical/v3.0/check_v3_0.py`, 08-10-2026), con el STEP
+final de la placa, ya con los cambios de la auditoría ([cad/README.md](cad/README.md)), y las zonas
+de clavijas de `kicad/plugs.json`:
 
-- Placa, componentes y clavijas enchufadas: 0 mm³ de choques con la carcasa y con los rieles
-  propuestos.
-- Paso por Ø52: radio máximo 23.21 mm.
-- Lo más justo:
-  - los cables de la batería, a 0.46 mm de la base (de ahí la ranura propuesta en la base, que
-    les deja ~3.5 mm);
-  - la cara trasera, a 0.40 mm del carrier;
-  - la cara de la placa, a 2.51 mm del botón.
-- Con el ESP32-S3-WROOM-1 (06-10-2026): la placa (STEP de `kicad-cli`, con el modelo del WROOM
-  puesto donde su `.wrl`) contra las piezas de la carcasa V2.3: 0 mm³ de choques; radio máximo
-  23.35 mm. Sin plástico frente a la antena (`check_v2_3.py`).
-- Los rieles y brazos del primer estudio sí chocan con la placa nueva: hay que hacerlos con la
-  propuesta de arriba.
+- 0 choques en posición final y los 11 barridos del montaje sin choques;
+- la guarda de la pared del tubo pasa;
+- contra la placa real, el émbolo de la tecla queda a 0.355 de SW401 y la guía de luz a 0.345 de
+  D403.
+
+Lo que no se verificó (módulo OLED real, carrier medida, cables, antena, impresión) está en el
+[README de V3.0](../../mechanical/v3.0/README.md#verificaciones).
+
+La v0.2 y su carcasa V2.3 están en la rama `hw/main-board-kicad`.
 
 ## Conectores
 
-Todos los de cable son JST GH (1.25 mm) o SH (1.0 mm) de entrada lateral, de 8 pines como máximo,
-salvo la batería. Los cables se arman con el kit de cables precrimpados GH y SH del propietario:
+Los de cable son JST GH (1.25 mm) o SH (1.0 mm) de entrada lateral, todos en el canto de abajo con
+la boca hacia abajo. Los cables se arman con el kit de cables precrimpados GH y SH del propietario:
 cada cable se inserta en su cavidad, **pin 1 con pin 1**, y se mide con el multímetro antes de
 enchufar. Tablas completas, generadas desde la netlist, en [fab/pinout.md](fab/pinout.md).
 
-**Dónde va cada uno y hacia dónde apunta.** Cada conector lateral apunta a un canto o a una zona
-sin componentes. Delante de su boca se reserva lo que asoma la clavija enchufada, más el doblez de
-sus cables y 1 mm a cada lado para tomarla:
+Delante de cada boca se reserva, sin componentes, lo que asoma la clavija enchufada, el doblez de
+sus cables (3 mm) y 1 mm a cada lado para tomarla:
 
 - GH: la clavija asoma 3.1 mm y mide 4.35 mm de alto (JST eGH, «Assembly layout»).
-- SH: asoma 3.0 mm y mide 2.95 mm de alto.
-- PH: asoma 3.5 mm (estimado) y mide 4.5 mm.
-- Para el doblez de los cables: 3 mm en GH y SH, 4 mm en PH.
+- SH: se toman 3.0 mm de asomo; la carcasa SHR mide 2.8 mm de alto (JST eSH).
 
 Esas reservas son áreas de regla `clavija_*` en el PCB: el DRC falla si una pieza entra en ellas.
 También van en `kicad/plugs.json` para la comprobación en CAD.
 
-| Ref. | Uso | Dónde y hacia dónde | Cabezal en la placa (LCSC) | Carcasa del cable (LCSC) | Contacto (LCSC) | Cable armado (búsqueda) |
+| Ref. | Uso | Dónde y hacia dónde | En la placa (LCSC) | Carcasa del cable (LCSC) | Contacto (LCSC) | Cable armado (búsqueda) |
 | --- | --- | --- | --- | --- | --- | --- |
-| J405 | IMU: 3V3, GND, SDO, SDA, SCL, INT1, INT3 | Canto superior, a la izquierda; boca hacia arriba (el cable sigue a la tapa) | GH 7 lateral SM07B-GHS-TB (C495552) | GHR-07V-S (C22465387) | SSHL-002T-P0.2 (C189897) | «cable JST GH 1.25 7 pines una cabeza» o precrimpados |
-| J101 | USB del panel: 1-3 VBUS, 4-6 GND, 7 D−, 8 D+ | Canto superior, al centro, justo bajo el J502 de la placa panel-usb; boca hacia arriba | GH 8 lateral XUNPU WAFER-GH1.25-8PWB, huella de JST SM08B-GHS-TB (C3029383) | GHR-08V-S (C485357) | SSHL-002T-P0.2 (C189897) | «cable JST GH 1.25 8 pines doble cabeza PIN1-PIN1», el más corto |
-| J403 | OLED, orden Qwiic: GND, 3V3, SDA, SCL | Bajo los pines de la OLED; boca hacia la izquierda, sobre una zona libre de 6 × 7 mm | SH 4 lateral SM04B-SRSS-TB (C160404) | SHR-04V-S (C385125) | SSH-003T-P0.2-H (C263995) | «cable Qwiic» o «cable JST SH 1.0 4 pines» |
-| J402 | Botón: GND, contacto, anillo LED A, K | A la izquierda del botón; boca hacia la izquierda, sobre una zona libre de 6.1 × 8.3 mm (el cable da la vuelta hacia el botón) | GH 4 lateral SM04B-GHS-TB (C189895) | GHR-04V-S (C160418) | SSHL-002T-P0.2 (C189897) | «cable JST GH 1.25 4 pines una cabeza» |
-| J401 | microSD (zócalo push-push) | Canto inferior, a la izquierda; la tarjeta entra por abajo quitando la base | TF-015 (C113206) | — | — | — |
-| J301 | Carrier GNSS (arnés en Y) | Canto inferior, al centro; boca hacia abajo | **SH 8** lateral SM08B-SRSS-TB (C160407) | SHR-08V-S (C265412); en la carrier, **soldado** a sus filas de agujeros (sin clavijas) | SSH-003T-P0.2-H (C263995) | «cable JST SH 1.0 8 pines una cabeza» |
-| J404 | NTC 10k B3435 de la celda (obligatoria) | Canto inferior, entre J301 y J102; boca hacia abajo | SH 2 lateral SM02B-SRSS-TB (C160402) | SHR-02V-S (C398472) | SSH-003T-P0.2-H (C263995) | «cable JST SH 1.0 2 pines una cabeza» |
-| J102 | Batería: 1 = BAT−, 2 = BAT+ | Canto inferior, a la derecha; boca hacia abajo | **JST PH 2.0 mm**, 2 pines, lateral S2B-PH-SM4-TB (C295747) | PHR-2 (C157955) | SPH-002T-P0.5S (C111515) | La del pack: **confirmar paso y polaridad** |
+| J102 | Batería: 1-2 = BAT− (GND), 3-4 = BAT+ | Canto de abajo, al centro (x −2.0…6.2); boca hacia abajo | GH 4 lateral SM04B-GHS-TB (C189895) | GHR-04V-S (C160418) | SSHL-002T-P0.2 (C189897), cable AWG #26 | El del pack, con cable GH de 4 hilos: **confirmar el pinout y medirlo** |
+| J404 | NTC 10k B3435 de la celda (obligatoria) | Canto de abajo, a la izquierda de J102 (x 6.9…10.9); boca hacia abajo | SH 2 lateral SM02B-SRSS-TB (C160402) | SHR-02V-S (C398472) | SSH-003T-P0.2-H (C263995) | «cable JST SH 1.0 2 pines una cabeza» |
+| J301 | Carrier GNSS (arnés en Y) | Canto de abajo, a la derecha (x −3.0…−13.0); boca hacia abajo. El arnés sube por el lado −X | **SH 8** lateral SM08B-SRSS-TB (C160407) | SHR-08V-S (C265412); en la carrier, **soldado** a sus filas de agujeros | SSH-003T-P0.2-H (C263995) | «cable JST SH 1.0 8 pines una cabeza» |
+| J101 | USB-C: carga y USB nativo del ESP32 | Costado +X, z ≈ 25; boca en u 3.1, hacia +X | HRO TYPE-C-31-M-12 (C165948) | — | — | — |
+| J401 | microSD (zócalo de empuje) | Costado +X, z 32–48; boca en u 1.5, hacia +X | TF-015 (C113206) | — | — | — |
+| J403 | OLED: 1 GND, 2 VCC (+3V3), 3 SCL, 4 SDA (**orden de GND y VCC sin confirmar**) | Bajo la fila de pines del módulo, v 8.95–11.35 | Cuatro pads SMD de 1.7 × 2.4, sin pieza de JLCPCB | — | — | Lo suelda el propietario |
 
 - **NTC obligatoria en J404.** TS del cargador es un divisor de REGN (5.1 kΩ arriba, 30 kΩ abajo)
   con la NTC en paralelo con los 30 kΩ. Con una NTC 10k B3435 (tipo 103AT) y los umbrales por
@@ -229,22 +268,25 @@ También van en `kicad/plugs.json` para la comprobación en CAD.
   - **Ojo al comprarla:** 10 kΩ a 25 °C con B = 3435 (tipo 103AT o «NTC 10K 3435»). Las de las
     impresoras 3D son de 100 kΩ (B3950): con esas el cargador cree que siempre hace frío y nunca
     carga.
-  - Se pega a la celda con cinta kapton y su cable va con el de la batería; ver la carcasa V2.3.
-- **J101 va justo bajo la placa panel-usb.** El cable entre J101 y J502 queda muy corto en línea
-  recta: usar el más corto del kit y dejar el sobrante doblado en el hueco sobre el canto.
+  - En V3.0 va pegada entre las dos celdas, en el valle de delante, y su cable baja con el de la
+    batería.
 
 Cuidados:
 
-- **J301 es SH de 8 pines y J101 GH de 8**: con familias distintas no se pueden cruzar. Antes eran
-  los dos GH 8, y un cable del USB enchufado en el GNSS ponía VBUS contra GND.
-- **Con el pinout de J101, un cable en espejo (pin 1 con 8) pone VBUS contra GND.** Medirlo pin a
-  pin antes de enchufar.
-- Ningún par de conectores comparte familia y número de pines.
+- **J301 es SH 8 y J102 GH 4**: con familias distintas no se pueden cruzar. Ningún par de
+  conectores comparte familia y número de pines.
+- **J102 lleva dos contactos por polo.** Un cable en espejo (pin 1 con pin 4) pone la batería al
+  revés. La placa tiene protección contra inversión (Q102 y Q103), pero hay que medir el cable del
+  pack antes de enchufarlo.
+- **USB-C:** CC1 y CC2 solo llevan Rd, así que la placa pide 5 V y no sabe cuánto da la fuente (ver
+  [Pendientes y riesgos](#pendientes-y-riesgos)).
 
 ## Firmware: qué tiene que cambiar
 
-El WROOM-1 se ruteó con GPIO nuevos (en el S3 la SD_MMC, las UART y el I2C van por la matriz de
-GPIO, así que solo cambia la configuración):
+Todavía no hay firmware para esta placa: el de `firmware/esp32` es para la SparkFun Thing Plus. El
+WROOM-1 se ruteó con GPIO nuevos (en el S3 la SD_MMC, las UART y el I2C van por la matriz de GPIO,
+así que solo cambia la configuración). La v0.3 usa los mismos que la v0.2, salvo las dos filas
+marcadas:
 
 | Función | GPIO |
 | --- | --- |
@@ -253,39 +295,66 @@ GPIO, así que solo cambia la configuración):
 | UART del GNSS (COM2 a 115200) | TX 8 (a RXD2), RX 9 (de TXD2) |
 | PPS, EVENT, RESET_N | 10, 11 (salida, 100 k a GND), 12 |
 | I2C de la OLED, cargador y medidor | SDA 13, SCL 14 |
-| IMU (`Wire1`, 400 kHz) | SDA 41, SCL 42, INT1 2, INT3 1 |
-| Botón / anillo del botón | 18 / 48 |
+| IMU BMI088 (`Wire1`, 400 kHz) | SDA 41, SCL 42, INT1 2, INT3 1 |
+| Botón | 18 (activo bajo) |
+| **LED de estado (v0.3; antes, anillo del botón)** | **48 (activo alto)** |
 | INT del cargador / ALRT del medidor | 21 / 47 |
 | 5 V de la carrier (TPS63070) | 45 |
-| Consola (UART0) | 43/44, sin conectar en la placa |
+| **Consola (UART0; v0.3: con puntos de prueba)** | **43 (TP208) / 44 (TP209)** |
 | Libres | 35, 36 y 37 (con punto de prueba), 38, 39, 40 y 46 |
 
-- **Particiones**: con 16 MB de flash las dos ranuras OTA pueden crecer a ~6 MB (hoy 1.875 MB).
-- **Sin LEDs del panel**: quitar o desactivar su código sin quitar claves de la API («la API solo
-  crece»).
+Lo nuevo de la v0.3 respecto de la v0.2:
 
+- **LED de estado en GPIO48** en lugar del anillo del botón (BTN_LED_EN, que movía Q402): activo
+  alto, unos 4.4 mA. En el reset GPIO48 queda como entrada sin pull, así que el LED no se enciende
+  mientras arranca. Sin LEDs del panel ni anillo: quitar o desactivar su código sin quitar claves de
+  la API («la API solo crece»).
+- **IMU en la placa:** mismo bus (`Wire1`, GPIO41/42), mismas interrupciones (INT1 en GPIO2, INT3 en
+  GPIO1) y mismas direcciones (0x18 y 0x68).
+  - **Cambia la orientación.** El BMI088 ya no va en la plataforma horizontal de la tapa, sino en la
+    placa, que en el tubo es vertical: plano XZ de la carcasa, con la cara de componentes hacia +Y.
+    U401 va girado 0° en KiCad (u = 18 − x, v = 80 − z).
+  - Hay que pasar los ejes del sensor (figura de ejes de la hoja de Bosch) a los de la carcasa y
+    confirmarlo con la placa armada, por ejemplo leyendo la gravedad en varias posiciones.
+  - **INT1 e INT3 en push-pull:** en la placa no tienen pull-up.
+- **OLED girada 180°:** el firmware tiene que voltear la imagen.
+- **Corriente de carga (ICHG) de 1.5 A como mucho.** Al arrancar, escribir `SFET_PRESENT = 1`
+  (REG0x14 bit 7), ICHG = 1 A (el valor por omisión del BQ25798) y desactivar el *watchdog*. J102
+  tiene dos contactos por polo de 1 A cada uno (cable AWG #26): no pasar de ~1.5 A.
+- **Botón mantenido 10 s:** el BQ25798 hace un reset por hardware (QON en bajo ≥ 10 s típ.). Abre el
+  FET de la batería unos 350 ms y el equipo rearranca ([research/power.md](research/power.md)). Ya
+  pasaba con el botón del panel de la v0.2. Los gestos del firmware tienen que quedar muy por debajo
+  (apagar con 2–3 s).
+- **Puntos de prueba de UART0:** TP208 (U0TXD, GPIO43) y TP209 (U0RXD, GPIO44). Sirven para leer los
+  mensajes de la ROM al arrancar y como consola por un adaptador serie si el USB nativo no responde.
+
+Lo que sigue igual que en la v0.2:
+
+- **Particiones:** con 16 MB de flash las dos ranuras OTA pueden crecer a ~6 MB (hoy 1.875 MB).
 - **Identidad nueva** (`hardware_id`, entorno de compilación): la API solo crece.
-- **Apagado = modo *ship* del BQ25798 por I2C**:
-  - Al arrancar, escribir `SFET_PRESENT = 1` (REG0x14 bit 7), ICHG = 1 A y desactivar el
-    *watchdog*.
-  - Para apagar: cerrar la microSD, apagar el GNSS, esperar a que se **suelte** el botón y
-    escribir REG0x11 `SDRV_CTRL = 10` con `SDRV_DLY = 1`.
-  - Con USB conectado la orden se ignora (estado `power_still_present`).
+- **Apagado = modo *ship* del BQ25798 por I2C:** cerrar la microSD, apagar el GNSS, esperar a que se
+  **suelte** el botón y escribir REG0x11 `SDRV_CTRL = 10` con `SDRV_DLY = 1`. Con USB conectado la
+  orden se ignora (estado `power_still_present`).
 - **GPIO45 enciende el 5 V de la carrier** (TPS63070); el firmware 0.8.x ya lo pone alto al
   arrancar. En modo «solo carga» se deja bajo. Con la carrier apagada, dejar GPIO8 en alta
   impedancia para no alimentarla por sus entradas.
   - GPIO45 es pin de arranque con 100k a GND (VDD_SPI a 3.3 V, lo correcto para el N16R2): en
     **cualquier reinicio del ESP32, también por software, la carrier se apaga** y el GNSS arranca
     de cero (pierde el fix RTK). El firmware no debe reiniciar el ESP32 a la ligera.
-- **Modo «solo carga»**: si al arrancar hay VBUS y no se pulsa el botón, dejar el GNSS apagado y
+- **Modo «solo carga»:** si al arrancar hay VBUS y no se pulsa el botón, dejar el GNSS apagado y
   mostrar la carga en la OLED. Un toque del botón pasa a modo normal; al quitar el USB se escribe el
   modo *ship*.
 - RESET_N se usa en drenador abierto con un pulso de ≥ 5 ms, pero la BDLX no lo saca.
 - El STAT del cargador queda al aire: el estado de carga se lee por I2C.
-- **1S**: apagar por batería baja con ≥ 3.5 V en reposo; en modo *ship* el BQ2579x necesita la
+- **1S:** apagar por batería baja con ≥ 3.5 V en reposo; en modo *ship* el BQ2579x necesita la
   celda por encima de ~3.4 V.
 
 ## Variantes 1S / 2S
+
+La v0.3 está pensada para un pack **1S2P** (dos 18650 protegidas en paralelo): para la placa es una
+celda 1S de doble capacidad, con la variante 1S por defecto. Las piezas de la variante 2S siguen en
+el esquema y la tabla vale igual, pero 2S no está previsto en la v0.3: la cuna de V3.0 lleva las
+celdas en paralelo y no se buscó sitio para un BMS de equilibrado.
 
 | Ref. | 1S (por defecto) | 2S |
 | --- | --- | --- |
@@ -295,93 +364,100 @@ GPIO, así que solo cambia la configuración):
 | U103 | MAX17048G+T10 | MAX17049G+T10 (C18185545; JLCPCB tenía 50 a 9.60 USD) |
 | R112 (VPACK → VDD del medidor) | 0 Ω | sin montar |
 | R114 (+3V3 → VDD del medidor) | sin montar | 0 Ω |
-| Batería | 1 × 18650 protegida | 2 × 18650 en serie **con BMS de equilibrado** (el BQ25798 no equilibra) |
+| Batería | 1S2P: 2 × 18650 protegidas en paralelo | 2 × 18650 en serie **con BMS de equilibrado** (el BQ25798 no equilibra) |
 
 - **5 V de la carrier:** el TPS63070 trabaja igual en las dos variantes.
 - **Cargador USB-C:** con 2S el cargador eleva desde 5 V y pide ~2.2 A de entrada; usar uno de 3 A.
-- **Anillo del botón:** se alimenta de VSYS; con 2S usar la versión de 6 V del botón.
-- **Mecánica:** 2S no cabe en la carcasa tal cual (ver [Mecánica](#mecánica)).
+  La placa no lee CC: no sabe si la fuente los da.
+- La serigrafía trasera resume las dos variantes (R103, R116, U103, R112 y R114).
 
 ## Pedido en JLCPCB
 
-Archivos del pedido, que llevan **las dos placas en un panel**:
+Archivos del pedido, con **la placa sola en un panel**:
 
 - `fab/tresvizo-panel-gerbers-jlcpcb.zip` (lo genera `build.py`; en git solo en los hitos)
 - `fab/tresvizo-panel-bom-jlcpcb.csv`
 - `fab/tresvizo-panel-cpl-jlcpcb.csv`
 
-Los `fab/tresvizo-main-*` y los de `../panel-usb/fab` son de cada placa sola, por si se piden por
-separado.
+Los `fab/tresvizo-main-*` son de la placa sin panel, por si se pide así.
 
-1. **PCB**:
+1. **PCB:**
    - Subir el zip del panel.
    - 4 capas, 1.6 mm, apilado JLC04161H-7628 (por defecto).
-   - **Delivery Format: Panel by Customer**, **Different Design: 2**, tamaño del panel
-     **82.8 × 79.0 mm** y cantidad en paneles (un panel = un juego de las dos placas).
+   - **Delivery Format: Panel by Customer**, un solo diseño, tamaño del panel **50 × 85.5 mm** y
+     cantidad en paneles (un panel = una placa).
    - Acabado ENIG recomendado (o HASL sin plomo).
-2. **Montaje**:
-   - PCBA **Standard** (la estimación de costo la usa; si el cotizador ofrece Economic para el
-     ESP32-S3-WROOM-1, también sirve).
+2. **Montaje:**
+   - PCBA **Standard** (la estimación de costo la usa).
    - Una cara (top).
-   - El panel ya trae rieles de 5 mm, 3 fiduciales de 1 mm con el centro a 3.85 mm del canto y 4
-     agujeros de herramienta de 2 mm, como pide JLCPCB. Las placas van unidas con puentes de 5 mm con
-     *mouse bites* (agujeros de 0.6 mm): dos en cada canto lateral de la placa madre (uno de ellos la
-     une a la panel-usb) y uno a cada lado de la panel-usb. Arriba y abajo de la placa madre no hay
-     puentes porque esos cantos llevan conectores.
-   - Los puentes de la placa madre a v 10.5 y 15.1 caen donde van los rieles: **lijar la rebaba** al
-     separar las placas.
-   - El USB-C de la panel-usb sobresale 1.29 mm del canto de su placa. Frente a él la fresa se
-     ensancha de 2 a 3 mm (`cuts` en `kicad/panel.json`), así que quedan 1.71 mm hasta el marco. El
-     marco crece 1 mm hacia arriba para que el riel conserve sus 5 mm.
+   - El panel ya trae rieles de 5 mm en los cuatro cantos, 3 fiduciales de 1 mm con el centro a
+     3.85 mm del canto y 4 agujeros de herramienta de 2 mm, como pide JLCPCB.
+   - La placa va unida al marco con 4 puentes de 5 mm con *mouse bites* (agujeros de 0.6 mm), dos en
+     cada canto lateral: v 6.5 y 41 a la izquierda, v 13 y 24 a la derecha. Los cantos de arriba y
+     de abajo no llevan puentes (en el de abajo están las bocas de los conectores).
+   - Los puentes caen en los cantos por donde corren los rieles del chasis: **lijar la rebaba** al
+     separar la placa.
 3. Subir BOM y CPL del panel y elegir «Complete File, just proceed with my own files».
-   **Revisar la orientación de cada pieza en la vista previa** (sobre todo U201 con la antena hacia el canto
-   izquierdo, U102, U105, U301, Q1xx, D1xx y los conectores).
-4. La única pieza sin montar (DNP) es R114 (0 Ω de 2S) y queda fuera del BOM. J404 sí se monta;
-   la NTC va aparte, con su cable.
+   **Revisar la orientación de cada pieza en la vista previa**, sobre todo:
+   - U102, que usa la huella de TI de KiCad y no la de LCSC;
+   - la polaridad de D403 (pad 1 = cátodo; los pads están renumerados respecto de EasyEDA);
+   - U201, con la antena hacia el canto derecho mirando el frente (−X);
+   - las piezas nuevas con huella de LCSC: J101, J102, SW401 y U401.
+4. Fuera del BOM:
+   - R114 (0 Ω de la variante 2S, sin montar);
+   - J403: la OLED la suelda el propietario. Sus pads llevan pasta y salen estañados;
+   - TP208 y TP209, que son solo pads.
+
+   J404 sí se monta; la NTC va aparte, con su cable.
 
 ## Costo
 
-Estimación de [fab/costo-jlcpcb.md](fab/costo-jlcpcb.md) para **5 juegos**, con precios y
-existencias de la API pública de JLCPCB del 07-10-2026 y las tarifas de su página (no es una
-cotización):
+Estimación de [fab/costo-jlcpcb.md](fab/costo-jlcpcb.md) para **5 placas** (un panel cada una), con
+precios y existencias de la API pública de JLCPCB del 08-10-2026 y las tarifas de su página (no es
+una cotización):
 
-| Pedido | Montaje + piezas | Por juego |
-| --- | ---: | ---: |
-| (A) Un panel con las dos placas, PCBA Standard | 209.08 USD | 41.82 USD |
-| (B) Dos pedidos: principal Standard + panel-usb Economic | 221.83 USD | 44.37 USD |
+| Concepto | USD |
+| --- | ---: |
+| Piezas | 130.15 |
+| Preparación Standard | 25.56 |
+| Plantilla | 8.21 |
+| Alimentadores: 40 piezas distintas × 1.53 | 61.20 |
+| Juntas: 1940 × 0.0016 | 3.10 |
+| Rayos X: 5 componentes (los BMI088) | 8.20 |
+| **Montaje + piezas** | **236.43** |
+| Por placa | 47.29 |
 
-- El panel único ahorra **12.75 USD** en montaje, y además es un solo envío.
-- **No incluye el PCB desnudo** (4 capas, panel con dos diseños): JLCPCB no publica ese precio ni
-  el cargo por diseño distinto; sale en el cotizador.
-- Lo que más pesa: los alimentadores de PCBA Standard (40 piezas distintas × 1.53 USD = 61.20 USD)
-  y las piezas (102.59 USD, sobre todo el ESP32-S3-WROOM-1-N16R2 a 5.80 USD, el BQ25798 y el MAX17048).
-- J301 en SH 8 suma 2.25 USD a los 5 juegos frente al GH 8 compartido con J101: un alimentador más
-  (1.53 USD) y 5 conectores de 0.33 USD en lugar de 0.19.
-- J404, ahora montado, suma 2.22 USD a los 5 juegos: su alimentador (1.53 USD), 5 conectores
-  (0.66 USD) y 20 juntas (0.03 USD).
-- **PCBA Standard** en la placa madre: la estimación la usa. La API de JLCPCB no dice si el
-  ESP32-S3-WROOM-1-N16R2 admite Economic (no pide rayos X); confirmarlo en el cotizador.
-- Piezas *Extended* que quedan: no tienen equivalente *Basic* en JLCPCB (cargador, medidor,
-  reguladores, ESP32, conectores GH/SH, TVS, ESD y la de 8.2 kΩ de ILIM; ver [research/v02.md](research/v02.md) §4).
-- Todas tienen existencias (la menor: ESP32-S3-WROOM-1-N16R2, 1243; sin rayos X).
+- **No incluye el PCB desnudo** (4 capas, en panel) ni el envío: salen en el cotizador.
+- Lo que más pesa: los alimentadores (61.20 USD) y las piezas, sobre todo el BMI088 (6.79 USD;
+  33.96 los cinco), el ESP32-S3-WROOM-1-N16R2 (5.80), el BQ25798 (2.93) y el MAX17048 (2.17).
+- El BMI088 es LGA y JLCPCB lo marca para rayos X: 8.20 USD para los cinco.
+- Frente a la v0.2 (209.08 USD por 5 juegos con la panel-usb, 07-10-2026) sube 27.35 USD. El
+  BMI088 y sus rayos X suman 42.16; se ahorran el cargo por panel de dos diseños (8.21) y los
+  conectores de cable que ya no van.
+- 17 de las 40 piezas son *Extended*. Las nuevas de la v0.3 (LED KT-0603R, pulsador TS-1187A-B-A-B
+  y la de 330 Ω) son *Basic*.
+- **PCBA Standard:** no se comprobó si Economic admite el BMI088 (pide rayos X) y el WROOM;
+  confirmarlo en el cotizador.
+- Existencias: todas alcanzan para 5 placas. La menor es la del **BMI088: 396** (682 el
+  07-10-2026 y 4 482 el 04-10-2026), que baja rápido. Después vienen el ESP32-S3-WROOM-1-N16R2
+  (1180) y el TPS62903 (2172).
 
 ## Antes de mandar a fabricar
 
 | Punto | ¿Frena el pedido? | Qué hacer |
 | --- | --- | --- |
-| Orientación de cada pieza en el CPL | Sí | Revisarla en la vista previa de JLCPCB y corregir el giro ahí |
-| **Batería: conector y polaridad** | Sí | J102 es JST PH de 2.0 mm, pin 1 = BAT− y pin 2 = BAT+. **Confirmar que el pack tiene ese conector y esa polaridad** (medir con multímetro). La placa tiene protección contra inversión |
-| Pinout de los conectores de la carrier | Sí, para el arnés | Leído de la serigrafía de la foto oficial; que el pin 1 sea el pad cuadrado es una suposición (no hay plano). **Antes de enchufar el arnés, medir con multímetro en la carrier cuál pin es GND y cuál 5V_IN**: si estuviera al revés, los 5 V de J301 entrarían a una línea TTL del UM980 |
-| Breakout BMI088 | Sí, para el cable | El orden del header (1 VCC … 9 INT3) salió de fotos del vendedor. Comprobarlo con multímetro, poner el selector en IIC y confirmar que SDO va a la hilera |
-| Cable GH de 8 pines de J101 | Sí | Con el pinout de J101 un cable en espejo pone VBUS contra GND: medirlo pin a pin. J301 es SH 8 y no se confunde con él |
-| Anillo del botón | Sí, si es el de 12 V | La placa lo alimenta con VSYS (3.5–4.2 V en 1S): usar el de 3–6 V |
-| Carcasa | No | Hecha: [V2.3](../../mechanical/v2.3/README.md), con chasis deslizable para esta placa (rieles, H1/H2, corte frente a la antena del WROOM, ranuras de la carrier y ménsulas atornilladas de la panel-usb). Comprobada en CAD con la placa final: 0 choques en su sitio y en el montaje paso a paso; nada impreso todavía |
-| Cable USB entre J101 y la panel-usb | No | Los dos conectores quedan casi enfrentados: usar el cable GH8 más corto del kit, pin 1 con pin 1, y doblar el sobrante sobre el canto |
-| Rebabas de los puentes del panel | No | Lijar las de los cantos laterales de la placa madre antes de meterla en los rieles |
+| Orden de GND y VCC de la OLED | Sí | El esquema supone GND, VCC, SCL, SDA. Leer la serigrafía del módulo: si no coincide, cambiar `OLED_PINS` en `scripts/circuit.py` y regenerar. Cruzados, el módulo recibe la alimentación invertida |
+| Fila de pines de la OLED | Sí | Se tomó a 1.4 mm del canto del módulo, deducido del plano del vendedor. Medirla con calibrador: si está unos 1.4 mm más lejos del canto, el módulo toca la lata del WROOM |
+| Medidas de la carrier BDLX | Sí | Salen de una foto (±1 mm). Medirla con calibrador: de ellas dependen la muesca del SMA, el aire de 0.5 mm detrás de la placa y las ranuras del chasis |
+| Antena GNSS: modelo y conector | Sí, para la tapa y el coaxial | [hardware/bom.md](../bom.md) dice «Helix; modelo exacto por confirmar». La tapa de V3.0 está hecha para la HA-901A |
+| Existencias del BMI088 | Sí | 396 en la API de JLCPCB el 08-10-2026 (682 el 07-10): comprobarlas justo antes de pedir |
+| Orientación en el CPL | Sí | En la vista previa de JLCPCB: U102 (huella de TI de KiCad), polaridad de D403 (pad 1 = cátodo) y también U201, J101, J102, SW401 y U401. Corregir el giro ahí |
+| Cable del pack (J102) | Sí | GH 4: pines 1-2 BAT−, 3-4 BAT+, dos contactos por polo con cable AWG #26. Armarlo o confirmar el del pack y medir la polaridad con multímetro. La placa tiene protección contra inversión |
+| Pinout de los conectores de la carrier | Sí, para el arnés | Leído de la serigrafía de la foto oficial; que el pin 1 sea el pad cuadrado es una suposición (no hay plano). **Antes de conectar el arnés, medir con multímetro en la carrier cuál pin es GND y cuál 5V_IN**: si estuviera al revés, los 5 V de J301 entrarían a una línea TTL del UM980 |
 | NTC de la celda | Sí, para cargar | Comprar una NTC 10k B3435 con cable (no las de 100k de impresora 3D) y crimpar o comprar un cable SH 1.0 de 2 pines. Sin ella el cargador no carga (el GPS sí funciona con el USB) |
-| Carrier: espesor, cantos y acceso a sus conectores | No | Resuelto en la carcasa V2.3 con las medidas de la foto más 1 mm de holgura (9 mm de grueso, aire para las patas del SMA). La carrier no tiene margen en los cantos: las ranuras del chasis dejan sitio a su USB-C, que sobresale ~0.9 mm, y a las soldaduras del arnés de J301 en la columna de agujeros pegada al otro canto (modelo por componentes en [cad/carrier_bdlx.py](cad/carrier_bdlx.py)). El arnés va soldado a la carrier |
-| 2S | No para 1S | No cabe sin recorte frente al botón; decidirlo antes de rehacer la carcasa |
-| Antena del ESP32 a 6.8 mm de la carrier | No | Medir RSSI en el primer prototipo |
+| Coaxial de la antena | No para la placa | La curva en S de R 5.25 pide un coaxial de 1.13 mm o RG178 (Ø1.8), con clavija SMA recta. Confirmar en la hoja del cable que admite ese radio fijo |
+| Soldar la OLED sobre pads SMD | No | Probar el método en una placa antes de montar el módulo bueno |
+| Rebabas de los puentes del panel | No | Lijarlas antes de meter la placa en los rieles |
 | Firmware para esta placa | No para fabricar | Todavía no existe; ver [Firmware](#firmware-qué-tiene-que-cambiar) |
 | Nada medido | — | Pedir pocas placas y probar por bloques, empezando por la alimentación |
 
@@ -391,119 +467,177 @@ Lo comprobado con las herramientas (nada se ha fabricado ni medido):
 
 | Comprobación | Resultado |
 | --- | --- |
-| ERC (KiCad 10.0.6), placa madre y panel-usb | 0 errores, 0 avisos |
-| DRC placa madre ([fab/drc.rpt](fab/drc.rpt)) | 0 errores, 0 avisos, 0 sin conectar, 0 diferencias de paridad con el esquema |
-| DRC panel-usb ([../panel-usb/fab/drc.rpt](../panel-usb/fab/drc.rpt)) | 0 errores, 0 avisos, 0 sin conectar, 0 de paridad |
-| DRC del panel ([fab/drc-panel.rpt](fab/drc-panel.rpt)) | 0 errores, 0 avisos, 0 sin conectar; 82.8 × 79.0 mm |
-| Clavijas enchufadas | Áreas `clavija_*` en el DRC: ninguna pieza dentro. En CAD: 0 mm³ contra la carcasa y los componentes; la más justa, la batería (0.46 mm a la base sin la ranura propuesta) |
-| Rieles, botón y antena | Áreas `riel_*`, `boton` y `esp32_antena` en el DRC: sin violaciones |
-| Serigrafía | 0 solapes ni serigrafía sobre pads (DRC); textos de 0.8 mm o más; el logotipo no tiene trazos de menos de 0.35 mm (apertura morfológica), sobre el mínimo de 0.15 mm de JLCPCB |
-| Ruteo | 133 de 133 conexiones con `route_rest.py`, el bus de la microSD primero; potencia solo por capas externas. Reproducible: dos ejecuciones completas de `build.py` (06-10-2026) dieron los mismos PCB, esquemáticos, BOM, CPL, mapa de pines y Gerber; solo cambian las fechas dentro de los informes, de los netlists y de los Gerber |
+| ERC (KiCad 10.0.6, [fab/erc.rpt](fab/erc.rpt)) | 0 errores, 0 avisos |
+| DRC de la placa ([fab/drc.rpt](fab/drc.rpt)) | 0 violaciones (errores y avisos), 0 sin conectar, 0 diferencias de paridad con el esquema |
+| DRC del panel ([fab/drc-panel.rpt](fab/drc-panel.rpt)) | 0 violaciones, 0 sin conectar. Panel de 50 × 85.5 mm: rieles de 5 mm, 4 puentes con *mouse bites*, 3 fiduciales y 4 agujeros de herramienta |
+| Áreas de regla | `clavija_*`, `canto_*`, `esp32_antena` y `guia_de_luz_D403` entran en el DRC de la placa: sin violaciones |
+| Ruteo | En `build.py`, `route_rest.py` rutea 89 de 89 conexiones y, después de los rellenos, 1 de 1. Total: 1880 tramos (F.Cu 703 mm, In2.Cu 304 mm, B.Cu 1067 mm) y 282 vías |
+| Reproducible, casi siempre | Con las entradas finales (08-10-2026) se corrió cuatro veces: dos `build.py` completos y dos réplicas de sus pasos. Tres dieron el mismo PCB byte a byte, y también los mismos esquemáticos, JSON, BOM, CPL, posiciones y mapa de pines. En la cuarta, el DRC de KiCad con `--refill-zones` contó 90 conexiones pendientes en lugar de 89, y salieron unos 10 tramos de GND y +3V3 distintos; esa placa también pasaba el DRC sin violaciones. Cada script da lo mismo con la misma entrada: la variación viene del relleno de zonas y del DRC de KiCad. Los archivos de la rama son los de las tres corridas que coincidieron. Los Gerber, el netlist, el esquema en PDF y los informes solo cambian en la fecha |
+| Altos (`cad/check_heights.py`, sale con 0) | Las 106 piezas con modelo 3D (las 105 del BOM y R114) caben bajo h(x), que ya deja 0.3 de aire, y fuera de las franjas. Lo más justo, además de esos 0.3: J401, SW201 y SW202, 0.05 mm; U302, U303 y U201, 0.06; J101, 0.07 |
+| Auditoría eléctrica independiente (08-10-2026) | Siete puntos, todos corregidos en `build.py`: OLED en pads SMD; puentes del panel lejos de U401 y de los condensadores de potencia; zona sin cobre de la antena ampliada; relleno de GND de J102 con 4 vías y vías dobles de VPACK; 4 vías de GND en el pad del WROOM; R409 de 330 Ω; TP208 y TP209. Lo que aceptó como riesgo está en [Pendientes y riesgos](#pendientes-y-riesgos) |
 | *Bootstrap* del cargador | BTST1 → C101: 0.9 mm; BTST2 → C102: 1.6 mm (cara superior). Retorno a SW por vía y 4.3 / 5.7 mm de B.Cu |
-| Mecánica (primer estudio y placa terminada) | Ver [research/v02.md](research/v02.md) §7 y §8 |
-| Montaje en la carcasa V2.3 (`b94647d`) | Con la placa de este diseño y la carrier aproximada con sus componentes: sin choques paso a paso, la placa entrando por abajo; ver [cad/README.md](cad/README.md) |
-| Costo y existencias | API de JLCPCB del 05-10-2026: todas las piezas con existencias |
+| BOM y CPL | 40 líneas y 105 piezas montadas; el CPL tiene las mismas 105 |
+| Carcasa V3.0 (`check_v3_0.py`, 08-10-2026) | Con el STEP final de la placa y sus zonas de clavijas: 0 choques en posición final, 11 barridos de montaje sin choques y la guarda de la pared del tubo pasa |
+| Costo y existencias | API de JLCPCB del 08-10-2026: todas las piezas con existencias para 5 placas (la menor, el BMI088: 396) |
 
-No comprobado: fabricación y montaje, ninguna medida eléctrica, el firmware para esta placa, el
-pinout real de la carrier y del breakout BMI088, el lugar exacto de los conectores en la carrier, el
-asomo de la clavija PH de la batería (3.5 mm estimado; JST no da el plano enchufado) y la carcasa
-impresa con los cambios propuestos.
+No comprobado: fabricación y montaje; ninguna medida eléctrica; el firmware para esta placa; el
+orden de pines y la fila de la OLED; las medidas de la carrier y el pinout real de sus conectores;
+el modelo de la antena GNSS; el soldado de la OLED sobre pads SMD; las pruebas de RF, de C/N0 y de
+carga de [Pendientes y riesgos](#pendientes-y-riesgos); la carcasa impresa.
 
 ## Pendientes y riesgos
 
-- **Corriente del USB (revisión del 05-10-2026):** sin detección del puerto, el techo fijo (R102)
-  es la única protección para una computadora. Para v0.3: llevar CC1/CC2 de la panel-usb (OR con
-  diodos) por uno de los GND de J101/J502 a un ADC del ESP32 y fijar IINDPM según lo que anuncie la
-  fuente (0.5 / 1.5 / 3 A).
-- **D+/D− (revisión del 06-10-2026):** D+ mide 37.6 mm con 3 vías (F.Cu, B.Cu e In2.Cu); D− mide
-  34.3 mm con 4 vías (F.Cu y B.Cu). No van juntos como par.
-  - Para USB Full Speed (12 Mb/s, lo único que tiene el ESP32-S3) la diferencia, unos 22 ps, es
-    despreciable frente a un bit de 83 ns. La pista entera equivale a ~0.25 ns, frente a flancos de
-    4 ns o más.
-  - Aun así, Espressif recomienda par diferencial con referencia continua.
-  - El cruce viene del orden de pines: D− va a la izquierda de D+ en J101 y al revés en U101 y el
-    ESP32. Corregirlo pide invertir los pines 7/8 de J101 y de J502 (la panel-usb también) y
-    rutear el par junto. Queda para v0.3 junto con el CC.
+Riesgos que la auditoría eléctrica del 08-10-2026 aceptó, con la prueba o el límite que piden:
 
-- **Nada medido**: carga 1S/2S, modo *ship*, arranque del TPS63070 con la carrier y su consumo,
-  ruido del GNSS (C/N0) con el ESP32 transmitiendo, alcance de BLE/Wi-Fi.
-- **Antena del ESP32**: Espressif pide 15 mm libres; en el tubo hay 5.85 mm hasta la pared y
-  6.8 mm hasta la carrier.
-- **Bootstrap del BQ25798**: los condensadores quedan junto a sus pines en la cara superior, pero
+- **Antena del WROOM.** Queda delante de la carrier (sus componentes a 0.5 mm del dorso de la placa
+  y su PCB a 6.9 mm), cerca del plástico (la pared del tubo a 0.29 mm de la esquina del módulo) y de
+  la OLED. Espressif pide 15 mm libres.
+  - Hacer una prueba de RSSI y de caudal con todo montado.
+  - Poner un M2 de nailon en el agujero de la OLED del lado de la antena (x −11.75).
+  - Plan B: ESP32-S3-WROOM-1U-N16R2 (C3013945, con conector para antena externa) en la misma huella.
+- **Desensibilización del GNSS.** Los armónicos del reloj de 40 MHz de la microSD caen en 1560 y
+  1600 MHz, dentro de las bandas B1 de BeiDou (1561 MHz) y G1 de GLONASS (1598–1606 MHz). Medir el
+  C/N0 con el Wi-Fi y la microSD activos.
+- **Corriente de carga.** Limitar ICHG a ~1.5 A en el firmware (el BQ25798 arranca con 1 A). El
+  cable del pack va en AWG #26 a un GH 4, con dos contactos por polo de 1 A cada uno según JST.
+- **Potencia por In2.Cu.** VSYS al TPS62903 (0.6 mm, 12.8 mm de largo) y GNSS_5V (0.4 mm, 26.1 mm)
+  van por cobre interno de 0.5 oz: según IPC-2221, unos 0.5 A y 0.37 A con 10 °C de subida. La
+  carrier pide 160 mA; con los picos del Wi-Fi y de la microSD, la entrada del TPS62903 puede
+  acercarse a 0.5 A por poco tiempo (estimado, sin medir).
+- **Plano de +3V3 cortado.** In2.Cu lleva 304 mm de pistas, 211 de ellas del bus del IMU. Las líneas
+  de la microSD van por B.Cu sobre ese plano y cruzan sus ranuras: cada una tiene de 2.8 a 3.2 mm sin
+  plano debajo y 14 cambios de referencia.
+- **USB:** D+ mide 55.8 mm y D− 62.4 mm, no van juntos como par y tienen 4.9 y 9.0 mm sin plano
+  debajo. Para USB Full Speed (12 Mb/s, lo único que tiene el ESP32-S3) el auditor lo da por bueno:
+  la diferencia de largo son unas decenas de ps frente a un bit de 83 ns. Espressif recomienda, aun
+  así, par diferencial con referencia continua.
+- **Entrada USB sin detección de CC**, igual que en la v0.2. Con una fuente de 500 mA la placa pide
+  más de lo que da y el cargador baja la corriente cuando cae VBUS (VINDPM). El firmware puede bajar
+  IINDPM por I2C (modo de carga lenta). Leer CC con un ADC del ESP32 y fijar IINDPM según lo que
+  anuncie la fuente (0.5 / 1.5 / 3 A) queda pendiente.
+- **Nodos SW del cargador:** unos 9 mm por B.Cu, como en la v0.2.
+
+De la placa (detalle en [research/v03-compacta.md](research/v03-compacta.md#riesgos-de-la-placa)):
+
+- Márgenes de alto de 0.05 a 0.07 mm en J401, SW201, SW202, U302, U303, U201 y J101.
+- El canto del módulo OLED pasa 0.47 mm por encima del PCB del WROOM y a 1.4 mm de su lata, con la
+  fila de pines sin medir.
+- Bajo el cuerpo del WROOM (fuera de la antena) pasan unos 74 mm de pistas de señal en F.Cu, con
+  máscara. En la v0.2 también las había.
+- Los cuatro puentes del panel quedan en los 45 mm de arriba de la placa, y la parte de abajo cuelga
+  unos 30 mm sin puente. Si JLCPCB pide otro puente, habría que mover piezas.
+- Las vías del pad central del WROOM quedan a 0.05 mm de las esquinas de sus ventanas de máscara:
+  tapadas, pero con muy poca máscara entre la vía y la ventana.
+- El punto de pin 1 de la huella SOT-23-6 (U101, U302 y U303) quedó bajo el cuerpo; el CPL no
+  depende de él.
+
+De la v0.2, que siguen valiendo:
+
+- **Nada medido:** carga 1S, modo *ship*, arranque del TPS63070 con la carrier y su consumo, ruido
+  del GNSS (C/N0) con el ESP32 transmitiendo, alcance de BLE/Wi-Fi.
+- **Bootstrap del BQ25798:** los condensadores quedan junto a sus pines en la cara superior, pero
   su retorno a SW pasa por una vía y 4–6 mm de B.Cu; TI lo muestra con los condensadores en la cara
   inferior, que aquí no se puede usar.
-- **Plano interno de 3V3** perforado por las vías del ruteo automático: quedan tiras y cuellos finos
+- **Plano interno de 3V3 perforado por las vías del ruteo automático:** quedan tiras y cuellos finos
   (el DRC no encuentra cuellos bajo 0.127 mm, pero conviene mirarlo a mano antes de pedir). Los
   planos internos van con 0.12 mm de margen a otras redes (JLCPCB admite 0.09 mm en capas internas)
   para que las vías dejen menos tiras.
-- **Hoja del BQ2579x rev D**: la copia pública dice «TI Confidential»; pedir la oficial.
+- **Hoja del BQ2579x rev D:** la copia pública dice «TI Confidential»; pedir la oficial.
 - **Ruteo automático** con `route_rest.py`, un ruteador propio (A* en rejilla con arranque y
   reruteo). Las pistas críticas están prerruteadas en `layout.py`:
   - lazos del cargador, nodos SW, *bootstrap*, BAT y la salida en abanico de su fila inferior;
-  - el TPS62903 según su hoja de datos: SW a L102 en 0.9 mm por F.Cu sin vías, C115 (10 µF de entrada)
-    a 0.4 mm de VIN y de GND con EN saliendo entre sus pads, C118 y C119 (salida) junto a L102 y GND,
-    y FB con su divisor a 1.5 mm. Antes el SW daba un rodeo de 8.7 mm con dos vías y pasaba entre los
-    pads de C115;
-  - el lazo del TPS63070 y su EN;
-  - CELL y VDD del medidor;
-  - las GND cercadas del cargador y de C303.
-  
+  - el TPS62903 según su hoja de datos, el lazo del TPS63070 y su EN, y CELL y VDD del medidor;
+  - en la v0.3, además, los buses de la microSD y del GNSS (B.Cu), el del IMU (In2.Cu), la
+    alimentación y lo agregado tras la auditoría (ver
+    [research/v03-compacta.md](research/v03-compacta.md#ruteo)).
+
   El resto se nota automático (escaleras de tramos de 0.1 mm, pistas bajo el ESP32).
   `finish_pcb.py` une con un tramo corto las vías que el ruteador deja tocando de canto una pista de
   su misma red.
-- **Modelo 3D del BQ25798**: KiCad no trae el del RQM0029A; el STEP usa un VQFN de 4 × 4 mm.
+- **Modelo 3D del BQ25798:** KiCad no trae el del RQM0029A; el STEP usa un VQFN de 4 × 4 mm.
 
 ## Regenerar
 
-Requisitos: KiCad 10 (con su Python) y Python 3. KiCad tiene que tener sus bibliotecas estándar en
-las tablas globales (Preferencias → Gestionar bibliotecas); si no, el ERC y el DRC añaden cientos de
-avisos de «biblioteca no incluida» que no son errores del diseño.
+Requisitos: KiCad 10 (con su Python), Python 3 y FreeCAD 1.1 para el STEP en los ejes de la
+carcasa. KiCad tiene que tener sus bibliotecas estándar en las tablas globales (Preferencias →
+Gestionar bibliotecas); si no, el ERC y el DRC añaden cientos de avisos de «biblioteca no incluida»
+que no son errores del diseño.
 
 ```bash
 cd hardware/main-board/scripts
 KICAD_APP=/Applications/KiCad/KiCad.app python3 build.py
-python3 cost_jlc.py ../fab/costo-jlcpcb.md 5 ../fab/tresvizo-main-bom-jlcpcb.csv ../kicad/tresvizo-main.kicad_pcb ../../panel-usb/fab/tresvizo-panel-usb-bom-jlcpcb.csv ../../panel-usb/kicad/tresvizo-panel-usb.kicad_pcb
 ```
+
+Después del build, el STEP de la placa en los ejes de la carcasa y la comprobación de altos (desde
+`hardware/main-board`; ver [cad/README.md](cad/README.md)):
+
+```bash
+PYTHONPATH=/Applications/FreeCAD.app/Contents/Resources/lib \
+  /Applications/FreeCAD.app/Contents/Resources/bin/python cad/export_board_step.py
+python3 cad/check_heights.py
+```
+
+- `export_board_step.py` escribe `cad/placa-principal.step` (el PCB y un sólido por componente, con
+  su referencia) y `cad/placa-principal.json` (la caja de cada pieza). La carcasa V3.0 los usa.
+- `check_heights.py` comprueba que cada pieza quepa bajo h(x) con 0.3 de aire y fuera de las franjas
+  de los cantos; si alguna no cabe, sale con 1.
+
+El costo (desde `scripts`):
+
+```bash
+python3 cost_jlc.py ../fab/costo-jlcpcb.md 5 ../fab/tresvizo-main-bom-jlcpcb.csv ../kicad/tresvizo-main.kicad_pcb
+```
+
+- Consulta la API pública de JLCPCB y guarda lo leído en `fab/jlc_parts_cache.json` (fuera de
+  git). Si ese archivo existe, reutiliza los precios y existencias guardados: borrarlo para
+  consultarlos de nuevo.
+- Con la panel-usb de la v0.2 se le pasan además su BOM y su PCB, y compara el panel de las dos
+  placas con dos pedidos separados.
 
 `build.py` hace todo el pedido:
 
-- Placa madre:
+- Placa principal:
   - `circuit.py` escribe el esquemático.
   - `layout.py` fija contorno, colocación, pistas críticas, zonas, clases de red y el panel.
   - `build_pcb.py` construye el PCB y `fanout.py` baja los pads de GND y +3V3 a sus planos.
   - `route_rest.py` rutea el resto y `finish_pcb.py` añade los rellenos de GND con vías de cosido.
-- Placa del USB-C: la regenera con su propio `build.py` (`../panel-usb`).
-- Panel: `panelize.py` junta las dos placas con rieles, fiduciales, agujeros de herramienta y mouse
-  bites.
-- Pedido: `export_jlc.py` saca BOM y CPL de cada placa y del panel.
+    En la última vuelta (`finish_pcb.py --final`) quita además las vías que quedaron sin uso.
+- Panel: `panelize.py` junta las placas de `kicad/panel.json` con rieles, fiduciales, agujeros de
+  herramienta y mouse bites. En la v0.3 lleva solo la placa principal.
+- Pedido: `export_jlc.py` saca BOM y CPL de la placa y del panel.
 
 Otros scripts:
 
-- `cost_jlc.py` compara el panel único con dos pedidos separados.
+- `cost_jlc.py` estima el costo de montaje (arriba).
 - `mklib.py` genera los símbolos propios.
 - `logo.py` convierte el logotipo del repositorio en polígonos de serigrafía.
 - `silk_clean.py` (dentro de `build.py`) corrige la serigrafía que el DRC marca encimada.
 - `fp_silk_trim.py` recorta la serigrafía de una huella de la biblioteca que pisa sus propios pads
   (se usó una vez, con L2520, SOD-882 y `SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm`,
   copiada de la biblioteca estándar de KiCad).
-- `layout.py` escribe además `kicad/plugs.json`: las clavijas enchufadas y los agujeros, para
-  comprobarlos en CAD contra la carcasa.
-- El proyecto del panel usa la biblioteca de la placa madre; `build.py` le copia la huella y el
-  modelo del USB-C que solo tiene `../panel-usb`.
+- `layout.py` escribe además `kicad/plugs.json`: las clavijas enchufadas, los agujeros y las muescas
+  del contorno (`cutouts`: USB-C y SMA de la carrier), para comprobarlos en CAD contra la carcasa.
+- El proyecto del panel usa la biblioteca de la placa principal, que ya tiene el USB-C (en la v0.2,
+  `build.py` se lo copiaba de `../panel-usb`).
 - Las huellas de `kicad/lib/lcsc.pretty` vienen de LCSC/EasyEDA (easyeda2kicad), para que la
-  orientación coincida con la de JLCPCB.
+  orientación coincida con la de JLCPCB. La del LED (D403) tiene los pads renumerados (1 = cátodo) y
+  la de la OLED (`OLED_0.96in_I2C_4P_P2.54mm`) es propia, para el módulo del propietario.
 
 No se guardan en git, por pesados y regenerables:
 
 - los modelos STEP de LCSC (los `.wrl` sí);
 - la caché de easyeda2kicad;
 - los STEP de las placas;
-- los Gerber (`fab/*-gerbers-jlcpcb.zip`), las vistas (`fab/*-top.png`, `fab/*-bottom.png`) y el esquema
-  en PDF: cambian en cada vuelta. Se guardan solo en los hitos (pedido a JLCPCB, versión cerrada), con
-  `git add -f`.
+- los Gerber (`fab/*-gerbers-jlcpcb.zip`), las vistas (`fab/*-top.png`, `fab/*-bottom.png`) y el
+  esquema en PDF: cambian en cada vuelta. Se guardan solo en los hitos (pedido a JLCPCB, versión
+  cerrada), con `git add -f`.
 
-El build es reproducible: con las mismas entradas, dos ejecuciones de `build.py` dan los mismos archivos
-byte a byte (solo cambia la fecha dentro de los informes del DRC y del ERC). Para eso:
+El build casi siempre es reproducible. Con las mismas entradas, `build.py` da los mismos PCB,
+esquemáticos, JSON, BOM, CPL, posiciones y mapa de pines, byte a byte; los Gerber, el netlist, el
+esquema en PDF y los informes solo cambian en la fecha. La excepción: en una de cuatro corridas, el
+relleno de zonas y el DRC de KiCad dieron una conexión pendiente más, y el ruteo cambió en unos pocos
+tramos de GND y +3V3. Esa placa también pasaba el DRC; ver [Verificaciones](#verificaciones). Para lo
+demás:
 
 - `kiid_seed.py` siembra los identificadores (KIID) de KiCad en cada paso con el contenido de sus
   entradas. KiCad ordena el PCB por esos identificadores, que de otro modo son aleatorios.
@@ -514,5 +648,5 @@ Si un paso se cae, `build.py` dice cuál y, si fue por una señal, cuál. Por ej
 zonas de KiCad 10 se ha caído con la señal 11 con ciertas geometrías. `route_rest.py` guarda lo ruteado
 antes de rellenar, para no perderlo.
 
-La investigación con sus fuentes está en `research/`: v0.1 en los archivos originales y v0.2 en
-[research/v02.md](research/v02.md).
+La investigación con sus fuentes está en `research/`: v0.1 en los archivos originales, v0.2 en
+[research/v02.md](research/v02.md) y v0.3 en [research/v03-compacta.md](research/v03-compacta.md).

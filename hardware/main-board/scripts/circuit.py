@@ -28,12 +28,11 @@ C0805 = "Capacitor_SMD:C_0805_2012Metric"
 LC = "tresvizo_lcsc:"
 TP = "TestPoint:TestPoint_Pad_D1.0mm"
 
-# JST GH de entrada lateral (SMxxB-GHS-TB, paso 1.25): huella importada de LCSC y código, por número de pines
-# El SM08B-GHS-TB de JST está agotado en LCSC (04-10-2026): se monta el clon XUNPU de huella idéntica.
-GH_FP = {8: "CONN-SMD_8P-P1.25_XUNPU-WAFER-GH1.25-8PWB"}
-GH_LCSC = {8: "C3029383"}
-GH_MPN = {8: "WAFER-GH1.25-8PWB"}
 USBLC6_LCSC = "C2687116"
+# Módulo OLED de 4 pines (v0.3: soldado a la placa). Los pines 3 y 4 son SCL y SDA en las dos variantes conocidas
+# del módulo; GND y VCC (pines 1 y 2) cambian de lugar según el fabricante (research/constraints.md §4): antes de
+# pedir la placa, comprobar la serigrafía de la unidad y, si dice VCC GND SCL SDA, cambiar aquí los pines 1 y 2.
+OLED_PINS = {"1": "GND", "2": "+3V3", "3": "I2C_SCL", "4": "I2C_SDA"}
 
 
 def gnss_5v(d, s, group, R, C):
@@ -67,6 +66,7 @@ def gnss_5v(d, s, group, R, C):
 RES = {
     "0": (R0402, "C17168", "0402WGF0000TCE"),
     "100": (R0402, "C25076", "0402WGF1000TCE"),
+    "330": (R0402, "C25104", "0402WGF3300TCE"),
     "1k": (R0402, "C11702", "0402WGF1001TCE"),
     "4.7k": (R0402, "C25900", "0402WGF4701TCE"),
     "5.1k": (R0402, "C25905", "0402WGF5101TCE"),
@@ -91,14 +91,15 @@ CAP = {
 
 
 def build(libs):
-    d = Design(libs, PROJECT, "TresVizo MeridianV — placa principal", "0.2", "2026-10-04", "TresVizo",
+    d = Design(libs, PROJECT, "TresVizo MeridianV — placa principal", "0.3", "2026-10-07", "TresVizo",
                comments=["Exploratorio: no fabricado ni probado",
-                         "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector",
+                         "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS por conector",
+                         "v0.3 compacta: USB-C, OLED, botón, LED y BMI088 en la placa",
                          "JLCPCB 4 capas JLC04161H-7628"])
     d.sheet("power", "power.kicad_sch", "Alimentación, carga y batería")
     d.sheet("mcu", "mcu.kicad_sch", "ESP32-S3")
     d.sheet("gnss", "gnss.kicad_sch", "GNSS: carrier UM980 por conector y su 5 V")
-    d.sheet("io", "io.kicad_sch", "microSD, IMU por conector y panel")
+    d.sheet("io", "io.kicad_sch", "microSD, IMU, OLED, botón y LED")
     count = {}
 
     def ref(prefix, sheet):
@@ -127,26 +128,32 @@ def build(libs):
 
     # =================================================================== POWER
     s = "power"
-    d.group(s, "usb", "Entrada USB-C del panel (5 V, datos al ESP32)", 150)
+    d.group(s, "usb", "Entrada USB-C (5 V sin PD, datos al ESP32)", 150)
     d.group(s, "chg", "Cargador BQ25798 (buck-boost NVDC, 1S por defecto; 2S por PROG)", 230)
     d.group(s, "bat", "Batería: polaridad inversa, FET de apagado (ship) y medidor", 200)
     d.group(s, "buck", "3.3 V: TPS62903 (3-17 V, 3 A, modo 100 %)", 170)
     d.group(s, "flags", "Banderas de alimentación (ERC)", 120)
 
-    # Enlace con la placa del USB-C del panel (pinout del propietario): 3 contactos por lado porque el GH
-    # admite ~1 A por contacto con AWG26 (JST, eGH.pdf) y el peor caso (2S cargando) pide ~2.2 A.
-    d.add("J101", "Connector_Generic_MountingPin:Conn_01x08_MountingPin", "PANEL_USB", s, "usb",
-          {"1": "VBUS", "2": "VBUS", "3": "VBUS", "4": "GND", "5": "GND", "6": "GND", "7": "USB_DN", "8": "USB_DP",
-           "MP": "GND"},
-          footprint=LC + GH_FP[8], lcsc=GH_LCSC[8], mpn=GH_MPN[8],
-          description="GH 8 lateral a la placa del USB-C del panel: VBUS x3, GND x3, D-, D+ (cable 1 a 1)")
+    # v0.3: el USB-C va en la placa (ya no hay placa panel-usb ni J101 de GH 8). Mismo receptáculo y circuito que
+    # la panel-usb (../../panel-usb/scripts/circuit.py): Rd de 5.1k en CC1 y CC2 (sumidero de 5 V, sin PD), D+ y
+    # D- de las dos caras unidos en la placa, SBU al aire y carcasa a GND. VBUS va al cargador como iba el de J101.
+    # Las Rd van al final de esta hoja (R119, R120) para no renumerar R101-R118.
+    d.add("J101", "Connector:USB_C_Receptacle_USB2.0_16P", "USB_C", s, "usb",
+          {"A1": "GND", "A12": "GND", "B1": "GND", "B12": "GND", "SH": "GND",
+           "A4": "VBUS", "A9": "VBUS", "B4": "VBUS", "B9": "VBUS",
+           "A5": "CC1", "B5": "CC2", "A6": "USB_DP", "B6": "USB_DP", "A7": "USB_DN", "B7": "USB_DN",
+           "A8": None, "B8": None},
+          footprint=LC + "USB-C_SMD-TYPE-C-31-M-12", lcsc="C165948", mpn="TYPE-C-31-M-12",
+          datasheet="https://www.lcsc.com/datasheet/lcsc_datasheet_2205251630_Korean-Hroparts-Elec-TYPE-C-31-M-12_C165948.pdf",
+          description="HRO TYPE-C-31-M-12: USB-C 16 contactos horizontal (huella y modelo de la panel-usb); carcasa "
+                      "a GND; cara 1.29 mm por delante del canto en la panel-usb, eje a ~1.65 mm de la placa")
     d.add("D101", "Device:D_Zener", "SMF15A", s, "usb", {"1": "VBUS", "2": "GND"}, rot=90,
           footprint=LC + "SOD-123FL_L2.7-W1.8-LS3.8-RD", lcsc="C19077509", mpn="SMF15A",
-          description="TVS de VBUS: 15 V de trabajo, limita a 24.4 V a 8.2 A (VBUS del BQ25798: 30 V máx.)")
+          description="TVS de VBUS junto al USB-C: 15 V de trabajo, limita a 24.4 V a 8.2 A (VBUS del BQ25798: 30 V máx.)")
     d.add("U101", "Power_Protection:USBLC6-2SC6", "USBLC6-2SC6", s, "usb",
           {"1": "USB_DN", "6": "USB_DN", "3": "USB_DP", "4": "USB_DP", "5": "+3V3", "2": "GND"},
           footprint=LC + "SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL", lcsc="C2687116", mpn="USBLC6-2SC6",
-          description="ESD de D+/D-; pin 5 a +3V3 (rompe a 6 V, no va a VBUS)")
+          description="ESD de D+/D- junto al USB-C; pin 5 a +3V3 (rompe a 6 V, no va a VBUS)")
 
     d.add("U102", "Battery_Management:BQ25798", "BQ25798RQMR", s, "chg",
           {"VBUS": "VBUS", "VAC1": "VBUS", "VAC2": "VBUS", "ACDRV1": "GND", "ACDRV2": "GND",
@@ -205,9 +212,15 @@ def build(libs):
           lcsc="C20917", mpn="AO3400A", description="Enciende Q102 solo si el borne de la celda es positivo")
     R(s, "bat", "100k", "VBATT_IN", "BATREV_SENSE")
     R(s, "bat", "1M", "BATREV_SENSE", "GND")
-    d.add("J102", "Connector_Generic_MountingPin:Conn_01x02_MountingPin", "BATTERY", s, "bat",
-          {"1": "GND", "2": "VBATT_IN", "MP": "GND"}, footprint=LC + "CONN-SMD_P2.00_S2B-PH-SM4-TB-LF-SN",
-          lcsc="C295747", mpn="S2B-PH-SM4-TB(LF)(SN)", description="JST PH 2: 1 = BAT-, 2 = BAT+ (medir el pack)")
+    # v0.3: el PH 2 lateral mide 5.5 mm sobre la placa y en el tubo de Ø52 caben 4.63 mm: GH 4 lateral (el que
+    # usaba J402, ~4.25 mm) con dos contactos por polo para el pack 1S2P. GH admite ~1 A por contacto (JST,
+    # eGH.pdf, con cable AWG 26): ~2 A por polo sin margen para un reparto desigual. Auditoría del 08-10-2026: la carga
+    # (ICHG del BQ25798, 1 A al encender) se limita a ~1.5 A en el firmware y el cable del pack es AWG 26.
+    d.add("J102", "Connector_Generic_MountingPin:Conn_01x04_MountingPin", "BATTERY", s, "bat",
+          {"1": "GND", "2": "GND", "3": "VBATT_IN", "4": "VBATT_IN", "MP": "GND"},
+          footprint=LC + "CONN-SMD_4P-P1.25_SM04B-GHS-TB-LF-SN", lcsc="C189895", mpn="SM04B-GHS-TB(LF)(SN)",
+          description="JST GH 4 lateral al pack 1S2P: 1-2 = BAT-, 3-4 = BAT+ (dos contactos por polo, ~1 A cada uno). "
+                      "El pack necesita cable GH de 4 hilos AWG 26; ICHG del BQ25798 <= 1.5 A. Medir el pack antes de enchufar")
     v2s["fg"] = d.add("U103", "tresvizo:MAX17048", "MAX17048G+T10", s, "bat",
           {"VDD": "FG_VDD", "CELL": "VPACK", "CTG": "GND", "QSTRT": "GND", "SDA": "I2C_SDA", "SCL": "I2C_SCL",
            "~{ALRT}": "FG_ALRT_N", "GND": "GND", "EP": "GND"},
@@ -235,6 +248,10 @@ def build(libs):
         C(s, "buck", "22uF", "+3V3")
     C(s, "buck", "100nF", "+3V3")
 
+    # Rd del USB-C (grupo «usb»), al final de la hoja para no renumerar las demás resistencias
+    R(s, "usb", "5.1k", "CC1", "GND", note="Rd de CC1: el cargador ve un sumidero y entrega 5 V (sin PD ni HVDCP)")
+    R(s, "usb", "5.1k", "CC2", "GND", note="Rd de CC2")
+
     for net in ("VBUS", "VBATT_IN", "VPACK", "FG_VDD", "+3V3", "GND"):
         FLAG(s, "flags", net)
 
@@ -255,9 +272,9 @@ def build(libs):
         "IO8": "GNSS_TX_MCU", "USB_D-": "USB_DN", "USB_D+": "USB_DP",
         "IO46": None, "IO9": "GNSS_TXD2_MCU", "IO10": "GNSS_PPS_MCU", "IO11": "GNSS_EVENT_MCU",
         "IO12": "GNSS_RESET_MCU", "IO13": "I2C_SDA", "IO14": "I2C_SCL", "IO21": "CHG_INT_N",
-        "IO47": "FG_ALRT_N", "IO48": "BTN_LED_EN", "IO45": "GNSS_PWR_EN",
+        "IO47": "FG_ALRT_N", "IO48": "LED_STATUS", "IO45": "GNSS_PWR_EN",
         "IO35": "ESP_IO35", "IO36": "ESP_IO36", "IO37": "ESP_IO37", "IO38": None, "IO39": None, "IO40": None,
-        "IO41": "IMU_SDA", "IO42": "IMU_SCL", "RXD0": None, "TXD0": None,
+        "IO41": "IMU_SDA", "IO42": "IMU_SCL", "RXD0": "ESP_RXD0", "TXD0": "ESP_TXD0",
     }
     sym = libs.get("RF_Module:ESP32-S3-WROOM-1")
     pins = {}
@@ -288,7 +305,10 @@ def build(libs):
     R(s, "i2c", "4.7k", "+3V3", "I2C_SDA")
     R(s, "i2c", "4.7k", "+3V3", "I2C_SCL")
     for net, name in (("+3V3", "3V3"), ("GND", "GND"), ("ESP_IO35", "IO35"), ("ESP_IO36", "IO36"),
-                      ("ESP_IO37", "IO37"), ("USB_DP", "D+"), ("USB_DN", "D-")):
+                      ("ESP_IO37", "IO37"), ("USB_DP", "D+"), ("USB_DN", "D-"),
+                      # UART0 (GPIO43/44): mensajes de la ROM al arrancar y consola por un adaptador serie si el USB
+                      # nativo no responde en la puesta en marcha
+                      ("ESP_TXD0", "U0TXD"), ("ESP_RXD0", "U0RXD")):
         TPt(s, "tps", net, name)
 
     # ==================================================================== GNSS
@@ -304,7 +324,7 @@ def build(libs):
            "7": "GNSS_RESET_N", "8": "GND", "MP": "GND"},
           footprint=LC + "CONN-TH_SM08B-SRSS-TB-LF-SN", lcsc="C160407", mpn="SM08B-SRSS-TB(LF)(SN)",
           description="SH 8 lateral (JST SM08B-SRSS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND. "
-                      "SH y no GH, para que no se pueda cruzar con J101 (GH 8 con VBUS)")
+                      "SH y no GH, para que no se pueda cruzar con J102 (GH 4 de la batería)")
     # ESD junto al conector (la carrier va por cable); el pin 5 a +3V3 como en U101
     for k, (a_net, b_net) in enumerate((("GNSS_RXD2", "GNSS_TXD2"), ("GNSS_PPS", "GNSS_EVENT"))):
         d.add("U%d" % (302 + k), "Power_Protection:USBLC6-2SC6", "USBLC6-2SC6", s, "conn",
@@ -324,8 +344,8 @@ def build(libs):
     # ====================================================================== IO
     s = "io"
     d.group(s, "sd", "microSD (SD_MMC 4 bits, mismos GPIO que la Thing Plus)", 200)
-    d.group(s, "imu", "IMU: breakout BMI088 V1.0 de la tapa por cable (I2C)", 200)
-    d.group(s, "ui", "Panel: botón, LEDs y OLED", 300)
+    d.group(s, "imu", "IMU BMI088 en la placa (I2C, segundo bus)", 200)
+    d.group(s, "ui", "Botón, LED de estado, OLED y NTC", 300)
     d.add("J401", "tresvizo:TF-015", "TF-015", s, "sd",
           {"VDD": "+3V3", "CLK": "SD_CLK", "CMD": "SD_CMD", "DAT0": "SD_D0", "DAT1": "SD_D1", "DAT2": "SD_D2",
            "DAT3": "SD_D3", "CD": "SD_CD_N", "VSS": "GND", "SHIELD": "GND"}, lcsc="C113206", mpn="TF-015")
@@ -338,41 +358,64 @@ def build(libs):
           description="Invierte la detección: GPIO17 HIGH con tarjeta")
     R(s, "sd", "100k", "SD_DET", "GND")
 
-    # Panel en dos conectores de 8 pines o menos (kit de cables GH/SH del propietario); familias y números de
-    # pines distintos de la OLED (SH4) para que no se puedan cruzar.
-    d.add("J402", "Connector_Generic_MountingPin:Conn_01x04_MountingPin", "BOTON", s, "ui",
-          {"1": "GND", "2": "BTN_N", "3": "BTN_LED_A", "4": "BTN_LED_K", "MP": "GND"},
-          footprint=LC + "CONN-SMD_4P-P1.25_SM04B-GHS-TB-LF-SN", lcsc="C189895", mpn="SM04B-GHS-TB(LF)(SN)",
-          description="GH 4 lateral al botón del panel: GND, contacto, anillo LED ánodo y cátodo")
+    # v0.3: botón, LED y OLED en la placa (sin J402 ni J403 por cable). El botón es un pulsador táctil SMD bajo la
+    # tecla de la cara plana: BTN_N a GND al pulsar, despierta al cargador (QON) y llega a GPIO18 por D402.
+    # TS-1187A-B-A-B (hoja de XKB TS-1187A-X-X-X): 5.1 x 5.1 x 1.5 mm, 1.6 N, recorrido 0.25 mm, botón de latón
+    # de Ø2; A-B y C-D unidos por dentro: se usan dos pads en diagonal (símbolo SW_TACT de mklib.py).
+    d.add("SW401", "tresvizo:SW_TACT", "BOTON", s, "ui", {"1": "BTN_N", "4": "GND"},
+          footprint=LC + "SW-SMD_4P-L5.1-W5.1-P3.70-LS6.5-TL_H1.5", lcsc="C318884", mpn="TS-1187A-B-A-B",
+          datasheet="https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_XKB-Connection-TS-1187A-B-A-B_C318884.pdf",
+          description="Botón del equipo: pulsador táctil 5.1 x 5.1 x 1.5 mm (1.6 N) bajo la tecla de la cara plana")
+    # D401 se queda: el botón de latón del pulsador queda detrás de la abertura de la tecla, el único camino desde
+    # fuera hasta la placa aparte del USB-C, y BTN_N va directo a QON y, por D402, a GPIO18.
     d.add("D401", "Device:D_TVS", "PESD5V0F1BL", s, "ui", {"1": "BTN_N", "2": "GND"}, rot=90,
           footprint=LC + "SOD-882_L1.0-W0.6-BI", lcsc="C3001950", mpn="PESD5V0F1BL",
-          description="ESD del botón metálico, UMW (fuga < 1 nA: QON tiene un pull-up de 200 kohm)")
+          description="ESD del botón (la tecla deja llegar descargas al botón de latón), UMW; fuga < 1 nA: QON tiene "
+                      "un pull-up de 200 kohm")
     d.add("D402", "Device:D", "1N4148W", s, "ui", {"1": "BTN_N", "2": "BTN_SENSE_N"}, rot=90,
           footprint=LC + "SOD-123F_L2.7-W1.6-LS3.8-RD", lcsc="C81598", mpn="1N4148W",
           description="Aísla QON (pull-up interno a 3.2-3.8 V) del GPIO18; silicio, no Schottky")
     R(s, "ui", "10k", "+3V3", "BTN_SENSE_N")
-    R(s, "ui", "100", "VSYS", "BTN_LED_A", note="Anillo del botón: usar la versión de 3-6 V (la de 12 V no enciende)")
-    d.add("Q402", "Transistor_FET:AO3400A", "AO3400A", s, "ui", {"G": "BTN_LED_EN", "S": "GND", "D": "BTN_LED_K"},
-          footprint=LC + "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR", lcsc="C20917", mpn="AO3400A")
-    R(s, "ui", "100k", "BTN_LED_EN", "GND")
-    d.add("J403", "Connector_Generic_MountingPin:Conn_01x04_MountingPin", "OLED", s, "ui",
-          {"1": "GND", "2": "+3V3", "3": "I2C_SDA", "4": "I2C_SCL", "MP": "GND"},
-          footprint=LC + "CONN-SMD_4P-P1.00_SM04B-SRSS-TB-LF-SN", lcsc="C160404", mpn="SM04B-SRSS-TB(LF)(SN)",
-          description="JST SH 4 lateral con el orden Qwiic: GND, 3V3, SDA, SCL")
+    # LED de estado directo desde GPIO48 (antes BTN_LED_EN, que movía el anillo del botón con Q402): GPIO48 sale con
+    # 20 mA de capacidad por omisión y en el reset queda solo como entrada, sin pull-up ni pull-down (hoja del
+    # ESP32-S3 v2.2, tabla 2-1, pin 36 SPICLK_N): el LED no se enciende mientras arranca y no hace falta un FET.
+    # 330 ohm con un LED rojo (Vf ~1.85 V): ~4.4 mA. Con 1k (~1.5 mA) quedaba tenue detrás de la guía de luz de Ø2 a
+    # pleno sol (auditoría del 08-10-2026). R409 era la resistencia del anillo y pasa a ser la del LED.
+    R(s, "ui", "330", "LED_STATUS", "LED_STATUS_A", note="LED de estado: ~4.4 mA desde GPIO48 (3.3 V, LED rojo de ~1.85 V)")
+    # R410 (100k de la puerta de Q402) se fue con el anillo: su número queda reservado para no renumerar R411/R412
+    ref("R", s)
+    d.add("D403", "Device:LED", "KT-0603R", s, "ui", {"K": "GND", "A": "LED_STATUS_A"},
+          footprint=LC + "LED-SMD_L1.6-W0.8-R-RD", lcsc="C2286", mpn="KT-0603R",
+          datasheet="https://www.lcsc.com/datasheet/lcsc_datasheet_1810231112_Hubei-KENTO-Elec-KT-0603R_C2286.pdf",
+          description="LED de estado rojo 0603, junto al botón bajo su ventanita (pad 1 = cátodo)")
+    # OLED: el mismo módulo de 4 pines I2C (SSD1306, 0x3C/0x3D) en el bus que usaba J403, soldado por su header a la
+    # placa y girado 180° (pines abajo). Lo suelda el propietario: fuera del montaje de JLCPCB. El orden de GND y VCC
+    # está sin verificar en la unidad: ver OLED_PINS al principio.
+    d.add("J403", "Connector_Generic:Conn_01x04", "OLED", s, "ui", OLED_PINS,
+          footprint=LC + "OLED_0.96in_I2C_4P_P2.54mm", in_bom=False,
+          description="Módulo OLED 0.96 in I2C de 4 pines del propietario (no va en el montaje de JLCPCB): "
+                      "1 %s, 2 %s, 3 %s, 4 %s; pin 1 = el de la izquierda mirado de frente con los pines arriba"
+                      % tuple(OLED_PINS[k] for k in "1234"))
     d.add("J404", "Connector_Generic_MountingPin:Conn_01x02_MountingPin", "NTC", s, "ui",
           {"1": "CHG_TS", "2": "GND", "MP": "GND"}, footprint=LC + "CONN-SMD_2P-P1.00_SM02B-SRSS-TB-LF-SN",
           lcsc="C160402", mpn="SM02B-SRSS-TB(LF)(SN)",
           description="NTC 10k B3435 (103AT) obligatoria, pegada a la celda: sin ella el cargador no carga")
-    # IMU de la tapa por I2C en un segundo bus (GPIO11 SDA, GPIO12 SCL) con sus dos interrupciones. El GH7 sigue
-    # el orden del header de 9 pines del breakout BMI088 V1.0 (research/constraints.md §4) sin CSB1/CSB2:
-    # cable n -> pin [1, 2, 3, 4, 5, 8, 9][n-1] del breakout. El pin 3 (SDO1/SDO2) a GND fija las direcciones
-    # 0x18 (acelerómetro) y 0x68 (giróscopo); el selector del breakout va en IIC.
-    d.add("J405", "Connector_Generic_MountingPin:Conn_01x07_MountingPin", "IMU", s, "imu",
-          {"1": "+3V3", "2": "GND", "3": "GND", "4": "IMU_SDA", "5": "IMU_SCL", "6": "IMU_INT1", "7": "IMU_INT3",
-           "MP": "GND"},
-          footprint=LC + "CONN-SMD_SM7B-GHS-TB-LF-SN", lcsc="C495552", mpn="SM07B-GHS-TB(LF)(SN)",
-          description="GH 7 lateral al BMI088 de la tapa (I2C): 3V3, GND, SDO a GND, SDA, SCL, INT1, INT3")
-    R(s, "imu", "4.7k", "+3V3", "IMU_SDA", note="Pull-ups del bus del IMU (400 kHz por ~15 cm de cable)")
+    # IMU (v0.3): BMI088 en la placa, como en v0.1, pero por I2C en el bus que usaba J405 (GPIO41 SDA, GPIO42 SCL)
+    # con INT1 (acelerómetro) en GPIO2 e INT3 (giróscopo) en GPIO1. Conexión según la hoja de Bosch
+    # BST-BMI088-DS001 rev 1.9: PS a VDDIO = I2C (§6); CSB1 a VDDIO y CSB2 al aire (tabla 14 y fig. 9); SDO1 y SDO2
+    # a GND = acelerómetro 0x18 y giróscopo 0x68 (§6.2), las mismas direcciones que el breakout de v0.2; NC (pin 2)
+    # a GND; INT2 e INT4 sin conectar (la hoja pide no conectar las INT que no se usan); 100 nF en VDD y en VDDIO.
+    d.add("U401", "tresvizo:BMI088_I2C", "BMI088", s, "imu",
+          {"VDD": "+3V3", "VDDIO": "+3V3", "GNDA": "GND", "GNDIO": "GND", "PS": "+3V3", "SCK/SCL": "IMU_SCL",
+           "SDI/SDA": "IMU_SDA", "SDO1": "GND", "SDO2": "GND", "~{CSB1}": "+3V3", "~{CSB2}": None,
+           "INT1": "IMU_INT1", "INT3": "IMU_INT3", "INT2": None, "INT4": None},
+          footprint=LC + "LGA-16_L4.5-W3.0-P0.50-BL", lcsc="C194919", mpn="BMI088",
+          datasheet="https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmi088-ds001.pdf",
+          description="Acelerómetro y giróscopo por I2C (0x18 y 0x68). Sin cobre en la capa superior bajo el "
+                      "encapsulado (DS §8.2); lejos del botón, de los agujeros, de los cantos y del calor")
+    C(s, "imu", "100nF", "+3V3")
+    C(s, "imu", "100nF", "+3V3")
+    R(s, "imu", "4.7k", "+3V3", "IMU_SDA", note="Pull-ups del bus del IMU a VDDIO (DS §6.2); hasta 400 kHz")
     R(s, "imu", "4.7k", "+3V3", "IMU_SCL")
     return d
 
@@ -432,9 +475,9 @@ def write_project(kicad_dir, design):
 def main():
     sym_dir, kicad_dir = sys.argv[1:3]
     libs = Libraries()
-    for n in ("Device", "power", "Connector", "Connector_Generic_MountingPin", "Battery_Management", "Switch",
-              "Sensor_Motion", "Power_Management", "Power_Protection", "Transistor_FET", "Regulator_Linear",
-              "Jumper", "RF_Module"):
+    for n in ("Device", "power", "Connector", "Connector_Generic", "Connector_Generic_MountingPin",
+              "Battery_Management", "Switch", "Sensor_Motion", "Power_Management", "Power_Protection",
+              "Transistor_FET", "Regulator_Linear", "Jumper", "RF_Module"):
         libs.add(os.path.join(sym_dir, n + ".kicad_sym"))
     libs.add(os.path.join(kicad_dir, "lib", "tresvizo.kicad_sym"), "tresvizo")
     d = build(libs)
@@ -447,6 +490,9 @@ def main():
            % (v["prog"].ref, v["fg"].ref, v["fgv1"].ref))
     d.note("_root", "%s montado (VDD del medidor desde +3V3) y %s (EN del buck, abajo) = 3.9k."
            % (v["fgv2"].ref, v["en_bot"].ref))
+    d.note("io", "J403 (OLED del propietario, soldada a mano): antes de pedir, comprobar en la serigrafía del módulo "
+                 "el orden de GND y VCC (aquí: %s, %s, %s, %s)." % tuple(OLED_PINS[k] for k in "1234"))
+    d.note("power", "J102 (GH 4, dos contactos por polo): el pack necesita cable GH de 4 hilos AWG 26; ICHG del BQ25798 <= 1.5 A.")
     d.write(kicad_dir)
     write_project(kicad_dir, d)
     try:

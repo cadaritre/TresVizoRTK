@@ -5,9 +5,9 @@
 --fab-only no regenera ni rutea el PCB: parte de kicad/tresvizo-main.kicad_pcb tal como esté
 (por ejemplo, después de retocarlo a mano en KiCad) y rehace DRC y archivos de fabricación.
 
-Si existe la placa del USB-C del panel (../../panel-usb), la regenera con su propio build.py, arma el
-panel de las dos placas (panelize.py con kicad/panel.json) y saca un solo juego de archivos para el
-pedido: fab/tresvizo-panel-*.
+v0.3: el USB-C, la OLED, el botón y el LED van en la placa principal; ya no hay placa panel-usb. El panel
+del pedido (panelize.py con kicad/panel.json) lleva solo la placa principal, con rieles, marcas de JLCPCB y
+puentes con mouse bites, y saca su propio juego de archivos: fab/tresvizo-panel-*.
 
 Variables de entorno:
     KICAD_APP          ruta a KiCad.app (por omisión /Applications/KiCad/KiCad.app)
@@ -29,10 +29,10 @@ KDIR = os.path.join(ROOT, "kicad")
 FAB = os.path.join(ROOT, "fab")
 PROJECT = "tresvizo-main"
 PANEL = "tresvizo-panel"
-PUSB = os.path.join(os.path.dirname(ROOT), "panel-usb")
-PUSB_NET = os.path.join(PUSB, "kicad", "tresvizo-panel-usb.net")
 
 KICAD_APP = os.environ.get("KICAD_APP", "/Applications/KiCad/KiCad.app")
+# Redes que route_rest.py rutea antes que el resto (prefijos): las que pasan por los pasos más estrechos
+ROUTE_FIRST = "SD_,USB_"
 KCLI = os.path.join(KICAD_APP, "Contents/MacOS/kicad-cli")
 KPY = os.path.join(KICAD_APP, "Contents/Frameworks/Python.framework/Versions/Current/bin/python3")
 SHARED = os.path.join(KICAD_APP, "Contents/SharedSupport")
@@ -125,17 +125,18 @@ def main():
         rep = os.path.join(tmp, "drc-%s.json" % tag)
         run([KCLI, "pcb", "drc", "--refill-zones", "--format", "json", "--severity-error", "-o", rep, pcb],
             env=env)
-        # El bus de la microSD primero: entre el ESP32, J402 y el zócalo no queda más que su paso, y si
-        # lo toman antes otras redes el ruteador no lo encuentra
-        run([KPY, os.path.join(HERE, "route_rest.py"), pcb, rep], env=dict(env, SKIP_NETS=skip, ROUTE_FIRST="SD_"))
+        # Primero lo que queda de la microSD y el USB (el bus de datos de la microSD va prerruteado en
+        # layout.py): pasan bajo el WROOM y el zócalo, donde no queda más que su paso
+        run([KPY, os.path.join(HERE, "route_rest.py"), pcb, rep],
+            env=dict(env, SKIP_NETS=skip, ROUTE_FIRST=ROUTE_FIRST))
     if not (a.no_route or a.fab_only):
         route("1", skip="GND")
     if not a.fab_only:
         run([KPY, os.path.join(HERE, "finish_pcb.py"), pcb, spec], env=env)
     if not (a.no_route or a.fab_only):
         route("2")
-        # Las pistas nuevas pueden partir los rellenos: otra vez cosido e islas
-        run([KPY, os.path.join(HERE, "finish_pcb.py"), pcb, spec], env=env)
+        # Las pistas nuevas pueden partir los rellenos: otra vez cosido e islas; y fuera las vías que quedaron sin uso
+        run([KPY, os.path.join(HERE, "finish_pcb.py"), pcb, spec, "--final"], env=env)
     if not a.fab_only:
         # Serigrafía sin solapes (referencias y trazos de huellas que pisan pads u otra serigrafía)
         run([KPY, os.path.join(HERE, "silk_clean.py"), pcb, KCLI], env=env)
@@ -147,23 +148,13 @@ def main():
     # 5. Fabricación de la placa sola (referencia y comparación de costo)
     fab_outputs(PROJECT, pcb, [net], env, renders=True)
 
-    # 6. Panel del pedido: placa madre + placa del USB-C del panel
-    if os.path.exists(os.path.join(PUSB, "scripts", "build.py")):
-        if not a.fab_only:
-            run([sys.executable, os.path.join(PUSB, "scripts", "build.py")], env=env)
-        ppcb = os.path.join(KDIR, PANEL + ".kicad_pcb")
-        shutil.copy(os.path.join(KDIR, PROJECT + ".kicad_pro"), os.path.join(KDIR, PANEL + ".kicad_pro"))
-        # El proyecto del panel usa la biblioteca de la placa madre: se le añaden las huellas y modelos que
-        # solo tiene la placa del USB-C (el receptáculo), con el mismo nombre de biblioteca
-        for sub in ("lcsc.pretty", "lcsc.3dshapes"):
-            src = os.path.join(PUSB, "kicad", "lib", sub)
-            for fn in sorted(os.listdir(src)):
-                if not os.path.exists(os.path.join(KDIR, "lib", sub, fn)):
-                    shutil.copy(os.path.join(src, fn), os.path.join(KDIR, "lib", sub, fn))
-        run([KPY, os.path.join(HERE, "panelize.py"), os.path.join(KDIR, "panel.json"), ppcb], env=env)
-        run([KCLI, "pcb", "drc", "--refill-zones", "--severity-all", "--format", "report",
-             "-o", os.path.join(FAB, "drc-panel.rpt"), ppcb], env=env)
-        fab_outputs(PANEL, ppcb, [net, PUSB_NET], env, renders=True, step=False)
+    # 6. Panel del pedido: la placa principal con rieles, marcas de JLCPCB y puentes con mouse bites
+    ppcb = os.path.join(KDIR, PANEL + ".kicad_pcb")
+    shutil.copy(os.path.join(KDIR, PROJECT + ".kicad_pro"), os.path.join(KDIR, PANEL + ".kicad_pro"))
+    run([KPY, os.path.join(HERE, "panelize.py"), os.path.join(KDIR, "panel.json"), ppcb], env=env)
+    run([KCLI, "pcb", "drc", "--refill-zones", "--severity-all", "--format", "report",
+         "-o", os.path.join(FAB, "drc-panel.rpt"), ppcb], env=env)
+    fab_outputs(PANEL, ppcb, [net], env, renders=True, step=False)
     shutil.rmtree(tmp, ignore_errors=True)
     print("listo:", FAB)
 

@@ -1,11 +1,14 @@
-"""Estimación del costo de montaje en JLCPCB: panel único de las dos placas frente a pedidos separados.
+"""Estimación del costo de montaje en JLCPCB.
 
     python3 cost_jlc.py <salida.md> <placas> <bom_principal.csv> <pcb_principal> [<bom_usb.csv> <pcb_usb>]
+
+Con la placa principal sola (v0.3) estima su panel en PCBA Standard. Con la placa del USB-C (v0.2)
+compara además el panel único de las dos placas con dos pedidos separados.
 
 Consulta precio, existencias, clase y rayos X de cada pieza en la API pública de JLCPCB (con caché en
 fab/jlc_parts_cache.json). Tarifas de la página «PCB assembly price» de JLCPCB (actualizada el
 09-09-2026, consultada el 04-10-2026); conviene confirmarlas en el cotizador antes de pedir. El PCB
-desnudo no entra: su precio de 4 capas con dos diseños no está publicado y solo lo da el cotizador.
+desnudo no entra: su precio de 4 capas no está publicado y solo lo da el cotizador.
 """
 
 import csv
@@ -125,15 +128,18 @@ def main():
                 acc[code] = (c, n + len(ds))
         return [(code, c, n) for code, (c, n) in acc.items()]
 
-    # (A) Panel único con las dos placas, PCBA Standard
+    two = len(pairs) > 1
+    unit = "juego" if two else "placa"
+    # (A) Panel único (con las dos placas en v0.2), PCBA Standard
     lines_a = merge(boms)
     parts_a, rows_a, ext_a, xray_a = parts_cost(lines_a, boards, cache)
     j_a = sum(joints) * boards
-    asm_a = {"Preparación Standard": STD["setup"], "Plantilla": STD["stencil"],
-             "Panel con %d diseños" % len(pairs): STD["panel"] if len(pairs) > 1 else 0.0,
-             "Alimentadores: %d piezas distintas x %.2f" % (len(lines_a), STD["feeder"]): len(lines_a) * STD["feeder"],
-             "Juntas: %d x %.4f" % (j_a, JOINT): j_a * JOINT,
-             "Rayos X: %d componentes" % xray_a: xray_a * xray_fee(xray_a)}
+    asm_a = {"Preparación Standard": STD["setup"], "Plantilla": STD["stencil"]}
+    if two:
+        asm_a["Panel con %d diseños" % len(pairs)] = STD["panel"]
+    asm_a.update({"Alimentadores: %d piezas distintas x %.2f" % (len(lines_a), STD["feeder"]): len(lines_a) * STD["feeder"],
+                  "Juntas: %d x %.4f" % (j_a, JOINT): j_a * JOINT,
+                  "Rayos X: %d componentes" % xray_a: xray_a * xray_fee(xray_a)})
     total_a = parts_a + sum(asm_a.values())
     # (B) Pedidos separados: principal en Standard, placa del USB-C en Economic
     res_b = []
@@ -151,23 +157,26 @@ def main():
     total_b = sum(p + a for _, _, p, a in res_b)
 
     with open(out, "w", encoding="utf-8") as f:
-        f.write("# Estimación de costo en JLCPCB (%d juegos de placas)\n\n" % boards)
+        f.write("# Estimación de costo en JLCPCB (%d %s)\n\n" % (boards, "juegos de placas" if two else "placas"))
         f.write("Precios, existencias y clase de la API pública de JLCPCB consultada al generar este archivo; "
                 "tarifas de montaje de su página de precios (09-09-2026). No es una cotización: confirmar en "
-                "https://cart.jlcpcb.com/quote antes de pedir. **No incluye el PCB desnudo** (4 capas, panel con "
-                "dos diseños: su precio y el cargo por diseño distinto solo los da el cotizador) ni el envío.\n\n")
-        f.write("| LCSC | Pieza | Por juego | Clase | Rayos X | Existencias | USD/u | Compra | USD |\n")
+                "https://cart.jlcpcb.com/quote antes de pedir. **No incluye el PCB desnudo** (%s) ni el envío.\n\n"
+                % ("4 capas, panel con dos diseños: su precio y el cargo por diseño distinto solo los da el cotizador"
+                   if two else "4 capas, en panel: su precio solo lo da el cotizador"))
+        f.write("| LCSC | Pieza | Por %s | Clase | Rayos X | Existencias | USD/u | Compra | USD |\n" % unit)
         f.write("| --- | --- | ---: | --- | --- | ---: | ---: | ---: | ---: |\n")
         for code, comment, n, info, up, buy, cost in sorted(rows_a, key=lambda r: -r[6]):
             f.write("| %s | %s (%s) | %d | %s | %s | %s | %.4f | %d | %.2f |\n" % (
                 code, comment, info["mpn"] or "?", n, info["type"] or "?", "sí" if info.get("xray") else "no",
                 info["stock"], up, buy, cost))
-        f.write("\n## (A) Un solo pedido: panel con las dos placas, PCBA Standard\n\n| Concepto | USD |\n| --- | ---: |\n")
+        f.write("\n## %s\n\n| Concepto | USD |\n| --- | ---: |\n"
+                % ("(A) Un solo pedido: panel con las dos placas, PCBA Standard" if two
+                   else "Panel de la placa principal, PCBA Standard"))
         f.write("| Piezas | %.2f |\n" % parts_a)
         for k, v in asm_a.items():
             f.write("| %s | %.2f |\n" % (k, v))
-        f.write("| **Montaje + piezas** | **%.2f** |\n| Por juego | %.2f |\n" % (total_a, total_a / boards))
-        if len(pairs) > 1:
+        f.write("| **Montaje + piezas** | **%.2f** |\n| Por %s | %.2f |\n" % (total_a, unit, total_a / boards))
+        if two:
             f.write("\n## (B) Dos pedidos: principal en Standard y placa del USB-C en Economic\n\n")
             f.write("| Pedido | Montaje | Piezas | Montaje + piezas |\n| --- | --- | ---: | ---: |\n")
             for name, kind, parts, asm in res_b:
@@ -177,7 +186,10 @@ def main():
                     "hay dos PCB y dos envíos; en (A) un solo PCB más grande con cargo por diseño distinto.\n"
                     % (total_b - total_a))
     json.dump(cache, open(cache_path, "w"), indent=1)
-    print("panel único %.2f USD; separados %.2f USD (%d juegos, sin PCB desnudo)" % (total_a, total_b, boards))
+    if two:
+        print("panel único %.2f USD; separados %.2f USD (%d juegos, sin PCB desnudo)" % (total_a, total_b, boards))
+    else:
+        print("placa principal %.2f USD (%d placas, sin PCB desnudo)" % (total_a, boards))
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 (export
 	(version "E")
 	(design
-		(source "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-kicad/hardware/main-board/kicad/tresvizo-main.kicad_sch")
-		(date "2026-10-07T16:51:04")
+		(source "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-v03/hardware/main-board/kicad/tresvizo-main.kicad_sch")
+		(date "2026-10-08T07:03:06")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")
@@ -11,8 +11,8 @@
 			(title_block
 				(title "TresVizo MeridianV — placa principal")
 				(company "TresVizo")
-				(rev "0.2")
-				(date "2026-10-04")
+				(rev "0.3")
+				(date "2026-10-07")
 				(source "tresvizo-main.kicad_sch")
 				(comment
 					(number "1")
@@ -20,15 +20,15 @@
 				)
 				(comment
 					(number "2")
-					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS por conector")
 				)
 				(comment
 					(number "3")
-					(value "JLCPCB 4 capas JLC04161H-7628")
+					(value "v0.3 compacta: USB-C, OLED, botón, LED y BMI088 en la placa")
 				)
 				(comment
 					(number "4")
-					(value "")
+					(value "JLCPCB 4 capas JLC04161H-7628")
 				)
 				(comment
 					(number "5")
@@ -59,8 +59,8 @@
 			(title_block
 				(title "Alimentación, carga y batería")
 				(company "TresVizo")
-				(rev "0.2")
-				(date "2026-10-04")
+				(rev "0.3")
+				(date "2026-10-07")
 				(source "power.kicad_sch")
 				(comment
 					(number "1")
@@ -68,15 +68,15 @@
 				)
 				(comment
 					(number "2")
-					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS por conector")
 				)
 				(comment
 					(number "3")
-					(value "JLCPCB 4 capas JLC04161H-7628")
+					(value "v0.3 compacta: USB-C, OLED, botón, LED y BMI088 en la placa")
 				)
 				(comment
 					(number "4")
-					(value "")
+					(value "JLCPCB 4 capas JLC04161H-7628")
 				)
 				(comment
 					(number "5")
@@ -107,8 +107,8 @@
 			(title_block
 				(title "ESP32-S3")
 				(company "TresVizo")
-				(rev "0.2")
-				(date "2026-10-04")
+				(rev "0.3")
+				(date "2026-10-07")
 				(source "mcu.kicad_sch")
 				(comment
 					(number "1")
@@ -116,15 +116,15 @@
 				)
 				(comment
 					(number "2")
-					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS por conector")
 				)
 				(comment
 					(number "3")
-					(value "JLCPCB 4 capas JLC04161H-7628")
+					(value "v0.3 compacta: USB-C, OLED, botón, LED y BMI088 en la placa")
 				)
 				(comment
 					(number "4")
-					(value "")
+					(value "JLCPCB 4 capas JLC04161H-7628")
 				)
 				(comment
 					(number "5")
@@ -155,8 +155,8 @@
 			(title_block
 				(title "GNSS: carrier UM980 por conector y su 5 V")
 				(company "TresVizo")
-				(rev "0.2")
-				(date "2026-10-04")
+				(rev "0.3")
+				(date "2026-10-07")
 				(source "gnss.kicad_sch")
 				(comment
 					(number "1")
@@ -164,15 +164,15 @@
 				)
 				(comment
 					(number "2")
-					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS por conector")
 				)
 				(comment
 					(number "3")
-					(value "JLCPCB 4 capas JLC04161H-7628")
+					(value "v0.3 compacta: USB-C, OLED, botón, LED y BMI088 en la placa")
 				)
 				(comment
 					(number "4")
-					(value "")
+					(value "JLCPCB 4 capas JLC04161H-7628")
 				)
 				(comment
 					(number "5")
@@ -198,13 +198,13 @@
 		)
 		(sheet
 			(number "5")
-			(name "/microSD, IMU por conector y panel/")
+			(name "/microSD, IMU, OLED, botón y LED/")
 			(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			(title_block
-				(title "microSD, IMU por conector y panel")
+				(title "microSD, IMU, OLED, botón y LED")
 				(company "TresVizo")
-				(rev "0.2")
-				(date "2026-10-04")
+				(rev "0.3")
+				(date "2026-10-07")
 				(source "io.kicad_sch")
 				(comment
 					(number "1")
@@ -212,15 +212,15 @@
 				)
 				(comment
 					(number "2")
-					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS e IMU por conector")
+					(value "ESP32-S3-WROOM-1-N16R2 + BQ25798 (1S; 2S por variante); GNSS por conector")
 				)
 				(comment
 					(number "3")
-					(value "JLCPCB 4 capas JLC04161H-7628")
+					(value "v0.3 compacta: USB-C, OLED, botón, LED y BMI088 en la placa")
 				)
 				(comment
 					(number "4")
-					(value "")
+					(value "JLCPCB 4 capas JLC04161H-7628")
 				)
 				(comment
 					(number "5")
@@ -1570,7 +1570,7 @@
 			(ref "D101")
 			(value "SMF15A")
 			(footprint "tresvizo_lcsc:SOD-123FL_L2.7-W1.8-LS3.8-RD")
-			(description "TVS de VBUS: 15 V de trabajo, limita a 24.4 V a 8.2 A (VBUS del BQ25798: 30 V máx.)")
+			(description "TVS de VBUS junto al USB-C: 15 V de trabajo, limita a 24.4 V a 8.2 A (VBUS del BQ25798: 30 V máx.)")
 			(fields
 				(field
 					(name "MPN") "SMF15A")
@@ -1582,7 +1582,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "TVS de VBUS: 15 V de trabajo, limita a 24.4 V a 8.2 A (VBUS del BQ25798: 30 V máx.)")
+					(name "Description") "TVS de VBUS junto al USB-C: 15 V de trabajo, limita a 24.4 V a 8.2 A (VBUS del BQ25798: 30 V máx.)")
 			)
 			(libsource
 				(lib "Device")
@@ -1634,34 +1634,34 @@
 		)
 		(comp
 			(ref "J101")
-			(value "PANEL_USB")
-			(footprint "tresvizo_lcsc:CONN-SMD_8P-P1.25_XUNPU-WAFER-GH1.25-8PWB")
-			(description "GH 8 lateral a la placa del USB-C del panel: VBUS x3, GND x3, D-, D+ (cable 1 a 1)")
+			(value "USB_C")
+			(footprint "tresvizo_lcsc:USB-C_SMD-TYPE-C-31-M-12")
+			(datasheet "https://www.lcsc.com/datasheet/lcsc_datasheet_2205251630_Korean-Hroparts-Elec-TYPE-C-31-M-12_C165948.pdf")
+			(description "HRO TYPE-C-31-M-12: USB-C 16 contactos horizontal (huella y modelo de la panel-usb); carcasa a GND; cara 1.29 mm por delante del canto en la panel-usb, eje a ~1.65 mm de la placa")
 			(fields
 				(field
-					(name "MPN") "WAFER-GH1.25-8PWB")
+					(name "MPN") "TYPE-C-31-M-12")
 				(field
-					(name "LCSC") "C3029383")
+					(name "LCSC") "C165948")
 				(field
-					(name "Footprint") "tresvizo_lcsc:CONN-SMD_8P-P1.25_XUNPU-WAFER-GH1.25-8PWB")
+					(name "Footprint") "tresvizo_lcsc:USB-C_SMD-TYPE-C-31-M-12")
 				(field
-					(name "Datasheet")
-				)
+					(name "Datasheet") "https://www.lcsc.com/datasheet/lcsc_datasheet_2205251630_Korean-Hroparts-Elec-TYPE-C-31-M-12_C165948.pdf")
 				(field
-					(name "Description") "GH 8 lateral a la placa del USB-C del panel: VBUS x3, GND x3, D-, D+ (cable 1 a 1)")
+					(name "Description") "HRO TYPE-C-31-M-12: USB-C 16 contactos horizontal (huella y modelo de la panel-usb); carcasa a GND; cara 1.29 mm por delante del canto en la panel-usb, eje a ~1.65 mm de la placa")
 			)
 			(libsource
-				(lib "Connector_Generic_MountingPin")
-				(part "Conn_01x08_MountingPin")
-				(description "Generic connectable mounting pin connector, single row, 01x08, script generated (kicad-library-utils/schlib/autogen/connector/)")
+				(lib "Connector")
+				(part "USB_C_Receptacle_USB2.0_16P")
+				(description "USB 2.0-only 16P Type-C Receptacle connector")
 			)
 			(property
 				(name "MPN")
-				(value "WAFER-GH1.25-8PWB")
+				(value "TYPE-C-31-M-12")
 			)
 			(property
 				(name "LCSC")
-				(value "C3029383")
+				(value "C165948")
 			)
 			(property
 				(name "Sheetname")
@@ -1673,11 +1673,11 @@
 			)
 			(property
 				(name "ki_keywords")
-				(value "connector")
+				(value "usb universal serial bus type-C USB2.0")
 			)
 			(property
 				(name "ki_fp_filters")
-				(value "Connector*:*_1x??-1MP*")
+				(value "USB*C*Receptacle*")
 			)
 			(sheetpath
 				(names "/Alimentación, carga y batería/")
@@ -1689,31 +1689,55 @@
 					(name "A")
 					(pins
 						(pin
-							(num "1")
+							(num "SH")
 						)
 						(pin
-							(num "2")
+							(num "A1")
 						)
 						(pin
-							(num "3")
+							(num "A12")
 						)
 						(pin
-							(num "4")
+							(num "B1")
 						)
 						(pin
-							(num "5")
+							(num "B12")
 						)
 						(pin
-							(num "6")
+							(num "A4")
 						)
 						(pin
-							(num "7")
+							(num "A9")
 						)
 						(pin
-							(num "8")
+							(num "B4")
 						)
 						(pin
-							(num "MP")
+							(num "B9")
+						)
+						(pin
+							(num "A5")
+						)
+						(pin
+							(num "B5")
+						)
+						(pin
+							(num "A7")
+						)
+						(pin
+							(num "B7")
+						)
+						(pin
+							(num "A6")
+						)
+						(pin
+							(num "B6")
+						)
+						(pin
+							(num "A8")
+						)
+						(pin
+							(num "B8")
 						)
 					)
 				)
@@ -1722,33 +1746,33 @@
 		(comp
 			(ref "J102")
 			(value "BATTERY")
-			(footprint "tresvizo_lcsc:CONN-SMD_P2.00_S2B-PH-SM4-TB-LF-SN")
-			(description "JST PH 2: 1 = BAT-, 2 = BAT+ (medir el pack)")
+			(footprint "tresvizo_lcsc:CONN-SMD_4P-P1.25_SM04B-GHS-TB-LF-SN")
+			(description "JST GH 4 lateral al pack 1S2P: 1-2 = BAT-, 3-4 = BAT+ (dos contactos por polo, ~1 A cada uno). El pack necesita cable GH de 4 hilos AWG 26; ICHG del BQ25798 <= 1.5 A. Medir el pack antes de enchufar")
 			(fields
 				(field
-					(name "MPN") "S2B-PH-SM4-TB(LF)(SN)")
+					(name "MPN") "SM04B-GHS-TB(LF)(SN)")
 				(field
-					(name "LCSC") "C295747")
+					(name "LCSC") "C189895")
 				(field
-					(name "Footprint") "tresvizo_lcsc:CONN-SMD_P2.00_S2B-PH-SM4-TB-LF-SN")
+					(name "Footprint") "tresvizo_lcsc:CONN-SMD_4P-P1.25_SM04B-GHS-TB-LF-SN")
 				(field
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "JST PH 2: 1 = BAT-, 2 = BAT+ (medir el pack)")
+					(name "Description") "JST GH 4 lateral al pack 1S2P: 1-2 = BAT-, 3-4 = BAT+ (dos contactos por polo, ~1 A cada uno). El pack necesita cable GH de 4 hilos AWG 26; ICHG del BQ25798 <= 1.5 A. Medir el pack antes de enchufar")
 			)
 			(libsource
 				(lib "Connector_Generic_MountingPin")
-				(part "Conn_01x02_MountingPin")
-				(description "Generic connectable mounting pin connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)")
+				(part "Conn_01x04_MountingPin")
+				(description "Generic connectable mounting pin connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
 			)
 			(property
 				(name "MPN")
-				(value "S2B-PH-SM4-TB(LF)(SN)")
+				(value "SM04B-GHS-TB(LF)(SN)")
 			)
 			(property
 				(name "LCSC")
-				(value "C295747")
+				(value "C189895")
 			)
 			(property
 				(name "Sheetname")
@@ -1780,6 +1804,12 @@
 						)
 						(pin
 							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
 						)
 						(pin
 							(num "MP")
@@ -3253,10 +3283,142 @@
 			)
 		)
 		(comp
+			(ref "R119")
+			(value "5.1k")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(description "Rd de CC1: el cargador ve un sumidero y entrega 5 V (sin PD ni HVDCP)")
+			(fields
+				(field
+					(name "MPN") "0402WGF5101TCE")
+				(field
+					(name "LCSC") "C25905")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Rd de CC1: el cargador ve un sumidero y entrega 5 V (sin PD ni HVDCP)")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF5101TCE")
+			)
+			(property
+				(name "LCSC")
+				(value "C25905")
+			)
+			(property
+				(name "Sheetname")
+				(value "Alimentación, carga y batería")
+			)
+			(property
+				(name "Sheetfile")
+				(value "power.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/Alimentación, carga y batería/")
+				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
+			)
+			(tstamps "e8631686-79af-5c09-aa89-23d73103a2e9")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R120")
+			(value "5.1k")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(description "Rd de CC2")
+			(fields
+				(field
+					(name "MPN") "0402WGF5101TCE")
+				(field
+					(name "LCSC") "C25905")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Rd de CC2")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF5101TCE")
+			)
+			(property
+				(name "LCSC")
+				(value "C25905")
+			)
+			(property
+				(name "Sheetname")
+				(value "Alimentación, carga y batería")
+			)
+			(property
+				(name "Sheetfile")
+				(value "power.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/Alimentación, carga y batería/")
+				(tstamps "/e680a61f-2584-5531-b79e-1aca3f5bfe2f/")
+			)
+			(tstamps "09929c41-6212-5237-8c79-a9f9f3f1bff1")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
 			(ref "U101")
 			(value "USBLC6-2SC6")
 			(footprint "tresvizo_lcsc:SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL")
-			(description "ESD de D+/D-; pin 5 a +3V3 (rompe a 6 V, no va a VBUS)")
+			(description "ESD de D+/D- junto al USB-C; pin 5 a +3V3 (rompe a 6 V, no va a VBUS)")
 			(fields
 				(field
 					(name "MPN") "USBLC6-2SC6")
@@ -3268,7 +3430,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "ESD de D+/D-; pin 5 a +3V3 (rompe a 6 V, no va a VBUS)")
+					(name "Description") "ESD de D+/D- junto al USB-C; pin 5 a +3V3 (rompe a 6 V, no va a VBUS)")
 			)
 			(libsource
 				(lib "Power_Protection")
@@ -4666,6 +4828,114 @@
 			)
 		)
 		(comp
+			(ref "TP208")
+			(value "U0TXD")
+			(footprint "TestPoint:TestPoint_Pad_D1.0mm")
+			(fields
+				(field
+					(name "Footprint") "TestPoint:TestPoint_Pad_D1.0mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description")
+				)
+			)
+			(libsource
+				(lib "Connector")
+				(part "TestPoint")
+				(description "test point")
+			)
+			(property
+				(name "Sheetname")
+				(value "ESP32-S3")
+			)
+			(property
+				(name "Sheetfile")
+				(value "mcu.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "test point tp")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Pin* Test*")
+			)
+			(sheetpath
+				(names "/ESP32-S3/")
+				(tstamps "/e9e785da-599d-5483-8195-25e4e46f5dcf/")
+			)
+			(tstamps "706ba342-6901-5a9d-8670-c8cfaadeb2f1")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "TP209")
+			(value "U0RXD")
+			(footprint "TestPoint:TestPoint_Pad_D1.0mm")
+			(fields
+				(field
+					(name "Footprint") "TestPoint:TestPoint_Pad_D1.0mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description")
+				)
+			)
+			(libsource
+				(lib "Connector")
+				(part "TestPoint")
+				(description "test point")
+			)
+			(property
+				(name "Sheetname")
+				(value "ESP32-S3")
+			)
+			(property
+				(name "Sheetfile")
+				(value "mcu.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "test point tp")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Pin* Test*")
+			)
+			(sheetpath
+				(names "/ESP32-S3/")
+				(tstamps "/e9e785da-599d-5483-8195-25e4e46f5dcf/")
+			)
+			(tstamps "18769a5b-fac3-515a-b8f2-bb9b6622c4bd")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
 			(ref "U201")
 			(value "ESP32-S3-WROOM-1-N16R2")
 			(footprint "tresvizo_lcsc:WIRELM-SMD_ESP32-S3-WROOM-1")
@@ -5314,7 +5584,7 @@
 			(ref "J301")
 			(value "GNSS")
 			(footprint "tresvizo_lcsc:CONN-TH_SM08B-SRSS-TB-LF-SN")
-			(description "SH 8 lateral (JST SM08B-SRSS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND. SH y no GH, para que no se pueda cruzar con J101 (GH 8 con VBUS)")
+			(description "SH 8 lateral (JST SM08B-SRSS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND. SH y no GH, para que no se pueda cruzar con J102 (GH 4 de la batería)")
 			(fields
 				(field
 					(name "MPN") "SM08B-SRSS-TB(LF)(SN)")
@@ -5326,7 +5596,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "SH 8 lateral (JST SM08B-SRSS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND. SH y no GH, para que no se pueda cruzar con J101 (GH 8 con VBUS)")
+					(name "Description") "SH 8 lateral (JST SM08B-SRSS-TB): 5V, GND, RXD2, TXD2, PPS, EVENT, RESET_N, GND. SH y no GH, para que no se pueda cruzar con J102 (GH 4 de la batería)")
 			)
 			(libsource
 				(lib "Connector_Generic_MountingPin")
@@ -6391,7 +6661,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -6406,7 +6676,7 @@
 				(value "C_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "3af1bd58-45d1-5fb9-8969-ae0502ff7a17")
@@ -6457,7 +6727,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -6472,7 +6742,7 @@
 				(value "C_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "25ba46b6-4506-5a35-bbfd-827a4f592a7d")
@@ -6491,10 +6761,142 @@
 			)
 		)
 		(comp
+			(ref "C403")
+			(value "100nF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(description "100nF 50V X7R")
+			(fields
+				(field
+					(name "MPN") "CL05B104KB54PNC")
+				(field
+					(name "LCSC") "C307331")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "100nF 50V X7R")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "MPN")
+				(value "CL05B104KB54PNC")
+			)
+			(property
+				(name "LCSC")
+				(value "C307331")
+			)
+			(property
+				(name "Sheetname")
+				(value "microSD, IMU, OLED, botón y LED")
+			)
+			(property
+				(name "Sheetfile")
+				(value "io.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/microSD, IMU, OLED, botón y LED/")
+				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
+			)
+			(tstamps "22803ba6-4243-5567-9328-18fb643647da")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C404")
+			(value "100nF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(description "100nF 50V X7R")
+			(fields
+				(field
+					(name "MPN") "CL05B104KB54PNC")
+				(field
+					(name "LCSC") "C307331")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "100nF 50V X7R")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "MPN")
+				(value "CL05B104KB54PNC")
+			)
+			(property
+				(name "LCSC")
+				(value "C307331")
+			)
+			(property
+				(name "Sheetname")
+				(value "microSD, IMU, OLED, botón y LED")
+			)
+			(property
+				(name "Sheetfile")
+				(value "io.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/microSD, IMU, OLED, botón y LED/")
+				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
+			)
+			(tstamps "023dd364-a666-5b5e-85c4-980c00318d95")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
 			(ref "D401")
 			(value "PESD5V0F1BL")
 			(footprint "tresvizo_lcsc:SOD-882_L1.0-W0.6-BI")
-			(description "ESD del botón metálico, UMW (fuga < 1 nA: QON tiene un pull-up de 200 kohm)")
+			(description "ESD del botón (la tecla deja llegar descargas al botón de latón), UMW; fuga < 1 nA: QON tiene un pull-up de 200 kohm")
 			(fields
 				(field
 					(name "MPN") "PESD5V0F1BL")
@@ -6506,7 +6908,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "ESD del botón metálico, UMW (fuga < 1 nA: QON tiene un pull-up de 200 kohm)")
+					(name "Description") "ESD del botón (la tecla deja llegar descargas al botón de latón), UMW; fuga < 1 nA: QON tiene un pull-up de 200 kohm")
 			)
 			(libsource
 				(lib "Device")
@@ -6523,7 +6925,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -6538,7 +6940,7 @@
 				(value "TO-???* *_Diode_* *SingleDiode* D_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "e532c350-01de-5616-95d1-1cc0694477c3")
@@ -6589,7 +6991,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -6604,10 +7006,76 @@
 				(value "TO-???* *_Diode_* *SingleDiode* D_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "c815ad1e-98f4-5dbf-9629-a2f91a39e57f")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "D403")
+			(value "KT-0603R")
+			(footprint "tresvizo_lcsc:LED-SMD_L1.6-W0.8-R-RD")
+			(datasheet "https://www.lcsc.com/datasheet/lcsc_datasheet_1810231112_Hubei-KENTO-Elec-KT-0603R_C2286.pdf")
+			(description "LED de estado rojo 0603, junto al botón bajo su ventanita (pad 1 = cátodo)")
+			(fields
+				(field
+					(name "MPN") "KT-0603R")
+				(field
+					(name "LCSC") "C2286")
+				(field
+					(name "Footprint") "tresvizo_lcsc:LED-SMD_L1.6-W0.8-R-RD")
+				(field
+					(name "Datasheet") "https://www.lcsc.com/datasheet/lcsc_datasheet_1810231112_Hubei-KENTO-Elec-KT-0603R_C2286.pdf")
+				(field
+					(name "Description") "LED de estado rojo 0603, junto al botón bajo su ventanita (pad 1 = cátodo)")
+			)
+			(libsource
+				(lib "Device")
+				(part "LED")
+				(description "Light emitting diode")
+			)
+			(property
+				(name "MPN")
+				(value "KT-0603R")
+			)
+			(property
+				(name "LCSC")
+				(value "C2286")
+			)
+			(property
+				(name "Sheetname")
+				(value "microSD, IMU, OLED, botón y LED")
+			)
+			(property
+				(name "Sheetfile")
+				(value "io.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "LED diode")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "LED* LED_SMD:* LED_THT:*")
+			)
+			(sheetpath
+				(names "/microSD, IMU, OLED, botón y LED/")
+				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
+			)
+			(tstamps "0ecd110f-4b0c-59a3-bd80-0695fa679c26")
 			(units
 				(unit
 					(name "A")
@@ -6655,14 +7123,14 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
 				(value "io.kicad_sch")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "a6cd5f60-e1ad-5344-ac02-62a78c514c23")
@@ -6714,118 +7182,34 @@
 			)
 		)
 		(comp
-			(ref "J402")
-			(value "BOTON")
-			(footprint "tresvizo_lcsc:CONN-SMD_4P-P1.25_SM04B-GHS-TB-LF-SN")
-			(description "GH 4 lateral al botón del panel: GND, contacto, anillo LED ánodo y cátodo")
-			(fields
-				(field
-					(name "MPN") "SM04B-GHS-TB(LF)(SN)")
-				(field
-					(name "LCSC") "C189895")
-				(field
-					(name "Footprint") "tresvizo_lcsc:CONN-SMD_4P-P1.25_SM04B-GHS-TB-LF-SN")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "GH 4 lateral al botón del panel: GND, contacto, anillo LED ánodo y cátodo")
-			)
-			(libsource
-				(lib "Connector_Generic_MountingPin")
-				(part "Conn_01x04_MountingPin")
-				(description "Generic connectable mounting pin connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
-			)
-			(property
-				(name "MPN")
-				(value "SM04B-GHS-TB(LF)(SN)")
-			)
-			(property
-				(name "LCSC")
-				(value "C189895")
-			)
-			(property
-				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
-			)
-			(property
-				(name "Sheetfile")
-				(value "io.kicad_sch")
-			)
-			(property
-				(name "ki_keywords")
-				(value "connector")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "Connector*:*_1x??-1MP*")
-			)
-			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
-				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
-			)
-			(tstamps "51204580-0ec5-5ea8-8e6e-db1611443a74")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-						(pin
-							(num "3")
-						)
-						(pin
-							(num "4")
-						)
-						(pin
-							(num "MP")
-						)
-					)
-				)
-			)
-		)
-		(comp
 			(ref "J403")
 			(value "OLED")
-			(footprint "tresvizo_lcsc:CONN-SMD_4P-P1.00_SM04B-SRSS-TB-LF-SN")
-			(description "JST SH 4 lateral con el orden Qwiic: GND, 3V3, SDA, SCL")
+			(footprint "tresvizo_lcsc:OLED_0.96in_I2C_4P_P2.54mm")
+			(description "Módulo OLED 0.96 in I2C de 4 pines del propietario (no va en el montaje de JLCPCB): 1 GND, 2 +3V3, 3 I2C_SCL, 4 I2C_SDA; pin 1 = el de la izquierda mirado de frente con los pines arriba")
 			(fields
 				(field
-					(name "MPN") "SM04B-SRSS-TB(LF)(SN)")
-				(field
-					(name "LCSC") "C160404")
-				(field
-					(name "Footprint") "tresvizo_lcsc:CONN-SMD_4P-P1.00_SM04B-SRSS-TB-LF-SN")
+					(name "Footprint") "tresvizo_lcsc:OLED_0.96in_I2C_4P_P2.54mm")
 				(field
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "JST SH 4 lateral con el orden Qwiic: GND, 3V3, SDA, SCL")
+					(name "Description") "Módulo OLED 0.96 in I2C de 4 pines del propietario (no va en el montaje de JLCPCB): 1 GND, 2 +3V3, 3 I2C_SCL, 4 I2C_SDA; pin 1 = el de la izquierda mirado de frente con los pines arriba")
 			)
 			(libsource
-				(lib "Connector_Generic_MountingPin")
-				(part "Conn_01x04_MountingPin")
-				(description "Generic connectable mounting pin connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
-			)
-			(property
-				(name "MPN")
-				(value "SM04B-SRSS-TB(LF)(SN)")
-			)
-			(property
-				(name "LCSC")
-				(value "C160404")
+				(lib "Connector_Generic")
+				(part "Conn_01x04")
+				(description "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
 				(value "io.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
 			)
 			(property
 				(name "ki_keywords")
@@ -6833,10 +7217,10 @@
 			)
 			(property
 				(name "ki_fp_filters")
-				(value "Connector*:*_1x??-1MP*")
+				(value "Connector*:*_1x??_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "a7d7c092-bfab-59e6-a1df-c1fa38a06dad")
@@ -6855,9 +7239,6 @@
 						)
 						(pin
 							(num "4")
-						)
-						(pin
-							(num "MP")
 						)
 					)
 				)
@@ -6896,7 +7277,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -6911,7 +7292,7 @@
 				(value "Connector*:*_1x??-1MP*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "a9d4af64-8325-59a8-bcac-5ded49b9584d")
@@ -6924,90 +7305,6 @@
 						)
 						(pin
 							(num "2")
-						)
-						(pin
-							(num "MP")
-						)
-					)
-				)
-			)
-		)
-		(comp
-			(ref "J405")
-			(value "IMU")
-			(footprint "tresvizo_lcsc:CONN-SMD_SM7B-GHS-TB-LF-SN")
-			(description "GH 7 lateral al BMI088 de la tapa (I2C): 3V3, GND, SDO a GND, SDA, SCL, INT1, INT3")
-			(fields
-				(field
-					(name "MPN") "SM07B-GHS-TB(LF)(SN)")
-				(field
-					(name "LCSC") "C495552")
-				(field
-					(name "Footprint") "tresvizo_lcsc:CONN-SMD_SM7B-GHS-TB-LF-SN")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "GH 7 lateral al BMI088 de la tapa (I2C): 3V3, GND, SDO a GND, SDA, SCL, INT1, INT3")
-			)
-			(libsource
-				(lib "Connector_Generic_MountingPin")
-				(part "Conn_01x07_MountingPin")
-				(description "Generic connectable mounting pin connector, single row, 01x07, script generated (kicad-library-utils/schlib/autogen/connector/)")
-			)
-			(property
-				(name "MPN")
-				(value "SM07B-GHS-TB(LF)(SN)")
-			)
-			(property
-				(name "LCSC")
-				(value "C495552")
-			)
-			(property
-				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
-			)
-			(property
-				(name "Sheetfile")
-				(value "io.kicad_sch")
-			)
-			(property
-				(name "ki_keywords")
-				(value "connector")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "Connector*:*_1x??-1MP*")
-			)
-			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
-				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
-			)
-			(tstamps "6271e17f-9a4c-5756-ba03-c5a273d9a91d")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-						(pin
-							(num "3")
-						)
-						(pin
-							(num "4")
-						)
-						(pin
-							(num "5")
-						)
-						(pin
-							(num "6")
-						)
-						(pin
-							(num "7")
 						)
 						(pin
 							(num "MP")
@@ -7049,7 +7346,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -7064,79 +7361,10 @@
 				(value "SOT?23*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "54adc09d-9fc9-51bb-9295-1551d41c2697")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "3")
-						)
-						(pin
-							(num "2")
-						)
-					)
-				)
-			)
-		)
-		(comp
-			(ref "Q402")
-			(value "AO3400A")
-			(footprint "tresvizo_lcsc:SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR")
-			(fields
-				(field
-					(name "MPN") "AO3400A")
-				(field
-					(name "LCSC") "C20917")
-				(field
-					(name "Footprint") "tresvizo_lcsc:SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description")
-				)
-			)
-			(libsource
-				(lib "Transistor_FET")
-				(part "AO3400A")
-				(description "30V Vds, 5.7A Id, N-Channel MOSFET, SOT-23")
-			)
-			(property
-				(name "MPN")
-				(value "AO3400A")
-			)
-			(property
-				(name "LCSC")
-				(value "C20917")
-			)
-			(property
-				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
-			)
-			(property
-				(name "Sheetfile")
-				(value "io.kicad_sch")
-			)
-			(property
-				(name "ki_keywords")
-				(value "N-Channel MOSFET")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "SOT?23*")
-			)
-			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
-				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
-			)
-			(tstamps "70899dcb-ce87-5824-8e03-6419bb2471ec")
 			(units
 				(unit
 					(name "A")
@@ -7187,7 +7415,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -7202,7 +7430,7 @@
 				(value "R_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "c72ef235-82a2-5fb8-b45c-c4b92ddfad8e")
@@ -7253,7 +7481,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -7268,7 +7496,7 @@
 				(value "R_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "ab17944a-01fc-5a9d-ad71-8a6a4b4c49d8")
@@ -7319,7 +7547,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -7334,7 +7562,7 @@
 				(value "R_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "168f5000-3d91-58c2-ae3d-f2293c59087d")
@@ -7385,7 +7613,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -7400,7 +7628,7 @@
 				(value "R_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "a82ae598-5a77-599c-8d3f-ef5c54c3d414")
@@ -7451,7 +7679,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -7466,7 +7694,7 @@
 				(value "R_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "8aedb1f1-4017-5ddc-9470-1d8c979571b3")
@@ -7517,7 +7745,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -7532,7 +7760,7 @@
 				(value "R_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "212b6ea2-7b15-58f4-9fa3-fd167968d09b")
@@ -7583,7 +7811,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -7598,7 +7826,7 @@
 				(value "R_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "a5aac588-07d6-5262-b85f-13afb1be6b5f")
@@ -7649,7 +7877,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -7664,7 +7892,7 @@
 				(value "R_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "de9f1d96-83dd-5504-bcc1-ec8bf2b88971")
@@ -7684,21 +7912,21 @@
 		)
 		(comp
 			(ref "R409")
-			(value "100")
+			(value "330")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(description "Anillo del botón: usar la versión de 3-6 V (la de 12 V no enciende)")
+			(description "LED de estado: ~4.4 mA desde GPIO48 (3.3 V, LED rojo de ~1.85 V)")
 			(fields
 				(field
-					(name "MPN") "0402WGF1000TCE")
+					(name "MPN") "0402WGF3300TCE")
 				(field
-					(name "LCSC") "C25076")
+					(name "LCSC") "C25104")
 				(field
 					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
 				(field
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "Anillo del botón: usar la versión de 3-6 V (la de 12 V no enciende)")
+					(name "Description") "LED de estado: ~4.4 mA desde GPIO48 (3.3 V, LED rojo de ~1.85 V)")
 			)
 			(libsource
 				(lib "Device")
@@ -7707,15 +7935,15 @@
 			)
 			(property
 				(name "MPN")
-				(value "0402WGF1000TCE")
+				(value "0402WGF3300TCE")
 			)
 			(property
 				(name "LCSC")
-				(value "C25076")
+				(value "C25104")
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -7730,7 +7958,7 @@
 				(value "R_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "52c129dd-e964-52ef-b35d-20da23f26aa9")
@@ -7749,76 +7977,10 @@
 			)
 		)
 		(comp
-			(ref "R410")
-			(value "100k")
-			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(fields
-				(field
-					(name "MPN") "0402WGF1003TCE")
-				(field
-					(name "LCSC") "C25741")
-				(field
-					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description")
-				)
-			)
-			(libsource
-				(lib "Device")
-				(part "R")
-				(description "Resistor")
-			)
-			(property
-				(name "MPN")
-				(value "0402WGF1003TCE")
-			)
-			(property
-				(name "LCSC")
-				(value "C25741")
-			)
-			(property
-				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
-			)
-			(property
-				(name "Sheetfile")
-				(value "io.kicad_sch")
-			)
-			(property
-				(name "ki_keywords")
-				(value "R res resistor")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "R_*")
-			)
-			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
-				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
-			)
-			(tstamps "1145db06-177f-5fbf-a066-8c9d8a43c231")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-					)
-				)
-			)
-		)
-		(comp
 			(ref "R411")
 			(value "4.7k")
 			(footprint "Resistor_SMD:R_0402_1005Metric")
-			(description "Pull-ups del bus del IMU (400 kHz por ~15 cm de cable)")
+			(description "Pull-ups del bus del IMU a VDDIO (DS §6.2); hasta 400 kHz")
 			(fields
 				(field
 					(name "MPN") "0402WGF4701TCE")
@@ -7830,7 +7992,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "Pull-ups del bus del IMU (400 kHz por ~15 cm de cable)")
+					(name "Description") "Pull-ups del bus del IMU a VDDIO (DS §6.2); hasta 400 kHz")
 			)
 			(libsource
 				(lib "Device")
@@ -7847,7 +8009,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -7862,7 +8024,7 @@
 				(value "R_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "263b1811-942e-55de-84de-1a067240286d")
@@ -7913,7 +8075,7 @@
 			)
 			(property
 				(name "Sheetname")
-				(value "microSD, IMU por conector y panel")
+				(value "microSD, IMU, OLED, botón y LED")
 			)
 			(property
 				(name "Sheetfile")
@@ -7928,7 +8090,7 @@
 				(value "R_*")
 			)
 			(sheetpath
-				(names "/microSD, IMU por conector y panel/")
+				(names "/microSD, IMU, OLED, botón y LED/")
 				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
 			)
 			(tstamps "34b23e1e-83b8-5eb5-8634-d6af0e3d63b7")
@@ -7941,6 +8103,178 @@
 						)
 						(pin
 							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "SW401")
+			(value "BOTON")
+			(footprint "tresvizo_lcsc:SW-SMD_4P-L5.1-W5.1-P3.70-LS6.5-TL_H1.5")
+			(datasheet "https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_XKB-Connection-TS-1187A-B-A-B_C318884.pdf")
+			(description "Botón del equipo: pulsador táctil 5.1 x 5.1 x 1.5 mm (1.6 N) bajo la tecla de la cara plana")
+			(fields
+				(field
+					(name "MPN") "TS-1187A-B-A-B")
+				(field
+					(name "LCSC") "C318884")
+				(field
+					(name "Footprint") "tresvizo_lcsc:SW-SMD_4P-L5.1-W5.1-P3.70-LS6.5-TL_H1.5")
+				(field
+					(name "Datasheet") "https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_XKB-Connection-TS-1187A-B-A-B_C318884.pdf")
+				(field
+					(name "Description") "Botón del equipo: pulsador táctil 5.1 x 5.1 x 1.5 mm (1.6 N) bajo la tecla de la cara plana")
+			)
+			(libsource
+				(lib "tresvizo")
+				(part "SW_TACT")
+				(description "Pulsador táctil SMD de 4 pads; se conectan los pads diagonales 1 y 4")
+			)
+			(property
+				(name "MPN")
+				(value "TS-1187A-B-A-B")
+			)
+			(property
+				(name "LCSC")
+				(value "C318884")
+			)
+			(property
+				(name "Sheetname")
+				(value "microSD, IMU, OLED, botón y LED")
+			)
+			(property
+				(name "Sheetfile")
+				(value "io.kicad_sch")
+			)
+			(sheetpath
+				(names "/microSD, IMU, OLED, botón y LED/")
+				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
+			)
+			(tstamps "cb1e1466-651b-5f89-8273-1b8bc8a3218c")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U401")
+			(value "BMI088")
+			(footprint "tresvizo_lcsc:LGA-16_L4.5-W3.0-P0.50-BL")
+			(datasheet "https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmi088-ds001.pdf")
+			(description "Acelerómetro y giróscopo por I2C (0x18 y 0x68). Sin cobre en la capa superior bajo el encapsulado (DS §8.2); lejos del botón, de los agujeros, de los cantos y del calor")
+			(fields
+				(field
+					(name "MPN") "BMI088")
+				(field
+					(name "LCSC") "C194919")
+				(field
+					(name "Footprint") "tresvizo_lcsc:LGA-16_L4.5-W3.0-P0.50-BL")
+				(field
+					(name "Datasheet") "https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmi088-ds001.pdf")
+				(field
+					(name "Description") "Acelerómetro y giróscopo por I2C (0x18 y 0x68). Sin cobre en la capa superior bajo el encapsulado (DS §8.2); lejos del botón, de los agujeros, de los cantos y del calor")
+			)
+			(libsource
+				(lib "tresvizo")
+				(part "BMI088_I2C")
+				(description "BMI088 por I2C: PS y CSB1 a VDDIO, CSB2 al aire, SDO1/SDO2 fijan la dirección (a GND: acelerómetro 0x18, giróscopo 0x68)")
+			)
+			(property
+				(name "MPN")
+				(value "BMI088")
+			)
+			(property
+				(name "LCSC")
+				(value "C194919")
+			)
+			(property
+				(name "Sheetname")
+				(value "microSD, IMU, OLED, botón y LED")
+			)
+			(property
+				(name "Sheetfile")
+				(value "io.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "Bosch-Sensortec inertial-measurement-unit IMU")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Bosch*LGA*4.5x3mm?P0.5mm*ClockwisePinNumbering*")
+			)
+			(sheetpath
+				(names "/microSD, IMU, OLED, botón y LED/")
+				(tstamps "/befe428c-d30b-5a76-ab51-0453c74e9d6b/")
+			)
+			(tstamps "2d0dbc52-bcee-5c04-9977-e8967cacd5bc")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "14")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "8")
+						)
+						(pin
+							(num "9")
+						)
+						(pin
+							(num "15")
+						)
+						(pin
+							(num "10")
+						)
+						(pin
+							(num "7")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "11")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "16")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "12")
+						)
+						(pin
+							(num "13")
 						)
 					)
 				)
@@ -8149,6 +8483,159 @@
 			)
 		)
 		(libpart
+			(lib "Connector")
+			(part "USB_C_Receptacle_USB2.0_16P")
+			(description "USB 2.0-only 16P Type-C Receptacle connector")
+			(docs "https://www.usb.org/sites/default/files/documents/usb_type-c.zip")
+			(footprints
+				(fp "USB*C*Receptacle*")
+			)
+			(fields
+				(field
+					(name "Reference") "J")
+				(field
+					(name "Value") "USB_C_Receptacle_USB2.0_16P")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet") "https://www.usb.org/sites/default/files/documents/usb_type-c.zip")
+				(field
+					(name "Description") "USB 2.0-only 16P Type-C Receptacle connector")
+			)
+			(pins
+				(pin
+					(num "A1")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "A4")
+					(name "VBUS")
+					(type "passive")
+				)
+				(pin
+					(num "A5")
+					(name "CC1")
+					(type "bidirectional")
+				)
+				(pin
+					(num "A6")
+					(name "D+")
+					(type "bidirectional")
+				)
+				(pin
+					(num "A7")
+					(name "D-")
+					(type "bidirectional")
+				)
+				(pin
+					(num "A8")
+					(name "SBU1")
+					(type "bidirectional")
+				)
+				(pin
+					(num "A9")
+					(name "VBUS")
+					(type "passive")
+				)
+				(pin
+					(num "A12")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "B1")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "B4")
+					(name "VBUS")
+					(type "passive")
+				)
+				(pin
+					(num "B5")
+					(name "CC2")
+					(type "bidirectional")
+				)
+				(pin
+					(num "B6")
+					(name "D+")
+					(type "bidirectional")
+				)
+				(pin
+					(num "B7")
+					(name "D-")
+					(type "bidirectional")
+				)
+				(pin
+					(num "B8")
+					(name "SBU2")
+					(type "bidirectional")
+				)
+				(pin
+					(num "B9")
+					(name "VBUS")
+					(type "passive")
+				)
+				(pin
+					(num "B12")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "SH")
+					(name "SHIELD")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Connector_Generic")
+			(part "Conn_01x04")
+			(description "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			(footprints
+				(fp "Connector*:*_1x??_*")
+			)
+			(fields
+				(field
+					(name "Reference") "J")
+				(field
+					(name "Value") "Conn_01x04")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "Pin_1")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "Pin_2")
+					(type "passive")
+				)
+				(pin
+					(num "3")
+					(name "Pin_3")
+					(type "passive")
+				)
+				(pin
+					(num "4")
+					(name "Pin_4")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
 			(lib "Connector_Generic_MountingPin")
 			(part "Conn_01x02_MountingPin")
 			(description "Generic connectable mounting pin connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)")
@@ -8227,70 +8714,6 @@
 				(pin
 					(num "4")
 					(name "Pin_4")
-					(type "passive")
-				)
-				(pin
-					(num "MP")
-					(name "MountPin")
-					(type "passive")
-				)
-			)
-		)
-		(libpart
-			(lib "Connector_Generic_MountingPin")
-			(part "Conn_01x07_MountingPin")
-			(description "Generic connectable mounting pin connector, single row, 01x07, script generated (kicad-library-utils/schlib/autogen/connector/)")
-			(footprints
-				(fp "Connector*:*_1x??-1MP*")
-			)
-			(fields
-				(field
-					(name "Reference") "J")
-				(field
-					(name "Value") "Conn_01x07_MountingPin")
-				(field
-					(name "Footprint")
-				)
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "Generic connectable mounting pin connector, single row, 01x07, script generated (kicad-library-utils/schlib/autogen/connector/)")
-			)
-			(pins
-				(pin
-					(num "1")
-					(name "Pin_1")
-					(type "passive")
-				)
-				(pin
-					(num "2")
-					(name "Pin_2")
-					(type "passive")
-				)
-				(pin
-					(num "3")
-					(name "Pin_3")
-					(type "passive")
-				)
-				(pin
-					(num "4")
-					(name "Pin_4")
-					(type "passive")
-				)
-				(pin
-					(num "5")
-					(name "Pin_5")
-					(type "passive")
-				)
-				(pin
-					(num "6")
-					(name "Pin_6")
-					(type "passive")
-				)
-				(pin
-					(num "7")
-					(name "Pin_7")
 					(type "passive")
 				)
 				(pin
@@ -8551,6 +8974,44 @@
 				(pin
 					(num "2")
 					(name "2")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "LED")
+			(description "Light emitting diode")
+			(footprints
+				(fp "LED*")
+				(fp "LED_SMD:*")
+				(fp "LED_THT:*")
+			)
+			(fields
+				(field
+					(name "Reference") "D")
+				(field
+					(name "Value") "LED")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Light emitting diode")
+				(field
+					(name "Sim.Pins") "1=K 2=A")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "K")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "A")
 					(type "passive")
 				)
 			)
@@ -8979,6 +9440,109 @@
 		)
 		(libpart
 			(lib "tresvizo")
+			(part "BMI088_I2C")
+			(description "BMI088 por I2C: PS y CSB1 a VDDIO, CSB2 al aire, SDO1/SDO2 fijan la dirección (a GND: acelerómetro 0x18, giróscopo 0x68)")
+			(docs "https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmi088-ds001.pdf")
+			(footprints
+				(fp "Bosch*LGA*4.5x3mm?P0.5mm*ClockwisePinNumbering*")
+			)
+			(fields
+				(field
+					(name "Reference") "U")
+				(field
+					(name "Value") "BMI088")
+				(field
+					(name "Footprint") "tresvizo_lcsc:LGA-16_L4.5-W3.0-P0.50-BL")
+				(field
+					(name "Datasheet") "https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmi088-ds001.pdf")
+				(field
+					(name "Description") "BMI088 por I2C: PS y CSB1 a VDDIO, CSB2 al aire, SDO1/SDO2 fijan la dirección (a GND: acelerómetro 0x18, giróscopo 0x68)")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "INT2")
+					(type "bidirectional")
+				)
+				(pin
+					(num "2")
+					(name "GNDA")
+					(type "passive")
+				)
+				(pin
+					(num "3")
+					(name "VDD")
+					(type "power_in")
+				)
+				(pin
+					(num "4")
+					(name "GNDA")
+					(type "power_in")
+				)
+				(pin
+					(num "5")
+					(name "~{CSB2}")
+					(type "input")
+				)
+				(pin
+					(num "6")
+					(name "GNDIO")
+					(type "power_in")
+				)
+				(pin
+					(num "7")
+					(name "PS")
+					(type "input")
+				)
+				(pin
+					(num "8")
+					(name "SCK/SCL")
+					(type "input")
+				)
+				(pin
+					(num "9")
+					(name "SDI/SDA")
+					(type "bidirectional")
+				)
+				(pin
+					(num "10")
+					(name "SDO2")
+					(type "input")
+				)
+				(pin
+					(num "11")
+					(name "VDDIO")
+					(type "power_in")
+				)
+				(pin
+					(num "12")
+					(name "INT3")
+					(type "bidirectional")
+				)
+				(pin
+					(num "13")
+					(name "INT4")
+					(type "bidirectional")
+				)
+				(pin
+					(num "14")
+					(name "~{CSB1}")
+					(type "input")
+				)
+				(pin
+					(num "15")
+					(name "SDO1")
+					(type "input")
+				)
+				(pin
+					(num "16")
+					(name "INT1")
+					(type "bidirectional")
+				)
+			)
+		)
+		(libpart
+			(lib "tresvizo")
 			(part "MAX17048")
 			(description "Medidor de batería ModelGauge I2C 0x36 (MAX17048 1S / MAX17049 2S, misma huella)")
 			(docs "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX17048-MAX17049.pdf")
@@ -9038,6 +9602,46 @@
 				(pin
 					(num "9")
 					(name "EP")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "tresvizo")
+			(part "SW_TACT")
+			(description "Pulsador táctil SMD de 4 pads; se conectan los pads diagonales 1 y 4")
+			(fields
+				(field
+					(name "Reference") "SW")
+				(field
+					(name "Value") "SW_TACT")
+				(field
+					(name "Footprint") "tresvizo_lcsc:SW-SMD_4P-L5.1-W5.1-P3.70-LS6.5-TL_H1.5")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Pulsador táctil SMD de 4 pads; se conectan los pads diagonales 1 y 4")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "A")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "NC")
+					(type "no_connect")
+				)
+				(pin
+					(num "3")
+					(name "NC")
+					(type "no_connect")
+				)
+				(pin
+					(num "4")
+					(name "B")
 					(type "passive")
 				)
 			)
@@ -9288,6 +9892,10 @@
 			(uri "${KICAD10_SYMBOL_DIR}/Connector.kicad_sym")
 		)
 		(library
+			(logical "Connector_Generic")
+			(uri "${KICAD10_SYMBOL_DIR}/Connector_Generic.kicad_sym")
+		)
+		(library
 			(logical "Connector_Generic_MountingPin")
 			(uri "${KICAD10_SYMBOL_DIR}/Connector_Generic_MountingPin.kicad_sym")
 		)
@@ -9357,6 +9965,16 @@
 				(pintype "passive")
 			)
 			(node
+				(ref "C403")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C404")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
 				(ref "J401")
 				(pin "4")
 				(pinfunction "VDD_4")
@@ -9366,12 +9984,6 @@
 				(ref "J403")
 				(pin "2")
 				(pinfunction "Pin_2_2")
-				(pintype "passive")
-			)
-			(node
-				(ref "J405")
-				(pin "1")
-				(pinfunction "Pin_1_1")
 				(pintype "passive")
 			)
 			(node
@@ -9507,6 +10119,30 @@
 				(pinfunction "VBUS_5")
 				(pintype "passive")
 			)
+			(node
+				(ref "U401")
+				(pin "11")
+				(pinfunction "VDDIO_11")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U401")
+				(pin "14")
+				(pinfunction "~{CSB1}_14")
+				(pintype "input")
+			)
+			(node
+				(ref "U401")
+				(pin "3")
+				(pinfunction "VDD_3")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U401")
+				(pin "7")
+				(pinfunction "PS_7")
+				(pintype "input")
+			)
 		)
 		(net
 			(code "2")
@@ -9628,6 +10264,38 @@
 		)
 		(net
 			(code "8")
+			(name "/Alimentación, carga y batería/CC1")
+			(class "Default")
+			(node
+				(ref "J101")
+				(pin "A5")
+				(pinfunction "CC1_A5")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "R119")
+				(pin "1")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "9")
+			(name "/Alimentación, carga y batería/CC2")
+			(class "Default")
+			(node
+				(ref "J101")
+				(pin "B5")
+				(pinfunction "CC2_B5")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "R120")
+				(pin "1")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "10")
 			(name "/Alimentación, carga y batería/CHG_BATP")
 			(class "Default")
 			(node
@@ -9643,7 +10311,7 @@
 			)
 		)
 		(net
-			(code "9")
+			(code "11")
 			(name "/Alimentación, carga y batería/CHG_BTST1")
 			(class "Switch,Default")
 			(node
@@ -9659,7 +10327,7 @@
 			)
 		)
 		(net
-			(code "10")
+			(code "12")
 			(name "/Alimentación, carga y batería/CHG_BTST2")
 			(class "Switch,Default")
 			(node
@@ -9675,7 +10343,7 @@
 			)
 		)
 		(net
-			(code "11")
+			(code "13")
 			(name "/Alimentación, carga y batería/CHG_ILIM")
 			(class "Default")
 			(node
@@ -9696,7 +10364,7 @@
 			)
 		)
 		(net
-			(code "12")
+			(code "14")
 			(name "/Alimentación, carga y batería/CHG_PROG")
 			(class "Default")
 			(node
@@ -9712,7 +10380,7 @@
 			)
 		)
 		(net
-			(code "13")
+			(code "15")
 			(name "/Alimentación, carga y batería/CHG_SDRV")
 			(class "Default")
 			(node
@@ -9729,7 +10397,7 @@
 			)
 		)
 		(net
-			(code "14")
+			(code "16")
 			(name "/Alimentación, carga y batería/CHG_SW1")
 			(class "Switch,Default")
 			(node
@@ -9751,7 +10419,7 @@
 			)
 		)
 		(net
-			(code "15")
+			(code "17")
 			(name "/Alimentación, carga y batería/CHG_SW2")
 			(class "Switch,Default")
 			(node
@@ -9773,7 +10441,7 @@
 			)
 		)
 		(net
-			(code "16")
+			(code "18")
 			(name "/Alimentación, carga y batería/FG_VDD")
 			(class "Default")
 			(node
@@ -9799,7 +10467,7 @@
 			)
 		)
 		(net
-			(code "17")
+			(code "19")
 			(name "/Alimentación, carga y batería/PMID")
 			(class "Power,Default")
 			(node
@@ -9825,7 +10493,7 @@
 			)
 		)
 		(net
-			(code "18")
+			(code "20")
 			(name "/Alimentación, carga y batería/REGN")
 			(class "Default")
 			(node
@@ -9851,13 +10519,19 @@
 			)
 		)
 		(net
-			(code "19")
+			(code "21")
 			(name "/Alimentación, carga y batería/VBATT_IN")
 			(class "Power,Default")
 			(node
 				(ref "J102")
-				(pin "2")
-				(pinfunction "Pin_2_2")
+				(pin "3")
+				(pinfunction "Pin_3_3")
+				(pintype "passive")
+			)
+			(node
+				(ref "J102")
+				(pin "4")
+				(pinfunction "Pin_4_4")
 				(pintype "passive")
 			)
 			(node
@@ -9873,7 +10547,7 @@
 			)
 		)
 		(net
-			(code "20")
+			(code "22")
 			(name "/Alimentación, carga y batería/VBAT_CHG")
 			(class "Power,Default")
 			(node
@@ -9901,7 +10575,7 @@
 			)
 		)
 		(net
-			(code "21")
+			(code "23")
 			(name "/Alimentación, carga y batería/VBUS")
 			(class "Power,Default")
 			(node
@@ -9922,20 +10596,26 @@
 			)
 			(node
 				(ref "J101")
-				(pin "1")
-				(pinfunction "Pin_1_1")
+				(pin "A4")
+				(pinfunction "VBUS_A4")
 				(pintype "passive")
 			)
 			(node
 				(ref "J101")
-				(pin "2")
-				(pinfunction "Pin_2_2")
+				(pin "A9")
+				(pinfunction "VBUS_A9")
 				(pintype "passive")
 			)
 			(node
 				(ref "J101")
-				(pin "3")
-				(pinfunction "Pin_3_3")
+				(pin "B4")
+				(pinfunction "VBUS_B4")
+				(pintype "passive")
+			)
+			(node
+				(ref "J101")
+				(pin "B9")
+				(pinfunction "VBUS_B9")
 				(pintype "passive")
 			)
 			(node
@@ -9964,7 +10644,7 @@
 			)
 		)
 		(net
-			(code "22")
+			(code "24")
 			(name "/Alimentación, carga y batería/VPACK")
 			(class "Power,Default")
 			(node
@@ -10002,7 +10682,7 @@
 			)
 		)
 		(net
-			(code "23")
+			(code "25")
 			(name "/ESP32-S3/ESP_BOOT")
 			(class "Default")
 			(node
@@ -10024,7 +10704,7 @@
 			)
 		)
 		(net
-			(code "24")
+			(code "26")
 			(name "/ESP32-S3/ESP_EN")
 			(class "Default")
 			(node
@@ -10051,7 +10731,7 @@
 			)
 		)
 		(net
-			(code "25")
+			(code "27")
 			(name "/ESP32-S3/ESP_IO3")
 			(class "Default")
 			(node
@@ -10067,7 +10747,7 @@
 			)
 		)
 		(net
-			(code "26")
+			(code "28")
 			(name "/ESP32-S3/ESP_IO35")
 			(class "Default")
 			(node
@@ -10084,7 +10764,7 @@
 			)
 		)
 		(net
-			(code "27")
+			(code "29")
 			(name "/ESP32-S3/ESP_IO36")
 			(class "Default")
 			(node
@@ -10101,7 +10781,7 @@
 			)
 		)
 		(net
-			(code "28")
+			(code "30")
 			(name "/ESP32-S3/ESP_IO37")
 			(class "Default")
 			(node
@@ -10118,7 +10798,41 @@
 			)
 		)
 		(net
-			(code "29")
+			(code "31")
+			(name "/ESP32-S3/ESP_RXD0")
+			(class "Default")
+			(node
+				(ref "TP209")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U201")
+				(pin "36")
+				(pinfunction "RXD0_36")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "32")
+			(name "/ESP32-S3/ESP_TXD0")
+			(class "Default")
+			(node
+				(ref "TP208")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U201")
+				(pin "37")
+				(pinfunction "TXD0_37")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "33")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_5V")
 			(class "Power,Default")
 			(node
@@ -10161,7 +10875,7 @@
 			)
 		)
 		(net
-			(code "30")
+			(code "34")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_EVENT")
 			(class "Default")
 			(node
@@ -10189,7 +10903,7 @@
 			)
 		)
 		(net
-			(code "31")
+			(code "35")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_FB")
 			(class "Default")
 			(node
@@ -10210,7 +10924,7 @@
 			)
 		)
 		(net
-			(code "32")
+			(code "36")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_L1")
 			(class "Power,Default")
 			(node
@@ -10227,7 +10941,7 @@
 			)
 		)
 		(net
-			(code "33")
+			(code "37")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_L2")
 			(class "Power,Default")
 			(node
@@ -10244,7 +10958,7 @@
 			)
 		)
 		(net
-			(code "34")
+			(code "38")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_PPS")
 			(class "Default")
 			(node
@@ -10272,7 +10986,7 @@
 			)
 		)
 		(net
-			(code "35")
+			(code "39")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_RESET_N")
 			(class "Default")
 			(node
@@ -10288,7 +11002,7 @@
 			)
 		)
 		(net
-			(code "36")
+			(code "40")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_RXD2")
 			(class "Default")
 			(node
@@ -10316,7 +11030,7 @@
 			)
 		)
 		(net
-			(code "37")
+			(code "41")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_TXD2")
 			(class "Default")
 			(node
@@ -10344,7 +11058,7 @@
 			)
 		)
 		(net
-			(code "38")
+			(code "42")
 			(name "/GNSS: carrier UM980 por conector y su 5 V/GNSS_VAUX")
 			(class "Default")
 			(node
@@ -10360,13 +11074,13 @@
 			)
 		)
 		(net
-			(code "39")
-			(name "/microSD, IMU por conector y panel/BTN_LED_A")
+			(code "43")
+			(name "/microSD, IMU, OLED, botón y LED/LED_STATUS_A")
 			(class "Default")
 			(node
-				(ref "J402")
-				(pin "3")
-				(pinfunction "Pin_3_3")
+				(ref "D403")
+				(pin "2")
+				(pinfunction "A_2")
 				(pintype "passive")
 			)
 			(node
@@ -10376,25 +11090,8 @@
 			)
 		)
 		(net
-			(code "40")
-			(name "/microSD, IMU por conector y panel/BTN_LED_K")
-			(class "Default")
-			(node
-				(ref "J402")
-				(pin "4")
-				(pinfunction "Pin_4_4")
-				(pintype "passive")
-			)
-			(node
-				(ref "Q402")
-				(pin "3")
-				(pinfunction "D_3")
-				(pintype "passive")
-			)
-		)
-		(net
-			(code "41")
-			(name "/microSD, IMU por conector y panel/SD_CD_N")
+			(code "44")
+			(name "/microSD, IMU, OLED, botón y LED/SD_CD_N")
 			(class "Default")
 			(node
 				(ref "J401")
@@ -10415,29 +11112,7 @@
 			)
 		)
 		(net
-			(code "42")
-			(name "BTN_LED_EN")
-			(class "Default")
-			(node
-				(ref "Q402")
-				(pin "1")
-				(pinfunction "G_1")
-				(pintype "input")
-			)
-			(node
-				(ref "R410")
-				(pin "1")
-				(pintype "passive")
-			)
-			(node
-				(ref "U201")
-				(pin "25")
-				(pinfunction "IO48_25")
-				(pintype "bidirectional")
-			)
-		)
-		(net
-			(code "43")
+			(code "45")
 			(name "BTN_N")
 			(class "Default")
 			(node
@@ -10453,9 +11128,9 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "J402")
-				(pin "2")
-				(pinfunction "Pin_2_2")
+				(ref "SW401")
+				(pin "1")
+				(pinfunction "A_1")
 				(pintype "passive")
 			)
 			(node
@@ -10466,7 +11141,7 @@
 			)
 		)
 		(net
-			(code "44")
+			(code "46")
 			(name "BTN_SENSE_N")
 			(class "Default")
 			(node
@@ -10488,7 +11163,7 @@
 			)
 		)
 		(net
-			(code "45")
+			(code "47")
 			(name "CHG_INT_N")
 			(class "Default")
 			(node
@@ -10510,7 +11185,7 @@
 			)
 		)
 		(net
-			(code "46")
+			(code "48")
 			(name "CHG_TS")
 			(class "Default")
 			(node
@@ -10537,7 +11212,7 @@
 			)
 		)
 		(net
-			(code "47")
+			(code "49")
 			(name "FG_ALRT_N")
 			(class "Default")
 			(node
@@ -10559,7 +11234,7 @@
 			)
 		)
 		(net
-			(code "48")
+			(code "50")
 			(name "GND")
 			(class "Default")
 			(node
@@ -10713,6 +11388,16 @@
 				(pintype "passive")
 			)
 			(node
+				(ref "C403")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C404")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
 				(ref "D101")
 				(pin "2")
 				(pinfunction "A_2")
@@ -10725,33 +11410,51 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "J101")
-				(pin "4")
-				(pinfunction "Pin_4_4")
+				(ref "D403")
+				(pin "1")
+				(pinfunction "K_1")
 				(pintype "passive")
 			)
 			(node
 				(ref "J101")
-				(pin "5")
-				(pinfunction "Pin_5_5")
+				(pin "A1")
+				(pinfunction "GND_A1")
 				(pintype "passive")
 			)
 			(node
 				(ref "J101")
-				(pin "6")
-				(pinfunction "Pin_6_6")
+				(pin "A12")
+				(pinfunction "GND_A12")
 				(pintype "passive")
 			)
 			(node
 				(ref "J101")
-				(pin "MP")
-				(pinfunction "MountPin_MP")
+				(pin "B1")
+				(pinfunction "GND_B1")
+				(pintype "passive")
+			)
+			(node
+				(ref "J101")
+				(pin "B12")
+				(pinfunction "GND_B12")
+				(pintype "passive")
+			)
+			(node
+				(ref "J101")
+				(pin "SH")
+				(pinfunction "SHIELD_SH")
 				(pintype "passive")
 			)
 			(node
 				(ref "J102")
 				(pin "1")
 				(pinfunction "Pin_1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "J102")
+				(pin "2")
+				(pinfunction "Pin_2_2")
 				(pintype "passive")
 			)
 			(node
@@ -10809,27 +11512,9 @@
 				(pintype "power_in")
 			)
 			(node
-				(ref "J402")
-				(pin "1")
-				(pinfunction "Pin_1_1")
-				(pintype "passive")
-			)
-			(node
-				(ref "J402")
-				(pin "MP")
-				(pinfunction "MountPin_MP")
-				(pintype "passive")
-			)
-			(node
 				(ref "J403")
 				(pin "1")
 				(pinfunction "Pin_1_1")
-				(pintype "passive")
-			)
-			(node
-				(ref "J403")
-				(pin "MP")
-				(pinfunction "MountPin_MP")
 				(pintype "passive")
 			)
 			(node
@@ -10840,36 +11525,12 @@
 			)
 			(node
 				(ref "J404")
-				(pin "MP")
-				(pinfunction "MountPin_MP")
-				(pintype "passive")
-			)
-			(node
-				(ref "J405")
-				(pin "2")
-				(pinfunction "Pin_2_2")
-				(pintype "passive")
-			)
-			(node
-				(ref "J405")
-				(pin "3")
-				(pinfunction "Pin_3_3")
-				(pintype "passive")
-			)
-			(node
-				(ref "J405")
 				(pin "MP")
 				(pinfunction "MountPin_MP")
 				(pintype "passive")
 			)
 			(node
 				(ref "Q103")
-				(pin "2")
-				(pinfunction "S_2")
-				(pintype "passive")
-			)
-			(node
-				(ref "Q402")
 				(pin "2")
 				(pinfunction "S_2")
 				(pintype "passive")
@@ -10905,6 +11566,16 @@
 				(pintype "passive")
 			)
 			(node
+				(ref "R119")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "R120")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
 				(ref "R203")
 				(pin "2")
 				(pintype "passive")
@@ -10930,11 +11601,6 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R410")
-				(pin "2")
-				(pintype "passive")
-			)
-			(node
 				(ref "SW201")
 				(pin "2")
 				(pinfunction "2_2")
@@ -10944,6 +11610,12 @@
 				(ref "SW202")
 				(pin "2")
 				(pinfunction "2_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "SW401")
+				(pin "4")
+				(pinfunction "B_4")
 				(pintype "passive")
 			)
 			(node
@@ -11072,9 +11744,39 @@
 				(pinfunction "GND_2")
 				(pintype "passive")
 			)
+			(node
+				(ref "U401")
+				(pin "10")
+				(pinfunction "SDO2_10")
+				(pintype "input")
+			)
+			(node
+				(ref "U401")
+				(pin "15")
+				(pinfunction "SDO1_15")
+				(pintype "input")
+			)
+			(node
+				(ref "U401")
+				(pin "2")
+				(pinfunction "GNDA_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U401")
+				(pin "4")
+				(pinfunction "GNDA_4")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U401")
+				(pin "6")
+				(pinfunction "GNDIO_6")
+				(pintype "power_in")
+			)
 		)
 		(net
-			(code "49")
+			(code "51")
 			(name "GNSS_EVENT_MCU")
 			(class "Default")
 			(node
@@ -11095,7 +11797,7 @@
 			)
 		)
 		(net
-			(code "50")
+			(code "52")
 			(name "GNSS_PPS_MCU")
 			(class "Default")
 			(node
@@ -11111,7 +11813,7 @@
 			)
 		)
 		(net
-			(code "51")
+			(code "53")
 			(name "GNSS_PWR_EN")
 			(class "Default")
 			(node
@@ -11133,7 +11835,7 @@
 			)
 		)
 		(net
-			(code "52")
+			(code "54")
 			(name "GNSS_RESET_MCU")
 			(class "Default")
 			(node
@@ -11149,7 +11851,7 @@
 			)
 		)
 		(net
-			(code "53")
+			(code "55")
 			(name "GNSS_TXD2_MCU")
 			(class "Default")
 			(node
@@ -11165,7 +11867,7 @@
 			)
 		)
 		(net
-			(code "54")
+			(code "56")
 			(name "GNSS_TX_MCU")
 			(class "Default")
 			(node
@@ -11181,13 +11883,13 @@
 			)
 		)
 		(net
-			(code "55")
+			(code "57")
 			(name "I2C_SCL")
 			(class "Default")
 			(node
 				(ref "J403")
-				(pin "4")
-				(pinfunction "Pin_4_4")
+				(pin "3")
+				(pinfunction "Pin_3_3")
 				(pintype "passive")
 			)
 			(node
@@ -11215,13 +11917,13 @@
 			)
 		)
 		(net
-			(code "56")
+			(code "58")
 			(name "I2C_SDA")
 			(class "Default")
 			(node
 				(ref "J403")
-				(pin "3")
-				(pinfunction "Pin_3_3")
+				(pin "4")
+				(pinfunction "Pin_4_4")
 				(pintype "passive")
 			)
 			(node
@@ -11249,49 +11951,43 @@
 			)
 		)
 		(net
-			(code "57")
+			(code "59")
 			(name "IMU_INT1")
 			(class "Default")
-			(node
-				(ref "J405")
-				(pin "6")
-				(pinfunction "Pin_6_6")
-				(pintype "passive")
-			)
 			(node
 				(ref "U201")
 				(pin "38")
 				(pinfunction "IO2_38")
 				(pintype "bidirectional")
 			)
+			(node
+				(ref "U401")
+				(pin "16")
+				(pinfunction "INT1_16")
+				(pintype "bidirectional")
+			)
 		)
 		(net
-			(code "58")
+			(code "60")
 			(name "IMU_INT3")
 			(class "Default")
-			(node
-				(ref "J405")
-				(pin "7")
-				(pinfunction "Pin_7_7")
-				(pintype "passive")
-			)
 			(node
 				(ref "U201")
 				(pin "39")
 				(pinfunction "IO1_39")
 				(pintype "bidirectional")
 			)
+			(node
+				(ref "U401")
+				(pin "12")
+				(pinfunction "INT3_12")
+				(pintype "bidirectional")
+			)
 		)
 		(net
-			(code "59")
+			(code "61")
 			(name "IMU_SCL")
 			(class "Default")
-			(node
-				(ref "J405")
-				(pin "5")
-				(pinfunction "Pin_5_5")
-				(pintype "passive")
-			)
 			(node
 				(ref "R412")
 				(pin "2")
@@ -11303,17 +11999,17 @@
 				(pinfunction "IO42_35")
 				(pintype "bidirectional")
 			)
+			(node
+				(ref "U401")
+				(pin "8")
+				(pinfunction "SCK/SCL_8")
+				(pintype "input")
+			)
 		)
 		(net
-			(code "60")
+			(code "62")
 			(name "IMU_SDA")
 			(class "Default")
-			(node
-				(ref "J405")
-				(pin "4")
-				(pinfunction "Pin_4_4")
-				(pintype "passive")
-			)
 			(node
 				(ref "R411")
 				(pin "2")
@@ -11325,9 +12021,31 @@
 				(pinfunction "IO41_34")
 				(pintype "bidirectional")
 			)
+			(node
+				(ref "U401")
+				(pin "9")
+				(pinfunction "SDI/SDA_9")
+				(pintype "bidirectional")
+			)
 		)
 		(net
-			(code "61")
+			(code "63")
+			(name "LED_STATUS")
+			(class "Default")
+			(node
+				(ref "R409")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U201")
+				(pin "25")
+				(pinfunction "IO48_25")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "64")
 			(name "SD_CLK")
 			(class "Default")
 			(node
@@ -11344,7 +12062,7 @@
 			)
 		)
 		(net
-			(code "62")
+			(code "65")
 			(name "SD_CMD")
 			(class "Default")
 			(node
@@ -11366,7 +12084,7 @@
 			)
 		)
 		(net
-			(code "63")
+			(code "66")
 			(name "SD_D0")
 			(class "Default")
 			(node
@@ -11388,7 +12106,7 @@
 			)
 		)
 		(net
-			(code "64")
+			(code "67")
 			(name "SD_D1")
 			(class "Default")
 			(node
@@ -11410,7 +12128,7 @@
 			)
 		)
 		(net
-			(code "65")
+			(code "68")
 			(name "SD_D2")
 			(class "Default")
 			(node
@@ -11432,7 +12150,7 @@
 			)
 		)
 		(net
-			(code "66")
+			(code "69")
 			(name "SD_D3")
 			(class "Default")
 			(node
@@ -11454,7 +12172,7 @@
 			)
 		)
 		(net
-			(code "67")
+			(code "70")
 			(name "SD_DET")
 			(class "Default")
 			(node
@@ -11476,14 +12194,20 @@
 			)
 		)
 		(net
-			(code "68")
+			(code "71")
 			(name "USB_DN")
 			(class "USB,Default")
 			(node
 				(ref "J101")
-				(pin "7")
-				(pinfunction "Pin_7_7")
-				(pintype "passive")
+				(pin "A7")
+				(pinfunction "D-_A7")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "J101")
+				(pin "B7")
+				(pinfunction "D-_B7")
+				(pintype "bidirectional")
 			)
 			(node
 				(ref "TP207")
@@ -11511,14 +12235,20 @@
 			)
 		)
 		(net
-			(code "69")
+			(code "72")
 			(name "USB_DP")
 			(class "USB,Default")
 			(node
 				(ref "J101")
-				(pin "8")
-				(pinfunction "Pin_8_8")
-				(pintype "passive")
+				(pin "A6")
+				(pinfunction "D+_A6")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "J101")
+				(pin "B6")
+				(pinfunction "D+_B6")
+				(pintype "bidirectional")
 			)
 			(node
 				(ref "TP206")
@@ -11546,7 +12276,7 @@
 			)
 		)
 		(net
-			(code "70")
+			(code "73")
 			(name "VSYS")
 			(class "Power,Default")
 			(node
@@ -11600,11 +12330,6 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "R409")
-				(pin "1")
-				(pintype "passive")
-			)
-			(node
 				(ref "U102")
 				(pin "25")
 				(pinfunction "SYS_25")
@@ -11624,7 +12349,51 @@
 			)
 		)
 		(net
-			(code "71")
+			(code "74")
+			(name "unconnected-(J101-SBU1-PadA8)")
+			(class "Default")
+			(node
+				(ref "J101")
+				(pin "A8")
+				(pinfunction "SBU1_A8")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "75")
+			(name "unconnected-(J101-SBU2-PadB8)")
+			(class "Default")
+			(node
+				(ref "J101")
+				(pin "B8")
+				(pinfunction "SBU2_B8")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "76")
+			(name "unconnected-(SW401-NC-Pad2)")
+			(class "Default")
+			(node
+				(ref "SW401")
+				(pin "2")
+				(pinfunction "NC_2")
+				(pintype "no_connect")
+			)
+		)
+		(net
+			(code "77")
+			(name "unconnected-(SW401-NC-Pad3)")
+			(class "Default")
+			(node
+				(ref "SW401")
+				(pin "3")
+				(pinfunction "NC_3")
+				(pintype "no_connect")
+			)
+		)
+		(net
+			(code "78")
 			(name "unconnected-(U102-D+-Pad6)")
 			(class "Default")
 			(node
@@ -11635,7 +12404,7 @@
 			)
 		)
 		(net
-			(code "72")
+			(code "79")
 			(name "unconnected-(U102-D--Pad7)")
 			(class "Default")
 			(node
@@ -11646,7 +12415,7 @@
 			)
 		)
 		(net
-			(code "73")
+			(code "80")
 			(name "unconnected-(U102-STAT-Pad1)")
 			(class "Default")
 			(node
@@ -11657,7 +12426,7 @@
 			)
 		)
 		(net
-			(code "74")
+			(code "81")
 			(name "unconnected-(U105-PG-Pad1)")
 			(class "Default")
 			(node
@@ -11668,7 +12437,7 @@
 			)
 		)
 		(net
-			(code "75")
+			(code "82")
 			(name "unconnected-(U201-IO38-Pad31)")
 			(class "Default")
 			(node
@@ -11679,7 +12448,7 @@
 			)
 		)
 		(net
-			(code "76")
+			(code "83")
 			(name "unconnected-(U201-IO39-Pad32)")
 			(class "Default")
 			(node
@@ -11690,7 +12459,7 @@
 			)
 		)
 		(net
-			(code "77")
+			(code "84")
 			(name "unconnected-(U201-IO40-Pad33)")
 			(class "Default")
 			(node
@@ -11701,7 +12470,7 @@
 			)
 		)
 		(net
-			(code "78")
+			(code "85")
 			(name "unconnected-(U201-IO46-Pad16)")
 			(class "Default")
 			(node
@@ -11712,29 +12481,7 @@
 			)
 		)
 		(net
-			(code "79")
-			(name "unconnected-(U201-RXD0-Pad36)")
-			(class "Default")
-			(node
-				(ref "U201")
-				(pin "36")
-				(pinfunction "RXD0_36")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "80")
-			(name "unconnected-(U201-TXD0-Pad37)")
-			(class "Default")
-			(node
-				(ref "U201")
-				(pin "37")
-				(pinfunction "TXD0_37")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "81")
+			(code "86")
 			(name "unconnected-(U301-FB2-Pad6)")
 			(class "Default")
 			(node
@@ -11745,7 +12492,7 @@
 			)
 		)
 		(net
-			(code "82")
+			(code "87")
 			(name "unconnected-(U301-PG-Pad2)")
 			(class "Default")
 			(node
@@ -11753,6 +12500,39 @@
 				(pin "2")
 				(pinfunction "PG_2")
 				(pintype "open_collector+no_connect")
+			)
+		)
+		(net
+			(code "88")
+			(name "unconnected-(U401-INT2-Pad1)")
+			(class "Default")
+			(node
+				(ref "U401")
+				(pin "1")
+				(pinfunction "INT2_1")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "89")
+			(name "unconnected-(U401-INT4-Pad13)")
+			(class "Default")
+			(node
+				(ref "U401")
+				(pin "13")
+				(pinfunction "INT4_13")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "90")
+			(name "unconnected-(U401-~{CSB2}-Pad5)")
+			(class "Default")
+			(node
+				(ref "U401")
+				(pin "5")
+				(pinfunction "~{CSB2}_5")
+				(pintype "input+no_connect")
 			)
 		)
 	)

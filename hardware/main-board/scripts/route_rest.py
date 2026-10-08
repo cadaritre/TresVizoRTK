@@ -15,7 +15,10 @@ rodea al volver a rellenar. Se ejecuta con el Python de KiCad; no usa biblioteca
 Variables de entorno: SKIP_NETS=GND,... omite redes (salvo las conexiones a pines de CI, U*);
 ROUTE_FIRST=SD_,... rutea antes las redes que empiezan así (los pasos más estrechos);
 ROUTE_REST_LIMIT=N solo intenta N pares;
-ROUTE_REST_MINUTES=M tiempo máximo (por omisión 30).
+ROUTE_REST_MINUTES=M tiempo máximo (por omisión 30);
+ROUTE_REST_EXPAND=N y ROUTE_REST_RIP_EXPAND=N celdas que puede abrir cada búsqueda A*, sin arranque y con
+arranque (por omisión 500000 y 2500000: las conexiones largas de una placa densa pueden necesitar más);
+ROUTE_REST_INNER_COST=C coste relativo de la capa interna (por omisión 1.8).
 """
 
 import heapq
@@ -42,7 +45,9 @@ HOLE_CLEARANCE = 0.25       # cobre a borde de agujero
 EDGE = 0.3                  # cobre al canto
 ZONE_CLEARANCE = 0.2
 VIA_COST = 30               # en celdas
-INNER_COST = 1.8            # coste relativo de la capa interna (es el plano de +3V3)
+INNER_COST = float(os.environ.get("ROUTE_REST_INNER_COST", "1.8"))   # coste relativo de la capa interna (plano de +3V3)
+EXPAND = int(os.environ.get("ROUTE_REST_EXPAND", "500000"))            # celdas por búsqueda A* sin arranque
+RIP_EXPAND = int(os.environ.get("ROUTE_REST_RIP_EXPAND", "2500000"))   # celdas por búsqueda A* con arranque
 RIP_PENALTY = 40            # coste por celda ocupada por otra ruta al buscar con arranque
 HIST_STEP = 5.0             # coste histórico que se suma a cada celda disputada
 MAX_RIPS = 60               # veces que una conexión puede arrancar a otras
@@ -420,10 +425,12 @@ MOVES = [(1, 0, 1.0), (-1, 0, 1.0), (0, 1, 1.0), (0, -1, 1.0),
          (1, 1, 1.4142), (1, -1, 1.4142), (-1, 1, 1.4142), (-1, -1, 1.4142)]
 
 
-def astar(g, w, vs, net, starts, goals, layer_cost, soft=None, hist=None, max_expand=500000, neck=None):
+def astar(g, w, vs, net, starts, goals, layer_cost, soft=None, hist=None, max_expand=None, neck=None):
     """A* en la rejilla g. Con soft, las celdas que soft bloquea se permiten con penalización.
     layer_cost[l] None prohíbe la capa. neck = (celdas (i, j)) permite pasar con NECK_W donde el
     ancho w no cabe, solo en esas celdas (junto a los pads de los extremos)."""
+    if max_expand is None:
+        max_expand = EXPAND
     starts = [c for c in starts if layer_cost[c[0]] is not None]
     goals = [c for c in goals if layer_cost[c[0]] is not None]
     goal_set = set(goals)
@@ -788,7 +795,7 @@ class Router:
         for w, vs in self.options(a):
             sa, sb = self.ends(self.fixed, idx, w, vs, net)
             p = astar(self.fixed, w, vs, net, sa, sb, self.costs(a), soft=self.g, hist=self.hist,
-                      max_expand=2500000, neck=self.neck(idx))
+                      max_expand=RIP_EXPAND, neck=self.neck(idx))
             if p is None:
                 continue
             shapes = self.shapes_for(idx, p, w, vs, net, clr, self.fixed)

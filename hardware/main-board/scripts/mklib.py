@@ -199,6 +199,30 @@ def build_symbols(kicad_sym_dir):
             p[2] = QStr(LCSC_FP + "BULETM-SMD_ESP32-S3-MINI-1-N8")
     syms.append(esp)
 
+    # Copia de un símbolo de KiCad con tipos de pin ajustados a cómo se usa aquí (para el ERC) y, si se
+    # pide, otras propiedades.
+    def derive(libname, symname, newname, types, props=None):
+        lib = libs.add(os.path.join(kicad_sym_dir, libname + ".kicad_sym"))
+        node = copy.deepcopy(lib.get(symname).node)
+        node[1] = QStr(newname)
+        for sub in findall(node, "symbol"):
+            sub[1] = QStr(str(sub[1]).replace(symname, newname, 1))
+            for item in findall(sub, "pin"):
+                num = str(find(item, "number")[1])
+                if num in types:
+                    item[1] = types[num]
+        for p in findall(node, "property"):
+            if props and str(p[1]) in props:
+                p[2] = QStr(props[str(p[1])])
+        return node
+
+    # BMI088 por I2C (v0.3): SDO1 (15) y SDO2 (10) no son salidas sino entradas que fijan el bit bajo de la
+    # dirección; van a GND (hoja de Bosch BST-BMI088-DS001 rev 1.9, tabla 14 y fig. 9). Con el tipo «output»
+    # del símbolo de KiCad el ERC daría conflicto con la bandera de alimentación de GND.
+    syms.append(derive("Sensor_Motion", "BMI088", "BMI088_I2C", {"10": "input", "15": "input"},
+                       {"Footprint": LCSC_FP + "LGA-16_L4.5-W3.0-P0.50-BL",
+                        "Description": "BMI088 por I2C: PS y CSB1 a VDDIO, CSB2 al aire, SDO1/SDO2 fijan la "
+                                       "dirección (a GND: acelerómetro 0x18, giróscopo 0x68)"}))
     return syms
 
 

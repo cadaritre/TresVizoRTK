@@ -1,5 +1,31 @@
 # Referencias para la carcasa
 
+## v0.3 compacta (rama `hw/compact-v03`)
+
+La placa v0.3 va en el tubo de Ø52 × 100 con cara plana de `mechanical/v3.0`. Las medidas e
+interfaces están en [../research/v03-compacta.md](../research/v03-compacta.md). Ejes:
+
+- **z** = eje del bastón hacia arriba;
+- **+Y** hacia la cara plana;
+- **+X** a la izquierda mirando el frente.
+
+| Archivo | Qué es |
+| --- | --- |
+| `export_board_step.py` | Exporta la placa con kicad-cli y la lleva a la carcasa con los datos de `../kicad/plugs.json` (x = x_u0 − u, y = y_back + h, z = z_top − v). Escribe `placa-principal.step`, con el PCB y un sólido por componente con su referencia, y `placa-principal.json`, con la caja de cada pieza. Corrige los modelos `.step` de LCSC a la posición de sus `.wrl` y valida que coincidan. Si a una huella le falta el modelo exportado, pone la caja de su `.wrl` y lo dice. Corre con el Python de FreeCAD |
+| `check_heights.py` | Comprueba que cada pieza del JSON quepa bajo el techo del tubo, min(cara plana, círculo de r 24.2), con 0.3 de aire, y fuera de la franja de 1 mm de los cantos. Corre con cualquier python 3 |
+
+```
+cd hardware/main-board
+PYTHONPATH=/Applications/FreeCAD.app/Contents/Resources/lib \
+  /Applications/FreeCAD.app/Contents/Resources/bin/python cad/export_board_step.py
+python3 cad/check_heights.py
+```
+
+Lo que sigue en este archivo es de v0.2 y V2.3. Se deja como referencia: los scripts de V2.3 no
+corren con la placa v0.3.
+
+## v0.2 en V2.3
+
 Datos de la placa v0.2 (ESP32-S3-WROOM-1 y J301 SH 8) en los ejes de la carcasa, para diseñar y
 comprobar la carcasa V2.3 (`mechanical/v2.3`). Ejes: **z = eje del jalón hacia arriba, +Y hacia el
 panel, +X a la izquierda mirando el panel**. Medidas en mm.
