@@ -226,26 +226,33 @@ la izquierda mirando el frente**; medidas en mm. Especificación y contrato con 
     un paso de 12 mm para una clavija macho.
 - **Frente:** ventana de la OLED, tecla de TPU sobre SW401 (x 0, z 22) y guía de luz de Ø2 sobre
   D403 (x −6, z 22). **Costado +X:** túnel cerrado del USB-C (z 25) y ranura justa de la microSD
-  (z 40.88, con muesca para la uña), con 0.3 por lado; los tapa una tapa de TPU con tres anclas.
+  (z 40.88, con muesca ciega para la uña), con 0.3 por lado; los tapa una tapa de TPU con tres
+  anclas. Dentro, un **marco del USB-C** (pieza 08) sigue el túnel hasta la boca de J101 y abraza su
+  carcasa: con la tapa abierta se ven J101 y el canto de la placa bajo él, no el interior.
 - **Orden de montaje** (detalle en V3.0):
   1. pack por arriba;
   2. carrier al chasis por abajo, con el arnés de J301 ya soldado;
   3. clavija SMA en la carrier, antes que la placa;
   4. placa al chasis por abajo, con la OLED soldada, y sus dos M2;
-  5. chasis al tubo por arriba y tapa con la antena;
-  6. batería y NTC por abajo, con la base quitada;
-  7. tecla, lámina de la ventana y guía de luz por fuera.
+  5. marco del USB-C sobre J101, deslizándolo desde +X hasta que el canto de la placa haga tope;
+  6. chasis al tubo por arriba y tapa con la antena;
+  7. batería y NTC por abajo, con la base quitada;
+  8. tecla, lámina de la ventana y guía de luz por fuera.
 
-**Comprobación en CAD** (FreeCAD 1.1.3, `mechanical/v3.0/check_v3_0.py`, 08-10-2026), con el STEP
+**Comprobación en CAD** (FreeCAD 1.1.3, `mechanical/v3.0/check_v3_0.py`, 09-10-2026), con el STEP
 final de la placa, ya con los cambios de la auditoría ([cad/README.md](cad/README.md)), y las zonas
 de clavijas de `kicad/plugs.json`:
 
-- 0 choques en posición final y los 11 barridos del montaje sin choques;
+- 0 choques en posición final y los 13 barridos del montaje sin choques (con el del marco del USB-C);
 - la guarda de la pared del tubo pasa;
 - se cumplen los objetivos de holgura: 0.4 entre impresas, 0.25 por cara en los rieles, 0.5 a lo
   comprado (pack incluido), coaxial con R 12.27 y mazos separados 8.8 o más;
 - contra la placa real, el émbolo de la tecla queda a 0.505 de SW401 y la guía de luz a 0.545 de
-  los componentes.
+  los componentes;
+- con la tapa de puertos abierta, de frente al túnel del USB-C el 98.3 % de lo que se ve es J101,
+  el canto de la placa bajo él, el marco o el tubo (rayos hasta 30°: 97.9 %). Por la ranura de la
+  microSD, de frente, solo se ven el lector y la tarjeta; en ángulo, algo del canto y la cara de la
+  placa.
 
 Lo que no se verificó (módulo OLED real, carrier medida, cables, antena, impresión) está en el
 [README de V3.0](../../mechanical/v3.0/README.md#verificaciones).

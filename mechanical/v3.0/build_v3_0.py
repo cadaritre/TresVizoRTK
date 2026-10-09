@@ -1,7 +1,7 @@
 """Construye la carcasa V3.0 (tubo de 56 x 111 para la placa principal compacta v0.3).
 
 Piezas: 01-base, 02-tube, 03-antenna-cap, 04-chassis, 05-key-tpu, 06-port-cover-tpu, 07-logo-inlay-tpu,
-en su posicion final.
+08-usb-bezel, en su posicion final.
 Ademas guarda las referencias (placa de la especificacion, carrier, celdas, tuerca, antena,
 coaxial, clavijas y cables) como objetos ref_* que no se exportan.
 
@@ -219,8 +219,14 @@ def side_openings():
     mu = cs['microsd']['muesca']
     ch = cs['microsd']['chaflan_entrada']
     slot = box(sx0, RO + 2, sy0, sy1, szc - sw / 2.0, szc + sw / 2.0)
-    notch = box(sx0, RO + 2, sy0, mu['y_sup'], szc - mu['ancho'] / 2.0, szc + mu['ancho'] / 2.0)
-    cuts = [usb, slot, notch, outer_top_chamfer(sy0, sy1, szc, sw, 0.0, ch), outer_top_chamfer(sy0, mu['y_sup'], szc, mu['ancho'], 0.0, ch)]
+    notch = G.sd_notch()
+    notch_ch = outer_top_chamfer(sy0, mu['y_sup'], szc, mu['ancho'], 0.0, ch)
+    if mu.get('pared_detras'):
+        # Muesca ciega: su chaflan tampoco puede entrar detras del fondo plano (x < sd_notch_x0()). Sin
+        # esto el chaflan (que empieza en x 18.19 con todo el alto de la muesca) atravesaba la pared de
+        # detras de y 17.25 a ~18.
+        notch_ch = notch_ch.cut(box(-RO - 2, G.sd_notch_x0(), -RO - 2, RO + 2, szc - mu['ancho'], szc + mu['ancho']))
+    cuts = [usb, slot, notch, outer_top_chamfer(sy0, sy1, szc, sw, 0.0, ch), notch_ch]
     ci = cs['microsd'].get('chaflan_interior', 0.0)
     if ci > 0:
         cuts.append(inner_edge_chamfer(sy0, szc - sw / 2.0, szc + sw / 2.0, ci))
@@ -378,6 +384,10 @@ def build_chassis():
         # Pared lateral; la de -X acaba en z 83: por encima pasa el coaxial.
         z_top_wall = pw['z'][1] if sx > 0 else pw['corte_coax_menos_x']['z0']
         parts.append(bx(pw['x'][0], pw['x'][1], pw['y'][0], pw['y'][1], pw['z'][0], z_top_wall))
+        # Muesca en el canto de la pared +X: por encima pasa el suelo del marco del USB-C (pieza 08).
+        mm = pw.get('muesca_marco')
+        if sx > 0 and mm:
+            cuts.append(bx(pw['x'][0] - 0.5, 26, mm['y_sup'], pw['y'][1] + 0.5, mm['z'][0], mm['z'][1]))
         # Ranura de la carrier, sacada de sus medidas (carrier.x, .z) y del juego (ranura_carrier.holgura).
         ca = P['carrier']
         hh = rc['holgura']
@@ -482,7 +492,7 @@ def build_port_cover():
     sx0, sy0, sy1, szc, sw = G.sd_slot()
     mu = cs['microsd']['muesca']
     sdb = box(sx0 + m, RO + 1, sy0 + m, sy1 - m, szc - sw / 2.0 + m, szc + sw / 2.0 - m).fuse(
-        box(sx0 + m, RO + 1, sy0 + m, mu['y_sup'] - m, szc - mu['ancho'] / 2.0 + m, szc + mu['ancho'] / 2.0 - m))
+        G.sd_notch(inset=m, x1=RO + 1))
     parts.append(sdb.common(ring_sd))
     # Setas de anclaje (una por agujero): vastago por la pared y cabeza con cono de entrada por dentro.
     an = tp['ancla']
@@ -527,7 +537,8 @@ def main():
               ('04_chassis', 'Chasis', build_chassis()),
               ('05_key_tpu', 'Tecla de TPU', build_key()),
               ('06_port_cover_tpu', 'Tapa de puertos de TPU', build_port_cover()),
-              ('07_logo_inlay_tpu', 'Distintivo de TPU para el grabado', G.logo_inlay())]
+              ('07_logo_inlay_tpu', 'Distintivo de TPU para el grabado', G.logo_inlay()),
+              ('08_usb_bezel', 'Marco del USB-C', G.usb_bezel())]
     doc = App.newDocument('TresVizo_V3_0')
     index = {'piezas': [], 'referencias': []}
     for name, label, shape in pieces:

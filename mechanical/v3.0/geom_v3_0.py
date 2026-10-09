@@ -305,6 +305,14 @@ def rounded_rect_x(x0, x1, yc, zc, h, w, r):
     return core.removeSplitter()
 
 
+def rounded_rect_inside(y, z, yc, zc, h, w, r):
+    """Si (y, z) cae dentro del rectangulo redondeado de rounded_rect_x (alto h en y, ancho w en z, radio r)."""
+    dy, dz = abs(y - yc) - (h / 2.0 - r), abs(z - zc) - (w / 2.0 - r)
+    if dy <= 0 or dz <= 0:
+        return abs(y - yc) <= h / 2.0 and abs(z - zc) <= w / 2.0
+    return dy * dy + dz * dz <= r * r
+
+
 def usb_tunnel():
     """Tunel del USB-C: (x0 = boca de J101, yc, zc, alto en y, ancho en z, radio): funda + holgura por lado."""
     u, f, c = PL['usb_c'], PL['funda_usb'], P['costado']['usb_c']
@@ -319,6 +327,24 @@ def sd_slot():
     return sd['x0'], t['y0'] - hh, t['y0'] + t['espesor'] + hh, SD_Z, t['ancho'] + 2 * hh
 
 
+def sd_notch_x0():
+    """x donde empieza la muesca. Ciega (con `pared_detras`): fondo plano en x0 = donde el techo de la
+    ranura (y1) llega a r = RI + pared_detras, asi el fondo cae a 90 grados sobre el techo y detras quedan
+    pared_detras o mas. Con un fondo curvo (r constante) el encuentro era un filo de ~50 grados (0.71)."""
+    sx0, sy0, sy1, szc, sw = sd_slot()
+    pw = P['costado']['microsd']['muesca'].get('pared_detras')
+    return max(sx0, math.sqrt((RI + pw) ** 2 - sy1 ** 2)) if pw else sx0
+
+
+def sd_notch(inset=0.0, x1=None):
+    """Muesca para la una sobre la ranura de la microSD, encogida `inset` por lado, desde sd_notch_x0()."""
+    sx0, sy0, sy1, szc, sw = sd_slot()
+    mu = P['costado']['microsd']['muesca']
+    x1 = RO + 2 if x1 is None else x1
+    return box(sd_notch_x0() + inset, x1, sy0 + inset, mu['y_sup'] - inset,
+               szc - mu['ancho'] / 2.0 + inset, szc + mu['ancho'] / 2.0 - inset)
+
+
 def anchor_zs():
     z = P['costado']['tapa_puertos']['ancla']['z']
     return list(z) if isinstance(z, (list, tuple)) else [z]
@@ -329,6 +355,111 @@ def usb_overmold():
     de J101, centrada en su eje."""
     f, u = PL['funda_usb'], PL['usb_c']
     return rounded_rect_x(u['boca_x'], u['boca_x'] + f['largo'], USB_Y, USB_Z, f['alto'], f['ancho'], f.get('radio', 0.0))
+
+
+# --- Marco del USB-C (pieza 08) -----------------------------------------------------------
+def board_component_boxes(skip=('J101',)):
+    """{ref: [[x0, x1, y0, y1, z0, z1], ...]} de placa-principal.json; para las piezas de
+    costado.usb_c.marco.cajas_placa_real, las cajas de sus partes en el STEP real."""
+    real = P['costado']['usb_c']['marco'].get('cajas_placa_real', {})
+    out = {}
+    for ref, v in ((board_json() or {}).get('componentes') or {}).items():
+        if ref in skip:
+            continue
+        c = v['caja']
+        out[ref] = [[c['x'][0], c['x'][1], c['y'][0], c['y'][1], c['z'][0], c['z'][1]]]
+    for ref, bxs in real.items():
+        if ref in out:
+            out[ref] = [list(b) for b in bxs]
+    return out
+
+
+def bezel_frame():
+    """Cotas del marco: tunel (x0, yc, zc, alto, ancho, radio), cara del collar xf, cara de atras xc,
+    z0-z1 (con las paredes), zt0-zt1 (lados del tunel), y0 (bajo el suelo), ytop (paso del chasis)."""
+    mc = P['costado']['usb_c']['marco']
+    ux0, uyc, uzc, uh, uw, ur = usb_tunnel()
+    return dict(mc=mc, ux0=ux0, uyc=uyc, uzc=uzc, uh=uh, uw=uw, ur=ur,
+                xf=ux0 - mc['retranqueo_boca'], xc=mc['x_collar'],
+                z0=uzc - uw / 2.0 - mc['pared'], z1=uzc + uw / 2.0 + mc['pared'],
+                zt0=uzc - uw / 2.0, zt1=uzc + uw / 2.0,
+                y0=uyc - uh / 2.0 - mc['suelo'], ytop=Y_FLAT_I - CLR,
+                yb=PL['y_dorso'], yf=PL['y_cara'], y_shell=PL['y_cara'] + PL['usb_c']['alto'])
+
+
+def usb_bezel(split=False):
+    """Marco del USB-C (ver costado.usb_c.marco). Con split=True devuelve (marco, parte rigida, resorte)."""
+    f = bezel_frame()
+    mc, xf, xc, z0, z1 = f['mc'], f['xf'], f['xc'], f['z0'], f['z1']
+    zt0, zt1, y0, ytop, yb, yf, ysh = f['zt0'], f['zt1'], f['y0'], f['ytop'], f['yb'], f['yf'], f['y_shell']
+    u = PL['usb_c']
+    body = box(xc, RO, y0, ytop, z0, z1)
+    clip = cyl_z(P['chasis']['r_max'], 0, 0, z0 - 1, z1 + 1).common(box(-40, 40, -40, ytop, z0 - 1, z1 + 1))
+    body = body.common(clip)
+    # Tunel (funda + holgura por lado) desde la cara del collar hacia fuera.
+    body = body.cut(rounded_rect_x(xf, RO + 2, f['uyc'], f['uzc'], f['uh'], f['uw'], f['ur']))
+    # El techo del tunel (y 20.15) queda por encima del paso del chasis (y 20.1): sus esquinas redondeadas
+    # dejarian cunas en lo alto de las paredes de los lados. Por encima del centro de esas esquinas, los
+    # lados del tunel siguen rectos.
+    body = body.cut(box(xf, RO + 2, f['uyc'] + f['uh'] / 2.0 - f['ur'], ytop + 1, zt0, zt1))
+    # Ranura de la placa: del dorso (el labio apoya) a la cara + juego, hasta el canto de la placa.
+    body = body.cut(box(xc - 1, PL['x'], yb, yf + mc['holgura_cara'], z0 - 1, z1 + 1))
+    # Abertura del collar: blindaje de J101 + holgura.
+    cu = mc['cuerpo_usb']
+    c = cu['holgura']
+    body = body.cut(rounded_rect_x(xc - 1, xf + 0.01, (yf + ysh) / 2.0, f['uzc'], ysh - yf + 2 * c,
+                                   u['ancho'] + 2 * c, cu['radio'] + c))
+    # Chaflan de entrada en el canto de atras de arriba del labio (entra bajo el dorso de la placa).
+    ch = mc['chaflan_labio']
+    tri = Part.Face(Part.makePolygon([V(xc - 0.01, yb - ch, z0 - 1), V(xc + ch, yb + 0.01, z0 - 1),
+                                      V(xc - 0.01, yb + 0.01, z0 - 1), V(xc - 0.01, yb - ch, z0 - 1)]))
+    body = body.cut(tri.extrude(V(0, 0, z1 - z0 + 2)))
+    # Resorte: dedo sobre el techo del blindaje con un tope cilindrico que lo aprieta.
+    rs = mc['resorte']
+    y_under = ysh + c
+    finger = box(rs['x0'], xc + 0.01, y_under, y_under + rs['espesor'], rs['z'][0], rs['z'][1])
+    tp = rs['tope']
+    yb_bump = ysh - rs['interferencia']
+    bump = Part.makeCylinder(tp['radio'], tp['z'][1] - tp['z'][0], V(tp['x'], yb_bump + tp['radio'], tp['z'][0]), V(0, 0, 1))
+    bump = bump.common(box(tp['x'] - 2, tp['x'] + 2, yb_bump - 1, y_under + 0.01, tp['z'][0] - 1, tp['z'][1] + 1))
+    spring = finger.fuse(bump).removeSplitter()
+    # Zonas prohibidas: cada componente salvo J101 crecido el aire a compradas y alargado hacia -X
+    # (el marco entra por -X y pasa por encima). Si entre la zona y el tunel quedaria una pared de
+    # lado mas fina que la local minima, se quita hasta el tunel (solo delante del collar).
+    air, wmin = HOL['compradas'], HOL['pared_local_minima']
+    cuts = []
+    for ref, bxs in board_component_boxes().items():
+        for bx0, bx1, by0, by1, bz0, bz1 in bxs:
+            k = [-50.0, bx1 + air, by0 - air, by1 + air, bz0 - air, bz1 + air]
+            if k[1] < rs['x0'] or k[5] < z0 or k[4] > z1 or k[3] < y0 or k[2] > ytop:
+                continue
+            cuts.append(box(*k))
+            for side, thin in (((z0 - 1, zt0 + 0.01), k[4] < zt0 and 0 < zt0 - k[5] < wmin),
+                               ((zt1 - 0.01, z1 + 1), k[5] > zt1 and 0 < k[4] - zt1 < wmin)):
+                if not thin:
+                    continue
+                cuts.append(box(xf, k[1], k[2], k[3], *side))
+                # Si la esquina de arriba de la zona queda a menos de wmin del paso del chasis (r_max), entre
+                # las dos quedaria un cuello fino: se quita la pared de esa esquina hacia fuera, dejando wmin
+                # de alto por encima de la zona y wmin entre la zona y lo que queda por debajo.
+                rmax_ = P['chasis']['r_max']
+                if rmax_ - math.hypot(k[1], k[3]) < wmin and k[3] + wmin < rmax_:
+                    xa = math.sqrt(rmax_ ** 2 - (k[3] + wmin) ** 2)
+                    cuts.append(box(xa, RO + 2, k[3] - wmin, ytop + 1, *side))
+    if cuts:
+        allc = fuse_all(cuts)
+        body, spring = body.cut(allc), spring.cut(allc)
+    out = clean(body.fuse(spring))
+    if split:
+        return out, clean(body), spring
+    return out
+
+
+def bezel_spring_zone():
+    """Caja que contiene el resorte del marco (detras del collar, sobre el blindaje)."""
+    f = bezel_frame()
+    rs = f['mc']['resorte']
+    return box(rs['x0'] - 1, f['xc'], f['y_shell'] - 1.0, f['ytop'] + 1, rs['z'][0] - 1, rs['z'][1] + 1)
 
 
 def microsd_card(dx=0.0):
@@ -691,7 +822,8 @@ def _openings_side(x, y, z, m=0.1):
     if x >= sx0 - m and sy0 - m <= y <= sy1 + m and abs(z - szc) <= sw / 2 + m:
         return 'ranura microSD'
     mu = cs['microsd']['muesca']
-    if x >= sx0 - m and sy0 - m <= y <= mu['y_sup'] + m and abs(z - szc) <= mu['ancho'] / 2 + m:
+    if (x >= sx0 - m and sy0 - m <= y <= mu['y_sup'] + m and abs(z - szc) <= mu['ancho'] / 2 + m
+            and x >= sd_notch_x0() - m):
         return 'muesca de la una'
     ch = cs['microsd']['chaflan_entrada'] + 0.3
     if math.hypot(x, y) >= RO - 2 * ch and ((sy1 - m <= y <= sy1 + ch and abs(z - szc) <= sw / 2 + m) or

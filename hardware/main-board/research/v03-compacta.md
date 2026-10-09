@@ -163,17 +163,25 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
       u 3.0, `cad/check_heights.py` daba −0.01 mm de margen; en u 3.1 da 0.07;
     - la pared lleva un túnel cerrado del tamaño de esa funda más 0.3 por lado (12.95 × 7.1,
       esquinas de R 1.3), en el eje real de J101 (y 16.6, z 25.0, del STEP de la placa), desde la
-      cara de fuera hasta la boca (x 14.9). Así, sin la tapa de TPU, por fuera solo se ve el
-      receptáculo y el canto de la placa.
+      cara de fuera hasta la boca (x 14.9). La boca queda 7.6 dentro de la cara de fuera y la
+      parte metálica de una clavija mide unos 6.6: el cuerpo de la clavija tiene que entrar, así
+      que el túnel no puede ser del tamaño del receptáculo. Se deja para cualquier cable (decisión
+      del propietario, 09-10-2026);
+    - entre la pared y la boca, un **marco del USB-C** aparte (pieza 08 de V3.0) sigue el túnel y
+      abraza la carcasa de J101: se pone cuando la placa ya está en el chasis, porque una pared fija
+      del tubo o del chasis impediría meter el chasis o la placa. Con la tapa abierta se ven J101 y
+      el canto de la placa bajo él; lo que más se asoma son rendijas de 0.1–0.2 (detalle en
+      `mechanical/v3.0/README.md`).
 - **microSD** (J401, TF-015 de empuje: 16.0 de ancho, 15.3 de fondo y 1.95 de alto) en el mismo
   costado, z ≈ 45.
   - Su alto pide |x| ≤ 16.5: la boca queda en u ≈ 1.5 mirando a +X.
   - La pared lleva una ranura justa para la tarjeta, 11.6 × 1.6 (la tarjeta, 11 × 1.0, más 0.3 por
-    lado), en el eje real de la tarjeta (z 40.88), con una muesca de 8 mm para la uña en su centro.
+    lado), en el eje real de la tarjeta (z 40.88), con una muesca ciega de 8 mm para la uña en su
+    centro: no atraviesa la pared (quedan 1.2 por dentro) y no deja ver el lector.
   - Posiciones de la tarjeta según la hoja de SOFNG del TF-015 (LCSC C113206), desde la boca de J401
     (x 16.5): trabada asoma 2.50 (x 19.0), se empuja hasta 1.32 para soltarla y expulsada asoma
-    5.60 (x 22.1). En la muesca, la trabada queda 0.4 por debajo de la cara de fuera y la expulsada
-    sobresale 2.7. Antes la carcasa la suponía trabada en x 17.5, 1.9 mm por dentro.
+    5.60 (x 22.1). Para soltarla se empuja con la uña o un clip, 2.7 dentro de la ranura desde la
+    muesca; expulsada queda 1.6 al descubierto. Antes la carcasa la suponía trabada en x 17.5.
     Que se tome cómodo con la uña hay que probarlo en una pieza impresa.
 - **Antena del ESP32-S3-WROOM-1:** hacia el canto derecho (−X), a media altura, sin cobre debajo.
   Lejos del coaxial y del SMA de la carrier.

@@ -20,7 +20,7 @@
    "etiqueta": "Tubo",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 44.84,
+   "volumen_cm3": 44.91,
    "caja": [
     -28.0,
     28.0,
@@ -50,7 +50,7 @@
    "etiqueta": "Chasis",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 6.65,
+   "volumen_cm3": 6.59,
    "caja": [
     -21.74,
     21.74,
@@ -80,7 +80,7 @@
    "etiqueta": "Tapa de puertos de TPU",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 1.04,
+   "volumen_cm3": 0.99,
    "caja": [
     12.6,
     27.71,
@@ -103,6 +103,21 @@
     22.9,
     39.25,
     59.75
+   ]
+  },
+  {
+   "nombre": "08-usb-bezel",
+   "etiqueta": "Marco del USB-C",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 0.32,
+   "caja": [
+    8.0,
+    22.24,
+    11.84,
+    20.1,
+    17.02,
+    32.98
    ]
   }
  ],

@@ -297,7 +297,63 @@
    "radio_funda": 1.0,
    "chaflan_entrada": 1.2,
    "_nota": "Tunel CERRADO de seccion rectangulo redondeado: la funda maxima de la clavija (12.35 x 6.5, esquinas de R1.0) mas 0.3 por lado (12.95 x 7.1, R1.3), centrado en el eje de J101 de la placa real (y 16.6, z 25.0, de placa-principal.json), de la cara exterior a la boca del receptaculo (x 14.9). Sin cortes abiertos. Solo un chaflan de 1.2 en el canto de fuera de arriba, donde el techo del tunel salia en cuna de ~44 grados. La funda va guiada a 0.3 por lado (ajuste pedido por el propietario, no aire de 0.5). Por dentro, chaflan de 0.6 a 45 grados en el canto de abajo con la cara interior (cuna, tambien en las esquinas redondeadas: medida 0.99 sin el); no se ve desde fuera.",
-   "chaflan_interior": 0.6
+   "chaflan_interior": 0.6,
+   "marco": {
+    "x_collar": 13.5,
+    "retranqueo_boca": 0.2,
+    "pared": 1.5,
+    "suelo": 1.2,
+    "holgura_cara": 0.2,
+    "cuerpo_usb": {
+     "radio": 1.0,
+     "holgura": 0.1,
+     "_nota": "Abertura del collar: el blindaje de J101 (placa.usb_c: 8.94 de ancho en z y 3.25 de alto sobre la cara; en el STEP real 8.94 x 3.2, esquinas de R1.0) mas 0.1 por lado. No aprieta: lo que sujeta es el resorte."
+    },
+    "resorte": {
+     "x0": 8.0,
+     "z": [
+      21.0,
+      29.0
+     ],
+     "espesor": 0.8,
+     "tope": {
+      "x": 8.5,
+      "radio": 0.5,
+      "z": [
+       21.5,
+       28.5
+      ]
+     },
+     "interferencia": 0.2,
+     "_nota": "Dedo elastico sobre el techo del blindaje de J101: 8 de ancho (z 21-29), 0.8 de espesor, de la cara de atras del collar (x 13.5) a x 8.0, a 0.1 sobre el techo. En la punta, tope cilindrico de R0.5 (eje en z, x 8.5) que baja 0.2 por debajo del techo nominal (y 18.65; 0.17 en el STEP real). Al montar el tope sube por el canto de la boca y el dedo se dobla 0.2 (unos 2.8 N; con las tolerancias de MJF, de la placa y de J101, de 0 a ~0.45: hasta 36 MPa en la raiz, por debajo de los ~48 de PA12). Empuja el marco hacia +y: el labio queda apoyado en el dorso de la placa y la rendija queda en la cara, solo a los lados del blindaje. Solo hace falta durante el montaje: con el chasis en el tubo el marco queda atrapado. Si se afloja con el tiempo no pasa nada."
+    },
+    "pared_minima": 1.0,
+    "pared_local_minima": 0.8,
+    "_nota_paredes": "Pedido para esta pieza: paredes de 1.0 o mas y 0.8 en lo local. El dedo del resorte mide 0.8 a proposito; el resto, 1.0 o mas (donde una zona prohibida dejaria menos de holguras.pared_local_minima entre ella y el tunel o el paso del chasis, la pared se quita).",
+    "chaflan_labio": 0.3,
+    "cajas_placa_real": {
+     "J401": [
+      [
+       2.1,
+       16.5,
+       15.39,
+       17.35,
+       32.6,
+       47.33
+      ],
+      [
+       11.3,
+       12.9,
+       15.39,
+       15.57,
+       31.98,
+       32.6
+      ]
+     ],
+     "_nota": "Cajas de las partes de J401 en placa-principal.step (cortes a z 31.8-32.7 y x 13-17): el cuerpo empieza en z 32.6 y solo la pata de x 11.3-12.9 baja a z 31.98. La caja de placa-principal.json junta las dos y dejaba el collar 0.65 mas bajo de lo necesario."
+    },
+    "_nota": "Pieza 08-usb-bezel, de PA12 como la carcasa: cierra la vista alrededor del USB-C. Se pone con la placa ya en el chasis y antes de meter el chasis en el tubo, deslizandola por -X sobre el receptaculo. Es una mordaza en C sobre el canto de la placa: (1) sigue el tunel de 12.95 x 7.1 R1.3 (funda + 0.3 por lado) desde x 14.7 hacia fuera hasta el paso del chasis (r 25.2, y 20.1: 0.4 al tubo), con suelo de 1.2 y paredes de 1.5 a los lados; sin techo, porque el tunel llega a y 20.15 y el chasis solo puede llegar a 20.1; (2) collar de x 13.5 a 14.7 (0.2 detras de la boca) alrededor del blindaje de J101, con 0.2 de juego sobre la cara de la placa; (3) labio bajo el dorso de la placa (y 13.8, apoyado) que cierra la franja de y 13.05 a 13.8 bajo el canto; (4) ranuras para el canto de la placa fuera de la muesca (de y 13.8 a 15.6), cuyo fondo en x 18.0 apoya en el canto y es el tope en x; (5) resorte sobre el blindaje. Zonas prohibidas: cada componente de la placa salvo J101 (placa-principal.json, + cajas_placa_real) crecido 0.5 y alargado hacia -X, porque el marco entra por -X y pasa por encima; donde lo que queda de pared entre esa zona y el tunel mide menos de holguras.pared_local_minima (1.0; R412 bajo el tunel, J401 encima) la pared se quita, y si la esquina de la zona queda a menos de 1.0 del paso del chasis tambien (no quedan cuellos finos); rendijas medidas en check.json (visibilidad). Para pasar, el chasis cambia: el riel +X empieza a cortarse en z 16.6 (antes 18.0) y la pared lateral +X baja a y 11.4 entre z 16.6 y 33.4."
+   }
   },
   "microsd": {
    "z_centro": 40.9,
@@ -307,7 +363,8 @@
    "muesca": {
     "ancho": 8.0,
     "y_sup": 20.2,
-    "_nota": "Muesca para la una en el centro de la tarjeta: 8 de ancho (z), de la ranura hasta y 20.2, atraviesa la pared. Arriba la cara exterior esta en x 19.39: el canto de la tarjeta trabada (x 19.0) queda 0.4 por debajo; para soltarla se empuja 1.2 mas (x 17.82) y expulsada asoma 2.7 (x 22.1), de donde se toma con la una. Era de 5: se ensancho para que entre la yema y no solo la una."
+    "_nota": "Muesca CIEGA para la una sobre la tarjeta (eleccion del propietario, 09-10-2026: que no se vea el lector y quede mas material): 8 de ancho (z), de la ranura hasta y 20.2, con fondo plano en x 20.51, donde el techo de la ranura (y 17.25) llega a r = RI + pared_detras (26.8): el fondo cae a 90 grados sobre el techo y detras quedan 1.2 o mas (con fondo curvo en r 26.8 era un filo de 0.71). La tarjeta trabada (x 19.0) se empuja con la una o un clip hasta x 17.82 para soltarla (2.7 dentro de la ranura desde el rebaje); expulsada (x 22.1) asoma 1.6 en el rebaje, de donde se toma con la una. Sin pared_detras la muesca atraviesa la pared.",
+    "pared_detras": 1.2
    },
    "chaflan_entrada": 1.2,
    "_nota": "Ranura justa para la tarjeta (11 x 1.0) mas 0.3 por lado: 11.6 x 1.6 (y 15.65-17.25), en el eje real de J401 (z 40.88 de placa-principal.json: centro de J401 mas 0.9 de corrimiento del canal; z_centro es el respaldo). La tarjeta entra y sale recta en x. Muesca para la una en su centro y chaflan de 1.2 en los cantos de fuera de arriba (ranura y muesca), donde salian en cuna. Por dentro, chaflan de 0.8 en el canto del suelo con la cara interior (cuna de ~53 grados; no se ve desde fuera).",
@@ -623,11 +680,11 @@
    "z_tope": 80.0,
    "cortes_mas_x": [
     [
-     18.0,
+     16.6,
      47.2
     ]
    ],
-   "_nota": "Riel en C sobre la franja de 1 mm del canto de la placa, 0.25 por cara. Labio desde x 17.5 (monta 0.5 sobre la placa; 0.5 a la envolvente de componentes, que llega a |x| 17, y 0.69 a U302 y U303 de la placa real). Esquina de fuera en r 25.17: 0.43 al tubo, sin ranuras. En +X se corta de z 18.0 a 47.2 (funda del USB-C y tarjeta, con 0.5). Tope de la placa en z 80."
+   "_nota": "Riel en C sobre la franja de 1 mm del canto de la placa, 0.25 por cara. Labio desde x 17.5 (monta 0.5 sobre la placa; 0.5 a la envolvente de componentes, que llega a |x| 17, y 0.69 a U302 y U303 de la placa real). Esquina de fuera en r 25.17: 0.43 al tubo, sin ranuras. En +X se corta de z 16.6 a 47.2 (marco del USB-C con 0.4, que empieza en z 17.02; antes 18.0, y tarjeta). Tope de la placa en z 80."
   },
   "pared_lateral": {
    "x": [
@@ -644,6 +701,14 @@
    ],
    "corte_coax_menos_x": {
     "z0": 83.0
+   },
+   "muesca_marco": {
+    "z": [
+     16.6,
+     33.4
+    ],
+    "y_sup": 11.4,
+    "_nota": "Muesca en el canto de la pared lateral +X (antes y 12.76) para que el suelo del marco del USB-C (y 11.85-13.05, z 17.02-32.98) pase por encima con 0.4 al deslizarlo por -X y en su sitio. Queda pared de y 4.3 a 11.4."
    },
    "_nota": "Paredes laterales a 0.4 bajo la tapa. La de -X acaba en z 83: por encima pasa el coaxial."
   },

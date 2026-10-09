@@ -13,7 +13,7 @@
    },
    "anillo": {
     "puntos": 58543,
-    "en_aberturas": 3489,
+    "en_aberturas": 3425,
     "sin_material": 0,
     "ejemplos": [],
     "ok": true
@@ -44,8 +44,8 @@
    ]
   },
   "volumen": {
-   "tubo_mm3": 44837.9,
-   "esperado_mm3": 44837.5,
+   "tubo_mm3": 44908.9,
+   "esperado_mm3": 44908.4,
    "anillo_solido_mm3": 43085.3,
    "diferencia_mm3": 0.4,
    "diferencia_pct": 0.001,
@@ -63,19 +63,19 @@
     ]
    },
    "ranura microSD y rebaje": {
-    "mm": 1.323,
+    "mm": 1.755,
     "donde": [
-     18.29,
-     21.2,
-     37.88
+     21.1,
+     18.4,
+     35.88
     ]
    },
    "agujeros de las anclas de la tapa de puertos": {
-    "mm": 1.314,
+    "mm": 1.343,
     "donde": [
-     18.3,
-     21.19,
-     44.3
+     18.34,
+     21.16,
+     20.0
     ]
    },
    "ventana OLED (bolsillo y chaflan)": {
@@ -128,11 +128,55 @@
  },
  "choques_entre_piezas": [],
  "choques_piezas_referencias": [],
+ "contactos_con_apriete_a_proposito": {
+  "08-usb-bezel / placa: J101": {
+   "mm3": 0.342,
+   "que_es": "resorte del marco sobre el techo del blindaje"
+  }
+ },
  "choques_entre_referencias": [],
  "llave_holgura_chasis": {
   "-30": 0.5,
   "0": 0.943,
   "30": 0.5
+ },
+ "marco_al_montarlo": {
+  "recorrido_mm": 15.0,
+  "holgura_minima_durante_el_recorrido_mm": {
+   "04-chassis": {
+    "mm": 0.425,
+    "a_mm_de_su_sitio": 0.0
+   },
+   "placa: J401": {
+    "mm": 0.5,
+    "a_mm_de_su_sitio": 0.0
+   },
+   "placa: R412": {
+    "mm": 0.5,
+    "a_mm_de_su_sitio": 0.0
+   },
+   "placa: Q103": {
+    "mm": 1.451,
+    "a_mm_de_su_sitio": 0.0
+   },
+   "placa: U401": {
+    "mm": 1.675,
+    "a_mm_de_su_sitio": 0.0
+   },
+   "carrier: USB-C (sobresale del canto +X)": {
+    "mm": 1.745,
+    "a_mm_de_su_sitio": 0.0
+   },
+   "placa: R411": {
+    "mm": 2.136,
+    "a_mm_de_su_sitio": 0.0
+   }
+  },
+  "componentes_min_mm": 0.5,
+  "carrier_min_mm": 1.745,
+  "chasis_min_mm": 0.425,
+  "resorte_sobre_J101_mm3_max": 0.626,
+  "_nota": "El marco entra por -X: el labio pasa bajo el dorso de la placa (contacto) y el collar por encima de la cara, hasta que el fondo de las ranuras toca el canto de la placa (x 18). El resorte sube por la boca de J101 y aprieta su techo (volumen a proposito, no es choque)."
  },
  "barridos": {
   "celdas_por_arriba": [],
@@ -145,7 +189,9 @@
   "tapa_por_arriba": [],
   "tecla_por_fuera": [],
   "tarjeta_por_el_costado": [],
-  "tapa_de_puertos_por_fuera": []
+  "tapa_de_puertos_por_fuera": [],
+  "marco_sobre_el_usb_c_por_fuera": [],
+  "funda_usb_c_por_el_costado": []
  },
  "holguras": {
   "chasis-tubo (contacto: pie de los rieles en sus repisas, z 9.5)": 0.0,
@@ -185,8 +231,8 @@
   "perno del baston (15.5)-soldaduras de la carrier": 1.2,
   "perno del baston (15.5)-celdas": 3.3,
   "guia de luz-componentes de la placa": 0.545,
-  "tapa de puertos-chasis": 0.565,
-  "tapa de puertos-tarjeta": 0.538,
+  "tapa de puertos-chasis": 0.614,
+  "tapa de puertos-tarjeta": 0.557,
   "chasis-componentes de la carrier (sin su PCB)": 0.5,
   "rieles-PCB de la placa (sin el tope de z 80 ni los salientes)": 0.25,
   "tapa bajo el canto del tubo (labio y lenguetas)-tubo": 0.4,
@@ -198,7 +244,17 @@
   "coaxial (recorrido)-cables": 32.678,
   "clavija SMA acodada-celdas": 4.1,
   "clavija SMA acodada-placa y OLED (sin la muesca)": 0.7,
-  "tuerca del baston-placa y carrier": 0.81
+  "tuerca del baston-placa y carrier": 0.81,
+  "marco-tubo": 0.4,
+  "marco-chasis": 0.425,
+  "marco-tapa de puertos": 0.45,
+  "marco-componentes de la placa (sin J101)": 0.5,
+  "marco-carrier": 1.745,
+  "marco-celdas y cables": 10.99,
+  "marco-PCB (contacto: labio bajo el dorso y fondo de las ranuras)": 0.0,
+  "marco sin resorte-J101 (abertura del collar)": 0.1,
+  "marco-funda USB-C (tunel del marco, por lado)": 0.3,
+  "marco-funda USB-C (collar y labio detras de la boca, en x)": 0.2
  },
  "holguras_laterales_en_barridos": {
   "minimos_por_categoria": {
@@ -374,7 +430,17 @@
      "mm": 0.4
     },
     {
+     "movil": "08-usb-bezel",
+     "obstaculo": "02-tube",
+     "mm": 0.4
+    },
+    {
      "movil": "04-chassis",
+     "obstaculo": "06-port-cover-tpu",
+     "mm": 0.45
+    },
+    {
+     "movil": "08-usb-bezel",
      "obstaculo": "06-port-cover-tpu",
      "mm": 0.45
     },
@@ -417,16 +483,6 @@
      "movil": "placa: J401",
      "obstaculo": "02-tube",
      "mm": 1.662
-    },
-    {
-     "movil": "placa: OLED pines",
-     "obstaculo": "02-tube",
-     "mm": 1.7
-    },
-    {
-     "movil": "placa: J101",
-     "obstaculo": "02-tube",
-     "mm": 1.764
     }
    ],
    "base_por_abajo": [
@@ -633,7 +689,7 @@
   "radio_interior_tubo": 25.6,
   "radio_fondo_ranuras": 25.6,
   "holgura_minima_al_tubo_por_encima_de_las_repisas": 0.4,
-  "_nota": "Radio sobre vertices y aristas discretizadas cada 0.5 mm. Tubo sin ranuras: interior R25.6; en |x| <= 15.33 el interior llega a la cara plana (y 20.5)."
+  "_nota": "Chasis con la placa, la carrier y el marco del USB-C. Radio sobre vertices y aristas discretizadas cada 0.5 mm. Tubo sin ranuras: interior R25.6; en |x| <= 15.33 el interior llega a la cara plana (y 20.5)."
  },
  "coaxial": {
   "cable": {
@@ -652,6 +708,2343 @@
    85.0,
    104.0
   ]
+ },
+ "marco_usb_c": {
+  "volumen_cm3": 0.321,
+  "solidos": 1,
+  "cascaras": 1,
+  "valido": true,
+  "una_pieza_sin_huecos_cerrados": true,
+  "caja": [
+   8.0,
+   22.24,
+   11.84,
+   20.1,
+   17.02,
+   32.98
+  ],
+  "recorrido_libre_con_el_chasis_en_el_tubo_mm": {
+   "+x (hacia el tubo)": {
+    "mm": 0.453,
+    "lo_para": "02-tube"
+   },
+   "-x (hacia dentro)": {
+    "mm": 0.0,
+    "lo_para": "placa: PCB"
+   },
+   "+y (hacia la cara plana)": {
+    "mm": 0.0,
+    "lo_para": "placa: PCB"
+   },
+   "-y (hacia atras)": {
+    "mm": 0.128,
+    "lo_para": "placa: J101"
+   },
+   "+z": {
+    "mm": 0.1,
+    "lo_para": "placa: J101"
+   },
+   "-z": {
+    "mm": 0.1,
+    "lo_para": "placa: J101"
+   }
+  },
+  "espesor_minimo_mm": {
+   "z": {
+    "mm": 0.8,
+    "donde": [
+     10.17,
+     19.55,
+     21.15
+    ]
+   },
+   "x": {
+    "mm": 0.8,
+    "donde": [
+     13.11,
+     19.55,
+     28.38
+    ]
+   },
+   "y": {
+    "mm": 1.2,
+    "donde": [
+     13.5,
+     19.97,
+     31.4
+    ]
+   }
+  },
+  "espesor_minimo_sin_el_resorte_mm": {
+   "z": {
+    "mm": 1.135,
+    "donde": [
+     21.6,
+     11.84,
+     19.15
+    ]
+   },
+   "x": {
+    "mm": 1.099,
+    "donde": [
+     16.61,
+     17.85,
+     32.1
+    ]
+   },
+   "y": {
+    "mm": 1.2,
+    "donde": [
+     13.5,
+     19.97,
+     19.98
+    ]
+   }
+  },
+  "espesor_objetivo_mm": {
+   "paredes": 1.0,
+   "local": 0.8
+  },
+  "espesor_minimo_cumple": true,
+  "resorte_J101_mm3": 0.342,
+  "resorte_J101_penetracion_mm": 0.171,
+  "_nota": "Parte rigida (sin el resorte) movida en cada sentido hasta tocar el tubo, el chasis, la tapa de puertos, la placa (PCB y componentes, J101 incluido) o la carrier. Espesor: secciones cada 0.5 mm normales a cada eje; el dedo del resorte mide 0.8 a proposito (local minima de esta pieza); sin el resorte, objetivo 1.0. Penetracion del resorte: tope nominal contra el techo del blindaje en el STEP real."
+ },
+ "visibilidad": {
+  "usb_c": {
+   "abertura": "tunel del USB-C (12.95 x 7.1)",
+   "rayos": 110677,
+   "direcciones": 49,
+   "angulos_grados": [
+    -30,
+    -20,
+    -10,
+    0,
+    10,
+    20,
+    30
+   ],
+   "otro_pct": 2.1,
+   "permitido_pct": 97.9,
+   "por_categoria_pct": {
+    "marco": 40.33,
+    "tubo": 27.85,
+    "J101": 19.51,
+    "canto de la PCB bajo J101 (permitido)": 9.88,
+    "PCB: lados de la muesca del USB-C": 0.96,
+    "PCB: cara de componentes": 0.95,
+    "J401": 0.33,
+    "placa: Q103": 0.03,
+    "placa: J102": 0.03,
+    "placa: D101": 0.02,
+    "05-key-tpu": 0.01,
+    "placa: R411": 0.01,
+    "placa: J404": 0.01,
+    "placa: SW401": 0.01,
+    "01-base": 0.01,
+    "placa: L101": 0.01,
+    "PCB: agujeros y cantos": 0.0,
+    "placa: R109": 0.0,
+    "placa: Q102": 0.0,
+    "placa: C401": 0.0,
+    "placa: U103": 0.0,
+    "placa: U102": 0.0,
+    "placa: R412": 0.0,
+    "placa: J301": 0.0,
+    "placa: R404": 0.0,
+    "placa: R111": 0.0,
+    "placa: U101": 0.0,
+    "placa: C306": 0.0,
+    "placa: R120": 0.0,
+    "placa: D403": 0.0,
+    "placa: C115": 0.0,
+    "placa: L102": 0.0,
+    "04-chassis": 0.0,
+    "placa: C101": 0.0,
+    "placa: R405": 0.0
+   },
+   "otro_pct_por_angulo_max": {
+    "0": 1.51,
+    "10": 1.42,
+    "20": 2.2,
+    "30": 2.28
+   },
+   "de_frente": {
+    "rayos": 36178,
+    "rejilla_mm": 0.05,
+    "otro_pct": 1.69,
+    "por_categoria_pct": {
+     "marco": 43.37,
+     "J101": 31.2,
+     "canto de la PCB bajo J101 (permitido)": 22.85,
+     "tubo": 0.88,
+     "05-key-tpu": 0.38,
+     "placa: D101": 0.28,
+     "placa: SW401": 0.25,
+     "placa: Q103": 0.24,
+     "placa: U101": 0.11,
+     "placa: U102": 0.08,
+     "placa: R120": 0.05,
+     "placa: R119": 0.05,
+     "placa: U105": 0.03,
+     "placa: D401": 0.03,
+     "placa: U103": 0.03,
+     "04-chassis": 0.03,
+     "placa: C101": 0.03,
+     "placa: C103": 0.02,
+     "placa: R117": 0.02,
+     "placa: D402": 0.02,
+     "placa: R104": 0.01,
+     "placa: C115": 0.01,
+     "placa: R102": 0.01,
+     "placa: C116": 0.01,
+     "placa: L102": 0.01,
+     "placa: R107": 0.01,
+     "placa: C104": 0.01,
+     "placa: R409": 0.0
+    }
+   },
+   "lo_que_se_ve_ademas": [
+    {
+     "que": "PCB: lados de la muesca del USB-C",
+     "rayos": 1064,
+     "pct": 0.96,
+     "choques_x_y_z": [
+      [
+       13.97,
+       17.95
+      ],
+      [
+       13.8,
+       15.4
+      ],
+      [
+       18.47,
+       31.52
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       13.05,
+       18.96
+      ],
+      [
+       19.23,
+       30.76
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       -30,
+       -30
+      ],
+      [
+       -30,
+       -20
+      ],
+      [
+       -30,
+       -10
+      ],
+      [
+       -30,
+       10
+      ],
+      [
+       -30,
+       20
+      ],
+      [
+       -30,
+       30
+      ],
+      [
+       -20,
+       -30
+      ],
+      [
+       -20,
+       -20
+      ],
+      [
+       -20,
+       -10
+      ],
+      [
+       -20,
+       10
+      ],
+      [
+       -20,
+       20
+      ],
+      [
+       -20,
+       30
+      ],
+      [
+       -10,
+       -30
+      ],
+      [
+       -10,
+       -20
+      ],
+      [
+       -10,
+       -10
+      ],
+      [
+       -10,
+       10
+      ],
+      [
+       -10,
+       20
+      ],
+      [
+       -10,
+       30
+      ],
+      [
+       0,
+       -30
+      ],
+      [
+       0,
+       -20
+      ],
+      [
+       0,
+       -10
+      ],
+      [
+       0,
+       10
+      ],
+      [
+       0,
+       20
+      ],
+      [
+       0,
+       30
+      ],
+      [
+       10,
+       -30
+      ],
+      [
+       10,
+       -20
+      ],
+      [
+       10,
+       -10
+      ],
+      [
+       10,
+       10
+      ],
+      [
+       10,
+       20
+      ],
+      [
+       10,
+       30
+      ]
+     ]
+    },
+    {
+     "que": "PCB: cara de componentes",
+     "rayos": 1052,
+     "pct": 0.95,
+     "choques_x_y_z": [
+      [
+       2.16,
+       17.59
+      ],
+      [
+       15.38,
+       15.4
+      ],
+      [
+       15.82,
+       33.06
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       16.32,
+       20.11
+      ],
+      [
+       18.55,
+       31.47
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       -30,
+       -30
+      ],
+      [
+       -30,
+       -20
+      ],
+      [
+       -30,
+       -10
+      ],
+      [
+       -30,
+       0
+      ],
+      [
+       -30,
+       10
+      ],
+      [
+       -30,
+       20
+      ],
+      [
+       -30,
+       30
+      ],
+      [
+       -20,
+       -30
+      ],
+      [
+       -20,
+       -20
+      ],
+      [
+       -20,
+       -10
+      ],
+      [
+       -20,
+       0
+      ],
+      [
+       -20,
+       10
+      ],
+      [
+       -20,
+       20
+      ],
+      [
+       -20,
+       30
+      ],
+      [
+       -10,
+       -30
+      ],
+      [
+       -10,
+       -20
+      ],
+      [
+       -10,
+       -10
+      ],
+      [
+       -10,
+       0
+      ],
+      [
+       -10,
+       10
+      ],
+      [
+       -10,
+       20
+      ],
+      [
+       -10,
+       30
+      ]
+     ]
+    },
+    {
+     "que": "placa: Q103",
+     "rayos": 37,
+     "pct": 0.03,
+     "choques_x_y_z": [
+      [
+       9.72,
+       12.05
+      ],
+      [
+       15.4,
+       16.12
+      ],
+      [
+       17.29,
+       19.84
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       13.72,
+       15.6
+      ],
+      [
+       19.11,
+       25.85
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       -30
+      ],
+      [
+       0,
+       -20
+      ],
+      [
+       0,
+       -10
+      ],
+      [
+       0,
+       0
+      ],
+      [
+       10,
+       -20
+      ]
+     ]
+    },
+    {
+     "que": "placa: J102",
+     "rayos": 28,
+     "pct": 0.03,
+     "choques_x_y_z": [
+      [
+       -1.4,
+       6.23
+      ],
+      [
+       15.43,
+       18.74
+      ],
+      [
+       12.05,
+       13.28
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       13.96,
+       18.74
+      ],
+      [
+       20.76,
+       26.12
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       -30
+      ],
+      [
+       0,
+       -20
+      ],
+      [
+       10,
+       -30
+      ],
+      [
+       10,
+       -20
+      ]
+     ]
+    },
+    {
+     "que": "placa: D101",
+     "rayos": 23,
+     "pct": 0.02,
+     "choques_x_y_z": [
+      [
+       4.89,
+       7.25
+      ],
+      [
+       15.4,
+       16.52
+      ],
+      [
+       30.45,
+       31.89
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.4,
+       20.03
+      ],
+      [
+       21.83,
+       31.45
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       -20,
+       10
+      ],
+      [
+       -10,
+       10
+      ],
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       10
+      ],
+      [
+       0,
+       20
+      ],
+      [
+       0,
+       30
+      ]
+     ]
+    },
+    {
+     "que": "05-key-tpu",
+     "rayos": 15,
+     "pct": 0.01,
+     "choques_x_y_z": [
+      [
+       0.49,
+       1.5
+      ],
+      [
+       18.1,
+       20.14
+      ],
+      [
+       20.58,
+       23.37
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       18.1,
+       20.14
+      ],
+      [
+       20.03,
+       30.23
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       -20
+      ],
+      [
+       0,
+       -10
+      ],
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       10
+      ]
+     ]
+    },
+    {
+     "que": "placa: R411",
+     "rayos": 12,
+     "pct": 0.01,
+     "choques_x_y_z": [
+      [
+       10.51,
+       11.5
+      ],
+      [
+       15.41,
+       15.57
+      ],
+      [
+       16.08,
+       16.5
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.41,
+       17.3
+      ],
+      [
+       20.68,
+       23.63
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       -10,
+       -30
+      ],
+      [
+       0,
+       -30
+      ],
+      [
+       0,
+       -20
+      ]
+     ]
+    },
+    {
+     "que": "placa: J404",
+     "rayos": 12,
+     "pct": 0.01,
+     "choques_x_y_z": [
+      [
+       6.92,
+       7.84
+      ],
+      [
+       15.53,
+       17.08
+      ],
+      [
+       13.25,
+       13.25
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       14.08,
+       16.22
+      ],
+      [
+       22.03,
+       23.08
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       -30
+      ],
+      [
+       10,
+       -30
+      ]
+     ]
+    },
+    {
+     "que": "placa: SW401",
+     "rayos": 10,
+     "pct": 0.01,
+     "choques_x_y_z": [
+      [
+       1.29,
+       3.25
+      ],
+      [
+       15.42,
+       16.53
+      ],
+      [
+       19.86,
+       23.64
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.42,
+       18.99
+      ],
+      [
+       19.86,
+       20.83
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       -10,
+       0
+      ],
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       10
+      ]
+     ]
+    },
+    {
+     "que": "01-base",
+     "rayos": 10,
+     "pct": 0.01,
+     "choques_x_y_z": [
+      [
+       -17.75,
+       -15.8
+      ],
+      [
+       18.64,
+       20.14
+      ],
+      [
+       2.35,
+       5.5
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       18.64,
+       20.14
+      ],
+      [
+       22.73,
+       27.8
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       -30
+      ]
+     ]
+    },
+    {
+     "que": "placa: L101",
+     "rayos": 10,
+     "pct": 0.01,
+     "choques_x_y_z": [
+      [
+       -8.53,
+       -5.8
+      ],
+      [
+       17.38,
+       17.83
+      ],
+      [
+       36.2,
+       40.21
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       17.38,
+       17.83
+      ],
+      [
+       29.61,
+       30.88
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       10
+      ],
+      [
+       0,
+       20
+      ]
+     ]
+    },
+    {
+     "que": "PCB: agujeros y cantos",
+     "rayos": 5,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       7.31,
+       11.7
+      ],
+      [
+       15.05,
+       15.36
+      ],
+      [
+       20.45,
+       29.5
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       17.8,
+       19.9
+      ],
+      [
+       20.45,
+       29.5
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       -30,
+       0
+      ],
+      [
+       -20,
+       -20
+      ],
+      [
+       -20,
+       0
+      ],
+      [
+       -10,
+       0
+      ]
+     ]
+    },
+    {
+     "que": "placa: R109",
+     "rayos": 5,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       8.63,
+       9.6
+      ],
+      [
+       15.41,
+       15.46
+      ],
+      [
+       16.32,
+       16.75
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.41,
+       15.46
+      ],
+      [
+       21.34,
+       25.29
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       -30
+      ],
+      [
+       0,
+       -20
+      ]
+     ]
+    },
+    {
+     "que": "placa: Q102",
+     "rayos": 5,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       5.83,
+       8.14
+      ],
+      [
+       15.4,
+       15.78
+      ],
+      [
+       17.59,
+       19.55
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.4,
+       15.78
+      ],
+      [
+       20.29,
+       28.38
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       -30
+      ],
+      [
+       0,
+       -20
+      ],
+      [
+       0,
+       -10
+      ]
+     ]
+    },
+    {
+     "que": "placa: C401",
+     "rayos": 5,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       -0.77,
+       0.1
+      ],
+      [
+       15.45,
+       15.49
+      ],
+      [
+       34.98,
+       35.68
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.45,
+       15.49
+      ],
+      [
+       26.23,
+       27.2
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       20
+      ]
+     ]
+    },
+    {
+     "que": "placa: U103",
+     "rayos": 4,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       0.47,
+       0.6
+      ],
+      [
+       15.4,
+       16.07
+      ],
+      [
+       17.16,
+       18.56
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.4,
+       19.51
+      ],
+      [
+       21.77,
+       26.86
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       -10,
+       -10
+      ],
+      [
+       0,
+       -20
+      ]
+     ]
+    },
+    {
+     "que": "placa: U102",
+     "rayos": 4,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       -6.42,
+       -6.4
+      ],
+      [
+       15.41,
+       15.47
+      ],
+      [
+       29.68,
+       30.09
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.41,
+       15.47
+      ],
+      [
+       29.68,
+       30.09
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "que": "placa: R412",
+     "rayos": 3,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       15.69,
+       16.39
+      ],
+      [
+       15.5,
+       15.67
+      ],
+      [
+       17.65,
+       17.65
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       14.3,
+       15.54
+      ],
+      [
+       21.82,
+       22.11
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       -30
+      ],
+      [
+       10,
+       -30
+      ]
+     ]
+    },
+    {
+     "que": "placa: J301",
+     "rayos": 3,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       -9.4,
+       -3.0
+      ],
+      [
+       15.42,
+       15.45
+      ],
+      [
+       13.04,
+       14.11
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.42,
+       15.45
+      ],
+      [
+       19.87,
+       24.28
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       -20
+      ],
+      [
+       0,
+       -10
+      ]
+     ]
+    },
+    {
+     "que": "placa: R404",
+     "rayos": 3,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       -0.25,
+       -0.25
+      ],
+      [
+       15.44,
+       15.49
+      ],
+      [
+       37.69,
+       37.83
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.44,
+       15.49
+      ],
+      [
+       24.16,
+       29.08
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       20
+      ],
+      [
+       0,
+       30
+      ]
+     ]
+    },
+    {
+     "que": "placa: R111",
+     "rayos": 2,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       4.79,
+       5.55
+      ],
+      [
+       15.43,
+       15.44
+      ],
+      [
+       15.16,
+       15.65
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.43,
+       15.44
+      ],
+      [
+       22.43,
+       25.47
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       -30
+      ],
+      [
+       0,
+       -20
+      ]
+     ]
+    },
+    {
+     "que": "placa: U101",
+     "rayos": 2,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       1.9,
+       3.98
+      ],
+      [
+       15.42,
+       15.55
+      ],
+      [
+       29.12,
+       29.83
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.42,
+       15.55
+      ],
+      [
+       26.04,
+       29.12
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       10
+      ]
+     ]
+    },
+    {
+     "que": "placa: C306",
+     "rayos": 2,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       -5.51,
+       -5.16
+      ],
+      [
+       15.41,
+       15.45
+      ],
+      [
+       44.58,
+       44.58
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.41,
+       15.45
+      ],
+      [
+       27.89,
+       28.08
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       30
+      ]
+     ]
+    },
+    {
+     "que": "placa: R120",
+     "rayos": 1,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       5.0,
+       5.0
+      ],
+      [
+       15.41,
+       15.41
+      ],
+      [
+       20.99,
+       20.99
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.41,
+       15.41
+      ],
+      [
+       24.24,
+       24.24
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       -10
+      ]
+     ]
+    },
+    {
+     "que": "placa: D403",
+     "rayos": 1,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       -5.19,
+       -5.19
+      ],
+      [
+       15.41,
+       15.41
+      ],
+      [
+       21.74,
+       21.74
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.41,
+       15.41
+      ],
+      [
+       26.79,
+       26.79
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       -10
+      ]
+     ]
+    },
+    {
+     "que": "placa: C115",
+     "rayos": 1,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       -13.92,
+       -13.92
+      ],
+      [
+       15.44,
+       15.44
+      ],
+      [
+       19.78,
+       19.78
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.44,
+       15.44
+      ],
+      [
+       19.78,
+       19.78
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "que": "placa: L102",
+     "rayos": 1,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       -8.9,
+       -8.9
+      ],
+      [
+       15.43,
+       15.43
+      ],
+      [
+       20.48,
+       20.48
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.43,
+       15.43
+      ],
+      [
+       20.48,
+       20.48
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "que": "04-chassis",
+     "rayos": 1,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       -18.25,
+       -18.25
+      ],
+      [
+       15.4,
+       15.4
+      ],
+      [
+       23.57,
+       23.57
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.4,
+       15.4
+      ],
+      [
+       23.57,
+       23.57
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "que": "placa: C101",
+     "rayos": 1,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       -3.3,
+       -3.3
+      ],
+      [
+       15.42,
+       15.42
+      ],
+      [
+       28.65,
+       28.65
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.42,
+       15.42
+      ],
+      [
+       28.65,
+       28.65
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "que": "placa: R405",
+     "rayos": 1,
+     "pct": 0.0,
+     "choques_x_y_z": [
+      [
+       -0.26,
+       -0.26
+      ],
+      [
+       15.41,
+       15.41
+      ],
+      [
+       38.56,
+       38.56
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.41,
+       15.41
+      ],
+      [
+       24.88,
+       24.88
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       30
+      ]
+     ]
+    }
+   ]
+  },
+  "microsd_sin_tarjeta": {
+   "abertura": "ranura de la microSD (11.6 x 1.6) y muesca",
+   "rayos": 52136,
+   "direcciones": 49,
+   "angulos_grados": [
+    -30,
+    -20,
+    -10,
+    0,
+    10,
+    20,
+    30
+   ],
+   "otro_pct": 11.4,
+   "permitido_pct": 88.6,
+   "por_categoria_pct": {
+    "tubo": 78.69,
+    "J401": 9.88,
+    "PCB: canto exterior (x 18)": 6.88,
+    "PCB: cara de componentes": 4.15,
+    "placa: U201": 0.21,
+    "04-chassis": 0.16,
+    "marco": 0.02
+   },
+   "otro_pct_por_angulo_max": {
+    "0": 0.0,
+    "10": 6.68,
+    "20": 12.51,
+    "30": 12.7
+   },
+   "de_frente": {
+    "rayos": 16864,
+    "rejilla_mm": 0.05,
+    "otro_pct": 0.0,
+    "por_categoria_pct": {
+     "tubo": 55.98,
+     "J401": 44.02
+    }
+   },
+   "lo_que_se_ve_ademas": [
+    {
+     "que": "PCB: canto exterior (x 18)",
+     "rayos": 3588,
+     "pct": 6.88,
+     "choques_x_y_z": [
+      [
+       17.97,
+       18.0
+      ],
+      [
+       13.89,
+       15.4
+      ],
+      [
+       33.73,
+       47.33
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       16.0,
+       17.62
+      ],
+      [
+       35.09,
+       46.68
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       -30,
+       -30
+      ],
+      [
+       -30,
+       -20
+      ],
+      [
+       -30,
+       -10
+      ],
+      [
+       -30,
+       0
+      ],
+      [
+       -30,
+       10
+      ],
+      [
+       -30,
+       20
+      ],
+      [
+       -30,
+       30
+      ],
+      [
+       -20,
+       -30
+      ],
+      [
+       -20,
+       -20
+      ],
+      [
+       -20,
+       -10
+      ],
+      [
+       -20,
+       0
+      ],
+      [
+       -20,
+       10
+      ],
+      [
+       -20,
+       20
+      ],
+      [
+       -20,
+       30
+      ],
+      [
+       -10,
+       -30
+      ],
+      [
+       -10,
+       -20
+      ],
+      [
+       -10,
+       -10
+      ],
+      [
+       -10,
+       0
+      ],
+      [
+       -10,
+       10
+      ],
+      [
+       -10,
+       20
+      ],
+      [
+       -10,
+       30
+      ]
+     ]
+    },
+    {
+     "que": "PCB: cara de componentes",
+     "rayos": 2163,
+     "pct": 4.15,
+     "choques_x_y_z": [
+      [
+       10.45,
+       17.97
+      ],
+      [
+       15.4,
+       15.4
+      ],
+      [
+       33.19,
+       51.14
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       16.26,
+       17.88
+      ],
+      [
+       35.1,
+       46.64
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       -30,
+       -30
+      ],
+      [
+       -30,
+       -20
+      ],
+      [
+       -30,
+       -10
+      ],
+      [
+       -30,
+       0
+      ],
+      [
+       -30,
+       10
+      ],
+      [
+       -30,
+       20
+      ],
+      [
+       -30,
+       30
+      ],
+      [
+       -20,
+       -30
+      ],
+      [
+       -20,
+       -20
+      ],
+      [
+       -20,
+       -10
+      ],
+      [
+       -20,
+       0
+      ],
+      [
+       -20,
+       10
+      ],
+      [
+       -20,
+       20
+      ],
+      [
+       -20,
+       30
+      ],
+      [
+       -10,
+       -30
+      ],
+      [
+       -10,
+       -20
+      ],
+      [
+       -10,
+       -10
+      ],
+      [
+       -10,
+       0
+      ],
+      [
+       -10,
+       10
+      ],
+      [
+       -10,
+       20
+      ],
+      [
+       -10,
+       30
+      ]
+     ]
+    },
+    {
+     "que": "placa: U201",
+     "rayos": 109,
+     "pct": 0.21,
+     "choques_x_y_z": [
+      [
+       -6.59,
+       10.35
+      ],
+      [
+       15.65,
+       18.46
+      ],
+      [
+       49.9,
+       52.61
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.65,
+       17.25
+      ],
+      [
+       36.48,
+       46.13
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       10
+      ],
+      [
+       0,
+       20
+      ],
+      [
+       0,
+       30
+      ],
+      [
+       10,
+       20
+      ],
+      [
+       10,
+       30
+      ]
+     ]
+    },
+    {
+     "que": "04-chassis",
+     "rayos": 82,
+     "pct": 0.16,
+     "choques_x_y_z": [
+      [
+       17.51,
+       19.25
+      ],
+      [
+       14.23,
+       16.45
+      ],
+      [
+       47.2,
+       47.43
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.66,
+       17.41
+      ],
+      [
+       44.15,
+       45.85
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       -30,
+       20
+      ],
+      [
+       -30,
+       30
+      ],
+      [
+       -20,
+       20
+      ],
+      [
+       -20,
+       30
+      ],
+      [
+       -10,
+       20
+      ],
+      [
+       -10,
+       30
+      ],
+      [
+       0,
+       20
+      ],
+      [
+       0,
+       30
+      ]
+     ]
+    }
+   ]
+  },
+  "microsd_con_la_tarjeta_trabada": {
+   "abertura": "ranura de la microSD (11.6 x 1.6) y muesca",
+   "rayos": 52136,
+   "direcciones": 49,
+   "angulos_grados": [
+    -30,
+    -20,
+    -10,
+    0,
+    10,
+    20,
+    30
+   ],
+   "otro_pct": 8.73,
+   "permitido_pct": 91.27,
+   "por_categoria_pct": {
+    "tubo": 78.11,
+    "tarjeta": 10.81,
+    "PCB: canto exterior (x 18)": 6.79,
+    "J401": 2.33,
+    "PCB: cara de componentes": 1.66,
+    "04-chassis": 0.16,
+    "placa: U201": 0.12,
+    "marco": 0.02
+   },
+   "otro_pct_por_angulo_max": {
+    "0": 0.0,
+    "10": 6.0,
+    "20": 8.83,
+    "30": 9.92
+   },
+   "de_frente": {
+    "rayos": 16864,
+    "rejilla_mm": 0.05,
+    "otro_pct": 0.0,
+    "por_categoria_pct": {
+     "tubo": 55.98,
+     "tarjeta": 26.09,
+     "J401": 17.93
+    }
+   },
+   "lo_que_se_ve_ademas": [
+    {
+     "que": "PCB: canto exterior (x 18)",
+     "rayos": 3542,
+     "pct": 6.79,
+     "choques_x_y_z": [
+      [
+       17.97,
+       18.0
+      ],
+      [
+       13.89,
+       15.4
+      ],
+      [
+       33.73,
+       47.33
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       16.0,
+       17.59
+      ],
+      [
+       35.09,
+       46.68
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       -30,
+       -30
+      ],
+      [
+       -30,
+       -20
+      ],
+      [
+       -30,
+       -10
+      ],
+      [
+       -30,
+       0
+      ],
+      [
+       -30,
+       10
+      ],
+      [
+       -30,
+       20
+      ],
+      [
+       -30,
+       30
+      ],
+      [
+       -20,
+       -30
+      ],
+      [
+       -20,
+       -20
+      ],
+      [
+       -20,
+       -10
+      ],
+      [
+       -20,
+       0
+      ],
+      [
+       -20,
+       10
+      ],
+      [
+       -20,
+       20
+      ],
+      [
+       -20,
+       30
+      ],
+      [
+       -10,
+       -30
+      ],
+      [
+       -10,
+       -20
+      ],
+      [
+       -10,
+       -10
+      ],
+      [
+       -10,
+       0
+      ],
+      [
+       -10,
+       10
+      ],
+      [
+       -10,
+       20
+      ],
+      [
+       -10,
+       30
+      ]
+     ]
+    },
+    {
+     "que": "PCB: cara de componentes",
+     "rayos": 865,
+     "pct": 1.66,
+     "choques_x_y_z": [
+      [
+       10.89,
+       17.97
+      ],
+      [
+       15.4,
+       15.4
+      ],
+      [
+       33.19,
+       51.14
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       16.26,
+       17.65
+      ],
+      [
+       35.1,
+       46.64
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       -30,
+       30
+      ],
+      [
+       -20,
+       -30
+      ],
+      [
+       -20,
+       -20
+      ],
+      [
+       -20,
+       -10
+      ],
+      [
+       -20,
+       0
+      ],
+      [
+       -20,
+       10
+      ],
+      [
+       -20,
+       20
+      ],
+      [
+       -20,
+       30
+      ],
+      [
+       -10,
+       -30
+      ],
+      [
+       -10,
+       -20
+      ],
+      [
+       -10,
+       -10
+      ],
+      [
+       -10,
+       0
+      ],
+      [
+       -10,
+       10
+      ],
+      [
+       -10,
+       20
+      ],
+      [
+       -10,
+       30
+      ]
+     ]
+    },
+    {
+     "que": "04-chassis",
+     "rayos": 81,
+     "pct": 0.16,
+     "choques_x_y_z": [
+      [
+       17.51,
+       19.25
+      ],
+      [
+       14.23,
+       16.45
+      ],
+      [
+       47.2,
+       47.43
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.66,
+       17.41
+      ],
+      [
+       44.15,
+       45.85
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       -30,
+       20
+      ],
+      [
+       -30,
+       30
+      ],
+      [
+       -20,
+       20
+      ],
+      [
+       -20,
+       30
+      ],
+      [
+       -10,
+       20
+      ],
+      [
+       -10,
+       30
+      ],
+      [
+       0,
+       20
+      ],
+      [
+       0,
+       30
+      ]
+     ]
+    },
+    {
+     "que": "placa: U201",
+     "rayos": 61,
+     "pct": 0.12,
+     "choques_x_y_z": [
+      [
+       -6.59,
+       10.35
+      ],
+      [
+       15.65,
+       18.46
+      ],
+      [
+       49.9,
+       52.61
+      ]
+     ],
+     "entran_por_y_z": [
+      [
+       15.65,
+       17.25
+      ],
+      [
+       36.6,
+       46.13
+      ]
+     ],
+     "direcciones_ay_az": [
+      [
+       0,
+       10
+      ],
+      [
+       0,
+       20
+      ],
+      [
+       0,
+       30
+      ],
+      [
+       10,
+       20
+      ],
+      [
+       10,
+       30
+      ]
+     ]
+    }
+   ]
+  },
+  "permitido": [
+   "marco",
+   "tubo",
+   "tapa de puertos",
+   "J101",
+   "J401",
+   "tarjeta",
+   "canto de la PCB bajo J101 (permitido)"
+  ],
+  "_nota": "Origenes en la piel exterior del tubo (r 28) dentro de cada abertura, en rejilla de 0.2 mm con desplazamiento aleatorio (semilla fija) para cada una de las 49 direcciones (-X inclinado de -30 a 30 grados en y y en z); de_frente: rejilla fija de 0.05 mm, rayos paralelos a -X. Tapa de puertos abierta 150 grados. \"otro\" es todo lo que no es J101, J401, la tarjeta, el tubo, el marco, la tapa de puertos o el canto de la PCB bajo J101 (x 14.9, y 13.8-15.4, z 18.5-31.5). Teselacion de 0.04 mm cerca de las aberturas."
  },
  "distancias_entre_mazos": {
   "mazo del pack (rojo, negro y NTC) / arnes de J301": 8.802,
@@ -694,8 +3087,8 @@
    "local_minimo_mm": 1.0,
    "espesores_mm": {
     "tunel USB-C": 1.333,
-    "ranura microSD y rebaje": 1.323,
-    "agujeros de las anclas de la tapa de puertos": 1.314,
+    "ranura microSD y rebaje": 1.755,
+    "agujeros de las anclas de la tapa de puertos": 1.343,
     "ventana OLED (bolsillo y chaflan)": 1.4,
     "tecla y LED": 1.8,
     "uniones (rebajes)": 1.198,
@@ -724,10 +3117,12 @@
   "ajustes_guiados": {
    "funda USB-C en el tunel (por lado)": 0.3,
    "tarjeta trabada en la ranura (por lado)": 0.3,
+   "funda USB-C en el tunel del marco (por lado)": 0.3,
    "objetivo_mm": 0.3,
+   "cumple": true,
    "_nota": "Pedido del propietario: aberturas justas, funda y tarjeta a 0.3 por lado; no es aire de 0.5."
   },
-  "_nota": "Contactos a proposito (no cuentan): pie de los rieles en sus apoyos (z 9.5), placa contra los salientes (y 13.8) y el tope (z 80), celdas en sus repisas, base y tapa contra los cantos del tubo, tornillos en sus avellanados y arandelas en sus asientos, tecla pegada en su rebaje, tapa de puertos sobre el tubo, seta en su agujero, cuerpos de TPU en las aberturas, tuerca del baston en su hexagono (0.3 por cara), pasamuros en su agujero en D. Ajustes de posicion aparte: rieles (B2) y carrier (B4)."
+  "_nota": "Contactos a proposito (no cuentan): pie de los rieles en sus apoyos (z 9.5), placa contra los salientes (y 13.8) y el tope (z 80), celdas en sus repisas, base y tapa contra los cantos del tubo, tornillos en sus avellanados y arandelas en sus asientos, tecla pegada en su rebaje, tapa de puertos sobre el tubo, seta en su agujero, cuerpos de TPU en las aberturas, tuerca del baston en su hexagono (0.3 por cara), pasamuros en su agujero en D, marco del USB-C con el labio bajo el dorso de la placa y el fondo de sus ranuras en el canto, resorte del marco sobre el blindaje de J101 (apriete a proposito). Ajustes de posicion aparte: rieles (B2) y carrier (B4)."
  },
  "bloqueos_al_sacar_el_chasis_con_la_tecla_puesta": [
   {
@@ -738,5 +3133,6 @@
   }
  ],
  "total_choques": 0,
- "guarda_pared_ok": true
+ "guarda_pared_ok": true,
+ "numero_de_barridos": 13
 }
