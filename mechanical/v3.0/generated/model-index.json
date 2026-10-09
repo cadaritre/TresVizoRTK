@@ -125,7 +125,7 @@
    "etiqueta": "Banda de TPU de abajo",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 12.39,
+   "volumen_cm3": 12.52,
    "caja": [
     -29.7,
     29.7,
@@ -140,7 +140,7 @@
    "etiqueta": "Banda de TPU de arriba",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 13.23,
+   "volumen_cm3": 13.37,
    "caja": [
     -29.7,
     29.7,
@@ -212,7 +212,7 @@
    ],
    "redondeos": {
     "fuera": {
-     "aristas": 23,
+     "aristas": 20,
      "radio_pedido": 1.0,
      "radio": 1.0
     },
@@ -230,7 +230,7 @@
    ],
    "redondeos": {
     "fuera": {
-     "aristas": 20,
+     "aristas": 16,
      "radio_pedido": 1.0,
      "radio": 1.0
     },

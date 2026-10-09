@@ -13,8 +13,10 @@ Mide, con las piezas de generated/TresVizo-V3.0.FCStd:
   - marco del USB-C: contactos, holguras, cuanto se mueve atrapado, espesores, y que se ve desde fuera
     por el USB-C y la ranura de la microSD (rayos rectos y oblicuos hasta 30 grados);
   - bandas de TPU: apriete contra el tubo, la base y la tapa (a proposito, no es choque), holguras de sus
-    aberturas, barrido de cada banda al ponerla, base, tapa, tecla, tarjeta y funda con las bandas puestas,
-    angulo maximo de la tapa de puertos con la banda, distintivo y rayas entre las bandas.
+    aberturas y de sus bolsillos sobre los M2.5, barrido de cada banda al ponerla con la carcasa cerrada (las
+    cabezas de los M2.5, aparte), tecla, tarjeta y funda con las bandas puestas, angulo maximo de la tapa de
+    puertos con la banda, distintivo y rayas entre las bandas;
+  - pared en 3D alrededor de los avellanados de los M2.5 radiales (solo se informa).
 
 Uso:
   PYTHONPATH=/Applications/FreeCAD.app/Contents/Resources/lib \\
@@ -187,6 +189,23 @@ th = {'tunel USB-C': G.min_wall_thickness(TUBE_WALL, [18.6, 19.0, 22.0, 25.0, 28
       'tornillos radiales de base y tapa': G.min_wall_thickness(TUBE_WALL, [P['base']['tornillos']['z'], P['tapa']['tornillos_z']], whole),
       'pared normal y lineas decorativas (z 15, 70, 95)': G.min_wall_thickness(TUBE_WALL, [15.0, 70.0, 95.0], whole)}
 guard['espesor_minimo'] = {k: {'mm': v[0], 'donde': v[1]} for k, v in th.items()}
+# Pared alrededor de los avellanados de los seis M2.5 radiales, en 3D: del avellanado (cono, sin el paso del tornillo,
+# que atraviesa la pared a proposito) al hueco interior del tubo y a los rebajes de las uniones. Las secciones
+# horizontales en el eje del tornillo no ven el punto fino, que va en diagonal hacia el canto del rebaje. Solo se
+# informa (no es objetivo): es un valor conocido de la carcasa ya pedida (en la base, 0.92).
+_void = G.interior(G.Z_TUBE0 - 1, G.Z_TUBE1 + 1).fuse(B.rebates())
+_tsc = P['base']['tornillos']
+_csk3d = {}
+for _cfg, _zs in ((P['base']['lenguetas'], _tsc['z']), (P['tapa']['lenguetas'], P['tapa']['tornillos_z'])):
+    for _a in _cfg['angulos']:
+        _d, _pts, _ = B.countersink(_a, _zs, _tsc['avellanado_diametro'], _tsc['paso']).distToShape(_void)
+        _p = _pts[0][1]
+        _csk3d[f'M2.5 a {_a:g} grados, z {_zs:g}'] = {'mm': round(_d, 3), 'punto_del_hueco': [round(_p.x, 2), round(_p.y, 2), round(_p.z, 2)]}
+guard['avellanados_3d_solo_informativo'] = {
+    'mm': _csk3d, 'minimo_mm': min(v['mm'] for v in _csk3d.values()),
+    '_nota': ('Del avellanado (cono, sin el paso) al hueco interior y a los rebajes de las uniones, en 3D. En la base el punto '
+              'fino va en diagonal al canto del rebaje (r 26.8, z 5.9). Valor conocido de la carcasa pedida: no cuenta como '
+              'objetivo.')}
 guard['espesor_por_debajo_de_1.2'] = {k: v[0] for k, v in th.items() if v[0] < HOLG['pared_minima']}
 guard['espesor_por_debajo_de_1.0'] = {k: v[0] for k, v in th.items() if v[0] < HOLG['pared_local_minima']}
 guard['espesor_minimo_ok'] = all(v[0] >= HOLG['pared_local_minima'] for v in th.values())
@@ -415,8 +434,6 @@ obst.update(carrier_refs)
 obst.update(cell_refs)
 obst.update({f'clavijas: {k}': v for k, v in plug_refs.items()})
 obst.update({f'cables: {k}': v for k, v in groups['cables'].items()})
-# Con la banda de abajo puesta (estirada): la base sale por abajo sin quitarla.
-obst['09-band-bottom-tpu (estirada)'] = BAND_B_ST
 sweeps['base_por_abajo'] = sweep(base_mov, obst, V(0, 0, -20))
 log('base:', sweeps['base_por_abajo'])
 # g. Tapa con la antena atornillada, por arriba (con sus topes de las celdas y su labio).
@@ -427,8 +444,6 @@ obst = {'02-tube': TUBE_NL, '04-chassis': CHS, 'coaxial: clavija SMA (tuerca Ø9
 obst.update(board_refs)
 obst.update(cell_refs)
 obst.update(batt)
-# Con la banda de arriba puesta (estirada): la tapa sale por arriba sin quitarla.
-obst['10-band-top-tpu (estirada)'] = BAND_T_ST
 sweeps['tapa_por_arriba'] = sweep(cap_mov, obst, V(0, 0, 20))
 log('tapa:', sweeps['tapa_por_arriba'])
 # h. Tecla entera por fuera (la pestana va en el rebaje exterior: entra y sale por fuera).
@@ -516,14 +531,14 @@ fo_obst.update(board_refs)
 fo_obst.update(carrier_refs)
 sweeps['funda_usb_c_por_el_costado'] = sweep({'usb: funda de la clavija': groups['usb']['funda de la clavija']}, fo_obst, V(15, 0, 0))
 log('funda por el costado:', sweeps['funda_usb_c_por_el_costado'])
-# m, n. Bandas de TPU: la de abajo sube por abajo y la de arriba baja por arriba hasta su sitio. Se ponen sobre el
-#    tubo con la tapa de puertos puesta y ANTES de los seis M2.5 radiales y de la tecla, que van despues por sus
-#    agujeros y su ventana (como en el servicio): las cabezas avellanadas son planas sobre una pared curva y sus
-#    cantos asoman 0.11 (diagnostico abajo), y la tecla asoma 1.0. La base y la tapa entran por dentro de las bandas
-#    (barridos base_por_abajo y tapa_por_arriba, con las bandas). Se mide al reves (de su sitio hasta que sale).
-#    Banda estirada (contorno interior = cuerpo + holgura_barrido): nada que quede dentro del contorno del cuerpo
-#    + 0.01 la puede tocar, asi que se barre contra lo que sobresale de ese contorno de cada pieza y referencia
-#    (exacto, y mucho mas rapido que contra las piezas enteras). Se comprueba que la banda estirada queda fuera.
+# m, n. Bandas de TPU: la de abajo sube por abajo y la de arriba baja por arriba hasta su sitio, con la carcasa
+#    cerrada (base, tapa y sus seis M2.5 radiales puestos) y SIN la tecla, que va al final por la ventana. Se mide al
+#    reves (de su sitio hasta que sale). Banda estirada (contorno interior = cuerpo + holgura_barrido): nada que quede
+#    dentro del contorno del cuerpo + 0.01 la puede tocar, asi que se barre contra lo que sobresale de ese contorno de
+#    cada pieza y referencia (exacto, y mucho mas rapido que contra las piezas enteras). Las cabezas de los M2.5 son
+#    planas sobre la pared curva: sus cantos asoman 0.11 sobre R28 (la carcasa ya esta pedida, no se hunden). Al pasar
+#    por encima el TPU se estira esos 0.11: se mide aparte (estiramiento_sobre_las_cabezas) y no cuenta como choque;
+#    el barrido contra todo lo demas tiene que salir limpio.
 BODY_OUT = G.body_prism(-60, 200, 0.01)
 
 
@@ -551,45 +566,35 @@ L_BB = G.band_z('abajo')[1] + 2.0                                               
 L_BT = G.H_TOTAL + P['antena']['altura'] - G.band_z('arriba')[0] + 2.0                  # hasta pasar la antena
 sweeps['banda_de_abajo_por_abajo'] = sweep({'09-band-bottom-tpu (estirada)': BAND_B_ST}, BAND_OBST, V(0, 0, -L_BB))
 sweeps['banda_de_arriba_por_arriba'] = sweep({'10-band-top-tpu (estirada)': BAND_T_ST}, BAND_OBST, V(0, 0, L_BT))
-# o. Los seis M2.5 radiales por los agujeros de las bandas puestas (estiradas): cada uno, de su avellanado hacia fuera.
-L_SC = 8.0
-_scr_sw, _scr_gap = [], {}
-for _cfg, _zs, _bs, _bn in ((P['base']['lenguetas'], P['base']['tornillos']['z'], BAND_B_ST, '09-band-bottom-tpu (estirada)'),
-                            (P['tapa']['lenguetas'], P['tapa']['tornillos_z'], BAND_T_ST, '10-band-top-tpu (estirada)')):
-    for _a in _cfg['angulos']:
-        _sc = G.radial_screw(_a, _zs)
-        _u = V(math.cos(math.radians(_a)), math.sin(math.radians(_a)), 0)
-        _nm = f'M2.5 a {_a:g} grados, z {_zs:g}'
-        _scr_sw += sweep({_nm: _sc}, {_bn: _bs}, _u * L_SC)
-        _g = sweep_min_gaps(_sc, {_bn: _bs}, _u * L_SC, near=3.0)
-        _scr_gap[_nm] = _g.get(_bn, (None, None))[0]
-sweeps['tornillos_radiales_por_las_bandas'] = _scr_sw
 _kp = protrusions({'05-key-tpu': KEY})
 _sp = protrusions({k: v for k, v in refs.items() if k.startswith('tornillos:')})
+_heads = (sweep({'09-band-bottom-tpu (estirada)': BAND_B_ST}, _sp, V(0, 0, -L_BB))
+          + sweep({'10-band-top-tpu (estirada)': BAND_T_ST}, _sp, V(0, 0, L_BT)))
 band_sweep = {
     'metodo': ('Banda estirada (contorno interior = el del cuerpo + %g, espesor %g) barrida en pasos de %g mm contra lo '
-               'que sobresale del contorno del cuerpo + 0.01 de cada pieza y referencia, sin la tecla ni los M2.5 radiales '
-               '(van despues, por la ventana y los agujeros).' % (G.BD['holgura_barrido'], G.BD['espesor'], args.step)),
+               'que sobresale del contorno del cuerpo + 0.01 de cada pieza y referencia, con la carcasa cerrada y sin la '
+               'tecla. Las cabezas de los M2.5, aparte (estiramiento_sobre_las_cabezas).'
+               % (G.BD['holgura_barrido'], G.BD['espesor'], args.step)),
     'banda_estirada_dentro_del_contorno_mm3': {'abajo': round(common_vol(BAND_B_ST, BODY_OUT), 4),
                                                'arriba': round(common_vol(BAND_T_ST, BODY_OUT), 4)},
-    'lo_que_sobresale': {k: round(v.Volume, 2) for k, v in BAND_OBST.items()},
-    'recorrido_mm': {'abajo': L_BB, 'arriba': round(L_BT, 2), 'tornillos': L_SC},
+    'lo_que_sobresale': {k: round(v.Volume, 2) for k, v in dict(BAND_OBST, **_sp).items()},
+    'recorrido_mm': {'abajo': L_BB, 'arriba': round(L_BT, 2)},
     'holgura_minima_al_ponerla_mm': {
         'abajo': {k: {'mm': v[0], 'a_mm_de_su_sitio': v[1]} for k, v in sweep_min_gaps(BAND_B_ST, BAND_OBST, V(0, 0, -L_BB), near=5.0).items()},
         'arriba': {k: {'mm': v[0], 'a_mm_de_su_sitio': v[1]} for k, v in sweep_min_gaps(BAND_T_ST, BAND_OBST, V(0, 0, L_BT), near=5.0).items()}},
-    'tornillos_por_los_agujeros_holgura_mm': _scr_gap,
-    'cantos_de_las_cabezas_de_los_tornillos_sobre_la_pared_mm': round(math.hypot(G.RO, P['base']['tornillos']['avellanado_diametro'] / 2.0) - G.RO, 3),
+    'estiramiento_sobre_las_cabezas': {
+        'cantos_de_la_cabeza_sobre_R%g_mm' % G.RO: round(G.screw_head_out(), 3),
+        'contra_la_banda_estirada_del_modelo_mm': round(G.screw_head_out() - G.BD['holgura_barrido'], 3),
+        'choques_al_pasar': _heads,
+        'mm3_max': max([h_['mm3_max'] for h_ in _heads], default=0.0),
+        '_nota': ('Margen de estiramiento del TPU, SOLO sobre las cabezas de los seis M2.5 radiales: la banda pasa por encima de '
+                  'sus cantos, que asoman 0.11 sobre la pared (cabeza plana sobre pared curva de R28, avellanado de la carcasa '
+                  'ya pedida). No cuenta como choque; todo lo demas sale limpio. En su sitio, cada cabeza queda en su bolsillo.')},
     'con_la_tecla_puesta': sweep({'09-band-bottom-tpu (estirada)': BAND_B_ST}, _kp, V(0, 0, -L_BB)),
-    'con_los_tornillos_radiales_puestos': (sweep({'09-band-bottom-tpu (estirada)': BAND_B_ST}, _sp, V(0, 0, -L_BB))
-                                           + sweep({'10-band-top-tpu (estirada)': BAND_T_ST}, _sp, V(0, 0, L_BT))),
-    '_nota': ('Orden: cada banda sobre el tubo (con la tapa de puertos ya puesta) antes de cerrar con la base o la tapa; la '
-              'base y la tapa entran por dentro de ella y sus M2.5 radiales y la tecla van despues, por los agujeros y la '
-              'ventana, como en el servicio. Con todo armado no pasaria limpia: la tecla asoma 1.0 y los cantos de las '
-              'cabezas de los M2.5 (planas, sobre la pared curva de R28) asoman 0.11 (diagnosticos con_la_tecla_puesta y '
-              'con_los_tornillos_radiales_puestos). El TPU pasaria por encima de 0.11 estirandose, pero el modelo no lo '
-              'cuenta.')}
-log('bandas al ponerlas:', sweeps['banda_de_abajo_por_abajo'], sweeps['banda_de_arriba_por_arriba'],
-    sweeps['tornillos_radiales_por_las_bandas'], band_sweep)
+    '_nota': ('Orden: base, tapa y sus seis M2.5 puestos; despues las bandas (la de abajo por abajo, la de arriba por arriba, '
+              'por encima de la antena); al final la tecla, por la ventana de la banda de abajo (con ella puesta la banda '
+              'no pasa: asoma 1.0, diagnostico con_la_tecla_puesta). Para abrir la base o la tapa se saca antes su banda.')}
+log('bandas al ponerlas:', sweeps['banda_de_abajo_por_abajo'], sweeps['banda_de_arriba_por_arriba'], band_sweep)
 report['barridos'] = sweeps
 log('barridos:', {k: len(v) for k, v in sweeps.items()})
 
@@ -704,8 +709,10 @@ pairs.update({
     'banda de abajo-distintivo de TPU': gap(BAND_B, parts['07-logo-inlay-tpu']),
     'banda de arriba-distintivo de TPU': gap(BAND_T, parts['07-logo-inlay-tpu']),
     'banda de abajo-guia de luz del LED': gap(BAND_B, groups['frente']['guia de luz del LED']),
-    'banda de abajo-tornillos de la base': gap(BAND_B, _scr),
-    'banda de arriba-tornillos de la tapa': gap(BAND_T, _scr),
+    # Cabezas de los M2.5 en sus bolsillos, con la banda puesta (estirada): con su medida de impresion la banda queda
+    # 0.3 dentro del cuerpo, cosa que no pasa en la carcasa (ver bandas.bolsillos).
+    'banda de abajo puesta-cabezas de los tornillos de la base': gap(BAND_B_ST, _scr),
+    'banda de arriba puesta-cabezas de los tornillos de la tapa': gap(BAND_T_ST, _scr),
     'banda de arriba-lamina de la ventana': gap(BAND_T, groups['frente']['lamina de la ventana (PC 1.0)']),
     'banda de arriba-antena': gap(BAND_T, groups['antena']['antena HA-901A']),
 })
@@ -1337,6 +1344,17 @@ _inside_grip = G.body_prism(G.H_TOTAL - 1.0, G.H_TOTAL + 5.0, -G.BD['apriete'] -
 _tpp = P['costado']['tapa_puertos']
 _tab = COVER.common(box(_tpp['lengueta']['x0'] - 0.01, _tpp['x_frente_plano'] + 0.01, G.Y_FLAT_O - 0.01, 40,
                         _tpp['lengueta']['z'][0] - 0.01, _tpp['lengueta']['z'][1] + 0.01))
+# Bolsillos: holgura de cada cabeza (con la banda puesta y con su medida de impresion) y TPU que queda por fuera, medido
+# con un rayo fino por el eje del tornillo (cilindro de r 0.05 de r 26 a 32).
+_pk_gap, _pk_tpu = {}, {}
+for _w, _bp, _bs in (('abajo', BAND_B, BAND_B_ST), ('arriba', BAND_T, BAND_T_ST)):
+    for _a, _zs in G.band_screws(_w):
+        _sc = G.radial_screw(_a, _zs)
+        _nm = f'M2.5 a {_a:g} grados, z {_zs:g}'
+        _pk_gap[_nm] = {'banda_puesta_mm': gap(_bs, _sc), 'medida_de_impresion_mm': gap(_bp, _sc)}
+        _u = V(math.cos(math.radians(_a)), math.sin(math.radians(_a)), 0)
+        _ray = Part.makeCylinder(0.05, 6.0, _u * 26.0 + V(0, 0, _zs), _u)
+        _pk_tpu[_nm] = {k_: round(common_vol(b_, _ray) / (math.pi * 0.05 ** 2), 3) for k_, b_ in (('impresa', _bp), ('puesta', _bs))}
 _bt_ok = {
     'tapa de puertos >= 0.5': (pairs['banda de abajo-tapa de puertos (pedido >= 0.5)'] or 0) >= G.BD['abajo']['muesca_tapa_puertos']['holgura'] - 1e-3,
     'tecla >= 1.0': (pairs['banda de abajo-tecla (pedido >= 1.0)'] or 0) >= 1.0 - 1e-3,
@@ -1346,8 +1364,10 @@ _bt_ok = {
     'rayas >= 1.5 a las bandas': _lvz[0] - _bz_b[1] >= 1.5 - 1e-6 and _bz_t[0] - _lvz[1] >= 1.5 - 1e-6,
     'nada sobre la cara de arriba de la tapa': (common_vol(BAND_T, box(-60, 60, -60, 60, G.H_TOTAL, G.H_TOTAL + 50)) <= 1e-3
                                                 and common_vol(BAND_T, _inside_grip) <= 1e-3),
-    'barridos de las bandas limpios': (not sweeps['banda_de_abajo_por_abajo'] and not sweeps['banda_de_arriba_por_arriba']
-                                       and not sweeps['tornillos_radiales_por_las_bandas']),
+    'barridos de las bandas limpios (sin contar las cabezas de los M2.5)': (not sweeps['banda_de_abajo_por_abajo']
+                                                                           and not sweeps['banda_de_arriba_por_arriba']),
+    'bolsillos: 1.2 de TPU o mas sobre cada tornillo': min(v_ for d_ in _pk_tpu.values() for v_ in d_.values()) >= 1.2 - 1e-3,
+    'bolsillos: cabezas a 0.5 o mas con la banda puesta': min(v_['banda_puesta_mm'] for v_ in _pk_gap.values()) >= 0.5 - 1e-3,
 }
 report['bandas'] = {
     'piezas': {G.BAND_NAMES[w_]: {'z': list(G.band_z(w_)), 'volumen_cm3': round(sh_.Volume / 1000.0, 2), 'solidos': len(sh_.Solids),
@@ -1358,9 +1378,10 @@ report['bandas'] = {
     'por_fuera_del_cuerpo_mm': round(G.BD['espesor'] - G.BD['apriete'], 3),
     'apriete_mm3': band_grip,
     'aberturas': {
-        'agujeros de los tornillos de la base': {'diametro': G.BD['abajo']['tornillos_diametro'], 'z': P['base']['tornillos']['z'],
-                                                 'angulos': P['base']['lenguetas']['angulos'],
-                                                 'holgura_a_la_cabeza_mm': pairs['banda de abajo-tornillos de la base']},
+        'bolsillos de los M2.5 (por dentro, tapan las cabezas)': {
+            'diametro': G.BD['bolsillos_tornillos']['diametro'], 'hondo': G.BD['bolsillos_tornillos']['hondo'],
+            'cantos_de_la_cabeza_sobre_R28_mm': round(G.screw_head_out(), 3),
+            'holgura_a_la_cabeza_mm': _pk_gap, 'tpu_por_fuera_mm': _pk_tpu},
         'ventana de la tecla y el LED': {'diametro_tecla': _vt['diametro_tecla'], 'diametro_led': _vt['diametro_led'],
                                          'holgura_a_la_tecla_mm': pairs['banda de abajo-tecla (pedido >= 1.0)'],
                                          'holgura_a_la_guia_de_luz_mm': pairs['banda de abajo-guia de luz del LED']},
@@ -1368,14 +1389,11 @@ report['bandas'] = {
                                              holgura_a_la_tapa_cerrada_mm=pairs['banda de abajo-tapa de puertos (pedido >= 0.5)'],
                                              sitio_para_la_una_delante_de_la_lengueta_mm=gap(BAND_B, _tab)),
         'desague (holgura al agujero)': gap(BAND_B, _drain),
-        'agujeros de los tornillos de la tapa': {'diametro': G.BD['arriba']['tornillos_diametro'], 'z': P['tapa']['tornillos_z'],
-                                                 'angulos': P['tapa']['lenguetas']['angulos'],
-                                                 'holgura_a_la_cabeza_mm': pairs['banda de arriba-tornillos de la tapa']},
         'muesca de la OLED': dict({k_: round(v_, 3) for k_, v_ in _bd['oled'].items()},
                                   holgura_al_bolsillo_mm=gap(BAND_T, _pocket),
                                   holgura_a_la_lamina_mm=pairs['banda de arriba-lamina de la ventana'])},
     'anillo_completo_banda_de_abajo': {'z': [_bz_b[0], round(_ring_top, 3)], 'alto_mm': round(_ring_top - _bz_b[0], 3),
-                                       'objetivo_mm': 12.0, '_nota': 'Sin muesca ni ventana; solo los tres agujeros de los tornillos de la base.'},
+                                       'objetivo_mm': 12.0, '_nota': 'Sin muesca ni ventana; solo los tres bolsillos ciegos de los tornillos de la base, por dentro.'},
     'cara_de_arriba_de_la_tapa': {'banda_por_encima_de_z_%g_mm3' % G.H_TOTAL: round(common_vol(BAND_T, box(-60, 60, -60, 60, G.H_TOTAL, G.H_TOTAL + 50)), 4),
                                   'banda_por_dentro_de_su_contorno_de_apriete_mm3': round(common_vol(BAND_T, _inside_grip), 4),
                                   'holgura_a_la_antena_mm': pairs['banda de arriba-antena'],
@@ -1428,8 +1446,9 @@ B3_KEYS = ('chasis-celdas', 'chasis-componentes de la placa y OLED', 'chasis-com
            'guia de luz-componentes de la placa', 'tapa de puertos-tarjeta', 'tapa-tornillos de la antena (radial, en su rebaje)',
            'tapa-tuerca del pasamuros (radial, en su bolsillo)', 'conector de la tapa (dentro)-placa, OLED y celdas',
            'tuerca del baston-placa y carrier', 'carrier-PCB de la placa', 'marco-componentes de la placa (sin J101)',
-           'marco-carrier', 'marco-celdas y cables', 'banda de abajo-guia de luz del LED', 'banda de abajo-tornillos de la base',
-           'banda de arriba-tornillos de la tapa', 'banda de arriba-lamina de la ventana', 'banda de arriba-antena')
+           'marco-carrier', 'marco-celdas y cables', 'banda de abajo-guia de luz del LED',
+           'banda de abajo puesta-cabezas de los tornillos de la base', 'banda de arriba puesta-cabezas de los tornillos de la tapa',
+           'banda de arriba-lamina de la ventana', 'banda de arriba-antena')
 tp_rep = report['tapa_de_puertos']
 _head = []
 for an_k, an_v in tp_rep['anclas'].items():
@@ -1472,7 +1491,11 @@ objetivos = {
     'bandas_de_tpu': {'cumple': report['bandas']['cumple'], 'todo_cumple': report['bandas']['todo_cumple'],
                       'apriete_mm3': report['bandas']['apriete_mm3'],
                       'angulo_maximo_de_la_tapa_de_puertos_grados': _cb['angulo_maximo_grados'],
-                      'anillo_completo_mm': report['bandas']['anillo_completo_banda_de_abajo']['alto_mm']},
+                      'anillo_completo_mm': report['bandas']['anillo_completo_banda_de_abajo']['alto_mm'],
+                      'estiramiento_sobre_las_cabezas_de_los_M2.5': {
+                          'cantos_sobre_R28_mm': band_sweep['estiramiento_sobre_las_cabezas']['cantos_de_la_cabeza_sobre_R%g_mm' % G.RO],
+                          'mm3_max': band_sweep['estiramiento_sobre_las_cabezas']['mm3_max'],
+                          '_nota': 'Margen de estiramiento del TPU solo sobre las cabezas al poner las bandas; no cuenta como choque.'}},
     # La tarjeta trabada asoma 2.5 de la boca de J401 (hoja del TF-015): queda dentro de su ranura, guiada.
     'ajustes_guiados': {'funda USB-C en el tunel (por lado)': pairs.get('tubo-funda USB-C'),
                         'tarjeta trabada en la ranura (por lado)': pairs.get('tubo-tarjeta microSD'),
@@ -1488,7 +1511,8 @@ objetivos = {
               'agujero, cuerpos de TPU en las aberturas, tuerca del baston en su hexagono (0.3 por cara), pasamuros en su '
               'agujero en D, marco del USB-C con el labio bajo el dorso de la placa y el fondo de sus ranuras en el canto, '
               'resorte del marco sobre el blindaje de J101 (apriete a proposito), bandas de TPU sobre el tubo, la base y la tapa '
-              '(apriete de 0.3 por lado, ver bandas). Ajustes de posicion aparte: rieles (B2) y carrier (B4).')}
+              '(apriete de 0.3 por lado, ver bandas) y, al ponerlas, sobre los cantos de las cabezas de los M2.5 (0.11). '
+              'Ajustes de posicion aparte: rieles (B2) y carrier (B4).')}
 report['objetivos'] = objetivos
 log('objetivos:', {k: (v.get('minimo_mm'), v.get('cumple')) if isinstance(v, dict) and 'minimo_mm' in v else None
                    for k, v in objetivos.items() if k.startswith('B')})

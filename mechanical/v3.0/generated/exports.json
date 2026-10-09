@@ -109,11 +109,11 @@
    "etiqueta": "Banda de TPU de abajo",
    "solido_valido": true,
    "solidos": 1,
-   "triangulos": 11880,
+   "triangulos": 8974,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 12.39,
+   "volumen_cm3": 12.52,
    "stl": "09-band-bottom-tpu.stl",
    "step": "09-band-bottom-tpu.step"
   },
@@ -122,11 +122,11 @@
    "etiqueta": "Banda de TPU de arriba",
    "solido_valido": true,
    "solidos": 1,
-   "triangulos": 10806,
+   "triangulos": 7702,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 13.23,
+   "volumen_cm3": 13.37,
    "stl": "10-band-top-tpu.stl",
    "step": "10-band-top-tpu.step"
   }
@@ -144,12 +144,12 @@
   {
    "a": "02-tube",
    "b": "09-band-bottom-tpu",
-   "mm3": 1605.528
+   "mm3": 1605.446
   },
   {
    "a": "02-tube",
    "b": "10-band-top-tpu",
-   "mm3": 1721.851
+   "mm3": 1722.181
   },
   {
    "a": "03-antenna-cap",

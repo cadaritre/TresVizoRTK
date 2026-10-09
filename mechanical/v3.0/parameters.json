@@ -1134,7 +1134,7 @@
   }
  },
  "bandas": {
-  "_que_es": "Piezas 09 y 10: dos bandas de proteccion de TPU de 40 mm, abajo (z 0-40) y arriba (z 76-116), con el mismo concepto que las de V2.2 y V2.3 adaptado a V3.0: siguen el contorno del cuerpo (circulo R28 cortado por la cara plana en y 22.9) y van montadas por fuera, sobre la superficie. Se ponen en el tubo con la tapa de puertos ya puesta, la de abajo por abajo y la de arriba por arriba, ANTES de la base, la tapa, sus seis M2.5 radiales y la tecla, que van despues por dentro de ellas, por sus agujeros y por su ventana (como en el servicio): con todo armado no pasarian limpias (la tecla asoma 1.0 y los cantos de las cabezas avellanadas, planas sobre la pared curva, 0.11). Con ellas puestas se abren la base y la tapa.",
+  "_que_es": "Piezas 09 y 10: dos bandas de proteccion de TPU de 40 mm, abajo (z 0-40) y arriba (z 76-116), con el mismo concepto que las de V2.2 y V2.3 adaptado a V3.0: siguen el contorno del cuerpo (circulo R28 cortado por la cara plana en y 22.9), van montadas por fuera, sobre la superficie, y TAPAN los seis M2.5 radiales con bolsillos ciegos por dentro (pedido del propietario). Se ponen con la carcasa cerrada (base, tapa y sus seis tornillos puestos), la de abajo por abajo y la de arriba por arriba; la tecla va al final, por la ventana de la de abajo. Para abrir la base o la tapa se saca antes su banda.",
   "alto": 40.0,
   "_nota_alto": "Alto de cada banda (pedido del propietario: 4 cm abajo y 4 cm arriba). La de abajo va de z 0 a 40; la de arriba, de tubo.alto_total - 40 (z 76) a tubo.alto_total (z 116), a ras de la cara de arriba de la tapa.",
   "espesor": 2.0,
@@ -1142,16 +1142,20 @@
   "apriete": 0.3,
   "_nota_apriete": "Por lado: el contorno interior es el del cuerpo desplazado 0.3 hacia dentro (0.6 en diametro, como V2.2 y V2.3). El TPU se estira y aprieta. El modelo dibuja la banda con su medida de impresion: el solape de 0.3 con el tubo, la base y la tapa es el apriete (contacto a proposito, no choque).",
   "redondeo": 1.0,
-  "_nota_redondeo": "Redondeo de todos los cantos de fuera: los dos cantos libres de cada banda y los bordes de las aberturas (ventana, agujeros y muescas).",
+  "_nota_redondeo": "Redondeo de todos los cantos de fuera: los dos cantos libres de cada banda y los bordes de las aberturas (ventana de la tecla y muescas). Los bolsillos de los tornillos van por dentro.",
   "entrada": 0.5,
-  "_nota_entrada": "Redondeo del canto de dentro que entra primero al ponerla (el de arriba de la banda de abajo y el de abajo de la banda de arriba): ayuda a pasar por encima del canto vivo de fuera del extremo del tubo (z 4 y z 112) y de la cara plana. El canto de dentro del lado que va contra la cama queda vivo.",
+  "_nota_entrada": "Redondeo del canto de dentro que entra primero al ponerla (el de arriba de la banda de abajo y el de abajo de la banda de arriba): ayuda a pasar por encima del canto vivo de la cara plana (abajo en la base y arriba en la tapa, donde no hay redondeo R4) y de las cabezas de los tornillos. El canto de dentro del lado que va contra la cama queda vivo.",
   "radio_esquinas": 2.0,
   "_nota_radio_esquinas": "Radio de las esquinas de las dos muescas, para que el TPU no se rasgue desde una esquina viva. La holgura de cada muesca se cumple en esa esquina; en los lados rectos queda algo mas (radio - (radio - holgura) / raiz de 2).",
   "holgura_barrido": 0.02,
   "_nota_holgura_barrido": "Solo para las comprobaciones: banda ESTIRADA (contorno interior = el del cuerpo + 0.02, espesor 2.0) en los barridos y al abrir la tapa de puertos. El 0.02 evita caras coincidentes en los booleanos; no es una holgura de diseno.",
+  "bolsillos_tornillos": {
+   "diametro": 6.4,
+   "_nota_diametro": "Bolsillo ciego por dentro de la banda sobre cada M2.5 radial (los tres de la base, z 8.5, y los tres de la tapa, z 107): la cabeza de 5 + 0.7 por lado. La banda tapa los tornillos, como en V2.2 y V2.3. Bolsillos locales, no una ranura corrida: la cara plana de la banda fija su giro.",
+   "hondo": 0.8,
+   "_nota_hondo": "Hondo desde la cara de dentro de la banda, con el fondo curvo (concentrico con la banda): quedan 1.2 de TPU por fuera (2.0 - 0.8). La cabeza es plana y la pared curva: con su centro a ras, sus cantos asoman 0.11 sobre R28 (la carcasa ya esta pedida: no se cambian los avellanados). El bolsillo tiene que salvar esos 0.11 mas el apriete de 0.3: hacen falta 0.41; con 0.8, la banda puesta queda a 0.71 de los cantos de la cabeza (0.39 con su medida de impresion) y a 0.7 de los lados."
+  },
   "abajo": {
-   "tornillos_diametro": 6.4,
-   "_nota_tornillos_diametro": "Agujeros pasantes sobre los tres M2.5 avellanados de la base (z 8.5; 210, 270 y 330 grados): cabeza de 5 + 0.7 por lado (el TPU de FDM saca los agujeros algo mas chicos). Los tornillos salen por ellos y la base se quita por abajo sin sacar la banda.",
    "ventana_tecla": {
     "diametro_tecla": 11.0,
     "_nota_diametro_tecla": "Ventana sobre la tecla: la pestana de 8.8 + 1.1 por lado (pedido: 1.0 o mas, que la banda no toque nunca la tecla). La tecla entra y sale por ella con la banda puesta.",
@@ -1166,17 +1170,15 @@
     "_nota_una": "Sitio para la una delante de la lengueta (su canto en x 12.6): el canto de delante de la muesca va en x 9.1, en todo el alto de la muesca.",
     "_nota": "Muesca abierta hacia el canto de arriba alrededor de la huella de la tapa de puertos: de un plano paralelo al canto de atras del ala (16.5 grados) a 0.94 por detras hasta x 9.1 en la cara plana, desde z 15.86 (0.94 bajo el ala) hasta arriba. Debajo queda el anillo completo de z 0 a 15.86 (pedido: 12 o mas). La tapa se abre con la banda puesta (ver check.json, bandas)."
    },
-   "_nota": "Banda de abajo, z 0-40. Por dentro es recta hasta z 0 (no abraza el redondeo R4 de la base): asi la base sale por abajo con la banda puesta; toca el canto de la base solo donde el R4 pasa de r 27.7 (z 2.5-4). El desague (y 19.2) queda dentro del contorno del cuerpo, lejos de la banda."
+   "_nota": "Banda de abajo, z 0-40. Por dentro es recta hasta z 0 (no abraza el redondeo R4 de la base) y tapa los tres M2.5 de la base con sus bolsillos; toca el canto de la base solo donde el R4 pasa de r 27.7 (z 2.5-4). El desague (y 19.2) queda dentro del contorno del cuerpo, lejos de la banda."
   },
   "arriba": {
-   "tornillos_diametro": 6.4,
-   "_nota_tornillos_diametro": "Agujeros sobre los tres M2.5 avellanados de la tapa (z 107; 0, 180 y 270 grados), como los de abajo: la tapa se quita por arriba sin sacar la banda.",
    "muesca_oled": {
     "holgura": 1.0,
     "_nota_holgura": "Holgura minima al bolsillo de la lamina de la ventana de la OLED (0.8 mas grande por lado que la ventana), en las esquinas redondeadas; en los lados rectos queda 1.29 (a la lamina, 0.1 mas). Que la banda no tape la pantalla al mirarla de lado.",
     "_nota": "Muesca abierta hacia el canto de abajo: x +-14.21, de z 76 a 88.78."
    },
-   "_nota": "Banda de arriba, z 76-116, a ras de la cara de arriba de la tapa. Por dentro es recta hasta z 116: no tapa la cara de arriba de la tapa ni llega a la antena (r 21.75) ni a sus tornillos (por dentro de la tapa)."
+   "_nota": "Banda de arriba, z 76-116, a ras de la cara de arriba de la tapa; tapa los tres M2.5 de la tapa con sus bolsillos. Por dentro es recta hasta z 116: no tapa la cara de arriba de la tapa ni llega a la antena (r 21.75) ni a sus tornillos (por dentro de la tapa)."
   }
  }
 }

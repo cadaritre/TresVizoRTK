@@ -9,8 +9,9 @@
 > aberturas del costado justas, tapa de puertos con tres anclas y cuna para un pack 1S2P comercial).
 > 09-10-2026: **marco del USB-C** (pieza 08) para que por el túnel solo se vea el receptáculo, y
 > muesca de la microSD de verdad ciega (su chaflán atravesaba la pared). Después, **bandas de TPU**
-> (piezas 09 y 10, de 40 mm, abajo y arriba): el distintivo sube a z 56.3 y las rayas decorativas
-> quedan entre las bandas (z 41.5–74.5). Ver [Bandas de TPU](#bandas-de-tpu-09-y-10).
+> (piezas 09 y 10, de 40 mm, abajo y arriba), que tapan los seis tornillos radiales: el distintivo sube a
+> z 56.3 y las rayas decorativas quedan entre las bandas (z 41.5–74.5). Ver
+> [Bandas de TPU](#bandas-de-tpu-09-y-10).
 > **No se ha impreso ni montado nada.** Rama `hw/compact-v03`. Resultados en
 > [Verificaciones](#verificaciones).
 
@@ -29,8 +30,8 @@
 >    la uña** por su muesca. El modelo solo comprueba la tapa girada como sólido rígido: no prueba
 >    cómo se dobla el TPU ni si una uña llega.
 > 6. **Probar impresas las bandas de TPU** sobre el tramo de prueba: que el apriete de 0.3 por lado las
->    sujete sin que cueste demasiado ponerlas, que la tapa de puertos se abra con la banda puesta y que la
->    base y la tapa salgan sin quitarlas.
+>    sujete sin que cueste demasiado ponerlas, que pasen por encima de las cabezas de los tornillos (sus
+>    cantos asoman 0.11) y que la tapa de puertos se abra con la banda puesta.
 
 Especificación y contrato con la placa:
 [hardware/main-board/research/v03-compacta.md](../../hardware/main-board/research/v03-compacta.md).
@@ -104,8 +105,8 @@ z 60–80): ver la comprobación en [Verificaciones](#verificaciones).
 | 06-port-cover-tpu | **Tapa de puertos** de TPU, atada: ala curva de 0.9 sobre el costado +X que tapa el túnel del USB-C y la ranura de la microSD (con sus cuerpos a presión por dentro), lengüeta delante para abrirla, bisagra fina y **tres setas** de anclaje por agujeros de Ø2 de la pared, repartidas por su canto de atrás |
 | 07-logo-inlay-tpu | **Distintivo de TPU** (hexágono con el 3) para imprimir aparte, de otro color, y pegar en el grabado del frente: los mismos contornos reducidos 0.1 por lado, 0.8 de espesor, a ras de la cara plana. Son 6 islas: el hexágono, el 3 y cuatro rayas de unos 2 mm². Para imprimir: `generated/stl/07-logo-inlay-tpu-para-imprimir.stl`, acostado con la cara que se ve contra la cama |
 | 08-usb-bezel | **Marco del USB-C**, de PA12 como la carcasa: pieza chica (0.32 cm³) que se pone en la placa, deslizándola por −X sobre el receptáculo, para que por el túnel solo se vea el receptáculo. Sigue el túnel desde la boca hasta el paso del chasis, cierra alrededor del blindaje de J101 con un collar, pasa un labio bajo el dorso de la placa y la abraza por el canto con dos ranuras; un dedo elástico sobre el blindaje lo sujeta mientras se arma. Con el chasis en el tubo queda atrapado. Ver [Marco del USB-C](#marco-del-usb-c-08-usb-bezel) |
-| 09-band-bottom-tpu | **Banda de TPU de abajo**, z 0–40: 2.0 de espesor, 0.3 por lado más chica que el cuerpo (apriete), cantos de fuera redondeados 1.0. Agujeros Ø6.4 sobre los tres tornillos de la base, ventana sobre la tecla y el LED y una **muesca abierta hacia arriba** alrededor de la tapa de puertos, con sitio para la uña delante de la lengueta. Debajo de la muesca queda un anillo completo de 15.9. Ver [Bandas de TPU](#bandas-de-tpu-09-y-10) |
-| 10-band-top-tpu | **Banda de TPU de arriba**, z 76–116, a ras de la cara de arriba de la tapa: como la de abajo, con agujeros Ø6.4 sobre los tres tornillos de la tapa y una **muesca abierta hacia abajo** alrededor de la ventana de la OLED y el bolsillo de su lámina |
+| 09-band-bottom-tpu | **Banda de TPU de abajo**, z 0–40: 2.0 de espesor, 0.3 por lado más chica que el cuerpo (apriete), cantos de fuera redondeados 1.0. **Tapa** los tres tornillos de la base con bolsillos ciegos por dentro (Ø6.4 × 0.8; quedan 1.2 de TPU por fuera), ventana sobre la tecla y el LED y una **muesca abierta hacia arriba** alrededor de la tapa de puertos, con sitio para la uña delante de la lengueta. Debajo de la muesca queda un anillo completo de 15.9. Ver [Bandas de TPU](#bandas-de-tpu-09-y-10) |
+| 10-band-top-tpu | **Banda de TPU de arriba**, z 76–116, a ras de la cara de arriba de la tapa: como la de abajo, tapa los tres tornillos de la tapa con bolsillos ciegos por dentro y lleva una **muesca abierta hacia abajo** alrededor de la ventana de la OLED y el bolsillo de su lámina |
 
 Tornillería y piezas compradas:
 
@@ -131,16 +132,7 @@ Tornillería y piezas compradas:
    arandela ancha, a 270° y r 15, pisa 1.4 mm del borde trasero de la tuerca.
 2. **Tapa de puertos** (06) en el tubo: las tres setas entran por fuera en sus agujeros de Ø2 (el
    cono de cada cabeza abre paso; el TPU se deja). Mejor ahora, con el tubo vacío.
-3. **Bandas de TPU** (09 y 10) en el tubo, con la tapa de puertos ya puesta: la de abajo se desliza
-   por abajo, con la muesca hacia la tapa de puertos (la cara plana de la banda contra la cara plana del
-   tubo), hasta que su canto queda en z 0 (4 mm por debajo del canto del tubo: a ras de la cara de abajo
-   de la base cuando se ponga); la de arriba, por arriba, con la muesca hacia la ventana de la OLED, hasta
-   z 116 (4 mm por encima del canto del tubo); al final se dejan a ras a mano. Van antes que la base, la
-   tapa, sus seis M2.5 y la tecla, que se ponen después por dentro de ellas, por sus agujeros y por su
-   ventana, como en el servicio. Con todo armado no pasarían limpias: la tecla asoma 1.0 y los cantos de
-   las cabezas de los M2.5 (planas, sobre la pared curva) asoman 0.11. Ver
-   [Bandas de TPU](#bandas-de-tpu-09-y-10).
-4. **Pack 1S2P** (comercial: 2 × 18650 en funda termorretráctil, con BMS), con la tapa quitada y
+3. **Pack 1S2P** (comercial: 2 × 18650 en funda termorretráctil, con BMS), con la tapa quitada y
    sin el chasis. Baja por arriba a su cuna, con el **extremo del BMS (de donde salen sus cables)
    abajo**, y apoya en dos repisas (z 18.8). Medirlo: si es más fino que 20 o más corto que 68,
    calzarlo con espuma (ver [Pack](#pack-1s2p)).
@@ -150,20 +142,20 @@ Tornillería y piezas compradas:
      baja por detrás del saliente de la tuerca, lo rodea por +X pegado al piso (z 4.2) y va por el
      piso, delante, hasta J404 y J102. Ver [Cables](#cables).
    - El extremo con las clavijas queda colgando por abajo del tubo: se enchufa al final.
-5. **Carrier al chasis, POR ABAJO**, con el arnés de J301 ya soldado. Sube por sus ranuras, abre
+4. **Carrier al chasis, POR ABAJO**, con el arnés de J301 ya soldado. Sube por sus ranuras, abre
    los dos ganchos y queda entre los topes de arriba y los labios de los ganchos.
-6. **Latiguillo coaxial.**
+5. **Latiguillo coaxial.**
    - El pasamuros va ya en la tapa, con la antena atornillada (sus tres M2.5 desde dentro y la
      antena enroscada en el pasamuros). Ver [montaje del pasamuros](#antena-conector-y-coaxial).
    - La **clavija SMA acodada** se enrosca en el SMA de la carrier **antes de la placa**, con el
      cable hacia −X. El frente del chasis está abierto: una llave fija de 8 entra por delante (+Y)
      y gira ±30° por la ventana del puente. Desde aquí la tapa cuelga del latiguillo: sostenerla.
-7. **Placa al chasis, POR ABAJO**, con la OLED soldada. La muesca del canto de arriba (u 14.2–24.2,
+6. **Placa al chasis, POR ABAJO**, con la OLED soldada. La muesca del canto de arriba (u 14.2–24.2,
    v 0–6.5) pasa alrededor de la tuerca de la clavija.
    - Dos M2 × 8 autorroscantes por los agujeros de abajo de la OLED, los separadores de 1.3 y la
      placa, hasta los salientes del chasis.
    - Arnés de J301 a su clavija (x −13.5…−2.5).
-8. **Marco del USB-C (08), por fuera, hacia −X**, con la placa ya en el chasis y antes de meter el
+7. **Marco del USB-C (08), por fuera, hacia −X**, con la placa ya en el chasis y antes de meter el
    chasis en el tubo. Se presenta en el eje del receptáculo con el labio por debajo del canto de la
    placa (por el dorso) y el collar por encima, y se empuja hacia −X: el canto de la placa entra en
    sus dos ranuras, el labio pasa bajo el dorso (chaflán de entrada), el collar rodea el blindaje de
@@ -171,16 +163,23 @@ Tornillería y piezas compradas:
    de las ranuras toca el canto de la placa (x 18). El suelo del marco pasa por encima de la muesca de
    la pared lateral +X del chasis. El resorte lo sostiene mientras se mete el chasis; dentro del tubo
    queda atrapado.
-9. **Chasis armado al tubo, por arriba**, con el pack puesto y **sin la tecla**. Las paredes
+8. **Chasis armado al tubo, por arriba**, con el pack puesto y **sin la tecla**. Las paredes
    laterales, los rieles y el marco del USB-C bajan junto a la pared (0.4) y el pie de los rieles
    apoya en los apoyos del tubo (z 9.5). La tapa baja a la vez, colgada del latiguillo.
-10. **Tapa** en su sitio. El latiguillo queda en su recorrido: hacia −X sobre el puente, por fuera
+9. **Tapa** en su sitio. El latiguillo queda en su recorrido: hacia −X sobre el puente, por fuera
    del extremo −X del pack (entre él y la pared), por detrás de él y por encima del pack sube hacia el
-   eje y el pasamuros. La tapa entra por dentro de la banda de arriba. Tres M2.5 radiales en z 107, por
-   los agujeros de la banda.
-11. **Por abajo, sin la base:** clavija de la batería a J102 y de la NTC a J404 (con la tapa ya
-   puesta). Se recogen los mazos en su recorrido y se pone la base, por dentro de la banda de abajo,
-   con sus tres M2.5 radiales en z 8.5, por los agujeros de la banda.
+   eje y el pasamuros. Tres M2.5 radiales en z 107.
+10. **Por abajo, sin la base:** clavija de la batería a J102 y de la NTC a J404 (con la tapa ya
+   puesta). Se recogen los mazos en su recorrido y se pone la base con sus tres M2.5 radiales en
+   z 8.5.
+11. **Bandas de TPU** (09 y 10), con la carcasa cerrada y **antes de la tecla**: la de abajo se desliza
+    por abajo, con la muesca hacia la tapa de puertos (la cara plana de la banda contra la cara plana),
+    hasta que su canto queda a ras de la cara de abajo de la base; la de arriba, por arriba, por encima de
+    la antena, con la muesca hacia la ventana de la OLED, hasta que queda a ras de la cara de arriba de la
+    tapa. Cada banda **tapa** los tres M2.5 de su lado (bolsillos por dentro): se giran hasta que la cara
+    plana coincide y los bolsillos quedan sobre los tornillos. Al pasar, el TPU se estira 0.11 sobre los
+    cantos de las cabezas, que asoman de la pared curva. La tecla asoma 1.0: con ella puesta la banda de
+    abajo no pasa. Ver [Bandas de TPU](#bandas-de-tpu-09-y-10).
 12. **Tecla, lámina de la ventana y guía de luz**, por fuera. La tecla entra por la ventana de la banda
     de abajo y se pega con cinta adhesiva fina de doble cara o un adhesivo flexible que se pueda
     despegar: hay que sacarla para sacar el chasis.
@@ -191,17 +190,18 @@ Tornillería y piezas compradas:
 
 ## Desmontaje y servicio
 
-**Las bandas no hace falta quitarlas para abrir la base ni la tapa:** los seis M2.5 radiales salen por
-los agujeros de las bandas y la base y la tapa salen por dentro de ellas (por dentro las bandas son
-rectas hasta el canto; no abrazan los redondeos R4). Tampoco para sacar el chasis: la tecla sale por
-la ventana de la banda de abajo, y la tapa de puertos se abre con la banda puesta.
+**Para abrir la base o la tapa hay que sacar antes su banda**, como en V2.3: las bandas tapan los seis
+M2.5 radiales. La tapa de puertos (el USB-C y la microSD) se abre con la banda puesta y la tecla sale
+por su ventana.
 
 1. **Tecla fuera**, por fuera, por la ventana de la banda de abajo. Con la tecla puesta el chasis no
-   sale: su émbolo queda delante de la placa y J102 choca con él a los pocos milímetros de subir.
-2. **Base fuera** (tres M2.5 de z 8.5, por los agujeros de la banda de abajo). Desenchufar **J102**
+   sale: su émbolo queda delante de la placa y J102 choca con él a los pocos milímetros de subir; la
+   banda de abajo tampoco.
+2. **Banda de abajo fuera**, por abajo, y **base fuera** (tres M2.5 de z 8.5). Desenchufar **J102**
    (batería) y **J404** (NTC) por abajo.
-3. **Tapa suelta** (tres M2.5 de z 107, por los agujeros de la banda de arriba). No sale del todo:
-   sigue unida a la carrier por el latiguillo. Se levanta lo que deja el cable y se sostiene.
+3. **Banda de arriba fuera**, por arriba (pasa por encima de la antena), y **tapa suelta** (tres M2.5
+   de z 107). No sale del todo: sigue unida a la carrier por el latiguillo. Se levanta lo que deja el
+   cable y se sostiene.
 4. **Chasis fuera, por arriba**, tirando de los dos tiradores con un gancho o un alambre (agujeros
    Ø2.5: el de +X arriba, en z 107–111.6; el de −X en z 79–83, por debajo del paso del coaxial). La
    tapa sale con él, colgada del latiguillo. El pack se queda en el tubo.
@@ -218,7 +218,8 @@ la ventana de la banda de abajo, y la tapa de puertos se abre con la banda puest
 11. **Tuerca del bastón:** quitar el retén M2 y sacarla por arriba.
 
 Para volver a armar, al revés: la clavija acodada siempre antes que la placa, el marco del USB-C
-después de la placa y antes de meter el chasis, y la tecla siempre al final. No doblar el coaxial a menos de unos 19 mm cuando se manipula (10 × Ø: radio para flexiones
+después de la placa y antes de meter el chasis, las bandas con la carcasa cerrada y la tecla siempre al
+final. No doblar el coaxial a menos de unos 19 mm cuando se manipula (10 × Ø: radio para flexiones
 ocasionales de la hoja actual del RG 178).
 
 ## Geometría
@@ -464,15 +465,16 @@ frente).
 
 Dos fundas de protección de TPU de **40 mm** de alto (pedido del propietario: «una de 4 cm arriba y
 otra de 4 cm abajo»), el mismo concepto que las de V2.2 y V2.3 adaptado a V3.0. Van por fuera, sobre
-la superficie, y no cambian nada de dentro.
+la superficie, **tapan los seis M2.5 radiales** (pedido del propietario, como V2.2 y V2.3) y no cambian
+nada de la carcasa, que ya está pedida.
 
 | | Banda de abajo (09) | Banda de arriba (10) |
 | --- | --- | --- |
 | Alto | z 0–40, a ras de la cara de abajo de la base | z 76–116, a ras de la cara de arriba de la tapa |
 | Cubre | la base (su redondeo R4) y el arranque del tubo | el final del tubo y la tapa (su redondeo R4) |
-| Tornillos | agujeros Ø6.4 sobre los tres M2.5 de la base (z 8.5; 210°, 270° y 330°) | agujeros Ø6.4 sobre los tres M2.5 de la tapa (z 107; 0°, 180° y 270°) |
+| Tornillos | los tapa: bolsillos ciegos por dentro sobre los tres M2.5 de la base (z 8.5; 210°, 270° y 330°) | los tapa: bolsillos ciegos sobre los tres M2.5 de la tapa (z 107; 0°, 180° y 270°) |
 | Aberturas | ventana de la tecla y el LED; muesca abierta hacia arriba alrededor de la tapa de puertos | muesca abierta hacia abajo alrededor de la ventana de la OLED y su bolsillo |
-| Anillo completo | z 0–15.86 (solo con los agujeros de los tornillos) | z 88.78–116 |
+| Anillo completo | z 0–15.86 (solo con los bolsillos de los tornillos, por dentro) | z 88.78–116 |
 
 **Perfil** (`bandas` en [parameters.json](parameters.json)):
 - Sigue el contorno del cuerpo: el círculo R28 cortado por la cara plana en y 22.9 (en V3.0 esa unión es
@@ -482,24 +484,29 @@ la superficie, y no cambian nada de dentro.
   (R1.7). Por fuera mide Ø59.4 impresa (unos Ø60 puesta) y su cara plana queda en y 24.6. El modelo
   dibuja la banda con su medida de impresión: el solape de 0.3 con el tubo, la base y la tapa es el
   apriete (no es un choque; se informa aparte).
-- **Recta por dentro hasta el canto**, también delante de los redondeos R4 de la base y de la tapa: si
-  los abrazara, la base no podría salir por abajo ni la tapa por arriba con la banda puesta. Toca el
-  canto de la base (y el de la tapa) solo donde el R4 pasa de r 27.7 (los últimos 1.5 mm, z 2.5–4 y
-  112–113.5); más abajo queda una rendija que se abre hasta 3.7 en la cara de abajo. El canto de la banda
-  apoya en la mesa junto con la base, como un pie blando. Abajo empieza en r 27.7: el hombro de un
+- **Recta por dentro hasta el canto**, también delante de los redondeos R4 de la base y de la tapa (no
+  los abraza). Toca el canto de la base (y el de la tapa) solo donde el R4 pasa de r 27.7 (los últimos
+  1.5 mm, z 2.5–4 y 112–113.5); más abajo queda una rendija que se abre hasta 3.7 en la cara de abajo.
+  El canto de la banda apoya en la mesa junto con la base, como un pie blando. Abajo empieza en r 27.7: el hombro de un
   bastón normal queda muy por dentro (el bastón no está modelado).
-- **Sin tope:** se deja a ras a mano y la sujeta el apriete (un tope por dentro, en el canto, impediría
-  sacar la base o la tapa con la banda puesta).
+- **Sin tope:** se deja a ras a mano y la sujeta el apriete. Los bolsillos de los tornillos fijan el giro
+  junto con la cara plana, no la altura.
 - **Cantos redondeados:** 1.0 en todos los de fuera (los dos cantos libres y los bordes de las
   aberturas) y 0.5 en el de dentro que entra primero al ponerla (el de arriba de la de abajo y el de
-  abajo de la de arriba), que tiene que pasar por encima del canto vivo de fuera del extremo del tubo
-  (z 4 y 112) y de la cara plana. El canto de dentro que va contra la cama queda vivo. Las esquinas de
-  las dos muescas, **R2** por dentro, para que el TPU no se rasgue desde una esquina viva.
+  abajo de la de arriba), que tiene que pasar por encima del canto vivo de la cara plana (abajo en la
+  base y arriba en la tapa, donde no hay R4) y de las cabezas de los tornillos. El canto de dentro que va
+  contra la cama queda vivo. Las esquinas de las dos muescas, **R2** por dentro, para que el TPU no se
+  rasgue desde una esquina viva.
 
 **Aberturas y holguras** (medidas en [check.json](generated/check.json), `bandas`):
-- **Tornillos de la base y de la tapa:** Ø6.4 = cabeza de 5 + 0.7 por lado (el TPU de FDM saca los
-  agujeros algo más chicos). Los M2.5 salen por ellos: la base y la tapa se quitan sin sacar las
-  bandas. Holgura a la cabeza: 0.7.
+- **Tornillos de la base y de la tapa: bolsillos ciegos por dentro** (`bandas.bolsillos_tornillos`), uno
+  por tornillo (no una ranura corrida: la cara plana fija el giro de la banda). Ø6.4 = cabeza de 5 + 0.7
+  por lado, y 0.8 de hondo desde la cara de dentro, con el fondo curvo, concéntrico con la banda: quedan
+  **1.2 de TPU por fuera** de cada tornillo (medido con un rayo por su eje). La cabeza avellanada es
+  plana y la pared curva (R28): con su centro a ras, sus cantos asoman **0.11**. El bolsillo tiene que
+  salvar esos 0.11 más el apriete de 0.3 (0.41): con 0.8, la banda puesta queda a **0.7** de cada cabeza
+  (0.71 del fondo a los cantos, 0.7 a los lados). Con su medida de impresión, que en la carcasa no se da
+  (está 0.3 dentro del cuerpo), quedaría a 0.39 del fondo.
 - **Tecla y LED:** una sola ventana, la envolvente convexa de un círculo de Ø11 en la tecla (pestaña de
   8.8: 1.1 por lado, pedido 1.0 o más para que la banda no la toque nunca) y uno de Ø5 en el LED (guía de
   luz de Ø2: 1.5 por lado). La cabeza de la tecla (asoma 1.0) queda 1.0 por debajo de la cara de la
@@ -523,14 +530,17 @@ la superficie, y no cambian nada de dentro.
   cara: el canto de dentro de la banda le queda a 0.85 en planta (delante, donde la banda va en y 22.6) y
   sus tornillos, por dentro de la tapa, a 6.8.
 
-**Orden de montaje.** Cada banda se pone sobre el tubo con la tapa de puertos ya puesta y **antes** de la
-base, la tapa, sus seis M2.5 radiales y la tecla, que van después por dentro de ellas, por sus agujeros
-y por su ventana, igual que en el servicio (ver [Cómo se arma](#cómo-se-arma), paso 3). Con todo armado
-no pasarían limpias: la tecla asoma 1.0 y los cantos de las cabezas de los M2.5 asoman 0.11 (la cabeza es
-plana y la pared, curva de R28: con el centro a ras, los cantos quedan fuera). El TPU pasaría por encima
-de 0.11 estirándose un poco, pero el modelo rígido lo cuenta como choque. Si se prefiere poner las bandas
-al final, sobre la carcasa cerrada, habría que hundir 0.11 los avellanados de la base y de la tapa (cambio
-del tubo que no se hizo: queda a decisión del propietario); la tecla iría después igual.
+**Orden de montaje y servicio.** Las bandas se ponen con la carcasa cerrada (base, tapa y sus seis M2.5
+puestos) y **antes de la tecla**, que entra al final por la ventana de la banda de abajo (asoma 1.0: con
+ella puesta la banda no pasa). Para abrir la base o la tapa hay que sacar antes su banda (ver
+[Cómo se arma](#cómo-se-arma), paso 11, y [Desmontaje y servicio](#desmontaje-y-servicio)).
+
+**Margen de estiramiento sobre las cabezas de los tornillos.** Al poner cada banda, su cara de dentro pasa
+por encima de las seis cabezas avellanadas, cuyos cantos asoman **0.11** de la pared curva. La carcasa
+ya está pedida y los avellanados no se cambian, así que ahí el TPU se tiene que estirar 0.11 (en el
+modelo, la banda estirada rígida entra 0.82 mm³ como máximo en las cabezas al pasar; va a 0.02 de la
+pared, así que la entrada es de 0.09). Es el único sitio donde las bandas cuentan con estirarse: el
+barrido contra todo lo demás sale limpio. En su sitio cada cabeza queda en su bolsillo.
 
 **Tapa de puertos con la banda puesta.** La parte de delante de la bisagra se gira como sólido rígido,
 como en la comprobación de 135° y 180°, ahora con la banda de abajo **estirada** (como está montada:
@@ -685,7 +695,7 @@ real, en posición final y en los barridos del montaje (`objetivos` en
 | Radio de curva del coaxial | ≥ 12 en todas las curvas | **12.27** | todo el recorrido (6 × Ø de la hoja actual: 10.9–11.6) |
 | Mazos entre sí | ≥ 0.3 | **8.8** | mazo del pack–arnés de J301 (los hilos de la NTC se juntan con el mazo del pack a propósito) |
 | Bandas de TPU a piezas de TPU que se mueven | ≥ 0.5 (tecla ≥ 1.0) | **0.5** | tapa de puertos, en la esquina redondeada de la muesca (0.94 en los lados); tecla 1.1. La tapa de puertos se abre hasta 155.5° sin tocar la banda |
-| Bandas de TPU a piezas compradas | ≥ 0.5 | **0.7** | cabezas de los M2.5 en sus agujeros de Ø6.4; antena 0.85; lámina de la OLED 1.14 (bolsillo 1.0); guía de luz 1.5 |
+| Bandas de TPU a piezas compradas | ≥ 0.5 | **0.7** | cabezas de los M2.5 en sus bolsillos, con la banda puesta (0.7 a los lados, 0.71 al fondo); antena 0.85; lámina de la OLED 1.14 (bolsillo 1.0); guía de luz 1.5 |
 
 Nada queda por debajo en las categorías de aire y ajustes. Con la envolvente de la especificación
 (`--envelope`) no se volvió a pasar después del marco (ver [Verificaciones](#verificaciones)).
@@ -714,8 +724,9 @@ tubo, con sus cuerpos de TPU a presión en el túnel y en la ranura (sellan); NT
 pegados con kapton en la cara de atrás del pack; cables del pack saliendo de su extremo; clavijas
 enchufadas; marco del USB-C con el labio en el dorso de la placa y el fondo de sus ranuras en el canto,
 y su resorte apretando el techo del blindaje de J101 (0.2 nominal; 0.17 y 0.34 mm³ contra el STEP real);
-bandas de TPU sobre el tubo, la base y la tapa (apriete de 0.3 por lado; en el modelo, 1605.5 y 1721.9 mm³
-de solape con el tubo y 78.3 con la base y con la tapa).
+bandas de TPU sobre el tubo, la base y la tapa (apriete de 0.3 por lado; en el modelo, 1605.4 y 1722.2
+mm³ de solape con el tubo y 78.3 con la base y con la tapa) y, al ponerlas, sobre los cantos de las
+cabezas de los M2.5, que asoman 0.11 (margen de estiramiento: ver [Bandas de TPU](#bandas-de-tpu-09-y-10)).
 
 **Rasgos finos a propósito** (menos de 1.0; medidos en secciones horizontales de cada pieza):
 brazos de los ganchos 0.6 × 0.8 con ranuras de 0.6; labios de las ranuras de la carrier 0.65;
@@ -748,14 +759,25 @@ de esta carpeta ([generated/check.json](generated/check.json), [generated/export
 > porque van a media pared, dentro de la muesca. Lo mostró la prueba de visibilidad del marco del
 > USB-C. Ahora el chaflán se queda delante del fondo plano de la muesca (x ≥ 20.51).
 
+> **Valor conocido de la carcasa pedida (09-10-2026).** Midiendo en 3D la pared alrededor de los
+> avellanados de los M2.5 radiales, la de la **base queda en 0.92** (por debajo del 1.0 local): el
+> punto fino va en diagonal desde el cono del avellanado hasta el canto del rebaje de la unión de abajo
+> (r 26.8, z 5.9). Las secciones horizontales en el eje del tornillo (2.24) no lo veían. La de la tapa,
+> 1.27. La carcasa ya está pedida y no se cambia: `check_v3_0.py` lo mide y lo informa
+> (`guarda_pared_tubo.avellanados_3d_solo_informativo`), sin contarlo como objetivo. Si se rehace la
+> carcasa: subir los tornillos de la base a z 9.15 (y las lengüetas a z 11.3) y bajar los de la tapa a
+> z 106.85 dejaría unos 1.23, también hundiendo 0.21 los avellanados para que las cabezas no asomen
+> (cálculo con el cono a 45°, no pasado por el modelo).
+
 | Comprobación | Resultado |
 | --- | --- |
-| Piezas | 10 piezas, válidas (el distintivo, 6 islas; el resto, un sólido cada una). Mallas STL cerradas, sin no-manifold ni autointersecciones; sin interferencias entre ellas, salvo el apriete de las bandas sobre el tubo, la base y la tapa, que va aparte. Triángulos: base 5122, tubo 7328, tapa 6084, chasis 1930, tecla 812, tapa de puertos 2392, distintivo 1396, marco del USB-C 544, banda de abajo 11 880, banda de arriba 10 806. Volúmenes en cm³: 8.98, 45.30, 10.48, 6.59, 0.09, 0.99, 0.08, 0.32, 12.39 y 13.23 |
+| Piezas | 10 piezas, válidas (el distintivo, 6 islas; el resto, un sólido cada una). Mallas STL cerradas, sin no-manifold ni autointersecciones; sin interferencias entre ellas, salvo el apriete de las bandas sobre el tubo, la base y la tapa, que va aparte. Triángulos: base 5122, tubo 7328, tapa 6084, chasis 1930, tecla 812, tapa de puertos 2392, distintivo 1396, marco del USB-C 544, banda de abajo 8974, banda de arriba 7702. Volúmenes en cm³: 8.98, 45.30, 10.48, 6.59, 0.09, 0.99, 0.08, 0.32, 12.52 y 13.37 |
 | Pared del tubo: sondas a media pared cada 0.5 mm | Cara plana: 11 715 puntos, 1 473 en las aberturas, **0 sin material**. Anillo: 58 543 puntos, 3 425 en las aberturas, **0 sin material** |
+| Pared alrededor de los avellanados de los M2.5 (3D, solo se informa) | Del avellanado (cono, sin el paso del tornillo) al hueco interior y a los rebajes de las uniones: base (z 8.5) **0.92**, en diagonal hasta el canto del rebaje de abajo (r 26.8, z 5.9); tapa (z 107) 1.27. Valor conocido de la carcasa pedida (ver abajo) |
 | Pared del tubo: volumen | 45 298.6 mm³; esperado 45 298.0 (+0.001 %, tolerancia 0.5 %). Sube 0.39 cm³ porque las rayas son más cortas |
 | Pared del tubo: espesor (sin nervios) | Túnel del USB-C 1.34; ventana de la OLED 1.4; tecla y LED 1.8; uniones 1.2; tornillos radiales 2.24; pared normal y rayas 1.9 (z 15, 70 y 95: en z 60 ahora está el distintivo); agujeros de las anclas 1.34; ranura y muesca ciega de la microSD 1.77 (fondo plano a 90° sobre el techo de la ranura). El túnel y la ranura no cambiaron: la diferencia de 0.01 con la pasada anterior (1.33 y 1.75) es de la discretización de las secciones, que ya no cortan rayas en esas alturas |
 | Choques en posición final | 0 entre piezas (sin contar el apriete de las bandas), 0 de las piezas con las referencias y 0 entre referencias |
-| Barridos (pasos de 0.5 mm) | 0 choques en los dieciséis (lista de abajo) |
+| Barridos (pasos de 0.5 mm) | 0 choques en los quince (lista de abajo). Las bandas, al ponerlas, se estiran 0.11 sobre las cabezas de los M2.5 (margen medido aparte, ver abajo) |
 | Holgura lateral en los barridos verticales | Compradas 0.5 (el pack por su cuna); impresas 0.4 (chasis por el tubo); placa por los rieles 0.25; carrier por sus ranuras 0.3 (ajuste). La placa roza los salientes M2 a propósito (contacto) |
 | Chasis armado con la tecla puesta | Bloqueado: J102 choca con el émbolo a los 10.5 mm de subida. Sin la tecla sale limpio |
 | Llave fija de 8 en la tuerca de la clavija, sin la placa | Holgura al chasis 0.94 recta y 0.5 girada ±30° |
@@ -773,11 +795,11 @@ de esta carpeta ([generated/check.json](generated/check.json), [generated/export
 | Nada de la placa por detrás de su dorso delante del SMA de la carrier (x −6…3, y < 13.8, z 60–80) | Cumple |
 | Coaxial | Radio mínimo 12.27 en todo el recorrido; recorrido de 82.7; eje del cable hasta r 24.1; 0.59 a las piezas, 0.6 al pack, 4.4 a la placa y la OLED, 2.9 a la tapa |
 | Mazos entre sí | Mazo del pack–arnés de J301 8.8; coaxial a 32 o más de todos |
-| Bandas de TPU (09 y 10): apriete | Solape con su medida de impresión (0.3 por lado), a propósito: tubo 1605.5 y 1721.9 mm³, base 78.3, tapa 78.3. Contra todo lo demás, 0 |
-| Bandas de TPU: aberturas | Tecla 1.1; guía de luz 1.5; cabezas de los M2.5 0.7 (base y tapa); tapa de puertos cerrada 0.5 (esquina de la muesca); sitio para la uña delante de la lengüeta 3.5; agujero del desagüe 2.65; bolsillo de la lámina de la OLED 1.0 y lámina 1.14; antena 0.85; tornillos de la antena 6.8. Nada por encima de z 116 ni por dentro del contorno de apriete junto a la cara de arriba de la tapa |
-| Bandas de TPU: anillo completo de la de abajo | z 0–15.86 (15.86; pedido 12 o más), con solo los tres agujeros de los tornillos |
+| Bandas de TPU (09 y 10): apriete | Solape con su medida de impresión (0.3 por lado), a propósito: tubo 1605.4 y 1722.2 mm³, base 78.3, tapa 78.3. Contra todo lo demás, 0 |
+| Bandas de TPU: aberturas y bolsillos | Bolsillos de los M2.5 (Ø6.4 × 0.8, fondo curvo): 1.2 de TPU por fuera de cada tornillo; cabezas a 0.7 con la banda puesta (0.39 al fondo con la medida de impresión). Tecla 1.1; guía de luz 1.5; tapa de puertos cerrada 0.5 (esquina de la muesca); sitio para la uña delante de la lengüeta 3.5; agujero del desagüe 2.65; bolsillo de la lámina de la OLED 1.0 y lámina 1.14; antena 0.85; tornillos de la antena 6.8. Nada por encima de z 116 ni por dentro del contorno de apriete junto a la cara de arriba de la tapa |
+| Bandas de TPU: anillo completo de la de abajo | z 0–15.86 (15.86; pedido 12 o más), con solo los tres bolsillos de los tornillos, por dentro |
 | Tapa de puertos abierta con la banda de abajo puesta | Banda estirada (como está montada): gira hasta **155.5°** antes de tocar el canto de atrás de la muesca (158.8° con la medida de impresión). En ese ángulo, 2.63 a la funda del USB-C y 5.24 a la tarjeta; a 135°, 0 mm³ con la banda y las holguras de antes (1.62 y 5.12) |
-| Bandas de TPU al ponerlas | Banda estirada (contorno interior = cuerpo + 0.02), barrida contra lo que sobresale del contorno del cuerpo + 0.01 (la tapa de puertos y, si estuviera, la funda del USB-C): limpias; 0.5 a la tapa de puertos al pasar. La banda estirada queda toda fuera de ese contorno (0 mm³). Los seis M2.5 salen por los agujeros con 0.7. Diagnóstico con todo armado: la tecla bloquea la banda de abajo (19.2 mm³) y los cantos de las cabezas de los M2.5, que asoman 0.11, las dos (0.82 mm³): por eso van antes (ver [Bandas de TPU](#bandas-de-tpu-09-y-10)) |
+| Bandas de TPU al ponerlas | Con la carcasa cerrada y sin la tecla. Banda estirada (contorno interior = cuerpo + 0.02), barrida contra lo que sobresale del contorno del cuerpo + 0.01 (la tapa de puertos y, si estuviera, la funda del USB-C): limpias; 0.5 a la tapa de puertos al pasar. La banda estirada queda toda fuera de ese contorno (0 mm³). **Margen de estiramiento solo sobre las cabezas de los M2.5**, cuyos cantos asoman 0.11: 0.82 mm³ como máximo, medido aparte (no cuenta como choque). Con la tecla puesta la banda de abajo no pasa (19.2 mm³): la tecla va al final |
 | Distintivo y rayas | Distintivo z 45.9–66.7: 5.94 a la banda de abajo y 5.86 al bolsillo de la lámina (pedido 2). Rayas z 41.5–74.5: 1.5 a cada banda (pedido 1.5) |
 
 Los barridos (pasos de 0.5 mm; choque si el volumen común pasa de 0.05 mm³):
@@ -789,9 +811,9 @@ Los barridos (pasos de 0.5 mm; choque si el volumen común pasa de 0.05 mm³):
 - placa real con la OLED por los rieles, por abajo (92 mm), con la carrier y la clavija puestas;
 - chasis armado por arriba (103.5 mm, hasta salir del tubo), con el arnés de J301, el pack, su mazo
   y la tapa de puertos con sus tres setas, sin la tecla;
-- base por abajo (20 mm) contra todo lo de dentro, con las clavijas y los cables reales, y por
-  dentro de la banda de abajo (estirada);
-- tapa con la antena y el pasamuros por arriba (20 mm), por dentro de la banda de arriba (estirada);
+- base por abajo (20 mm) contra todo lo de dentro, con las clavijas y los cables reales (sin la
+  banda de abajo, que se saca antes);
+- tapa con la antena y el pasamuros por arriba (20 mm; sin la banda de arriba, que se saca antes);
 - tecla por fuera (12 mm), por la ventana de la banda de abajo;
 - tarjeta microSD por el costado (15 mm, por la ranura justa), con la banda de abajo;
 - tapa de puertos abriéndose hacia fuera (12 mm; las setas se quedan en sus agujeros), con el marco
@@ -802,8 +824,8 @@ Los barridos (pasos de 0.5 mm; choque si el volumen común pasa de 0.05 mm³):
 - **funda máxima del USB-C por el costado** (15 mm) con el marco puesto: tubo, marco, chasis, placa,
   carrier y banda de abajo;
 - **banda de abajo por abajo** (42 mm, hasta salir) y **banda de arriba por arriba** (82.8 mm, hasta
-  pasar la antena), estiradas, sin la tecla ni los M2.5 radiales (método en la tabla);
-- **los seis M2.5 radiales por los agujeros de las bandas** (8 mm hacia fuera cada uno).
+  pasar la antena), estiradas, con la carcasa cerrada y sin la tecla (método en la tabla; las cabezas de
+  los M2.5, aparte: margen de estiramiento).
 
 El chasis armado baja con el marco del USB-C puesto.
 
@@ -842,10 +864,11 @@ el marco se compara solo con la PCB).
   la placa: si las patas del blindaje asoman más de lo normal por el dorso, quedan a 0.5 del labio
   (agujeros hasta x 13.0, labio desde 13.5). Hay que imprimirlo y probarlo en la placa real.
 - **Bandas de TPU:** el apriete real (0.3 por lado supone TPU de 95A impreso a su medida; el TPU de FDM
-  suele salir algo grueso), que no se corran sin tope, cuánto cuesta ponerlas y si la base y la tapa salen
-  cómodas por dentro de ellas (el modelo usa la banda estirada como sólido rígido de 2.0, no calcula cómo
-  se estira el TPU ni si la parte plana de la banda queda pegada a la cara plana). La tapa de puertos
-  abierta contra la banda es un giro rígido: el TPU de verdad se dobla.
+  suele salir algo grueso), que no se corran sin tope, cuánto cuesta ponerlas y quitarlas, y que pasen
+  bien por encima de los cantos de las cabezas de los M2.5 (0.11) sin engancharse (el modelo usa la banda
+  estirada como sólido rígido de 2.0, no calcula cómo se estira el TPU ni si la parte plana de la banda
+  queda pegada a la cara plana). La tapa de puertos abierta contra la banda es un giro rígido: el TPU de
+  verdad se dobla.
 - **Acceso a la microSD con la uña:** según la hoja del zócalo, para soltar la tarjeta hay que
   empujarla 2.7 dentro de la ranura desde la muesca ciega (con la uña o un clip) y expulsada queda
   1.6 al descubierto. Que se tome cómodo con la uña solo se sabe probándolo impreso.
@@ -883,8 +906,9 @@ lado sujeta menos). En FDM, cada una **de pie sobre su canto entero, sin soporte
 orientación casi no importa): la de abajo sobre su canto de z 0 (la muesca queda arriba) y la de arriba
 dada vuelta, sobre su canto de z 116 (la muesca de la OLED queda arriba). Así salen en `generated/stl/09-band-bottom-tpu-para-imprimir.stl` y
 `10-band-top-tpu-para-imprimir.stl`, centradas en el origen. Las paredes son verticales y los bordes de
-las ventanas y agujeros, cortos: no necesitan soportes. El canto de la cama lleva el redondeo de 1.0 por
-fuera: apoya 1.0 de los 2.0 de espesor; si se despega, poner un borde (brim) de 3–5 mm. Medir el
+las ventanas, cortos: no necesitan soportes. Los bolsillos de los tornillos quedan de pie como agujeros
+ciegos horizontales de Ø6.4 y 0.8 de hondo: salen sin soporte. El canto de la cama lleva el redondeo de
+1.0 por fuera: apoya 1.0 de los 2.0 de espesor; si se despega, poner un borde (brim) de 3–5 mm. Medir el
 contorno interior impreso: si sale más chico que el modelo (el TPU suele salir algo grueso), aprieta más.
 
 **Marco del USB-C (08):** en MJF la orientación casi no importa (no lleva soportes). Si se puede
@@ -939,5 +963,8 @@ export PYTHONPATH=/Applications/FreeCAD.app/Contents/Resources/lib
   - `marco_usb_c` (cuánto se mueve atrapado, espesores, una sola pieza), `marco_al_montarlo`
     (holguras al deslizarlo) y `contactos_con_apriete_a_proposito` (resorte sobre J101);
   - `visibilidad`: qué se ve desde fuera por el túnel del USB-C y por la ranura de la microSD;
-  - `bandas`: apriete, aberturas y sus holguras, anillo completo, tapa de puertos abierta con la banda
-    puesta, barridos de las bandas (`al_ponerlas`), distintivo y rayas entre las bandas.
+  - `bandas`: apriete, aberturas y bolsillos con sus holguras y el TPU que queda sobre cada tornillo,
+    anillo completo, tapa de puertos abierta con la banda puesta, barridos de las bandas (`al_ponerlas`,
+    con el margen de estiramiento sobre las cabezas de los M2.5), distintivo y rayas entre las bandas;
+  - `guarda_pared_tubo.avellanados_3d_solo_informativo`: pared en 3D alrededor de los avellanados de los
+    M2.5 radiales (solo se informa).

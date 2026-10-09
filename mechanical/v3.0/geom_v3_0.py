@@ -1162,16 +1162,39 @@ def band_openings(which):
     z0, z1 = band_z(which)
     if which == 'abajo':
         ab = BD['abajo']
-        cuts = [_radial_cyl(a, P['base']['tornillos']['z'], ab['tornillos_diametro']) for a in P['base']['lenguetas']['angulos']]
+        cuts = []
         k, l, vt = P['frente']['tecla'], P['frente']['led'], ab['ventana_tecla']
         cuts.append(_hull2((k['x'], k['z']), vt['diametro_tecla'] / 2.0, (l['x'], l['z']), vt['diametro_led'] / 2.0,
                            Y_FLAT_O - 3.0, Y_FLAT_O + 6.0))
         cuts.append(_cover_notch(z1))
     else:
-        ar = BD['arriba']
-        cuts = [_radial_cyl(a, P['tapa']['tornillos_z'], ar['tornillos_diametro']) for a in P['tapa']['lenguetas']['angulos']]
-        cuts.append(_oled_notch(z0))
+        cuts = [_oled_notch(z0)]
     return fuse_all(cuts)
+
+
+def band_screws(which):
+    """[(angulo, z)] de los M2.5 radiales que tapa la banda (los de la base o los de la tapa)."""
+    if which == 'abajo':
+        return [(a, P['base']['tornillos']['z']) for a in P['base']['lenguetas']['angulos']]
+    return [(a, P['tapa']['tornillos_z']) for a in P['tapa']['lenguetas']['angulos']]
+
+
+def screw_head_out():
+    """Cuanto asoman sobre la pared curva (R28) los cantos de la cabeza plana de los M2.5 radiales, con su centro a
+    ras: hypot(RO, d/2) - RO (0.11 con el avellanado de 5)."""
+    return math.hypot(RO, P['base']['tornillos']['avellanado_diametro'] / 2.0) - RO
+
+
+def band_pockets(which, d_in):
+    """Bolsillos ciegos por dentro de la banda sobre cada M2.5 radial: cilindro radial de bolsillos_tornillos.diametro
+    hasta un fondo curvo, concentrico con la banda, a `hondo` de su cara de dentro (r RO + d_in): queda espesor - hondo
+    de TPU por fuera. Ningun tornillo cae en la cara plana."""
+    bt = BD['bolsillos_tornillos']
+    r_bottom = RO + d_in + bt['hondo']
+    z0, z1 = band_z(which)
+    keep = cyl_z(r_bottom, 0, 0, z0 - 1, z1 + 1)
+    return fuse_all([_radial_cyl(a, z, bt['diametro'], r0=RO - 3.0, r1=r_bottom + 1.0).common(keep)
+                     for a, z in band_screws(which)])
 
 
 def _on_offset_surface(face, d, tol=2e-3):
@@ -1205,7 +1228,7 @@ def _edges_on_surface(body, d, z_only=None):
 def band(which, stretched=False, info=None):
     """Banda de TPU ('abajo' o 'arriba'). Anillo entre el contorno del cuerpo desplazado -apriete (dentro) y
     -apriete + espesor (fuera, con la esquina de la cara plana en arco), recto por dentro en todo su alto (no
-    abraza los redondeos R4: la base y la tapa salen con la banda puesta), menos las aberturas. Cantos de fuera
+    abraza los redondeos R4), menos las aberturas y con bolsillos ciegos por dentro que tapan los M2.5 radiales. Cantos de fuera
     redondeados `redondeo` y canto de dentro que entra primero redondeado `entrada`. Con stretched=True, la
     banda estirada sobre el cuerpo (contorno interior = cuerpo + holgura_barrido, mismo espesor), para los
     barridos. `info` (dict) recibe los redondeos conseguidos."""
@@ -1213,7 +1236,7 @@ def band(which, stretched=False, info=None):
     d_in = band_inner_offset(stretched)
     d_out = d_in + BD['espesor']
     ring = body_prism(z0, z1, d_out).cut(body_prism(z0 - 1, z1 + 1, d_in))
-    body = clean(ring.cut(band_openings(which)))
+    body = clean(ring.cut(band_openings(which)).cut(band_pockets(which, d_in)))
     info = {} if info is None else info
     for key, d, r, z_only in (('fuera', d_out, BD['redondeo'], None),
                               ('dentro_entrada', d_in, BD['entrada'], z1 if which == 'abajo' else z0)):
