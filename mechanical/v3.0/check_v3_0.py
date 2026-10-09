@@ -807,7 +807,7 @@ B1_KEYS = ('chasis-tubo por encima de las repisas (z > 9.6)', 'chasis-base', 'ch
            'tecla-tubo (sin la pestana pegada)', 'tapa de puertos-chasis')
 B3_KEYS = ('chasis-celdas', 'chasis-componentes de la placa y OLED', 'chasis-componentes de la carrier (sin su PCB)',
            'tubo-celdas por encima de las repisas (nervios)', 'tubo-PCB de la placa', 'tubo-componentes de la placa y OLED',
-           'tubo-tarjeta microSD', 'tapa-OLED', 'tapa-coaxial (recorrido)', 'tapa-celdas',
+           'tapa-OLED', 'tapa-coaxial (recorrido)', 'tapa-celdas',
            'base-clavijas', 'base-PCB de la placa', 'base-celdas', 'base-carrier', 'reten-celdas',
            'tecla-SW401 (juego del embolo)', 'tecla-componentes de la placa', 'carrier (patas del SMA)-celdas',
            'cables (reservas)-piezas', 'cables (reservas)-celdas', 'cables (reservas)-placa y carrier',
@@ -854,7 +854,9 @@ objetivos = {
     'B6_coaxial': {k: report['coaxial'][k] for k in ('radio_curva_disponible', 'radio_curva_objetivo', 'radio_curva_preferido',
                                                      'cumple_objetivo', 'cumple_preferido')},
     'B7_mazos_entre_si': _summary(list(mazos.items()), 0.3),
+    # La tarjeta trabada asoma 2.5 de la boca de J401 (hoja del TF-015): queda dentro de su ranura, guiada.
     'ajustes_guiados': {'funda USB-C en el tunel (por lado)': pairs.get('tubo-funda USB-C'),
+                        'tarjeta trabada en la ranura (por lado)': pairs.get('tubo-tarjeta microSD'),
                         'objetivo_mm': P['costado']['usb_c']['holgura'],
                         '_nota': 'Pedido del propietario: aberturas justas, funda y tarjeta a 0.3 por lado; no es aire de 0.5.'},
     '_nota': ('Contactos a proposito (no cuentan): pie de los rieles en sus apoyos (z 9.5), placa contra los salientes '

@@ -13,7 +13,7 @@
    },
    "anillo": {
     "puntos": 58543,
-    "en_aberturas": 3405,
+    "en_aberturas": 3489,
     "sin_material": 0,
     "ejemplos": [],
     "ok": true
@@ -44,8 +44,8 @@
    ]
   },
   "volumen": {
-   "tubo_mm3": 44867.7,
-   "esperado_mm3": 44867.2,
+   "tubo_mm3": 44837.9,
+   "esperado_mm3": 44837.5,
    "anillo_solido_mm3": 43085.3,
    "diferencia_mm3": 0.4,
    "diferencia_pct": 0.001,
@@ -67,15 +67,15 @@
     "donde": [
      18.29,
      21.2,
-     39.88
+     37.88
     ]
    },
    "agujeros de las anclas de la tapa de puertos": {
-    "mm": 1.343,
+    "mm": 1.314,
     "donde": [
-     18.34,
-     21.16,
-     20.0
+     18.3,
+     21.19,
+     44.3
     ]
    },
    "ventana OLED (bolsillo y chaflan)": {
@@ -161,7 +161,7 @@
   "tubo-PCB de la placa": 1.911,
   "tubo-componentes de la placa y OLED": 0.5,
   "tubo-funda USB-C": 0.3,
-  "tubo-tarjeta microSD": 1.237,
+  "tubo-tarjeta microSD": 0.3,
   "tapa-OLED": 13.553,
   "tapa-coaxial (recorrido)": 2.907,
   "tapa-celdas": 0.5,
@@ -186,7 +186,7 @@
   "perno del baston (15.5)-celdas": 3.3,
   "guia de luz-componentes de la placa": 0.545,
   "tapa de puertos-chasis": 0.565,
-  "tapa de puertos-tarjeta": 1.437,
+  "tapa de puertos-tarjeta": 0.538,
   "chasis-componentes de la carrier (sin su PCB)": 0.5,
   "rieles-PCB de la placa (sin el tope de z 80 ni los salientes)": 0.25,
   "tapa bajo el canto del tubo (labio y lenguetas)-tubo": 0.4,
@@ -549,7 +549,7 @@
     "funda_mm3": 0.0,
     "funda_holgura": 1.616,
     "tarjeta_mm3": 0.0,
-    "tarjeta_holgura": 4.945
+    "tarjeta_holgura": 5.122
    },
    "180": {
     "funda_mm3": 0.0,
@@ -695,7 +695,7 @@
    "espesores_mm": {
     "tunel USB-C": 1.333,
     "ranura microSD y rebaje": 1.323,
-    "agujeros de las anclas de la tapa de puertos": 1.343,
+    "agujeros de las anclas de la tapa de puertos": 1.314,
     "ventana OLED (bolsillo y chaflan)": 1.4,
     "tecla y LED": 1.8,
     "uniones (rebajes)": 1.198,
@@ -723,6 +723,7 @@
   },
   "ajustes_guiados": {
    "funda USB-C en el tunel (por lado)": 0.3,
+   "tarjeta trabada en la ranura (por lado)": 0.3,
    "objetivo_mm": 0.3,
    "_nota": "Pedido del propietario: aberturas justas, funda y tarjeta a 0.3 por lado; no es aire de 0.5."
   },

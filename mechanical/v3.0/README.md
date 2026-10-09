@@ -213,15 +213,23 @@ placa); patas del SMA hasta y 3.2; pack 1S2P (estadio de 37.5 × 20, centro (0, 
     15.65–17.25, z 35.08–46.68), centrada en **z 40.88**: el eje de la tarjeta sale de J401 en la
     placa real (caja de J401 más el desplazamiento del canal, 0.9), no de la ranura. La tarjeta
     entra y sale recta en x;
-  - **muesca para la uña** en el centro de la tarjeta: 5 de ancho (z 38.38–43.38), de la ranura
-    hasta y 20.2, atravesando la pared. Arriba de la muesca la cara exterior está en x 19.39: el
-    canto de la tarjeta puesta (x 17.5) queda a 1.9 en x (antes, 5.2 por debajo de la cara exterior);
+  - **muesca para la uña** en el centro de la tarjeta: 8 de ancho (z 36.88–44.88), de la ranura
+    hasta y 20.2, atravesando la pared. Arriba de la muesca la cara exterior está en x 19.39.
+  - **Posiciones de la tarjeta**, de la hoja de SOFNG del TF-015 (LCSC C113206), medidas desde la
+    boca de J401 (x 16.5):
+    - trabada, asoma 2.50 (x 19.0): queda 0.4 por debajo de la cara exterior en la muesca y 3.7 en
+      el plano de la ranura;
+    - para soltarla se empuja hasta 1.32 (x 17.82), 1.2 más;
+    - expulsada, asoma 5.60 (x 22.1): sobresale 2.7 de la cara exterior en la muesca, de donde se
+      toma con la uña o la yema. En el plano de la ranura queda 0.6 por dentro.
+
+    Antes el modelo la tenía trabada en x 17.5, 1.5 más adentro de lo real, y la muesca era de 5.
   - chaflanes de 45° en los cantos de fuera de arriba de la ranura y de la muesca (1.2), y uno de
     0.8 por dentro en el canto del suelo de la ranura (cuña de ~53°; no se ve desde fuera);
   - **agujeros de las anclas** de la tapa de puertos: Ø2 radiales a 19°, en z 20, 32.5 y 45.
   - **Qué se ve desde fuera sin la tapa:** por el túnel, la boca del receptáculo al fondo (a 4.2 de
     la cara interior), el canto de la placa debajo de ella y, encima, las paredes del túnel; por la
-    ranura, el canto de la tarjeta (o la boca de J401) y, por la muesca de 5, la parte de arriba de
+    ranura, el canto de la tarjeta (o la boca de J401) y, por la muesca de 8, la parte de arriba de
     J401. Por dentro del tubo no puede haber paredes que alarguen el túnel: el chasis con la placa
     entra por arriba y pasaría por ahí.
 - **Rayas decorativas** como las de V2.3: 1.3 de ancho y 0.5 de hondo (quedan 1.9 de pared), en dos
@@ -289,7 +297,8 @@ del pulsador 0.25).
 - Ala de 0.9 sobre el costado +X (R28, de 16.5° hasta la cara plana), z 16.8–48.4: cubre el túnel
   del USB-C y la ranura de la microSD con más de 1.5 de solape.
 - Cuerpos a presión con la forma de las aberturas nuevas: el rectángulo redondeado del túnel y la
-  ranura con su muesca (sin holgura nominal: sellan).
+  ranura con su muesca (sin holgura nominal: sellan). El de la ranura empieza en r 26.0, a 0.54 del
+  canto de la tarjeta trabada: cerrar la tapa no la empuja (el zócalo es de empuje y la soltaría).
 - Lengüeta para abrirla en el canto delantero (x 12.6–14.6, z 22.5–27.5, 1.0 de alto).
 - Bisagra a 22.5°: franja de 2° donde el ala queda en 0.6.
 - **Tres setas** a 19°, en z 20, 32.5 y 45 (abajo, en medio y arriba del ala, por detrás de la
@@ -433,9 +442,9 @@ real, en posición final y en los barridos del montaje (`objetivos` en
 | Ajuste entre piezas impresas | ≥ 0.4 | **0.4** | chasis–tubo, chasis–base, chasis–tapa y labios y lengüetas de base y tapa en el tubo, también al bajar el chasis. Tapa de puertos–chasis 0.57; cabezas de las tres setas al barrer el chasis 0.61 |
 | Placa en los rieles, por cara | ≥ 0.25 | **0.25** | en su sitio y al subir la placa por los rieles |
 | Aire a piezas compradas | ≥ 0.5 | **0.5** | en el límite de diseño: componentes de la placa–tubo (h(x)), pack–cuna, topes de la tapa y retén, placa–base, SMA de la carrier–placa, cables–piezas, clavija acodada–chasis, tornillos de la antena–tapa y componentes de la carrier–chasis; las celdas al bajar por la cuna. El coaxial, 0.59 o más. El resto, más |
-| Funda del USB-C y tarjeta | 0.3 por lado (aberturas justas) | **0.3** | túnel cerrado y ranura justa, pedidos por el propietario: van guiadas, no es aire de 0.5 |
+| Funda del USB-C y tarjeta | 0.3 por lado (aberturas justas) | **0.3** | túnel cerrado y ranura justa, pedidos por el propietario: van guiadas, no es aire de 0.5. La tarjeta trabada (asoma 2.5 de J401) queda dentro de su ranura |
 | Carrier en sus ranuras | juego 0.3 por cara | 0.3 en su sitio y al subirla | ajuste de posición: ver [Carrier](#carrier-medir-y-suplementar) |
-| Pared del tubo | ≥ 1.2 (local ≥ 1.0) | **1.19**, local | chaflán de la ventana de la OLED bajo el bolsillo de la lámina (z 86.9). Uniones 1.2; túnel del USB-C 1.33; ranura y muesca de la microSD 1.32; agujeros de las anclas 1.34 |
+| Pared del tubo | ≥ 1.2 (local ≥ 1.0) | **1.19**, local | chaflán de la ventana de la OLED bajo el bolsillo de la lámina (z 86.9). Uniones 1.2; túnel del USB-C 1.33; ranura y muesca de la microSD 1.32; agujeros de las anclas 1.31 |
 | Radio de curva del coaxial | ≥ 12 en todas las curvas | **12.27** | todo el recorrido (6 × Ø de la hoja actual: 10.9–11.6) |
 | Mazos entre sí | ≥ 0.3 | **8.8** | mazo del pack–arnés de J301 (los hilos de la NTC se juntan con el mazo del pack a propósito) |
 
@@ -493,7 +502,7 @@ Hechas el 08-10-2026 con FreeCAD 1.1.3 sobre los archivos de esta carpeta
 | Piezas | 7 piezas, válidas (el distintivo, 6 islas; el resto, un sólido cada una). Mallas STL cerradas, sin no-manifold ni autointersecciones. Triángulos: base 5122, tubo 7364, tapa 6084, chasis 1916, tecla 812, tapa de puertos 2404, distintivo 1396. Volúmenes en cm³: 8.98, 44.87, 10.48, 6.65, 0.09, 1.02 y 0.08 |
 | Pared del tubo: sondas a media pared cada 0.5 mm | Cara plana: 11 715 puntos, 1 473 en las aberturas, **0 sin material**. Anillo: 58 543 puntos, 3 405 en las aberturas, **0 sin material** |
 | Pared del tubo: volumen | 44 867.7 mm³; esperado 44 867.2 (+0.001 %, tolerancia 0.5 %) |
-| Pared del tubo: espesor (sin nervios) | Túnel del USB-C 1.33; ranura y muesca de la microSD 1.32; agujeros de las anclas 1.34; ventana de la OLED 1.4; tecla y LED 1.8; uniones 1.2; tornillos radiales 2.24; pared normal y rayas 1.9. Barrido cada 1.5 mm: 1.19 en el chaflán de la ventana bajo el bolsillo (z 86.9), el resto ≥ 1.2 |
+| Pared del tubo: espesor (sin nervios) | Túnel del USB-C 1.33; ranura y muesca de la microSD 1.32; agujeros de las anclas 1.31; ventana de la OLED 1.4; tecla y LED 1.8; uniones 1.2; tornillos radiales 2.24; pared normal y rayas 1.9. Barrido cada 1.5 mm: 1.19 en el chaflán de la ventana bajo el bolsillo (z 86.9), el resto ≥ 1.2 |
 | Choques en posición final | 0 entre piezas, 0 de las piezas con las referencias y 0 entre referencias |
 | Barridos (pasos de 0.5 mm) | 0 choques en los once (lista de abajo), también la funda del USB-C por su túnel y la tarjeta por su ranura |
 | Holgura lateral en los barridos verticales | Compradas 0.5 (el pack por su cuna); impresas 0.4 (chasis por el tubo); placa por los rieles 0.25; carrier por sus ranuras 0.3 (ajuste). La placa roza los salientes M2 a propósito (contacto) |
@@ -503,9 +512,9 @@ Hechas el 08-10-2026 con FreeCAD 1.1.3 sobre los archivos de esta carpeta
 | Pack 1S2P (envolvente de 37.5 × 68 × 20) | 0.5 a la cuna por encima de las repisas, 0.5 a los topes de la tapa, 0.6 al chasis, 0.5 al retén de la tuerca, 1.8 a la carrier, 2.9 a la base; también al bajar por arriba |
 | Holguras a la cara plana | Vidrio de la OLED 0.5; PCB, cinta y tornillos de la OLED 0.9; componentes 0.84; clavijas 0.75. La pestaña de la tecla va en su rebaje (contacto) |
 | Tecla y guía de luz contra la placa real | Émbolo–SW401 0.5; tecla–otros componentes 1.9; guía de luz–D403 0.55 |
-| Aberturas del costado | Funda del USB-C (12.35 × 6.5) a 0.3 de su túnel; tarjeta a 0.3 de su ranura al entrar y salir; en su sitio, 1.24 al tubo |
+| Aberturas del costado | Funda del USB-C (12.35 × 6.5) a 0.3 de su túnel; tarjeta a 0.3 de su ranura al entrar y salir, y también trabada, porque queda dentro de la ranura |
 | Otras holguras | Clavija acodada–placa 0.54 (el cuerpo sobre el canto; la tuerca pasa por la muesca); perno de 15.5–soldaduras de la carrier 1.2; perno–pack 3.3; tuerca del bastón–placa y carrier 0.81; cables–piezas 0.5, –pack 8.9 (sin los que van pegados), –placa y carrier 2.6 |
-| Tapa de puertos (tres setas: 19°, z 20, 32.5 y 45) | Cada cabeza: 0.61 al chasis al barrerlo; en su sitio, 0.86 a la pared y 8.6 o más a lo demás. Pared entre cada agujero y las aberturas: 2.66 o más (túnel del USB-C a 2.66 de la seta de abajo). Abierta 135°: 1.62 a la funda del USB-C y 4.95 a la tarjeta; abierta 180°: 2.63 y 5.24 |
+| Tapa de puertos (tres setas: 19°, z 20, 32.5 y 45) | Cada cabeza: 0.61 al chasis al barrerlo; en su sitio, 0.86 a la pared y 8.6 o más a lo demás. Pared entre cada agujero y las aberturas: 2.66 o más (túnel del USB-C a 2.66 de la seta de abajo). Cerrada, su cuerpo queda a 0.54 del canto de la tarjeta trabada. Abierta 135°: 1.62 a la funda del USB-C y 5.12 a la tarjeta; abierta 180°: 2.63 y 5.24 |
 | Antena del WROOM (U201: x −15.15…−9.15, z 49.9–67.9) | Plástico del chasis a menos de 5 mm: 45.1 mm³, solo el saliente M2 de la OLED del lado −X, detrás de la placa (a 1.6). La pared del tubo queda a 1.69 del módulo |
 | Nada de la placa por detrás de su dorso delante del SMA de la carrier (x −6…3, y < 13.8, z 60–80) | Cumple |
 | Coaxial | Radio mínimo 12.27 en todo el recorrido; recorrido de 82.7; eje del cable hasta r 24.1; 0.59 a las piezas, 0.6 al pack, 4.4 a la placa y la OLED, 2.9 a la tapa |
@@ -552,9 +561,9 @@ que las rellena.
 - **Tapa de puertos de TPU:** la duración de la bisagra, el sellado de sus cuerpos a presión y lo que
   sujetan las tres setas. La comprobación gira la tapa como sólido rígido: no prueba cómo se dobla
   el TPU. Hay que imprimirla y probarla.
-- **Acceso a la microSD con la uña:** la muesca deja el canto de la tarjeta a 1.9 de la cara
-  exterior, pero si una uña llega a empujarla 1–1.5 mm más (lo que pide el zócalo de empuje para
-  soltarla) solo se sabe probándolo impreso.
+- **Acceso a la microSD con la uña:** según la hoja del zócalo, la tarjeta trabada queda 0.4 por
+  debajo de la cara exterior en la muesca, se empuja 1.2 más para soltarla y expulsada sobresale
+  2.7. Que se tome cómodo con la uña o la yema en la muesca de 8 solo se sabe probándolo impreso.
 - **Antena del WROOM:** cuánto la desafinan el saliente M2 de la OLED, detrás de la placa, y la
   pared del tubo.
 - **Perno del bastón:** el largo real de la rosca. Con más de 15.5 mm toca la carrier.

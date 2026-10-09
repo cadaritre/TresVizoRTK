@@ -30,9 +30,10 @@ TP = "TestPoint:TestPoint_Pad_D1.0mm"
 
 USBLC6_LCSC = "C2687116"
 # Módulo OLED de 4 pines (v0.3: soldado a la placa). Los pines 3 y 4 son SCL y SDA en las dos variantes conocidas
-# del módulo; GND y VCC (pines 1 y 2) cambian de lugar según el fabricante (research/constraints.md §4): antes de
-# pedir la placa, comprobar la serigrafía de la unidad y, si dice VCC GND SCL SDA, cambiar aquí los pines 1 y 2.
-OLED_PINS = {"1": "GND", "2": "+3V3", "3": "I2C_SCL", "4": "I2C_SDA"}
+# del módulo; GND y VCC (pines 1 y 2) cambian de lugar según el fabricante (research/constraints.md §4). El del
+# propietario (Mercado Libre, ANPOMNHBUK) dice VCC GND SCL SDA en la foto del anuncio (08-10-2026): comprobarlo en la
+# serigrafía de la unidad antes de pedir; si dice GND VCC, cambiar aquí los pines 1 y 2.
+OLED_PINS = {"1": "+3V3", "2": "GND", "3": "I2C_SCL", "4": "I2C_SDA"}
 
 
 def gnss_5v(d, s, group, R, C):
@@ -394,9 +395,9 @@ def build(libs):
           footprint=LC + "LED-SMD_L1.6-W0.8-R-RD", lcsc="C2286", mpn="KT-0603R",
           datasheet="https://www.lcsc.com/datasheet/lcsc_datasheet_1810231112_Hubei-KENTO-Elec-KT-0603R_C2286.pdf",
           description="LED de estado rojo 0603, junto al botón bajo su ventanita (pad 1 = cátodo)")
-    # OLED: el mismo módulo de 4 pines I2C (SSD1306, 0x3C/0x3D) en el bus que usaba J403, soldado por su header a la
-    # placa y girado 180° (pines abajo). Lo suelda el propietario: fuera del montaje de JLCPCB. El orden de GND y VCC
-    # está sin verificar en la unidad: ver OLED_PINS al principio.
+    # OLED: el mismo módulo de 4 pines I2C (SSD1306; el anuncio del propietario dice SSD1315, compatible; 0x3C/0x3D)
+    # en el bus que usaba J403, soldado por su header a la placa y girado 180° (pines abajo). Lo suelda el
+    # propietario: fuera del montaje de JLCPCB. El orden de VCC y GND sale de la foto del anuncio: ver OLED_PINS.
     d.add("J403", "Connector_Generic:Conn_01x04", "OLED", s, "ui", OLED_PINS,
           footprint=LC + "OLED_0.96in_I2C_4P_P2.54mm", in_bom=False,
           description="Módulo OLED 0.96 in I2C de 4 pines del propietario (no va en el montaje de JLCPCB): "

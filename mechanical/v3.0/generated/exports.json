@@ -22,7 +22,7 @@
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 44.87,
+   "volumen_cm3": 44.84,
    "stl": "02-tube.stl",
    "step": "02-tube.step"
   },
@@ -74,7 +74,7 @@
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 1.02,
+   "volumen_cm3": 1.04,
    "stl": "06-port-cover-tpu.stl",
    "step": "06-port-cover-tpu.step"
   },
@@ -106,7 +106,7 @@
   },
   "anillo": {
    "puntos": 14786,
-   "en_aberturas": 869,
+   "en_aberturas": 893,
    "sin_material": 0,
    "ejemplos": [],
    "ok": true

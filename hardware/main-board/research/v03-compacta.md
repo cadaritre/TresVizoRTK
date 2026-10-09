@@ -169,9 +169,12 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
   costado, z ≈ 45.
   - Su alto pide |x| ≤ 16.5: la boca queda en u ≈ 1.5 mirando a +X.
   - La pared lleva una ranura justa para la tarjeta, 11.6 × 1.6 (la tarjeta, 11 × 1.0, más 0.3 por
-    lado), en el eje real de la tarjeta (z 40.88), con una muesca de 5 mm para la uña en su centro.
-    Con la muesca, el canto de la tarjeta puesta queda a 1.9 mm de la cara de fuera (sin ella, a
-    5.2). Que la uña alcance hay que probarlo en una pieza impresa.
+    lado), en el eje real de la tarjeta (z 40.88), con una muesca de 8 mm para la uña en su centro.
+  - Posiciones de la tarjeta según la hoja de SOFNG del TF-015 (LCSC C113206), desde la boca de J401
+    (x 16.5): trabada asoma 2.50 (x 19.0), se empuja hasta 1.32 para soltarla y expulsada asoma
+    5.60 (x 22.1). En la muesca, la trabada queda 0.4 por debajo de la cara de fuera y la expulsada
+    sobresale 2.7. Antes la carcasa la suponía trabada en x 17.5, 1.9 mm por dentro.
+    Que se tome cómodo con la uña hay que probarlo en una pieza impresa.
 - **Antena del ESP32-S3-WROOM-1:** hacia el canto derecho (−X), a media altura, sin cobre debajo.
   Lejos del coaxial y del SMA de la carrier.
 - **Conectores de cable:** solo en el canto de abajo (z 8.5), con la boca hacia abajo, porque a
@@ -270,11 +273,13 @@ renumerar nada:
 
 Pendiente antes de pedir:
 
-- **Orden de GND y VCC en la OLED.** Los pines 3 y 4 son SCL y SDA en las dos variantes conocidas.
+- **Orden de VCC y GND en la OLED.** Los pines 3 y 4 son SCL y SDA en las dos variantes conocidas.
   GND y VCC cambian de lugar según el fabricante; si quedan cruzados, el módulo recibe la
   alimentación invertida.
-  El esquema usa GND, VCC, SCL, SDA. Hay que leer la serigrafía del módulo; si no coincide, se
-  cambia `OLED_PINS` en `circuit.py`.
+  El esquema usa VCC, GND, SCL, SDA desde el 08-10-2026: es lo que dice la foto del anuncio del
+  módulo del propietario (Mercado Libre, ANPOMNHBUK). El mismo anuncio da el controlador SSD1315,
+  compatible con las bibliotecas del SSD1306. Antes de pedir, confirmarlo en la serigrafía de la
+  unidad; si dice GND VCC, se cambia `OLED_PINS` en `circuit.py`.
 - **Alto de la fila de pines de la OLED:** está a 1.4 mm del canto del módulo, sacado del plano
   del vendedor. El plano de LCD wiki del mismo módulo (MC096VX,
   https://www.lcdwiki.com/images/1/19/MC096-015.jpg; revisado el 08-10-2026) da 1.50: cae dentro
@@ -461,7 +466,7 @@ dónde sale cada uno:
   firmware puede bajar IINDPM, nunca subirlo; no escribir `EN_EXTILIM = 0`.
 - **Botón:** 10 s (típ.) en bajo es el reset por hardware del BQ25798, con o sin USB: abre el FET de
   envío ~350 ms y el equipo rearranca. Los gestos, muy por debajo (apagar con 2–3 s).
-- **OLED:** girar la imagen 180°, no espejarla.
+- **OLED:** girar la imagen 180°, no espejarla. Controlador SSD1315 según el anuncio, compatible con las bibliotecas del SSD1306.
 - **Ejes del IMU** (acelerómetro y giróscopo): X carcasa = +X sensor, Y carcasa = +Z sensor y
   Z carcasa = −Y sensor. Quieto y con el bastón vertical, Y ≈ −1 g. Deducido de la hoja de Bosch
   (figura 6 y tabla 15) con U401 a 0° en KiCad; confirmarlo con la placa armada.

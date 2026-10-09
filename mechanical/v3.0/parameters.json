@@ -305,9 +305,9 @@
    "holgura": 0.3,
    "x0": 15.5,
    "muesca": {
-    "ancho": 5.0,
+    "ancho": 8.0,
     "y_sup": 20.2,
-    "_nota": "Muesca estrecha para la una en el centro de la tarjeta: 5 de ancho (z), de la ranura hasta y 20.2, atraviesa la pared. Arriba la cara exterior esta en x 19.39: el canto de la tarjeta puesta (x 17.5) queda a 1.9 de ella (antes 5.2 bajo la cara exterior)."
+    "_nota": "Muesca para la una en el centro de la tarjeta: 8 de ancho (z), de la ranura hasta y 20.2, atraviesa la pared. Arriba la cara exterior esta en x 19.39: el canto de la tarjeta trabada (x 19.0) queda 0.4 por debajo; para soltarla se empuja 1.2 mas (x 17.82) y expulsada asoma 2.7 (x 22.1), de donde se toma con la una. Era de 5: se ensancho para que entre la yema y no solo la una."
    },
    "chaflan_entrada": 1.2,
    "_nota": "Ranura justa para la tarjeta (11 x 1.0) mas 0.3 por lado: 11.6 x 1.6 (y 15.65-17.25), en el eje real de J401 (z 40.88 de placa-principal.json: centro de J401 mas 0.9 de corrimiento del canal; z_centro es el respaldo). La tarjeta entra y sale recta en x. Muesca para la una en su centro y chaflan de 1.2 en los cantos de fuera de arriba (ranura y muesca), donde salian en cuna. Por dentro, chaflan de 0.8 en el canto del suelo con la cara interior (cuna de ~53 grados; no se ve desde fuera).",
@@ -344,7 +344,8 @@
    },
    "cuerpos": {
     "usb_r0": 25.65,
-    "sd_r0": 25.8
+    "sd_r0": 26.0,
+    "_nota": "Los cuerpos de TPU llenan el tunel y la ranura desde r usb_r0 y sd_r0 hacia fuera. sd_r0 26.0: 0.54 al canto de la tarjeta trabada (x 19.0, esquina en r 25.46), para que cerrar la tapa no empuje la tarjeta (es de empuje: la soltaria)."
    },
    "lengueta": {
     "x0": 12.6,
@@ -436,8 +437,13 @@
    "largo": 15.0,
    "espesor": 1.0,
    "y0": 15.95,
-   "x_fuera": 17.5,
-   "_nota": "Tarjeta puesta: su canto queda en x 17.5. En el plano de la tarjeta (y 16.45) la cara exterior esta en x 22.66: 5.2 de hondo; la muesca lleva la cara exterior a x 19.39 encima de la tarjeta (1.9)."
+   "x_fuera": 19.0,
+   "_nota": "Tarjeta puesta (trabada): su canto queda en x 19.0. Hoja de SOFNG del TF-015 (LCSC C113206, revisada el 08-10-2026): desde el frente del cuerpo, que es la boca de J401 (x 16.5, placa-principal.json), la tarjeta trabada asoma 2.50, se empuja hasta 1.32 para soltarla y expulsada asoma 5.60 (x 22.1). Tolerancia del plano: +-0.15 a +-0.25. En el plano de la tarjeta (y 16.45) la cara exterior esta en x 22.66: trabada queda 3.7 hacia dentro y expulsada 0.6; por la muesca, la cara exterior esta en x 19.39 (0.4 sobre el canto trabado) y la expulsada asoma 2.7.",
+   "asoma_de_la_boca": {
+    "trabada": 2.5,
+    "empuje_max": 1.32,
+    "expulsada": 5.6
+   }
   },
   "clavijas": {
    "zona_y": [

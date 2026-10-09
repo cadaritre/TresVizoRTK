@@ -20,7 +20,7 @@
    "etiqueta": "Tubo",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 44.87,
+   "volumen_cm3": 44.84,
    "caja": [
     -28.0,
     28.0,
@@ -80,7 +80,7 @@
    "etiqueta": "Tapa de puertos de TPU",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 1.02,
+   "volumen_cm3": 1.04,
    "caja": [
     12.6,
     27.71,

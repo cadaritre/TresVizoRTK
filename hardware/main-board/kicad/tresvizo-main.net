@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-v03/hardware/main-board/kicad/tresvizo-main.kicad_sch")
-		(date "2026-10-08T15:33:34")
+		(date "2026-10-08T23:02:09")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")
@@ -7185,7 +7185,7 @@
 			(ref "J403")
 			(value "OLED")
 			(footprint "tresvizo_lcsc:OLED_0.96in_I2C_4P_P2.54mm")
-			(description "Módulo OLED 0.96 in I2C de 4 pines del propietario (no va en el montaje de JLCPCB): 1 GND, 2 +3V3, 3 I2C_SCL, 4 I2C_SDA; pin 1 = el de la izquierda mirado de frente con los pines arriba")
+			(description "Módulo OLED 0.96 in I2C de 4 pines del propietario (no va en el montaje de JLCPCB): 1 +3V3, 2 GND, 3 I2C_SCL, 4 I2C_SDA; pin 1 = el de la izquierda mirado de frente con los pines arriba")
 			(fields
 				(field
 					(name "Footprint") "tresvizo_lcsc:OLED_0.96in_I2C_4P_P2.54mm")
@@ -7193,7 +7193,7 @@
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "Módulo OLED 0.96 in I2C de 4 pines del propietario (no va en el montaje de JLCPCB): 1 GND, 2 +3V3, 3 I2C_SCL, 4 I2C_SDA; pin 1 = el de la izquierda mirado de frente con los pines arriba")
+					(name "Description") "Módulo OLED 0.96 in I2C de 4 pines del propietario (no va en el montaje de JLCPCB): 1 +3V3, 2 GND, 3 I2C_SCL, 4 I2C_SDA; pin 1 = el de la izquierda mirado de frente con los pines arriba")
 			)
 			(libsource
 				(lib "Connector_Generic")
@@ -9982,8 +9982,8 @@
 			)
 			(node
 				(ref "J403")
-				(pin "2")
-				(pinfunction "Pin_2_2")
+				(pin "1")
+				(pinfunction "Pin_1_1")
 				(pintype "passive")
 			)
 			(node
@@ -11513,8 +11513,8 @@
 			)
 			(node
 				(ref "J403")
-				(pin "1")
-				(pinfunction "Pin_1_1")
+				(pin "2")
+				(pinfunction "Pin_2_2")
 				(pintype "passive")
 			)
 			(node

@@ -275,7 +275,7 @@ También van en `kicad/plugs.json` para la comprobación en CAD.
 | J301 | Carrier GNSS (arnés en Y) | Canto de abajo, a la derecha (x −3.0…−13.0); boca hacia abajo. El arnés sube por el lado −X | **SH 8** lateral SM08B-SRSS-TB (C160407) | SHR-08V-S (C265412); en la carrier, **soldado** a sus filas de agujeros | SSH-003T-P0.2-H (C263995) | «cable JST SH 1.0 8 pines una cabeza» |
 | J101 | USB-C: carga y USB nativo del ESP32 | Costado +X, z ≈ 25; boca en u 3.1, hacia +X | HRO TYPE-C-31-M-12 (C165948) | — | — | — |
 | J401 | microSD (zócalo de empuje) | Costado +X, z 32–48; boca en u 1.5, hacia +X | TF-015 (C113206) | — | — | — |
-| J403 | OLED: 1 GND, 2 VCC (+3V3), 3 SCL, 4 SDA (**orden de GND y VCC sin confirmar**) | Bajo la fila de pines del módulo, v 8.95–11.35 | Cuatro pads SMD de 1.7 × 2.4, sin pieza de JLCPCB | — | — | Lo suelda el propietario |
+| J403 | OLED: 1 VCC (+3V3), 2 GND, 3 SCL, 4 SDA (según la foto del anuncio; **confirmar en la unidad**) | Bajo la fila de pines del módulo, v 8.95–11.35 | Cuatro pads SMD de 1.7 × 2.4, sin pieza de JLCPCB | — | — | Lo suelda el propietario |
 
 - **NTC obligatoria en J404.** TS del cargador es un divisor de REGN (5.1 kΩ arriba, 30 kΩ abajo)
   con la NTC en paralelo con los 30 kΩ. Con una NTC 10k B3435 (tipo 103AT) y los umbrales por
@@ -339,7 +339,7 @@ datos; ninguno se probó en una placa:
 | Corriente de carga (ICHG, REG0x03 del BQ25798) | **1.5 A como mucho.** Al arrancar: `SFET_PRESENT = 1` (REG0x14 bit 7), ICHG = 1 A y *watchdog* desactivado | J102 tiene dos contactos GH por polo, de 1 A cada uno con cable AWG #26. El BQ25798 arranca con 1 A y el *watchdog* y REG_RST lo devuelven a 1 A (hoja SLUSDV2C, REG03). ILIM no alcanza como tope: con 5 V y 1.34–1.56 A de entrada podría dar ~1.8 A a la celda a 3.7 V y hasta ~2.4 A cerca de 3.0 V, donde empieza la carga rápida, si se le pidiera más (estimado con 90–93 % de eficiencia y el sistema apagado) |
 | Techo de entrada (IINDPM, REG0x06) | Puede **bajarlo** (p. ej. a 500 mA en un puerto de PC), nunca subirlo. No escribir `EN_EXTILIM = 0` | Por hardware, ILIM_HIZ con 10k/8.2k desde REGN (4.6–5.0 V): **1.34–1.56 A**, 1.45 A típ. Es el techo de IINDPM salvo con EN_EXTILIM = 0 (§7.3.4.3). Con D+/D− del cargador al aire manda ILIM ([research/power.md](research/power.md) §2.4) |
 | Botón mantenido | Gestos muy por debajo de 10 s (apagar con 2–3 s) | QON en bajo durante tRST (10 s típ.) es un reset por hardware: el BQ25798 abre el FET de envío ~350 ms (típ.) y el equipo rearranca, con o sin USB (§7.3.12.3). Ya pasaba con el botón del panel de la v0.2 |
-| OLED | Girar la imagen 180° (no espejarla) | El módulo va girado 180° en su plano, con los pines abajo |
+| OLED | Girar la imagen 180° (no espejarla) | El módulo va girado 180° en su plano, con los pines abajo. Controlador SSD1315 según el anuncio (compatible con las bibliotecas del SSD1306) |
 | Ejes del IMU (acelerómetro y giróscopo) | X carcasa = +X sensor, Y carcasa = +Z sensor, Z carcasa = −Y sensor. Con el bastón vertical y quieto, el acelerómetro da Y ≈ −1 g y X, Z ≈ 0 | Deducido de la hoja de Bosch (BST-BMI088-DS001 rev 1.9, figura 6 y tabla 15) con U401 a 0° en KiCad: los pines 1–7 miran a −u (+X de la carcasa) y el 16 a +v (abajo). **Confirmarlo con la placa armada**, leyendo la gravedad en varias posiciones |
 
 Lo nuevo de la v0.3 respecto de la v0.2:
@@ -479,7 +479,7 @@ una cotización):
 
 | Punto | ¿Frena el pedido? | Qué hacer |
 | --- | --- | --- |
-| Orden de GND y VCC de la OLED | Sí | El esquema supone GND, VCC, SCL, SDA. Leer la serigrafía del módulo: si no coincide, cambiar `OLED_PINS` en `scripts/circuit.py` y regenerar. Cruzados, el módulo recibe la alimentación invertida |
+| Orden de VCC y GND de la OLED | Sí | El esquema usa VCC, GND, SCL, SDA, de la foto del anuncio del módulo (08-10-2026). Confirmarlo en la serigrafía de la unidad: si no coincide, cambiar `OLED_PINS` en `scripts/circuit.py` y regenerar. Cruzados, el módulo recibe la alimentación invertida |
 | Fila de pines de la OLED | Sí | Se tomó a 1.4 mm del canto del módulo, deducido del plano del vendedor. Medirla con calibrador: si está unos 1.4 mm más lejos del canto, el módulo toca la lata del WROOM |
 | Medidas de la carrier BDLX | Sí | Salen de una foto (±1 mm). Medirla con calibrador: de ellas dependen la muesca del SMA, el aire de 0.5 mm detrás de la placa y las ranuras del chasis |
 | Antena GNSS: conector | Sí, para la tapa y el coaxial | Es la HA-901A del kit de BDLX. La tienda da «SMA-J» (macho) y conexión directa al SMA de la carrier, y la tapa está hecha para eso (SMA hembra de panel). Confirmar en la antena: macho = tuerca que gira y pin al centro; hembra = rosca por fuera y agujero al centro. Si es hembra se cambia un parámetro de la tapa |

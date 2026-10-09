@@ -6285,7 +6285,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Módulo OLED 0.96 in I2C de 4 pines del propietario (no va en el montaje de JLCPCB): 1 GND, 2 +3V3, 3 I2C_SCL, 4 I2C_SDA; pin 1 = el de la izquierda mirado de frente con los pines arriba"
+		(property "Description" "Módulo OLED 0.96 in I2C de 4 pines del propietario (no va en el montaje de JLCPCB): 1 +3V3, 2 GND, 3 I2C_SCL, 4 I2C_SDA; pin 1 = el de la izquierda mirado de frente con los pines arriba"
 			(at 182.88 120.65 0)
 			(effects
 				(font
@@ -6324,8 +6324,8 @@
 		(uuid "c6be7038-f407-599b-9a7e-681dce1686b6")
 	)
 	(symbol
-		(lib_id "power:GND")
-		(at 175.26 118.11 270)
+		(lib_id "power:+3V3")
+		(at 175.26 118.11 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6341,13 +6341,12 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "GND"
-			(at 175.26 121.31 90)
+		(property "Value" "+3V3"
+			(at 175.26 114.91 270)
 			(effects
 				(font
 					(size 1 1)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" ""
@@ -6398,8 +6397,8 @@
 		(uuid "467e8b65-1ab6-5293-9fc7-a022c7d57d0f")
 	)
 	(symbol
-		(lib_id "power:+3V3")
-		(at 175.26 120.65 90)
+		(lib_id "power:GND")
+		(at 175.26 120.65 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6415,12 +6414,13 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+3V3"
-			(at 175.26 117.45 270)
+		(property "Value" "GND"
+			(at 175.26 123.85 90)
 			(effects
 				(font
 					(size 1 1)
 				)
+				(hide yes)
 			)
 		)
 		(property "Footprint" ""
@@ -8550,7 +8550,7 @@
 		)
 		(uuid "eec5232b-69c6-55a4-871e-58d9522c030c")
 	)
-	(text "J403 (OLED del propietario, soldada a mano): antes de pedir, comprobar en la serigrafía del módulo el orden de GND y VCC (aquí: GND, +3V3, I2C_SCL, I2C_SDA)."
+	(text "J403 (OLED del propietario, soldada a mano): antes de pedir, comprobar en la serigrafía del módulo el orden de GND y VCC (aquí: +3V3, GND, I2C_SCL, I2C_SDA)."
 		(exclude_from_sim no)
 		(at 12.7 161.29 0)
 		(effects
