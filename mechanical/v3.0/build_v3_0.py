@@ -1,6 +1,6 @@
-"""Construye la carcasa V3.0 (tubo de 52 x 100 para la placa principal compacta v0.3).
+"""Construye la carcasa V3.0 (tubo de 56 x 111 para la placa principal compacta v0.3).
 
-Piezas: 01-base, 02-tube, 03-antenna-cap, 04-chassis, 05-key-tpu, en su posicion final.
+Piezas: 01-base, 02-tube, 03-antenna-cap, 04-chassis, 05-key-tpu, 06-port-cover-tpu, en su posicion final.
 Ademas guarda las referencias (placa de la especificacion, carrier, celdas, tuerca, antena,
 coaxial, clavijas y cables) como objetos ref_* que no se exportan.
 
@@ -45,7 +45,7 @@ def radial_hole(angle, z, d, r_from=RO + 1.0, r_to=0.0):
 
 
 def countersink(angle, z, d_head, d_shank):
-    """Avellanado a 90 grados desde la cara exterior (r 26) hacia dentro."""
+    """Avellanado a 90 grados desde la cara exterior (r 28) hacia dentro."""
     a = math.radians(angle)
     ux, uy = math.cos(a), math.sin(a)
     h = (d_head - d_shank) / 2.0
@@ -77,7 +77,8 @@ def build_base():
     sb = BASE['saliente_tuerca']
     boss = cyl_z(sb['radio'], 0, 0, t_floor - 0.01, sb['z_sup']).common(box(-30, 30, -30, sb['y_max'], 0, 30))
     x, y = polar(RET['radio'], RET['angulo'])
-    boss = boss.fuse(cyl_z(RET['refuerzo_diametro'] / 2.0, x, y, t_floor - 0.01, sb['z_sup']))
+    z_ret = RET.get('refuerzo_z_sup', sb['z_sup'])
+    boss = boss.fuse(cyl_z(RET['refuerzo_diametro'] / 2.0, x, y, t_floor - 0.01, z_ret))
     body = body.fuse(boss)
     tb = BASE['lenguetas']
     body = body.fuse(tabs(tb, None))
@@ -94,7 +95,7 @@ def build_base():
     body = body.cut(cyl_z(r_hole, 0, 0, -1, ring + 0.1))
     body = body.cut(Part.makeCone(r_hole + c + 0.1, r_hole, c + 0.1, V(0, 0, -0.1)))
     # Piloto del reten M2 detras de la tuerca.
-    body = body.cut(cyl_z(RET['piloto'] / 2.0, x, y, sb['z_sup'] - RET['profundidad'], sb['z_sup'] + 1))
+    body = body.cut(cyl_z(RET['piloto'] / 2.0, x, y, z_ret - RET['profundidad'], z_ret + 1))
     # Pilotos de los tornillos radiales en las lenguetas.
     ts = BASE['tornillos']
     for a in tb['angulos']:
@@ -115,7 +116,7 @@ def tube_shell():
 
 
 def rebates():
-    """Rebajes interiores de 0.9 en los dos extremos del tubo (escalon de las uniones)."""
+    """Rebajes interiores de 1.2 (labio 0.8 + juego 0.4) en los dos extremos del tubo (uniones)."""
     lab = TB['laberinto']
     w = lab['ancho'] + lab['holgura']
     return fuse_all([G.cavity_offset(Z0 - 1, Z0 + lab['alto_base'] + lab['holgura'], w),
@@ -148,20 +149,39 @@ def front_openings():
     return fuse_all([win, key, led])
 
 
+def inner_edge_chamfer(y0, z0, z1, c):
+    """Chaflan del canto donde el suelo plano (y = y0) de una abertura del costado +X corta la cara
+    interior del tubo: ahi quedaba una cuna de ~53 grados. Quita el triangulo de c de lado."""
+    xe = math.sqrt(RI ** 2 - y0 ** 2)
+    ya = y0 - c
+    xa = math.sqrt(RI ** 2 - ya ** 2)
+    pts = [V(xe + c, y0 + 0.01, z0), V(xa, ya, z0), V(xa - 0.6, ya, z0), V(xe - 0.6, y0 + 0.01, z0)]
+    return Part.Face(Part.makePolygon(pts + [pts[0]])).extrude(V(0, 0, z1 - z0))
+
+
 def side_openings():
-    """Tunel de la funda del USB-C y ranura de la microSD con rebaje para la una (+X)."""
+    """Tunel de la funda del USB-C y ranura de la microSD con rebaje para la una (+X), con los
+    cantos interiores de sus suelos achaflanados, y agujero del ancla de la tapa de puertos."""
     cs = P['costado']
     u = cs['usb_c']
-    usb = box(u['x0'], RO + 2, u['y'][0], u['y'][1], u['z_centro'] - u['medio_alto'],
-              u['z_centro'] + u['medio_alto'])
+    za_u, zb_u = u['z_centro'] - u['medio_alto'], u['z_centro'] + u['medio_alto']
+    usb = box(u['x0'], RO + 2, u['y'][0], u['y'][1], za_u, zb_u).fuse(
+        box(u['x_abierto'], RO + 2, u['y'][0], RO + 2, za_u, zb_u))      # abierto hasta fuera pasada la cara plana
     sd = cs['microsd']
-    zc, w = sd['z_centro'], sd['ancho']
+    zc, w = G.SD_Z, sd['ancho']
     slot = box(15.5, RO + 2, sd['y'][0], sd['y'][1], zc - w / 2.0, zc + w / 2.0)
     nl = sd['una']
     y_e = sd['y'][1]
     x_out = math.sqrt(RO ** 2 - y_e ** 2)
     nail = cyl_z(nl['radio'], x_out + nl['radio'] - nl['hondo'], y_e, zc - nl['alto'] / 2.0, zc + nl['alto'] / 2.0)
-    return fuse_all([usb, slot, nail])
+    an = cs['tapa_puertos']['ancla']
+    anchor = radial_hole(an['angulo'], an['z'], an['agujero'], RO + 1.0, RI - 0.5)
+    ch = cs.get('chaflan_interior', 0.0)
+    cuts = [usb, slot, nail, anchor]
+    if ch > 0:
+        cuts += [inner_edge_chamfer(u['y'][0], za_u, zb_u, ch),
+                 inner_edge_chamfer(sd['y'][0], zc - w / 2.0, zc + w / 2.0, ch)]
+    return fuse_all(cuts)
 
 
 def screw_holes():
@@ -177,18 +197,10 @@ def screw_holes():
 
 # --- 02 Tubo: interior ----------------------------------------------------------------
 def rail_ledges():
-    """Repisa en el fondo de cada ranura: el pie del riel del chasis apoya aqui."""
-    rr, rp = TB['ranuras_rieles'], TB['repisas_rieles']
-    pl = P['placa']
-    out = []
-    for a0, a1 in rr['angulos']:
-        out.append(sector(rp['r'][1], rp['r'][0], rp['z'][0], rp['z'][1], a0, a1))
-    led = fuse_all(out)
-    m = CLR
-    led = led.cut(box(-pl['x'] - m, pl['x'] + m, pl['y_dorso'] - m, pl['y_cara'] + m, 0, 100))
-    # Delante de la placa, fuera de la envolvente de componentes y de las clavijas.
-    xs = pl['x'] - pl['franja'] + m
-    return led.cut(box(-xs, xs, pl['y_cara'] - m, 30, 0, 100))
+    """Repisas bajo las paredes laterales del chasis: su pie (z 9.5) apoya aqui. Nacen de la pared."""
+    ap = TB['apoyos_chasis']
+    out = [sector(RI + 0.8, ap['r0'], ap['z'][0], ap['z'][1], a0, a1) for a0, a1 in ap['angulos']]
+    return fuse_all(out)
 
 
 def cell_cradle():
@@ -206,7 +218,7 @@ def cell_cradle():
             dx, dy = sx * math.cos(a), math.sin(a)
             L = 30.0
             # Caja a lo largo de la direccion (dx, dy) desde el eje de la celda.
-            rib = box(0, L, -t / 2.0, t / 2.0, z0, z1)
+            rib = box(0, L, -t / 2.0, t / 2.0, z0, nv.get('z_labio', z1) if rel > 0 else z1)
             rib.rotate(V(), V(0, 0, 1), math.degrees(math.atan2(dy, dx)))
             rib.translate(V(cx, cy, 0))
             parts.append(rib)
@@ -219,10 +231,25 @@ def cell_cradle():
     return body
 
 
+def decorative_lines():
+    """Rayas verticales como las de V2.3: grupos de 5 a 9 grados, simetricos frente-atras."""
+    lv = TB.get('lineas_verticales')
+    if not lv:
+        return None
+    half = math.degrees(lv['ancho'] / 2.0 / RO)
+    cuts = [sector(RO + 1.0, RO - lv['profundidad'], lv['z'][0], lv['z'][1], a - half, a + half)
+            for grupo in lv['grupos'] for a in grupo]
+    return fuse_all(cuts)
+
+
 def build_tube():
     body = tube_shell().cut(rebates())
     body = body.fuse(rail_ledges()).fuse(cell_cradle())
     body = body.cut(front_openings()).cut(side_openings()).cut(screw_holes())
+    dl = decorative_lines()
+    if dl is not None:
+        body = body.cut(dl)
+    body = body.fuse(G.logo_relief())
     return clean(body)
 
 
@@ -247,21 +274,18 @@ def build_cap():
         body = body.cut(cyl_z(ANT['perno_paso'] / 2.0, x, y, Z1 - 1, G.H_TOTAL + 1))
         body = body.cut(cyl_z(ANT['avellanado_diametro'] / 2.0, x, y, Z1 - 1, Z1 + ANT['avellanado_cabeza']))
     # Paso del coaxial: Ø12 en el eje, alargado hacia el SMA de la carrier (ranura con dos arcos).
-    rp = ANT['paso_coaxial'] / 2.0
-    c = P['coaxial']['clavija']
-    ext = ANT.get('paso_coaxial_alargado', 0.0)
-    ang = math.atan2(c['y'], c['x'])
-    ux, uy = math.cos(ang), math.sin(ang)
-    nx, ny = -uy, ux
-    a0, a1 = V(0, 0, Z1 - 1), V(ux * ext, uy * ext, Z1 - 1)
-    e = [Part.Arc(a0 + V(nx, ny, 0) * rp, a0 - V(ux, uy, 0) * rp, a0 - V(nx, ny, 0) * rp),
-         Part.LineSegment(a0 - V(nx, ny, 0) * rp, a1 - V(nx, ny, 0) * rp),
-         Part.Arc(a1 - V(nx, ny, 0) * rp, a1 + V(ux, uy, 0) * rp, a1 + V(nx, ny, 0) * rp),
-         Part.LineSegment(a1 + V(nx, ny, 0) * rp, a0 + V(nx, ny, 0) * rp)]
-    stadium = Part.Face(Part.Wire([g.toShape() for g in e])).extrude(V(0, 0, G.H_TOTAL - Z1 + 2))
-    body = body.cut(stadium)
-    bo = CAP['bolsillo_oled']
-    body = body.cut(box(-bo['x'], bo['x'], bo['y'][0], bo['y'][1], Z1 - 1, bo['z_techo']))
+    cn = ANT['conector']
+    pm = cn['pasamuros']
+    if cn['tipo'] == 'macho':
+        # Pasamuros SMA hembra: agujero de 6.5 con cara plana antigiro y rebaje por dentro para la
+        # tuerca de 8, que deja el panel en su espesor.
+        hole = cyl_z(pm['agujero'] / 2.0, 0, 0, Z1 - 1, G.H_TOTAL + 1)
+        flat_y = pm['plano'] - pm['agujero'] / 2.0
+        hole = hole.cut(box(-5, 5, flat_y, 5, Z1 - 2, G.H_TOTAL + 2))
+        body = body.cut(hole)
+        body = body.cut(cyl_z(pm['bolsillo_tuerca'] / 2.0, 0, 0, Z1 - 1, G.H_TOTAL - pm['panel']))
+    else:
+        body = body.cut(cyl_z(cn['paso_hembra'] / 2.0, 0, 0, Z1 - 1, G.H_TOTAL + 1))
     return clean(body)
 
 
@@ -283,7 +307,7 @@ def spans_minus(z0, z1, cuts):
 
 
 def chassis_clip():
-    """Paso del chasis: r 23.9, y r 24.5 dentro de las ranuras del tubo (con 0.5 grados de holgura)."""
+    """Paso del chasis: r <= chasis.r_max (25.2, 0.4 al tubo) e y <= cara plana interior - 0.4."""
     CH = P['chasis']
     clip = cyl_z(CH['r_max'], 0, 0, -10, 200)
     for a0, a1 in TB['ranuras_rieles']['angulos']:
@@ -307,50 +331,59 @@ def build_chassis():
             parts.append(bx(rl['x_labio'], 26, rl['y_labio'][0], rl['y_labio'][1], za, zb))
         # Tope de la placa sobre el canto de arriba (franja), sin tocar la OLED (|x| <= 13.75).
         parts.append(bx(rl['x_labio'], 26, rl['y_dorso'][0], rl['y_labio'][1], rl['z_tope'], z1))
-        parts.append(bx(pw['x'][0], pw['x'][1], pw['y'][0], pw['y'][1], pw['z'][0], pw['z'][1]))
-        # Ranura de la carrier.
-        za, zb = rc['z']
-        wx0, wx1 = rc['x_pared']
-        parts.append(bx(wx0, pw['x'][0] + 0.01, rc['y'][0], rc['y'][1], za, zb))
-        lz0 = za if sx > 0 else rc['labio_atras_menos_x_desde_z']
-        parts.append(bx(rc['labio_atras_x'], wx0 + 0.01, rc['labio_atras_y'][0], rc['labio_atras_y'][1], lz0, zb))
-        parts.append(bx(rc['labio_delante_x'], wx0 + 0.01, rc['labio_delante_y'][0], rc['labio_delante_y'][1],
-                        rc['labio_delante_z'][0], rc['labio_delante_z'][1]))
+        # Pared lateral; la de -X acaba en z 83: por encima pasa el coaxial.
+        z_top_wall = pw['z'][1] if sx > 0 else pw['corte_coax_menos_x']['z0']
+        parts.append(bx(pw['x'][0], pw['x'][1], pw['y'][0], pw['y'][1], pw['z'][0], z_top_wall))
+        # Ranura de la carrier, sacada de sus medidas (carrier.x, .z) y del juego (ranura_carrier.holgura).
         ca = P['carrier']
+        hh = rc['holgura']
+        edge = ca['x'][1] if sx > 0 else -ca['x'][0]
         yb, yf = ca['y'][0], ca['y'][0] + ca['pcb']
-        parts.append(bx(rc['labio_delante_x'], wx0 + 0.01, yb, yf, rc['tope_z'][0], rc['tope_z'][1]))
+        cz0, cz1 = ca['z']
+        wx0, wx1 = edge + hh, edge + hh + 1.15
+        sy0, sy1 = yb - hh - 0.65, yf + hh + 0.65
+        za, zb = cz0 - hh - 0.8, cz1 + hh + 1.0
+        parts.append(bx(wx0, pw['x'][0] + 0.01, sy0, sy1, za, zb))
+        lz0 = za if sx > 0 else rc['labio_atras_menos_x_desde_z']
+        parts.append(bx(edge - rc['labio_atras_solape'], wx0 + 0.01, sy0, yb - hh, lz0, zb))
+        parts.append(bx(edge - rc['labio_delante_solape'], wx0 + 0.01, yf + hh, sy1, rc['labio_delante_z'][0], rc['labio_delante_z'][1]))
+        parts.append(bx(edge - 1.0, wx0 + 0.01, yb, yf, cz1 + hh, cz1 + hh + 1.0))
         if sx > 0:
             cuts.append(bx(wx0 - 0.3, wx1 + 0.3, rc['sin_pared_delante_mas_x_y'], 12.0, 0, rc['sin_pared_delante_mas_x_hasta_z']))
         else:
-            cuts.append(bx(wx0 - 0.3, rc['pared_atras_menos_x'], rc['y'][0] - 1, yb + 0.15, 0, rc['labio_atras_menos_x_desde_z']))
+            cuts.append(bx(wx0 - 0.3, rc['pared_atras_menos_x'], sy0 - 1, yb + rc['corte_atras_menos_x_y'], 0, rc['labio_atras_menos_x_desde_z']))
         # Gancho flexible al pie de la ranura: brazo separado de la pared y labio bajo el PCB.
-        gx0, gx1 = gk['x']
+        gx0, gx1 = edge - 0.7, wx0 + 0.8
         gy0, gy1 = gk['y']
         hx = gx1 + gk['hueco_detras']
         sl = gk['ranura']
-        zh0, zh1 = gk['labio_z'][0], gk['z'][1]
+        lip_z = (cz0 - hh - 0.8, cz0 - hh)
+        zh0, zh1 = lip_z[0], lip_z[0] + gk['largo']
         hook_cuts = [bx(wx0 - 0.05, hx, gy0 - sl, gy0, zh0 - 1, zh1 + sl),
                      bx(wx0 - 0.05, hx, gy1, gy1 + sl, zh0 - 1, zh1 + sl),
                      bx(gx1, hx, gy0 - sl, gy1 + sl, zh0 - 1, zh1 + sl)]
         cuts.extend(hook_cuts)
         arm = bx(wx0, gx1, gy0, gy1, zh0, zh1 + sl + 0.1)
-        lip = bx(gx0, wx0 + 0.01, gy0, gy1, gk['labio_z'][0], gk['labio_z'][1])
+        lip = bx(gx0, wx0 + 0.01, gy0, gy1, lip_z[0], lip_z[1])
         # Rampa de entrada bajo el labio (la carrier llega desde abajo).
-        ramp = Part.Face(Part.makePolygon([V(sx * gx0, gy0, gk['labio_z'][1]), V(sx * wx0, gy0, gk['labio_z'][0]),
-                                           V(sx * gx0, gy0, gk['labio_z'][0]), V(sx * gx0, gy0, gk['labio_z'][1])]))
+        ramp = Part.Face(Part.makePolygon([V(sx * gx0, gy0, lip_z[1]), V(sx * wx0, gy0, lip_z[0]),
+                                           V(sx * gx0, gy0, lip_z[0]), V(sx * gx0, gy0, lip_z[1])]))
         lip = lip.cut(ramp.extrude(V(0, gy1 - gy0, 0)))
         hook_parts.append(arm.fuse(lip).cut(fuse_all(hook_cuts)))
-        # Tirador en lo alto de la pared lateral: lengueta engrosada con agujero.
+        # Tirador en lo alto de cada pared lateral: lengueta engrosada con agujero para un gancho.
         tr = CH['tirador']
-        tab = bx(tr['x'][0], tr['x'][1], pw['y'][0], pw['y'][1], tr['z'][0], tr['z'][1])
-        parts.append(tab)
-        cuts.append(cyl_x(tr['agujero'] / 2.0, tr['y_agujero'], tr['z_agujero'], -30, 30))
+        tz0, tz1 = tr['z'] if sx > 0 else tr['z_menos_x']
+        parts.append(bx(tr['x'][0], tr['x'][1], pw['y'][0], pw['y'][1], tz0, tz1))
+        cuts.append(cyl_x(tr['agujero'] / 2.0, tr['y_agujero'], (tz0 + tz1) / 2.0, *sorted((sx * 15.0, sx * 30.0))))
         # Saliente M2 de la OLED, detras de la placa, y brazo hasta el puente.
         boss = cyl_y(sb['diametro'] / 2.0, sx * sb['x'], sb['z'], sb['y'][0], sb['y'][1])
         parts.append(boss)
         cuts.append(cyl_y(sb['piloto'] / 2.0, sx * sb['x'], sb['z'], sb['y'][1] - sb['piloto_hondo'], sb['y'][1] + 1))
         parts.append(bx(br['x'][0], br['x'][1], br['y'][0], br['y'][1], br['z'][0], br['z'][1]))
     bridge = box(-pu['x'], pu['x'], pu['y'][0], pu['y'][1], pu['z'][0], pu['z'][1])
+    # Esquinas de fuera quitadas: ahi pasan los labios delante-fuera de la cuna de las celdas.
+    for sx in (-1, 1):
+        bridge = bridge.cut(box(*sorted((sx * pu['esquinas_x'], sx * 30.0)), pu['y'][0] - 1, pw['y'][0], pu['z'][0] - 1, pu['z'][1] + 1))
     mq = pu['muesca']
     bridge = bridge.cut(box(mq['x'][0], mq['x'][1], mq['y_max'], pu['y'][1] + 1, pu['z'][0] - 1, pu['z'][1] + 1))
     vl = pu['ventana_llave']
@@ -369,7 +402,7 @@ def build_chassis():
 # --- 05 Tecla de TPU -------------------------------------------------------------------
 def build_key():
     """Tecla de TPU que se pone por fuera: pestana pegada (o a presion) en el rebaje exterior,
-    membrana de 0.4, cabeza que asoma 1.0 y embolo hasta 0.35 de SW401. Sella el agujero y se saca
+    membrana de 0.4, cabeza que asoma 1.0 y embolo hasta 0.5 de SW401. Sella el agujero y se saca
     por fuera."""
     tk, fr, pl = P['tecla'], P['frente']['tecla'], P['placa']
     x, z = fr['x'], fr['z']
@@ -384,36 +417,49 @@ def build_key():
     return clean(fuse_all([flange, membrane, head, plunger]))
 
 
-def build_plug(kind):
-    """Tapon de TPU: cuerpo que llena la abertura (sin holgura nominal: ajuste a presion del TPU),
-    ala curva sobre la pared y lengueta para tirar. kind = 'usb_c' o 'microsd'."""
+def build_port_cover():
+    """Tapa de TPU atada de los puertos del costado +X: ala curva sobre la pared que tapa el tunel
+    del USB-C y la ranura de la microSD, con sus cuerpos a presion por dentro, lengueta delante,
+    bisagra fina y seta de anclaje por un agujero de 2 en la pared."""
     cs = P['costado']
-    tp = cs['tapones_tpu']
-    ea, m = tp['espesor_ala'], tp['margen_ala']
-    if kind == 'usb_c':
-        u = cs['usb_c']
-        tpn = u['tapon']
-        za, zb = u['z_centro'] - u['medio_alto'] + 0.1, u['z_centro'] + u['medio_alto'] - 0.1
-        body = box(tpn['x0'], RO + 1, tpn['y'][0], tpn['y'][1], za, zb)
-        a0 = math.degrees(math.asin(u['y'][0] / RO))
-        a1 = math.degrees(math.asin(G.Y_FLAT_O / RO)) - 1.0
-    else:
-        sd = cs['microsd']
-        za, zb = sd['z_centro'] - sd['ancho'] / 2.0 + 0.05, sd['z_centro'] + sd['ancho'] / 2.0 - 0.05
-        body = box(sd['tapon']['x0'], RO + 1, sd['y'][0] + 0.05, sd['y'][1] - 0.05, za, zb)
-        a0 = math.degrees(math.asin(sd['y'][0] / RO))
-        a1 = math.degrees(math.asin((sd['y'][1] + sd['una']['radio']) / RO)) + 1.0
-    body = body.common(cyl_z(RO, 0, 0, 0, 100))
-    dm = math.degrees(m / RO)
-    wing = sector(RO + ea, RO, za - m, zb + m, a0 - dm, a1)
-    L, Wt, T = tp['lengueta']
-    am = (a0 + a1) / 2.0
-    dw = math.degrees(Wt / 2.0 / RO)
-    if kind == 'usb_c':
-        tab = sector(RO + T, RO, za - m - L, za - m + 0.01, am - dw, am + dw)
-    else:
-        tab = sector(RO + T, RO, zb + m - 0.01, zb + m + L, am - dw, am + dw)
-    return clean(fuse_all([body, wing, tab]))
+    tp = cs['tapa_puertos']
+    e = tp['espesor']
+    a0, a1 = tp['angulos']
+    za, zb = tp['z']
+    parts = [sector(RO + e, RO, za, zb, a0, a1),
+             box(tp['x_frente_plano'], math.sqrt(RO ** 2 - G.Y_FLAT_O ** 2) + 0.3, G.Y_FLAT_O, G.Y_FLAT_O + e, za, zb)]
+    lg = tp['lengueta']
+    parts.append(box(lg['x0'], tp['x_frente_plano'] + 0.01, G.Y_FLAT_O, G.Y_FLAT_O + e + lg['alto'], lg['z'][0], lg['z'][1]))
+    ring_usb = cyl_z(RO, 0, 0, 0, 100).cut(cyl_z(tp['cuerpos']['usb_r0'], 0, 0, -1, 101))
+    ring_sd = cyl_z(RO, 0, 0, 0, 100).cut(cyl_z(tp['cuerpos']['sd_r0'], 0, 0, -1, 101))
+    u = cs['usb_c']
+    m = 0.05
+    parts.append(box(u['x0'] + m, RO + 1, u['y'][0] + m, u['y'][1] - m, u['z_centro'] - u['medio_alto'] + m,
+                     u['z_centro'] + u['medio_alto'] - m).common(ring_usb).fuse(
+                 box(u['x_abierto'] + m, RO + 1, u['y'][0] + m, RO + 1, u['z_centro'] - u['medio_alto'] + m,
+                     u['z_centro'] + u['medio_alto'] - m).common(ring_usb)))
+    sd = cs['microsd']
+    parts.append(box(15.5 + m, RO + 1, sd['y'][0] + m, sd['y'][1] - m, G.SD_Z - sd['ancho'] / 2.0 + m,
+                     G.SD_Z + sd['ancho'] / 2.0 - m).common(ring_sd))
+    # Seta de anclaje: vastago por la pared y cabeza con cono de entrada por dentro.
+    an = tp['ancla']
+    a = math.radians(an['angulo'])
+    ux, uy = math.cos(a), math.sin(a)
+    def at(r):
+        return V(ux * r, uy * r, an['z'])
+    inward = V(-ux, -uy, 0)
+    # La cara de apoyo de la cabeza es plana y la pared curva: se mete 0.07 para que sus bordes no
+    # entren en la pared (a 1.7 del eje la pared esta 0.06 mas lejos).
+    r_seat = RI - 0.07
+    parts.append(Part.makeCylinder(an['vastago'] / 2.0, RO + 0.2 - r_seat, at(RO + 0.2), inward))
+    r_head = r_seat - an['cabeza_alto']
+    parts.append(Part.makeCylinder(an['cabeza_diametro'] / 2.0, an['cabeza_alto'], at(r_seat), inward))
+    parts.append(Part.makeCone(an['cabeza_diametro'] / 2.0, an['vastago'] / 2.0, an['cono'], at(r_head), inward))
+    body = fuse_all(parts)
+    bz = tp['bisagra']
+    body = body.cut(sector(RO + e + 1, RO + bz['espesor'], za - 1, zb + 1,
+                           bz['angulo'] - bz['ancho_grados'] / 2.0, bz['angulo'] + bz['ancho_grados'] / 2.0))
+    return clean(body)
 
 
 # --- Documento -------------------------------------------------------------------------
@@ -436,8 +482,7 @@ def main():
               ('03_antenna_cap', 'Tapa de antena', build_cap()),
               ('04_chassis', 'Chasis', build_chassis()),
               ('05_key_tpu', 'Tecla de TPU', build_key()),
-              ('06_usb_plug_tpu', 'Tapon de TPU del USB-C', build_plug('usb_c')),
-              ('07_sd_plug_tpu', 'Tapon de TPU de la microSD', build_plug('microsd'))]
+              ('06_port_cover_tpu', 'Tapa de puertos de TPU', build_port_cover())]
     doc = App.newDocument('TresVizo_V3_0')
     index = {'piezas': [], 'referencias': []}
     for name, label, shape in pieces:

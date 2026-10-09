@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/Users/cadaritre/Documents/TresVizo RTK/TresVizoRTK-hw-v03/hardware/main-board/kicad/tresvizo-main.kicad_sch")
-		(date "2026-10-08T07:03:06")
+		(date "2026-10-08T15:33:34")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")
@@ -446,21 +446,21 @@
 		)
 		(comp
 			(ref "C104")
-			(value "22uF")
+			(value "10uF")
 			(footprint "Capacitor_SMD:C_0805_2012Metric")
-			(description "22uF 25V X5R")
+			(description "10uF 25V X5R")
 			(fields
 				(field
-					(name "MPN") "CL21A226MAQNNNE")
+					(name "MPN") "CL21A106KAYNNNE")
 				(field
-					(name "LCSC") "C45783")
+					(name "LCSC") "C15850")
 				(field
 					(name "Footprint") "Capacitor_SMD:C_0805_2012Metric")
 				(field
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "22uF 25V X5R")
+					(name "Description") "10uF 25V X5R")
 			)
 			(libsource
 				(lib "Device")
@@ -469,11 +469,11 @@
 			)
 			(property
 				(name "MPN")
-				(value "CL21A226MAQNNNE")
+				(value "CL21A106KAYNNNE")
 			)
 			(property
 				(name "LCSC")
-				(value "C45783")
+				(value "C15850")
 			)
 			(property
 				(name "Sheetname")
@@ -578,21 +578,21 @@
 		)
 		(comp
 			(ref "C106")
-			(value "22uF")
+			(value "10uF")
 			(footprint "Capacitor_SMD:C_0805_2012Metric")
-			(description "22uF 25V X5R")
+			(description "10uF 25V X5R")
 			(fields
 				(field
-					(name "MPN") "CL21A226MAQNNNE")
+					(name "MPN") "CL21A106KAYNNNE")
 				(field
-					(name "LCSC") "C45783")
+					(name "LCSC") "C15850")
 				(field
 					(name "Footprint") "Capacitor_SMD:C_0805_2012Metric")
 				(field
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "22uF 25V X5R")
+					(name "Description") "10uF 25V X5R")
 			)
 			(libsource
 				(lib "Device")
@@ -601,11 +601,11 @@
 			)
 			(property
 				(name "MPN")
-				(value "CL21A226MAQNNNE")
+				(value "CL21A106KAYNNNE")
 			)
 			(property
 				(name "LCSC")
-				(value "C45783")
+				(value "C15850")
 			)
 			(property
 				(name "Sheetname")
@@ -644,21 +644,21 @@
 		)
 		(comp
 			(ref "C107")
-			(value "22uF")
+			(value "10uF")
 			(footprint "Capacitor_SMD:C_0805_2012Metric")
-			(description "22uF 25V X5R")
+			(description "10uF 25V X5R")
 			(fields
 				(field
-					(name "MPN") "CL21A226MAQNNNE")
+					(name "MPN") "CL21A106KAYNNNE")
 				(field
-					(name "LCSC") "C45783")
+					(name "LCSC") "C15850")
 				(field
 					(name "Footprint") "Capacitor_SMD:C_0805_2012Metric")
 				(field
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "22uF 25V X5R")
+					(name "Description") "10uF 25V X5R")
 			)
 			(libsource
 				(lib "Device")
@@ -667,11 +667,11 @@
 			)
 			(property
 				(name "MPN")
-				(value "CL21A226MAQNNNE")
+				(value "CL21A106KAYNNNE")
 			)
 			(property
 				(name "LCSC")
-				(value "C45783")
+				(value "C15850")
 			)
 			(property
 				(name "Sheetname")

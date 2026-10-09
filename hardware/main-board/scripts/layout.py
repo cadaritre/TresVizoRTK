@@ -67,7 +67,7 @@ def block(origin, rot, parts=None, tracks=None, vias=None):
 # ------------------------------------------------------------------------ cargador
 # BQ25798 en (0, 0) con los pines de potencia arriba (girado 0), como en el ejemplo de TI (hoja, 8.4):
 # - 100 nF de PMID (C108) sobre los pines 29 (PMID) y 27 (GND) y 100 nF de SYS (C112) junto al 25,
-#   con GND en T al pin 27; los 22 uF de PMID y de SYS en columnas a cada lado.
+#   con GND en T al pin 27; los 10 uF de PMID y los 22 uF de SYS en columnas a cada lado.
 # - SW1 y SW2 bajan por 3 vías cada uno bajo el chip y suben por B.Cu (1 mm) a la bobina, arriba.
 # - Bootstrap (C101 y C102) en la cara superior junto a sus pines (no hay cara inferior): su lado de
 #   SW baja por una vía y llega por B.Cu a la columna de vías de SW bajo el chip.
@@ -357,7 +357,7 @@ VIAS += _v
 # ------------------------------------------------------------- potencia prerruteada
 # VBUS (hasta ~2.2 A en 2S): el pad A4/B9 del USB-C sube por F.Cu (0.6 mm) al cátodo de la TVS (D101), y las dos
 # vías de cada pad de VBUS bajan a B.Cu, donde una pista de 0.8 mm junta los dos pads (rodeando el cruce de D-) y
-# va al 22 uF de entrada del cargador (C104), que sube por una vía de 0.8/0.4.
+# va al 10 uF de entrada del cargador (C104), que sube por una vía de 0.8/0.4.
 _UX = USBC_ORIGIN[0] + 3.58, USBC_ORIGIN[0] + 4.48    # columnas de las vías de VBUS junto a los pads del USB-C
 POWER_TRACKS = [
     ("VBUS", "F.Cu", 0.6, [(_UX[0], 52.6), (_UX[0], 49.95), (11.2, 49.35)]),
@@ -409,15 +409,16 @@ POWER_VIAS += [("VPACK", 10.95, 63.25, 0.8, 0.4), ("VPACK", 11.85, 63.45, 0.8, 0
 J102_GND_ZONE = [(11.55, 65.25), (15.85, 65.25), (15.85, 67.7), (20.25, 67.7), (20.25, 71.2), (11.55, 71.2)]
 POWER_VIAS += [("GND", 13.25, 65.6, 0.6, 0.3), ("GND", 13.1, 67.95, 0.6, 0.3), ("GND", 14.65, 67.95, 0.6, 0.3),
                ("GND", 15.9, 67.95, 0.6, 0.3)]
-# 5 V de la carrier (GNSS_5V, ~160 mA): de los 22 uF de salida del TPS63070 (C307) baja por In2 (0.4 mm, unos 12 mV
-# de caída) a lo largo de u 20.5, entre las piezas de la microSD y las del cargador, pasa bajo el botón hasta una vía
+# 5 V de la carrier (GNSS_5V, ~160 mA): de los 22 uF de salida del TPS63070 (C307) baja por In2 (0.6 mm desde el
+# endurecimiento del 08-10-2026, antes 0.4; en 0.5 oz, IPC-2221 da ~0.5 A con 10 C de subida, y son unos 43 mOhm)
+# a lo largo de u 20.5, entre las piezas de la microSD y las del cargador, pasa bajo el botón hasta una vía
 # junto al LED y por F.Cu llega al punto de prueba TP301 y a J301.1. Por B.Cu partía en dos el centro de la placa
 # (VBUS y VSYS no pueden ir por capas internas en el ruteo automático); si lo ruteaba el script, iba por el hueco del
 # USB-C, bajo su cuerpo.
 _g5u, _g5v = G5_ORIGIN[0] - 6.95, G5_ORIGIN[1] + 1.65        # pad de GNSS_5V de C307
 POWER_TRACKS += [
     ("GNSS_5V", "F.Cu", 0.4, [(_g5u, _g5v), (20.5, _g5v + 0.95)]),
-    ("GNSS_5V", "In2.Cu", 0.4, [(20.5, _g5v + 0.95), (20.5, 58.9), (21.0, 59.4), (22.7, 59.4), (23.3, 60.0), (23.3, 60.3)]),
+    ("GNSS_5V", "In2.Cu", 0.6, [(20.5, _g5v + 0.95), (20.5, 58.9), (21.0, 59.4), (22.7, 59.4), (23.3, 60.0), (23.3, 60.3)]),
     ("GNSS_5V", "F.Cu", 0.4, [(23.3, 60.3), (23.3, 61.6), (22.4, 62.5), (22.4, 62.6)]),
     ("GNSS_5V", "F.Cu", 0.4, [(22.4, 62.6), (22.5, 66.26)]),
 ]
@@ -438,14 +439,17 @@ POWER_TRACKS += [("GND", "F.Cu", 0.25, [(_gx + 1.4, _gy - 0.54), (_gx + 0.791, _
 POWER_VIAS += [("GND", _gx + 0.791, _gy - 2.395, 0.6, 0.3)]
 # VSYS (salida del cargador): del relleno de VSYS junto a C109/C110 sube por F.Cu a la entrada del TPS63070 (C301-C303),
 # pasando por el 10 uF de C111; al TPS62903, abajo, no hay paso por las capas externas (el abanico de la derecha del
-# cargador por F.Cu y el retorno de bootstrap de SW2 por B.Cu lo cierran), así que va por In2 (0.6 mm, menos de
-# 0.6 A en 1S) desde una vía en el relleno hasta otra junto a C116.
+# cargador por F.Cu y el retorno de bootstrap de SW2 por B.Cu lo cierran), así que va por In2 desde una vía en el
+# relleno hasta otra junto a C116. 1.2 mm desde el endurecimiento del 08-10-2026 (antes 0.6, corrido a u 31.2 para
+# pasar entre las vías de SDRV e INT): la entrada del TPS62903 puede llegar a ~0.75 A de pico (Wi-Fi, microSD y el
+# resto de 3.3 V); en 0.5 oz, IPC-2221 da ~0.83 A con 10 C de subida (0.6 mm: 0.5 A). Dos vías de 0.6/0.3 en el
+# relleno y una de 0.8/0.4 junto a C116 (antes una de 0.6/0.3 en cada punta; junto a C116 no hay sitio para dos).
 POWER_TRACKS += [
     ("VSYS", "F.Cu", 0.4, [(30.0, 43.2), (30.9, 42.3), (30.9, G5_ORIGIN[1] + 2.45), (31.4, G5_ORIGIN[1] + 1.95)]),
-    ("VSYS", "In2.Cu", 0.6, [(30.0, 44.0), (31.0, 45.0), (31.0, 55.55), (31.6, 56.15)]),
+    ("VSYS", "In2.Cu", 1.2, [(30.0, 43.1), (30.0, 44.0), (31.2, 45.2), (31.2, 55.75), (31.6, 56.15)]),
     ("VSYS", "F.Cu", 0.4, [(31.6, 56.15), (31.82, 56.95)]),
 ]
-POWER_VIAS += [("VSYS", 30.0, 44.0, 0.6, 0.3), ("VSYS", 31.6, 56.15, 0.6, 0.3)]
+POWER_VIAS += [("VSYS", 30.0, 44.0, 0.6, 0.3), ("VSYS", 30.0, 43.1, 0.6, 0.3), ("VSYS", 31.6, 56.15, 0.8, 0.4)]
 # ILIM (techo de entrada): sale por la derecha del cargador y su divisor (R101/R102) va a la izquierda, junto a REGN;
 # cruza bajo la fila de abajo del BQ25798 por B.Cu, entre las vías de SW y las de GND de los pines 10, 11 y 13.
 POWER_TRACKS += [

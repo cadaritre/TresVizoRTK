@@ -2,7 +2,7 @@
 
 ## v0.3 compacta (rama `hw/compact-v03`)
 
-La placa v0.3 va en el tubo de Ø52 × 100 con cara plana de `mechanical/v3.0`. Las medidas e
+La placa v0.3 va en el tubo de Ø56 × 111 con cara plana de `mechanical/v3.0`. Las medidas e
 interfaces están en [../research/v03-compacta.md](../research/v03-compacta.md). Ejes:
 
 - **z** = eje del bastón hacia arriba;
@@ -12,7 +12,7 @@ interfaces están en [../research/v03-compacta.md](../research/v03-compacta.md).
 | Archivo | Qué es |
 | --- | --- |
 | `export_board_step.py` | Exporta la placa con kicad-cli y la lleva a la carcasa con los datos de `../kicad/plugs.json` (x = x_u0 − u, y = y_back + h, z = z_top − v). Escribe `placa-principal.step`, con el PCB y un sólido por componente con su referencia, y `placa-principal.json`, con la caja de cada pieza. Corrige los modelos `.step` de LCSC a la posición de sus `.wrl` y valida que coincidan. Si a una huella le falta el modelo exportado, pone la caja de su `.wrl` y lo dice. Corre con el Python de FreeCAD |
-| `check_heights.py` | Comprueba que cada pieza del JSON quepa bajo el techo del tubo, min(cara plana, círculo de r 24.2), con 0.3 de aire, y fuera de la franja de 1 mm de los cantos. Corre con cualquier python 3 |
+| `check_heights.py` | Comprueba que cada pieza del JSON quepa bajo el tubo de `mechanical/v3.0`, con 0.5 de aire medido en radio, y fuera de la franja de 1 mm de los cantos. Lee el radio interior y la cara plana de `parameters.json` de la carcasa; las opciones permiten otros valores. Corre con cualquier python 3 |
 
 ```
 cd hardware/main-board

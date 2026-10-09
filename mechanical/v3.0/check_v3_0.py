@@ -50,7 +50,7 @@ parts = {o.Name.lstrip('_').replace('_', '-'): o.Shape for o in doc.Objects
          if hasattr(o, 'Shape') and not o.Shape.isNull() and not o.Name.startswith('ref_')}
 BASE, TUBE, CAP = parts['01-base'], parts['02-tube'], parts['03-antenna-cap']
 CHS, KEY = parts['04-chassis'], parts['05-key-tpu']
-PLUG_USB, PLUG_SD = parts['06-usb-plug-tpu'], parts['07-sd-plug-tpu']
+COVER = parts['06-port-cover-tpu']
 
 # --- Referencias ------------------------------------------------------------------------
 if args.board is None and not args.envelope and (G.MB_CAD / 'placa-principal.step').exists():
@@ -82,7 +82,10 @@ log('referencias:', len(refs), '| placa:', board_src, '| clavijas:', plug_src)
 MATES = [('carrier: SMA cañón', 'coaxial: clavija SMA de la carrier'),
          ('placa: J401', 'microsd: tarjeta puesta'),
          ('placa: componentes (envolvente h(x))', 'microsd: tarjeta puesta'),
-         ('antena: antena HA-901A', 'coaxial: coaxial (curva en S)'),
+         ('antena: antena HA-901A', 'coaxial: pasamuros SMA (fuera)'),
+         ('antena: antena HA-901A', 'coaxial: clavija SMA del cable'),
+         ('cables: cable NTC (cuerpo)', 'celdas:'),
+         ('cables: cable lengueta - del pack', 'celdas:'),
          ('cables: cable arnes_j301', 'carrier: arnés J301: cables por delante (8 agujeros)')]
 MATE_GROUPS = [('cables', 'clavijas')]
 
@@ -127,33 +130,53 @@ import build_v3_0 as B
 guard = {'sondas': G.wall_probes(TUBE, step=0.5)}
 wall_ref = G.wall_reference()
 rr_ = P['tubo']['ranuras_rieles']
-grooves = G.fuse_all([G.sector(rr_['radio'], G.RI - 0.5, rr_['z'][0], G.Z_TUBE1 + 1, a0, a1) for a0, a1 in rr_['angulos']])
-openings = G.fuse_all([B.front_openings(), B.side_openings(), B.screw_holes(), B.rebates()])
-expected = wall_ref.cut(grooves).fuse(B.rail_ledges()).fuse(B.cell_cradle()).cut(openings)
+groove_list = [G.sector(rr_['radio'], G.RI - 0.5, rr_['z'][0], G.Z_TUBE1 + 1, a0, a1) for a0, a1 in rr_['angulos']]
+openings = G.fuse_all([s_ for s_ in (B.front_openings(), B.side_openings(), B.screw_holes(), B.rebates(),
+                                     B.decorative_lines()) if s_ is not None])
+expected = wall_ref.cut(G.fuse_all(groove_list)) if groove_list else wall_ref
+expected = expected.fuse(B.rail_ledges()).fuse(B.cell_cradle()).cut(openings).fuse(G.logo_relief())
 v_tube, v_exp = TUBE.Volume, expected.Volume
 guard['volumen'] = {
     'tubo_mm3': round(v_tube, 1), 'esperado_mm3': round(v_exp, 1),
     'anillo_solido_mm3': round(wall_ref.Volume, 1),
     'diferencia_mm3': round(v_tube - v_exp, 1), 'diferencia_pct': round(100 * (v_tube - v_exp) / v_exp, 3),
     'tolerancia_pct': 0.5, 'ok': abs(v_tube - v_exp) <= 0.005 * v_exp,
-    '_nota': 'esperado = anillo solido (circulo R26 con la cara plana en y 22.13, hueco R24.2 con la cara plana interior en y 20.33 para |x| <= 13.65, z 4-96) - ranuras de los rieles - rebajes de las uniones + repisas + cuna - ventana con su bolsillo, tecla con su rebaje, LED, tunel USB-C, ranura microSD, rebaje de la una y tornillos.'}
+    '_nota': (f'esperado = anillo solido (circulo R{G.RO:g} con la cara plana en y {G.Y_FLAT_O:g}, hueco R{G.RI:g} con la cara '
+              f'plana interior en y {G.Y_FLAT_I:g} para |x| <= {G.X_FLAT:g}, z {G.Z_TUBE0:g}-{G.Z_TUBE1:g}) - rebajes de las uniones '
+              '+ apoyos del chasis + cuna - ventana con su bolsillo, tecla con su rebaje, LED, tunel USB-C, ranura microSD, '
+              'rebaje de la una, agujero del ancla de la tapa de puertos, tornillos y lineas decorativas + logo en relieve.')}
 # Espesor minimo de pared alrededor de las aberturas (rayos desde el contorno de secciones
-# horizontales; se ignoran 0.6 mm alrededor de las esquinas vivas). Minimo pedido: 0.6.
-side = (12.0, 27.0, 9.0, 23.0)
-front = (-14.5, 14.5, 19.0, 23.0)
-th = {'tunel USB-C': G.min_wall_thickness(TUBE, [19.0, 22.0, 25.0, 28.0, 31.0], side),
-      'ranura microSD y rebaje': G.min_wall_thickness(TUBE, [39.5, 41.0, 42.0, 45.0, 48.0, 49.0, 50.5], side),
-      'ventana OLED (bolsillo y chaflan)': G.min_wall_thickness(TUBE, [73.0, 75.0, 80.0, 86.0, 87.3], front),
-      'tecla y LED': G.min_wall_thickness(TUBE, [18.0, 20.0, 22.0, 24.0, 26.0], (-10.0, 10.0, 19.0, 23.0)),
-      'uniones (rebajes)': G.min_wall_thickness(TUBE, [4.5, 5.2, 94.8, 95.5], (-27, 27, -27, 23)),
-      'pared normal (z 60)': G.min_wall_thickness(TUBE, [60.0], (-27, 27, -27, 23))}
+# horizontales; se ignoran 0.6 mm alrededor de las esquinas vivas). Objetivo: 1.2 en general y no
+# menos de 1.0 en lo local (holguras.pared_minima / pared_local_minima); se listan los que no llegan.
+HOLG = P['holguras']
+RR = G.RO + 1.0
+side = (10.0, RR, 4.0, G.Y_FLAT_O + 1.0)
+front = (-G.X_FLAT - 1.5, G.X_FLAT + 1.5, G.Y_FLAT_I - 1.0, G.Y_FLAT_O + 1.0)
+whole = (-RR, RR, -RR, G.Y_FLAT_O + 1.0)
+_zsd = [round(G.SD_Z + d_, 2) for d_ in (-6.5, -5.0, -3.0, -1.0, 0.0, 1.0, 3.0, 5.0, 6.5)]
+# Solo la pared: se quitan los nervios, repisas y apoyos de dentro (no son pared; los nervios de la
+# cuna miden 1.6 a proposito).
+TUBE_WALL = TUBE.cut(G.interior(G.Z_TUBE0 - 1, G.Z_TUBE1 + 1, 0.05))
+_za = P['costado']['tapa_puertos']['ancla']['z']
+_wz = P['frente']['ventana_oled']['z']
+th = {'tunel USB-C': G.min_wall_thickness(TUBE_WALL, [18.6, 19.0, 22.0, 25.0, 28.0, 31.0, 31.4], side),
+      'ranura microSD y rebaje': G.min_wall_thickness(TUBE_WALL, _zsd, side),
+      'agujero del ancla de la tapa de puertos': G.min_wall_thickness(TUBE_WALL, [_za - 0.7, _za, _za + 0.7], side),
+      'ventana OLED (bolsillo y chaflan)': G.min_wall_thickness(TUBE_WALL, [_wz[0] - 0.5, _wz[0] + 1.0, 80.0, _wz[1] - 1.0, _wz[1] + 0.5], front),
+      'tecla y LED': G.min_wall_thickness(TUBE_WALL, [18.0, 20.0, 22.0, 24.0, 26.0], (-10.0, 10.0, G.Y_FLAT_I - 1.0, G.Y_FLAT_O + 0.5)),
+      'uniones (rebajes)': G.min_wall_thickness(TUBE_WALL, [G.Z_TUBE0 + 0.5, G.Z_TUBE0 + 1.2, G.Z_TUBE1 - 1.2, G.Z_TUBE1 - 0.5], whole),
+      'tornillos radiales de base y tapa': G.min_wall_thickness(TUBE_WALL, [P['base']['tornillos']['z'], P['tapa']['tornillos_z']], whole),
+      'pared normal y lineas decorativas (z 15, 60, 95)': G.min_wall_thickness(TUBE_WALL, [15.0, 60.0, 95.0], whole)}
 guard['espesor_minimo'] = {k: {'mm': v[0], 'donde': v[1]} for k, v in th.items()}
-guard['espesor_minimo_ok'] = all(v[0] >= 0.6 for v in th.values())
-guard['ok'] = (guard['sondas']['cara_plana']['ok'] and guard['sondas']['anillo']['ok'] and guard['volumen']['ok']
-               and guard['espesor_minimo_ok'])
+guard['espesor_por_debajo_de_1.2'] = {k: v[0] for k, v in th.items() if v[0] < HOLG['pared_minima']}
+guard['espesor_por_debajo_de_1.0'] = {k: v[0] for k, v in th.items() if v[0] < HOLG['pared_local_minima']}
+guard['espesor_minimo_ok'] = all(v[0] >= HOLG['pared_local_minima'] for v in th.values())
+# La guarda es la de pared que falta (sondas y volumen); el espesor se informa aparte.
+guard['ok'] = guard['sondas']['cara_plana']['ok'] and guard['sondas']['anillo']['ok'] and guard['volumen']['ok']
 report['guarda_pared_tubo'] = guard
 log('guarda de la pared:', {k: guard['sondas'][k]['sin_material'] for k in ('cara_plana', 'anillo')},
-    guard['volumen']['tubo_mm3'], 'vs', guard['volumen']['esperado_mm3'], 'ok' if guard['ok'] else 'FALLA')
+    guard['volumen']['tubo_mm3'], 'vs', guard['volumen']['esperado_mm3'], 'ok' if guard['ok'] else 'FALLA',
+    '| espesores:', {k: v['mm'] for k, v in guard['espesor_minimo'].items()})
 
 # --- 1. Posicion final ------------------------------------------------------------------
 names = sorted(parts)
@@ -167,7 +190,7 @@ report['choques_entre_piezas'] = pp
 pr = []
 # Piezas que ocupan el sitio de una referencia a proposito y nunca a la vez: el tapon del USB-C
 # va donde la funda de la clavija cuando no hay cable.
-ALTERNATIVES = [('06-usb-plug-tpu', 'usb: funda de la clavija')]
+ALTERNATIVES = [('06-port-cover-tpu', 'usb: funda de la clavija')]
 for pn in names:
     for rn, rs in refs.items():
         if (pn, rn) in ALTERNATIVES:
@@ -266,19 +289,27 @@ def sweep(moving, obstacles, vec, step=None):
     return found
 
 
-OBST_SLABS = {'02-tube': slabs(TUBE), '04-chassis': slabs(CHS)}
+# El logo en relieve esta fuera de la pared (y >= 22.9) y nada de dentro llega a el: los barridos
+# y las holguras usan el tubo sin el logo (mucho mas rapido). Las guardas y la posicion final, el tubo
+# entero.
+lgp = P['frente']['logo']
+TUBE_NL = TUBE.cut(box(-lgp['ancho'] / 2 - 0.2, lgp['ancho'] / 2 + 0.2, G.Y_FLAT_O - 0.01, G.Y_FLAT_O + lgp['relieve'] + 0.5,
+                       lgp['z_centro'] - 6.5, lgp['z_centro'] + 6.5))
+OBST_SLABS = {'02-tube': slabs(TUBE_NL), '04-chassis': slabs(CHS)}
 board_refs = {f'placa: {k}': v for k, v in board.items()}
 carrier_refs = {f'carrier: {k}': v for k, v in groups['carrier'].items()}
 cell_refs = {f'celdas: {k}': v for k, v in groups['celdas'].items()}
 sweeps = {}
 
 # a. Celdas por arriba (tapa quitada, chasis fuera, base puesta).
-sweeps['celdas_por_arriba'] = sweep(cell_refs, {'02-tube': TUBE, '01-base': BASE}, V(0, 0, 85))
+sweeps['celdas_por_arriba'] = sweep(cell_refs, {'02-tube': TUBE_NL, '01-base': BASE}, V(0, 0, 85))
 log('celdas:', sweeps['celdas_por_arriba'])
 # b. Carrier al chasis por abajo (los labios de los ganchos se apartan: no cuentan).
 gk = P['chasis']['ganchos']
-hook_zone = box(-17.5, -15.0, gk['y'][0] - 0.5, gk['y'][1] + 0.5, gk['labio_z'][0] - 0.5, gk['labio_z'][1] + 0.01)
-hook_zone = hook_zone.fuse(box(15.0, 17.5, gk['y'][0] - 0.5, gk['y'][1] + 0.5, gk['labio_z'][0] - 0.5, gk['labio_z'][1] + 0.01))
+_ca, _hh = P['carrier'], P['chasis']['ranura_carrier']['holgura']
+_lz = (_ca['z'][0] - _hh - 0.8, _ca['z'][0] - _hh)
+hook_zone = box(-17.8, -14.8, gk['y'][0] - 0.5, gk['y'][1] + 0.5, _lz[0] - 0.5, _lz[1] + 0.01)
+hook_zone = hook_zone.fuse(box(14.8, 17.8, gk['y'][0] - 0.5, gk['y'][1] + 0.5, _lz[0] - 0.5, _lz[1] + 0.01))
 chs_no_hooks = CHS.cut(hook_zone)
 OBST_SLABS['chasis sin labios de gancho'] = slabs(chs_no_hooks)
 sweeps['carrier_al_chasis_por_abajo'] = sweep(carrier_refs, {'chasis sin labios de gancho': chs_no_hooks}, V(0, 0, -60))
@@ -307,8 +338,9 @@ def wrench_at(angle_deg):
     return w
 
 
-obst = {'04-chassis': CHS, 'coaxial: cuerpo de la clavija': G.cyl_z(cxp['cuerpo']['diametro'] / 2.0, nx, ny,
-        cxp['tuerca']['z0'] + cxp['tuerca']['largo'], cxp['tuerca']['z0'] + cxp['tuerca']['largo'] + cxp['cuerpo']['largo'])}
+_ntz = cxp['tuerca']
+obst = {'04-chassis': CHS, 'coaxial: cuerpo acodado de la clavija': coax_refs['clavija SMA de la carrier'].cut(
+    box(-40, 40, -40, 40, _ntz['z0'] - 1, _ntz['z0'] + _ntz['largo']))}
 obst.update(carrier_refs)
 sweeps['llave_por_delante_sin_placa'] = sweep({'llave fija de 8 (envolvente)': wrench_at(0)}, obst, V(0, 30, 0))
 for ang in (-30, 30):
@@ -329,10 +361,13 @@ log('placa:', sweeps['placa_al_chasis_por_abajo'])
 assembly = {'04-chassis': CHS, 'coaxial: clavija SMA (tuerca Ø9.2 y cuerpo)': plug_sh}
 assembly.update(board_refs)
 assembly.update(carrier_refs)
+# El arnes de J301 va de la carrier a la placa: entra y sale con el chasis armado.
+assembly['cables: cable arnes_j301'] = groups['cables']['cable arnes_j301']
 batt = {f'cables: {k}': v for k, v in groups['cables'].items() if 'bateria' in k}
-obst = {'02-tube': TUBE, '01-base': BASE}
+obst = {'02-tube': TUBE_NL, '01-base': BASE}
 obst.update(cell_refs)
 obst.update(batt)
+obst['06-port-cover-tpu'] = COVER
 sweeps['chasis_armado_por_arriba_sin_tecla'] = sweep(assembly, obst, V(0, 0, 92))
 log('chasis armado sin tecla:', sweeps['chasis_armado_por_arriba_sin_tecla'])
 obst_k = {'05-key-tpu': KEY}
@@ -341,7 +376,7 @@ log('chasis armado con tecla:', sweeps['chasis_armado_con_tecla_puesta'])
 # f. Base por abajo (con la tuerca y el reten), con todo lo de dentro puesto.
 base_mov = {'01-base': BASE}
 base_mov.update({f'tuerca: {k}': v for k, v in groups['tuerca'].items() if 'perno' not in k})
-obst = {'02-tube': TUBE, '04-chassis': CHS}
+obst = {'02-tube': TUBE_NL, '04-chassis': CHS}
 obst.update(board_refs)
 obst.update(carrier_refs)
 obst.update(cell_refs)
@@ -352,23 +387,31 @@ log('base:', sweeps['base_por_abajo'])
 # g. Tapa con la antena atornillada, por arriba (con sus topes de las celdas y su labio).
 cap_mov = {'03-antenna-cap': CAP}
 cap_mov.update({f'antena: {k}': v for k, v in groups['antena'].items()})
-obst = {'02-tube': TUBE, '04-chassis': CHS, 'coaxial: clavija SMA (tuerca Ø9.2 y cuerpo)': plug_sh}
+cap_mov.update({f'coaxial: {k}': v for k, v in coax_refs.items() if 'pasamuros' in k or 'antena hembra' in k})
+obst = {'02-tube': TUBE_NL, '04-chassis': CHS, 'coaxial: clavija SMA (tuerca Ø9.2 y cuerpo)': plug_sh}
 obst.update(board_refs)
 obst.update(cell_refs)
 obst.update(batt)
 sweeps['tapa_por_arriba'] = sweep(cap_mov, obst, V(0, 0, 20))
 log('tapa:', sweeps['tapa_por_arriba'])
 # h. Tecla entera por fuera (la pestana va en el rebaje exterior: entra y sale por fuera).
-obst = {'02-tube': TUBE}
+obst = {'02-tube': TUBE_NL}
 obst.update(board_refs)
 sweeps['tecla_por_fuera'] = sweep({'05-key-tpu': KEY}, obst, V(0, 12, 0))
 # i. Tarjeta microSD por el costado +X.
 sweeps['tarjeta_por_el_costado'] = sweep({'microsd: tarjeta': G.microsd_card()},
-                                         {'02-tube': TUBE, '04-chassis': CHS, 'placa: PCB': board['PCB']}, V(15, 0, 0))
-# j. Tapones de TPU por fuera (hacia +X).
-obst = {'02-tube': TUBE, '04-chassis': CHS, 'microsd: tarjeta puesta': G.microsd_card()}
+                                         {'02-tube': TUBE_NL, '04-chassis': CHS, 'placa: PCB': board['PCB']}, V(15, 0, 0))
+# j. Tapa de puertos por fuera: la parte de delante de la bisagra (ala, cuerpos y lengueta) sale
+#    hacia +X; la seta queda en su agujero.
+tpp = P['costado']['tapa_puertos']
+# La cabeza de la seta (r < RI, de unos 15 a 23 grados) se queda en su sitio: la parte movil empieza
+# en la bisagra y en r RI (los cuerpos de TPU estan en r >= 25.65).
+_front_zone = G.sector(40, G.RI - 0.01, -1, 101, tpp['bisagra']['angulo'], 90)
+COVER_FRONT = COVER.common(_front_zone)
+COVER_ANCHOR = COVER.cut(_front_zone)
+obst = {'02-tube': TUBE_NL, '04-chassis': CHS, 'microsd: tarjeta puesta': G.microsd_card()}
 obst.update(board_refs)
-sweeps['tapones_por_fuera'] = sweep({'06-usb-plug-tpu': PLUG_USB, '07-sd-plug-tpu': PLUG_SD}, obst, V(12, 0, 0))
+sweeps['tapa_de_puertos_por_fuera'] = sweep({'06-port-cover-tpu (delante de la bisagra)': COVER_FRONT}, obst, V(12, 0, 0))
 report['barridos'] = sweeps
 log('barridos:', {k: len(v) for k, v in sweeps.items()})
 
@@ -376,22 +419,22 @@ log('barridos:', {k: len(v) for k, v in sweeps.items()})
 # --- 3. Holguras y radio del chasis armado -------------------------------------------------
 comp_shapes = [v for k, v in board.items() if k != 'PCB' and 'tornillos' not in k]
 pairs = {
-    'chasis-tubo (contacto: pie de los rieles en sus repisas, z 9.5)': gap(CHS, TUBE),
-    'chasis-tubo por encima de las repisas (z > 9.6)': gap(CHS, TUBE.common(box(-60, 60, -60, 60, 9.6, 200))),
+    'chasis-tubo (contacto: pie de los rieles en sus repisas, z 9.5)': gap(CHS, TUBE_NL),
+    'chasis-tubo por encima de las repisas (z > 9.6)': gap(CHS, TUBE_NL.common(box(-60, 60, -60, 60, 9.6, 200))),
     'chasis-celdas': min_gap(CHS, cell_refs.values()),
     'chasis-PCB de la placa': gap(CHS, board['PCB']),
     'chasis-componentes de la placa y OLED': min_gap(CHS, comp_shapes),
     'chasis-carrier (contactos: topes z 69 y ganchos z 17)': min_gap(CHS, carrier_refs.values()),
     'chasis-base': gap(CHS, BASE),
     'chasis-tapa': gap(CHS, CAP),
-    'tubo-celdas (contacto: repisas, z 17.5)': min_gap(TUBE, cell_refs.values()),
-    'tubo-celdas por encima de las repisas (nervios)': min_gap(TUBE.common(box(-60, 60, -60, 60, 17.6, 200)), cell_refs.values()),
-    'tubo-PCB de la placa': gap(TUBE, board['PCB']),
-    'tubo-componentes de la placa y OLED': min_gap(TUBE, comp_shapes),
-    'tubo-funda USB-C': gap(TUBE, groups['usb']['funda de la clavija']),
-    'tubo-tarjeta microSD': gap(TUBE, groups['microsd']['tarjeta puesta']),
+    'tubo-celdas (contacto: repisas, z 17.5)': min_gap(TUBE_NL, cell_refs.values()),
+    'tubo-celdas por encima de las repisas (nervios)': min_gap(TUBE_NL.common(box(-60, 60, -60, 60, 17.6, 200)), cell_refs.values()),
+    'tubo-PCB de la placa': gap(TUBE_NL, board['PCB']),
+    'tubo-componentes de la placa y OLED': min_gap(TUBE_NL, comp_shapes),
+    'tubo-funda USB-C': gap(TUBE_NL, groups['usb']['funda de la clavija']),
+    'tubo-tarjeta microSD': gap(TUBE_NL, groups['microsd']['tarjeta puesta']),
     'tapa-OLED': min_gap(CAP, [v for k, v in board.items() if 'OLED' in k]),
-    'tapa-coaxial': gap(CAP, coax_refs['coaxial (curva en S)']),
+    'tapa-coaxial (recorrido)': gap(CAP, coax_refs['coaxial (recorrido)']),
     'tapa-celdas': min_gap(CAP, cell_refs.values()),
     'base-clavijas': min_gap(BASE, plug_refs.values()),
     'base-PCB de la placa': gap(BASE, board['PCB']),
@@ -402,19 +445,246 @@ pairs = {
     'tecla-componentes de la placa': min_gap(KEY, [v for k, v in board.items() if k not in ('SW401',)]),
     'carrier-PCB de la placa': min_gap(board['PCB'], carrier_refs.values()),
     'carrier (patas del SMA)-celdas': min_gap(groups['carrier']['patas del SMA (atrás)'], cell_refs.values()),
-    'cables (reservas)-piezas': min([gap(c, p) for c in groups['cables'].values() for p in (TUBE, CHS, BASE, CAP)]),
-    'tuerca SMA (barrido Ø9.2)-chasis (pedido >= 0.5)': gap(CHS, coax_refs['clavija SMA de la carrier']),
+    'cables (reservas)-piezas': min([gap(c, p) for c in groups['cables'].values() for p in (TUBE_NL, CHS, BASE, CAP)]),
     'tuerca SMA-PCB con la muesca': gap(coax_refs['clavija SMA de la carrier'], board['PCB']),
-    'coaxial (bucle de servicio)-piezas': min(gap(coax_refs['coaxial: bucle de servicio'], p) for p in (TUBE, CHS, CAP)),
+    'coaxial (recorrido)-piezas': min(gap(coax_refs['coaxial (recorrido)'], p) for p in (TUBE_NL, CHS, CAP, BASE)),
+    'coaxial (recorrido)-celdas': min_gap(coax_refs['coaxial (recorrido)'], cell_refs.values()),
+    'coaxial (recorrido)-placa y OLED': min_gap(coax_refs['coaxial (recorrido)'], board.values()),
+    'clavija SMA acodada-chasis (pedido >= 0.5)': gap(CHS, coax_refs['clavija SMA de la carrier']),
+    'cables (reservas)-celdas': min_gap(G.fuse_all([v for k, v in groups['cables'].items() if 'NTC' not in k and 'lengueta' not in k]), cell_refs.values()),
+    'cables (reservas)-placa y carrier': min_gap(G.fuse_all([v for k, v in groups['cables'].items() if 'arnes' not in k]),
+                                                 [v for v in list(board.values()) + list(carrier_refs.values())]),
     'perno del baston (15.5)-soldaduras de la carrier': min_gap(groups['tuerca']['perno del baston (rosca maxima)'],
                                                               [v for k, v in groups['carrier'].items() if 'soldaduras' in k]),
     'perno del baston (15.5)-celdas': min_gap(groups['tuerca']['perno del baston (rosca maxima)'], cell_refs.values()),
     'guia de luz-componentes de la placa': min_gap(groups['frente']['guia de luz del LED'],
                                                    [v for k, v in board.items() if k != 'PCB' and 'OLED' not in k]),
-    'tapones TPU-chasis': min(gap(PLUG_USB, CHS), gap(PLUG_SD, CHS)),
-    'tapon microSD-tarjeta': gap(PLUG_SD, groups['microsd']['tarjeta puesta']),
+    'tapa de puertos-chasis': gap(COVER, CHS),
+    'tapa de puertos-tarjeta': gap(COVER, groups['microsd']['tarjeta puesta']),
 }
+
+
+def slab_gap(a, b, z0, z1):
+    """Holgura entre las partes de a y b dentro de la rebanada z0-z1 (quita los apoyos de fuera)."""
+    sl = box(-60, 60, -60, 60, z0, z1)
+    try:
+        aa, bb = a.common(sl), b.common(sl)
+    except Exception:
+        return None
+    return gap(aa, bb) if aa.Solids and bb.Solids else None
+
+
+_zt = P['placa']['z'][1]
+RAIL_ZONE = box(15.5, 30, 11.5, 18.0, 9.0, _zt - 0.1).fuse(box(-30, -15.5, 11.5, 18.0, 9.0, _zt - 0.1))
+RAILS = CHS.common(RAIL_ZONE)
+_ant = P['antena']
+_zc = G.Z_TUBE1 + _ant['avellanado_cabeza']
+_kr = P['frente']['tecla']['rebaje']['hondo']
+_cx_in = {k: v for k, v in coax_refs.items() if 'dentro' in k or 'antena hembra' in k}
+pairs.update({
+    'chasis-componentes de la carrier (sin su PCB)': min_gap(CHS, [v for k, v in carrier_refs.items() if not k.endswith('PCB')]),
+    'rieles-PCB de la placa (sin el tope de z 80 ni los salientes)': gap(RAILS, board['PCB']),
+    'tapa bajo el canto del tubo (labio y lenguetas)-tubo': slab_gap(CAP, TUBE_NL, G.Z_TUBE1 - 15, G.Z_TUBE1 - 0.02),
+    'base sobre el canto del tubo (labio, lenguetas, saliente)-tubo': slab_gap(BASE, TUBE_NL, G.Z_TUBE0 + 0.02, 30),
+    'tecla-tubo (sin la pestana pegada)': gap(KEY.common(box(-20, 20, -60, G.Y_FLAT_O - _kr - 0.05, 0, 200)), TUBE_NL),
+    'tapa-tornillos de la antena (radial, en su rebaje)': slab_gap(CAP, groups['antena']['tornillos M2.5 de la antena'],
+                                                                   G.Z_TUBE1 + 0.1, _zc - 0.1),
+    'tapa-tuerca del pasamuros (radial, en su bolsillo)': (slab_gap(CAP, coax_refs['pasamuros SMA (dentro)'], G.Z_TUBE1 + 0.1,
+                                                                    G.H_TOTAL - _ant['conector']['pasamuros']['panel'] - 0.1)
+                                                           if 'pasamuros SMA (dentro)' in coax_refs else None),
+    'conector de la tapa (dentro)-placa, OLED y celdas': min_gap(G.fuse_all(list(_cx_in.values())), list(board.values()) + list(cell_refs.values())),
+    'coaxial (recorrido)-cables': min_gap(coax_refs['coaxial (recorrido)'], groups['cables'].values()),
+    'clavija SMA acodada-celdas': min_gap(coax_refs['clavija SMA de la carrier'], cell_refs.values()),
+    'clavija SMA acodada-placa y OLED (sin la muesca)': min_gap(coax_refs['clavija SMA de la carrier'],
+                                                                [v for k, v in board.items() if k != 'PCB']),
+    'tuerca del baston-placa y carrier': min_gap(groups['tuerca']['tuerca 5/8-11'], list(board.values()) + list(carrier_refs.values())),
+})
 report['holguras'] = pairs
+log('holguras:', {k: v for k, v in pairs.items()})
+
+# --- 3b. Holguras laterales durante los barridos verticales ---------------------------------
+# En un barrido vertical cada seccion horizontal de la pieza movil (a z_m en su sitio) pasa por
+# todas las alturas z_m + t del recorrido. La holgura lateral minima del barrido es la distancia 2D
+# minima entre una seccion de la pieza y una del obstaculo (a z_o) con z_o - z_m dentro del
+# recorrido. Secciones cada 0.5 mm, a mitad de paso (no caen en caras planas). Los choques los
+# mide el barrido de arriba; aqui solo la holgura, y solo por debajo de SWEEP_CAP.
+import numpy as np
+SEC = {}
+SWEEP_CAP = 2.0
+PRINTED = ('01-base', '02-tube', '03-antenna-cap', '04-chassis', '05-key-tpu', '06-port-cover-tpu',
+           'chasis sin labios de gancho')
+
+
+def sections(name, shape, dz=0.5, ds=0.05):
+    """Secciones horizontales de una forma a mitad de cada paso dz: [(z, puntos del contorno cada ds)]."""
+    if name in SEC:
+        return SEC[name]
+    bb = shape.BoundBox
+    out = []
+    pieces = OBST_SLABS.get(name) or [shape]       # rebanadas de 10 mm: cada corte sale mas barato
+    z = math.floor(bb.ZMin / dz) * dz + dz / 2.0
+    while z < bb.ZMax:
+        src = next((q_ for q_ in pieces if q_.BoundBox.ZMin <= z <= q_.BoundBox.ZMax), None)
+        try:
+            polys = [np.array(p_) for p_ in G.section_polygons(src, z, ds) if len(p_) > 1] if src is not None else []
+        except Exception:
+            polys = []
+        if polys:
+            out.append((z, np.vstack(polys)))
+        z += dz
+    SEC[name] = out
+    return out
+
+
+TREES = {}
+
+
+def lateral_sweep_gap(moving, obstacles, L, cap=SWEEP_CAP):
+    """{(movil, obstaculo): holgura lateral minima} de las parejas que se acercan a menos de cap.
+    Distancia entre puntos de los contornos (cada 0.05 mm: error de unas centesimas) con un KD-tree
+    por seccion del obstaculo; cada seccion del obstaculo se compara con todas las de la pieza movil
+    que pasan por su altura durante el recorrido."""
+    from scipy.spatial import cKDTree
+    lo, hi = (0.0, L) if L > 0 else (L, 0.0)
+    res = {}
+    for on, os_ in obstacles.items():
+        ob = os_.BoundBox
+        cand = {mn: ms for mn, ms in moving.items()
+                if not (ms.BoundBox.XMin - cap > ob.XMax or ob.XMin - cap > ms.BoundBox.XMax
+                        or ms.BoundBox.YMin - cap > ob.YMax or ob.YMin - cap > ms.BoundBox.YMax
+                        or ms.BoundBox.ZMax + hi < ob.ZMin or ms.BoundBox.ZMin + lo > ob.ZMax)}
+        if not cand:
+            continue
+        SO = sections(on, os_)
+        if on not in TREES:
+            TREES[on] = [cKDTree(pts) for _, pts in SO]
+        trees = TREES[on]
+        for mn, ms in cand.items():
+            SM = sections(mn, ms)
+            if not SM:
+                continue
+            zm = np.array([q_[0] for q_ in SM])
+            pts_all = np.vstack([q_[1] for q_ in SM])
+            offs = np.cumsum([0] + [len(q_[1]) for q_ in SM])
+            best = None
+            for j, (zo, opts) in enumerate(SO):
+                i0_ = np.searchsorted(zm, zo - hi - 1e-9, side='left')
+                i1_ = np.searchsorted(zm, zo - lo + 1e-9, side='right')
+                if i1_ <= i0_:
+                    continue
+                P_ = pts_all[offs[i0_]:offs[i1_]]
+                omin, omax = opts.min(0) - cap, opts.max(0) + cap
+                sel = P_[(P_[:, 0] >= omin[0]) & (P_[:, 0] <= omax[0]) & (P_[:, 1] >= omin[1]) & (P_[:, 1] <= omax[1])]
+                if not len(sel):
+                    continue
+                d = float(trees[j].query(sel, k=1, distance_upper_bound=cap)[0].min())
+                if d < cap and (best is None or d < best):
+                    best = d
+            if best is not None:
+                res[(mn, on)] = round(best, 3)
+    return res
+
+
+def category(mn, on):
+    names = (mn, on)
+    if mn.startswith(PRINTED) and on.startswith(PRINTED):
+        return 'impresas'
+    if 'placa: PCB' in names and any(n.startswith('04-chassis: salientes') for n in names):
+        return 'contacto a proposito (placa contra los salientes)'
+    if 'placa: PCB' in names and any(n.startswith('04-chassis: rieles') for n in names):
+        return 'rieles'
+    if 'carrier: PCB' in names and any(n.startswith(('chasis sin labios', '04-chassis')) for n in names):
+        return 'carrier-ranuras'
+    return 'compradas'
+
+
+T3 = time.time()
+lat = {}
+lat['celdas_por_arriba'] = lateral_sweep_gap(cell_refs, {'02-tube': TUBE_NL, '01-base': BASE}, 85)
+lat['carrier_al_chasis_por_abajo'] = lateral_sweep_gap(carrier_refs, {'chasis sin labios de gancho': chs_no_hooks}, -60)
+_o = {'04-chassis': CHS}
+_o.update(carrier_no_barrel)
+lat['clavija_sma_por_arriba_sin_placa'] = lateral_sweep_gap({'coaxial: clavija SMA (tuerca Ø9.2 y cuerpo)': plug_sh}, _o, 25)
+_sx, _sz = P['chasis']['salientes']['x'], P['chasis']['salientes']['z']
+_bz = G.fuse_all([box(sg_ * _sx - 3.0, sg_ * _sx + 3.0, 7.5, 13.9, _sz - 3.0, _sz + 3.0) for sg_ in (-1, 1)])
+_o = {'04-chassis: rieles': RAILS, '04-chassis: salientes M2': CHS.common(_bz), '04-chassis: resto': CHS.cut(RAIL_ZONE).cut(_bz),
+      'coaxial: clavija SMA (tuerca Ø9.2 y cuerpo)': plug_sh}
+_o.update(carrier_refs)
+lat['placa_al_chasis_por_abajo'] = lateral_sweep_gap(board_mov, _o, -92)
+_o = {'02-tube': TUBE_NL, '01-base': BASE, '06-port-cover-tpu': COVER}
+_o.update(cell_refs)
+_o.update(batt)
+lat['chasis_armado_por_arriba_sin_tecla'] = lateral_sweep_gap(assembly, _o, 92)
+_o = {'02-tube': TUBE_NL, '04-chassis': CHS}
+for _g in (board_refs, carrier_refs, cell_refs, {f'clavijas: {k}': v for k, v in plug_refs.items()},
+           {f'cables: {k}': v for k, v in groups['cables'].items()}):
+    _o.update(_g)
+lat['base_por_abajo'] = lateral_sweep_gap(base_mov, _o, -20)
+_o = {'02-tube': TUBE_NL, '04-chassis': CHS, 'coaxial: clavija SMA (tuerca Ø9.2 y cuerpo)': plug_sh}
+for _g in (board_refs, cell_refs, batt):
+    _o.update(_g)
+lat['tapa_por_arriba'] = lateral_sweep_gap(cap_mov, _o, 20)
+lat_min = {}
+for sw, dd in lat.items():
+    for (mn, on), v in dd.items():
+        c = category(mn, on)
+        if c not in lat_min or v < lat_min[c]['mm']:
+            lat_min[c] = {'mm': v, 'barrido': sw, 'movil': mn, 'obstaculo': on}
+report['holguras_laterales_en_barridos'] = {
+    'minimos_por_categoria': lat_min,
+    'por_barrido': {sw: [{'movil': mn, 'obstaculo': on, 'mm': v} for (mn, on), v in sorted(dd.items(), key=lambda kv: kv[1])[:12]]
+                    for sw, dd in lat.items()},
+    '_nota': (f'Holgura lateral minima de cada barrido vertical (secciones cada 0.5 mm); solo parejas a menos de {SWEEP_CAP} mm, '
+              'las 12 mas justas por barrido. Contactos a proposito: placa contra los salientes (y 13.8).')}
+log('holguras laterales en barridos (%.0f s):' % (time.time() - T3), lat_min)
+
+# Tapa de puertos: holguras de la cabeza de la seta por dentro (en su sitio y al bajar o subir el
+# chasis: columna vertical de la cabeza contra el chasis armado) y tapa abierta en la bisagra.
+an = tpp['ancla']
+head = COVER_ANCHOR.common(G.cyl_z(G.RI - 0.01, 0, 0, 0, 100))
+# Planta de la cabeza (cilindro y cono de eje horizontal): su seccion por el plano de su eje, z del
+# ancla, extruida a todo lo alto. Es lo que barre el chasis al subir o bajar.
+_hw = head.slice(V(0, 0, 1), an['z'])
+_hf = Part.Face(Part.Wire(_hw[0].Edges)) if len(_hw) == 1 else Part.makeFace(_hw, 'Part::FaceMakerBullseye')
+_hf.translate(V(0, 0, -10 - an['z']))
+column = _hf.extrude(V(0, 0, 120))
+asm_parts = {'04-chassis': CHS, 'coaxial: clavija SMA': coax_refs['clavija SMA de la carrier']}
+asm_parts.update(board_refs)
+asm_parts.update(carrier_refs)
+fixed = dict(cell_refs)
+fixed.update(batt)
+fixed['01-base'] = BASE
+fixed['02-tube (sin la pared del agujero)'] = TUBE_NL.cut(G.cyl_z(G.RO + 1, 0, 0, an['z'] - 4, an['z'] + 4).cut(G.cyl_z(G.RI - 0.3, 0, 0, an['z'] - 5, an['z'] + 5)))
+fixed_gap = {k: gap(head, v) for k, v in fixed.items()}
+ha = math.radians(tpp['bisagra']['angulo'])
+Hh = V(G.RO * math.cos(ha), G.RO * math.sin(ha), 0)
+plb = P['placa']
+over_path = box(plb['usb_c']['boca_x'], 60, plb['funda_usb']['y_centro'] - plb['funda_usb']['alto'] / 2,
+                plb['funda_usb']['y_centro'] + plb['funda_usb']['alto'] / 2,
+                plb['usb_c']['z'] - plb['funda_usb']['ancho'] / 2, plb['usb_c']['z'] + plb['funda_usb']['ancho'] / 2)
+tj = plb['tarjeta']
+zc_sd = G.SD_Z
+card_path = box(tj['x_fuera'] - tj['largo'], 60, tj['y0'], tj['y0'] + tj['espesor'], zc_sd - tj['ancho'] / 2, zc_sd + tj['ancho'] / 2)
+opened = {}
+for ang in (135, 180):
+    fr = COVER_FRONT.copy()
+    fr.rotate(Hh, V(0, 0, 1), -ang)
+    opened[str(ang)] = {'funda_mm3': round(common_vol(fr, over_path), 3), 'funda_holgura': gap(fr, over_path),
+                        'tarjeta_mm3': round(common_vol(fr, card_path), 3), 'tarjeta_holgura': gap(fr, card_path)}
+report['tapa_de_puertos'] = {
+    'ancla': {'angulo': an['angulo'], 'z': an['z'], 'agujero': an['agujero']},
+    'cabeza_en_su_sitio_mm': fixed_gap,
+    'cabeza_al_barrer_el_chasis_mm': min_gap(column, asm_parts.values()),
+    'pared_entre_el_agujero_y_otras_aberturas_mm': {
+        'tunel USB-C': gap(B.radial_hole(an['angulo'], an['z'], an['agujero'], G.RO + 1.0, G.RI - 0.5),
+                           box(P['costado']['usb_c']['x0'], 30, P['costado']['usb_c']['y'][0], 30, 18.5, 31.5)),
+        'ranura microSD': gap(B.radial_hole(an['angulo'], an['z'], an['agujero'], G.RO + 1.0, G.RI - 0.5),
+                              box(15.5, 30, P['costado']['microsd']['y'][0], P['costado']['microsd']['y'][1], zc_sd - 6, zc_sd + 6)),
+        'lineas decorativas': gap(B.radial_hole(an['angulo'], an['z'], an['agujero'], G.RO + 1.0, G.RI - 0.5),
+                                  B.decorative_lines())},
+    'abierta_girada_en_la_bisagra': opened,
+    '_nota': 'Abierta: la parte de delante de la bisagra girada como solido rigido; en la realidad el TPU se dobla. Con 135 grados o mas deja libres la funda del USB-C (12.35 x 6.5) y la tarjeta.'}
+log('tapa de puertos:', report['tapa_de_puertos']['cabeza_al_barrer_el_chasis_mm'], opened)
 
 # Antena del ESP32-S3-WROOM-1 (U201): los ultimos 6 mm del modulo, en el canto -X. Como en V2.3,
 # nada de plastico del chasis a menos de 5 mm (zona = caja de la antena desplazada 5 mm).
@@ -428,7 +698,7 @@ report['antena_wroom'] = {
     'piezas_dentro': [[round(v, 2) for v in (q.BoundBox.XMin, q.BoundBox.XMax, q.BoundBox.YMin, q.BoundBox.YMax,
                                               q.BoundBox.ZMin, q.BoundBox.ZMax)] + [round(q.Volume, 1)] for q in (c5.Solids if c5.Solids else [])],
     'chasis_a_la_antena_mm': gap(CHS, ant),
-    'tubo_a_la_antena_mm': gap(TUBE, ant),
+    'tubo_a_la_antena_mm': gap(TUBE_NL, ant),
     'U201_en_el_STEP': [round(v, 2) for v in (board['U201'].BoundBox.XMin, board['U201'].BoundBox.XMax,
                                             board['U201'].BoundBox.ZMin, board['U201'].BoundBox.ZMax)] if 'U201' in board else None,
     '_nota': 'Lo que queda dentro de los 5 mm es el saliente M2 de la OLED del lado -X, detras de la placa (y 8-13.8, z 67.7-72.7): no se puede mover. El tubo (la pared) no cuenta.'}
@@ -448,8 +718,8 @@ report['placa_detras_del_dorso_frente_al_SMA'] = {'zona': db, 'piezas': bh, 'ok'
                                                                 if args.board and not args.envelope else None)}
 log('detras del dorso frente al SMA:', bh if bh else 'nada')
 
-# Holguras a la cara plana del tubo (pared de y 20.33 a 22.13 en |x| <= 13.65), pieza a pieza.
-front_wall = TUBE.common(box(-G.X_FLAT, G.X_FLAT, G.Y_FLAT_I - 0.5, G.Y_FLAT_O + 1, 0, 100))
+# Holguras a la cara plana del tubo (pared de y 20.5 a 22.9 en |x| <= 15.33), pieza a pieza.
+front_wall = TUBE_NL.common(box(-G.X_FLAT, G.X_FLAT, G.Y_FLAT_I - 0.5, G.Y_FLAT_O + 1, 0, G.Z_TUBE1 + 1))   # sin el logo (por fuera): mucho mas rapido
 fw = {
     'vidrio OLED (y 20.0)': gap(front_wall, board['OLED vidrio']) if 'OLED vidrio' in board else None,
     'OLED: PCB, cinta y tornillos': min_gap(front_wall, [v for k, v in board.items() if 'OLED' in k and 'vidrio' not in k]),
@@ -457,7 +727,7 @@ fw = {
     'clavijas (y 19.8)': min_gap(front_wall, plug_refs.values()),
     'tecla: pestana contra la cara interior (contacto)': gap(front_wall, KEY),
     'tecla: volumen dentro de la pared (mm3)': round(common_vol(front_wall, KEY), 3),
-    'chasis (lo mas cercano: labio de un riel, |x| 17.1)': gap(front_wall, CHS),
+    'chasis (lo mas cercano)': gap(front_wall, CHS),
 }
 report['holguras_cara_plana'] = fw
 log('cara plana:', fw)
@@ -486,11 +756,85 @@ for s in [CHS] + list(board.values()) + list(carrier_refs.values()):
 report['chasis_armado'] = {
     'radio_max': round(r_all, 3), 'radio_max_fuera_de_ranuras': round(r_out, 3),
     'radio_interior_tubo': G.RI, 'radio_fondo_ranuras': P['tubo']['ranuras_rieles']['radio'],
-    'holgura_minima_al_tubo_por_encima_de_las_repisas': min_gap(TUBE.common(box(-60, 60, -60, 60, 9.6, 200)),
+    'holgura_minima_al_tubo_por_encima_de_las_repisas': min_gap(TUBE_NL.common(box(-60, 60, -60, 60, 9.6, 200)),
                                                                 [CHS] + list(board.values()) + list(carrier_refs.values())),
-    '_nota': 'Radio sobre vertices y aristas discretizadas cada 0.5 mm. Dentro de las ranuras (31-47 y 133-149 grados) el limite es 24.8; en |x| <= 13.65 el interior llega a la cara plana (y 20.33), por eso el vidrio de la OLED (r 24.05) cabe.'}
-report['coaxial'] = {'radio_curva_disponible': round(coax_R, 2), 'radio_curva_pedido': P['coaxial']['radio_curva_minimo'],
-                     'cumple': coax_R >= P['coaxial']['radio_curva_minimo']}
+    '_nota': (f'Radio sobre vertices y aristas discretizadas cada 0.5 mm. Tubo sin ranuras: interior R{G.RI:g}; en '
+              f'|x| <= {G.X_FLAT:g} el interior llega a la cara plana (y {G.Y_FLAT_I:g}).')}
+_rc = P['coaxial']['radio_curva']
+_cp = G.coax_route()
+report['coaxial'] = {'cable': P['coaxial']['cable'], 'radio_curva_disponible': round(coax_R, 2),
+                     'radio_curva_objetivo': _rc['objetivo'], 'radio_curva_preferido': _rc['preferido'],
+                     # 1e-6: los arcos son de R exacto; la poligonal da 9.99999999999 por redondeo.
+                     'cumple_objetivo': coax_R >= _rc['objetivo'] - 1e-6, 'cumple_preferido': coax_R >= _rc['preferido'] - 1e-6,
+                     'largo_del_recorrido_mm': round(sum(math.dist(a_, b_) for a_, b_ in zip(_cp[:-1], _cp[1:])), 1),
+                     'radio_max_del_eje_del_cable': round(max(math.hypot(q_[0], q_[1]) for q_ in _cp), 2),
+                     'z_del_recorrido': [round(min(q_[2] for q_ in _cp), 2), round(max(q_[2] for q_ in _cp), 2)]}
+# --- 4. Objetivos de la revision: minimo conseguido por categoria ------------------------------
+# B1 ajustes entre impresas >= 0.4; B2 rieles de la placa >= 0.25 por cara; B3 aire a compradas
+# >= 0.5; B4 carrier en sus ranuras (juego y suplementos); B5 paredes >= 1.2 (local >= 1.0);
+# B6 radio de curva del coaxial >= 8 (preferido 10). Posicion final y barridos.
+def _summary(items, target):
+    vals = [(k, v) for k, v in items if v is not None]
+    if not vals:
+        return None
+    k, v = min(vals, key=lambda kv: kv[1])
+    return {'objetivo_mm': target, 'minimo_mm': v, 'donde': k, 'cumple': v >= target - 1e-3,
+            'por_debajo': {k_: v_ for k_, v_ in vals if v_ < target - 1e-3}}
+
+
+def _lat(cat):
+    d = lat_min.get(cat)
+    return [] if d is None else [(f"barrido {d['barrido']}: {d['movil']} / {d['obstaculo']}", d['mm'])]
+
+
+B1_KEYS = ('chasis-tubo por encima de las repisas (z > 9.6)', 'chasis-base', 'chasis-tapa',
+           'tapa bajo el canto del tubo (labio y lenguetas)-tubo', 'base sobre el canto del tubo (labio, lenguetas, saliente)-tubo',
+           'tecla-tubo (sin la pestana pegada)', 'tapa de puertos-chasis')
+B3_KEYS = ('chasis-celdas', 'chasis-componentes de la placa y OLED', 'chasis-componentes de la carrier (sin su PCB)',
+           'tubo-celdas por encima de las repisas (nervios)', 'tubo-PCB de la placa', 'tubo-componentes de la placa y OLED',
+           'tubo-funda USB-C', 'tubo-tarjeta microSD', 'tapa-OLED', 'tapa-coaxial (recorrido)', 'tapa-celdas',
+           'base-clavijas', 'base-PCB de la placa', 'base-celdas', 'base-carrier', 'reten-celdas',
+           'tecla-SW401 (juego del embolo)', 'tecla-componentes de la placa', 'carrier (patas del SMA)-celdas',
+           'cables (reservas)-piezas', 'cables (reservas)-celdas', 'cables (reservas)-placa y carrier',
+           'tuerca SMA-PCB con la muesca', 'coaxial (recorrido)-piezas', 'coaxial (recorrido)-celdas',
+           'coaxial (recorrido)-placa y OLED', 'coaxial (recorrido)-cables', 'clavija SMA acodada-chasis (pedido >= 0.5)',
+           'clavija SMA acodada-celdas', 'clavija SMA acodada-placa y OLED (sin la muesca)',
+           'perno del baston (15.5)-soldaduras de la carrier', 'perno del baston (15.5)-celdas',
+           'guia de luz-componentes de la placa', 'tapa de puertos-tarjeta', 'tapa-tornillos de la antena (radial, en su rebaje)',
+           'tapa-tuerca del pasamuros (radial, en su bolsillo)', 'conector de la tapa (dentro)-placa, OLED y celdas',
+           'tuerca del baston-placa y carrier', 'carrier-PCB de la placa')
+tp_rep = report['tapa_de_puertos']
+_head = [(f'cabeza de la seta en su sitio-{k}', v) for k, v in tp_rep['cabeza_en_su_sitio_mm'].items()]
+_head.append(('cabeza de la seta al barrer el chasis armado', tp_rep['cabeza_al_barrer_el_chasis_mm']))
+for ang, d in tp_rep['abierta_girada_en_la_bisagra'].items():
+    _head += [(f'tapa abierta {ang} grados-funda USB-C', d['funda_holgura']), (f'tapa abierta {ang} grados-tarjeta', d['tarjeta_holgura'])]
+HOL = P['holguras']
+objetivos = {
+    'B1_ajustes_entre_impresas': _summary([(k, pairs.get(k)) for k in B1_KEYS] + _lat('impresas'), HOL['ajuste_impresas']),
+    'B2_rieles_de_la_placa': _summary([('rieles-PCB de la placa (sin el tope de z 80 ni los salientes)',
+                                        pairs['rieles-PCB de la placa (sin el tope de z 80 ni los salientes)'])] + _lat('rieles'),
+                                      HOL['riel_placa']),
+    'B3_aire_a_compradas': _summary([(k, pairs.get(k)) for k in B3_KEYS] + _lat('compradas') + _head, HOL['compradas']),
+    'B4_carrier': {'juego_por_cara_mm': P['chasis']['ranura_carrier']['holgura'],
+                   'medido_en_su_sitio_mm': gap(chs_no_hooks, carrier_refs['carrier: PCB']),
+                   'medido_al_subirla_mm': lat_min.get('carrier-ranuras', {}).get('mm'),
+                   '_nota': 'Ajuste de posicion, no aire: la carrier va guiada. Medidas de la foto (+-1 mm): medir y '
+                            'ajustar chasis.ranura_carrier y carrier.x/z antes de imprimir; suplementos en README.'},
+    'B5_paredes_del_tubo': {'objetivo_mm': HOL['pared_minima'], 'local_minimo_mm': HOL['pared_local_minima'],
+                            'espesores_mm': {k: v['mm'] for k, v in guard['espesor_minimo'].items()},
+                            'por_debajo_de_1.2': guard['espesor_por_debajo_de_1.2'],
+                            'por_debajo_de_1.0': guard['espesor_por_debajo_de_1.0']},
+    'B6_coaxial': {k: report['coaxial'][k] for k in ('radio_curva_disponible', 'radio_curva_objetivo', 'radio_curva_preferido',
+                                                     'cumple_objetivo', 'cumple_preferido')},
+    '_nota': ('Contactos a proposito (no cuentan): pie de los rieles en sus apoyos (z 9.5), placa contra los salientes '
+              '(y 13.8) y el tope (z 80), celdas en sus repisas, base y tapa contra los cantos del tubo, tornillos en sus '
+              'avellanados y arandelas en sus asientos, tecla pegada en su rebaje, tapa de puertos sobre el tubo, seta en su '
+              'agujero, cuerpos de TPU en las aberturas, tuerca del baston en su hexagono (0.3 por cara), pasamuros en su '
+              'agujero en D. Ajustes de posicion aparte: rieles (B2) y carrier (B4).')}
+report['objetivos'] = objetivos
+log('objetivos:', {k: (v.get('minimo_mm'), v.get('cumple')) if isinstance(v, dict) and 'minimo_mm' in v else None
+                   for k, v in objetivos.items() if k.startswith('B')})
+
 # El barrido con la tecla puesta es un diagnostico: dice que bloquea si no se quita la tecla.
 report['bloqueos_al_sacar_el_chasis_con_la_tecla_puesta'] = sweeps.pop('chasis_armado_con_tecla_puesta')
 report['barridos'] = sweeps
@@ -499,6 +843,6 @@ report['total_choques'] = (len(report['choques_entre_piezas']) + len(report['cho
 report['guarda_pared_ok'] = guard['ok']
 (OUT / 'check.json').write_text(json.dumps(report, indent=1, ensure_ascii=False), encoding='utf-8')
 log('escrito', OUT / 'check.json')
-print(json.dumps({k: report.get(k) for k in ('guarda_pared_tubo', 'holguras', 'holguras_cara_plana', 'chasis_armado', 'coaxial', 'antena_wroom',
+print(json.dumps({k: report.get(k) for k in ('guarda_pared_tubo', 'objetivos', 'holguras_cara_plana', 'chasis_armado', 'coaxial', 'antena_wroom',
                                              'placa_detras_del_dorso_frente_al_SMA',
                                              'bloqueos_al_sacar_el_chasis_con_la_tecla_puesta', 'total_choques')}, indent=1, ensure_ascii=False))

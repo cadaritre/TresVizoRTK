@@ -5,11 +5,11 @@
    "etiqueta": "Base con la tuerca del baston",
    "solido_valido": true,
    "solidos": 1,
-   "triangulos": 5436,
+   "triangulos": 5122,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 8.37,
+   "volumen_cm3": 8.98,
    "stl": "01-base.stl",
    "step": "01-base.step"
   },
@@ -18,11 +18,11 @@
    "etiqueta": "Tubo",
    "solido_valido": true,
    "solidos": 1,
-   "triangulos": 5302,
+   "triangulos": 15326,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 27.78,
+   "volumen_cm3": 43.36,
    "stl": "02-tube.stl",
    "step": "02-tube.step"
   },
@@ -31,11 +31,11 @@
    "etiqueta": "Tapa de antena",
    "solido_valido": true,
    "solidos": 1,
-   "triangulos": 6110,
+   "triangulos": 6084,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 7.71,
+   "volumen_cm3": 10.16,
    "stl": "03-antenna-cap.stl",
    "step": "03-antenna-cap.step"
   },
@@ -44,11 +44,11 @@
    "etiqueta": "Chasis",
    "solido_valido": true,
    "solidos": 1,
-   "triangulos": 1928,
+   "triangulos": 1916,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 4.76,
+   "volumen_cm3": 6.57,
    "stl": "04-chassis.stl",
    "step": "04-chassis.step"
   },
@@ -61,35 +61,22 @@
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 0.08,
+   "volumen_cm3": 0.09,
    "stl": "05-key-tpu.stl",
    "step": "05-key-tpu.step"
   },
   {
-   "pieza": "06-usb-plug-tpu",
-   "etiqueta": "Tapon de TPU del USB-C",
+   "pieza": "06-port-cover-tpu",
+   "etiqueta": "Tapa de puertos de TPU",
    "solido_valido": true,
    "solidos": 1,
-   "triangulos": 124,
+   "triangulos": 872,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 0.51,
-   "stl": "06-usb-plug-tpu.stl",
-   "step": "06-usb-plug-tpu.step"
-  },
-  {
-   "pieza": "07-sd-plug-tpu",
-   "etiqueta": "Tapon de TPU de la microSD",
-   "solido_valido": true,
-   "solidos": 1,
-   "triangulos": 100,
-   "cerrada": true,
-   "no_manifold": false,
-   "autointersecciones": false,
-   "volumen_cm3": 0.11,
-   "stl": "07-sd-plug-tpu.stl",
-   "step": "07-sd-plug-tpu.step"
+   "volumen_cm3": 1.03,
+   "stl": "06-port-cover-tpu.stl",
+   "step": "06-port-cover-tpu.step"
   }
  ],
  "todas_cerradas": true,
@@ -98,15 +85,15 @@
  "limite_mm3": 0.05,
  "guarda_pared_tubo": {
   "cara_plana": {
-   "puntos": 2604,
-   "en_aberturas": 426,
+   "puntos": 2884,
+   "en_aberturas": 348,
    "sin_material": 0,
    "ejemplos": [],
    "ok": true
   },
   "anillo": {
-   "puntos": 12175,
-   "en_aberturas": 766,
+   "puntos": 14101,
+   "en_aberturas": 733,
    "sin_material": 0,
    "ejemplos": [],
    "ok": true
@@ -114,25 +101,25 @@
   "paso_mm": 1.0,
   "zonas": [
    [
-    6,
-    94,
-    21.23,
-    25.1,
-    25.6
+    7,
+    104,
+    21.7,
+    26.8,
+    26.8
    ],
    [
     4.2,
-    5.5,
-    21.68,
-    25.55,
-    25.55
+    5.8,
+    22.3,
+    27.4,
+    27.4
    ],
    [
-    94.5,
-    95.5,
-    21.68,
-    25.55,
-    25.55
+    105.2,
+    106.5,
+    22.3,
+    27.4,
+    27.4
    ]
   ]
  },

@@ -11,14 +11,14 @@ en paralelo. Lo que cambie durante el diseño se corrige aquí.
 
 | Tema | v0.2 / V2.3 | v0.3 compacta | Motivo |
 | --- | --- | --- | --- |
-| Carcasa | Tubo Ø64 × 130 con chasis de rieles | Tubo Ø52 × 100 con una cara plana al frente | Menos de la mitad de volumen |
+| Carcasa | Tubo Ø64 × 130 con chasis de rieles | Tubo Ø56 × 111 con una cara plana al frente (empezó en Ø52 × 100) | Unos dos tercios del volumen. Se agrandó en el endurecimiento del 08-10-2026 para dejar holguras de impresión y de montaje |
 | Batería | 1 × 18650 | 2 × 18650 en paralelo (1S2P), detrás de la carrier | Doble autonomía; la placa sigue en 1S |
 | Panel | Placa panel-usb, OLED, botón metálico de 12 mm y cables | OLED, botón táctil, LED, USB-C y microSD en la placa principal | Sin cables al panel; el botón de 12 mm es difícil de conseguir |
-| OLED | Módulo de 4 pines por cable (J403) | El mismo módulo, soldado por sus 4 pines a la placa, girado 180° | El propietario ya lo tiene; el firmware voltea la imagen |
+| OLED | Módulo de 4 pines por cable (J403) | El mismo módulo, soldado por sus 4 pines a la placa, girado 180° | El propietario ya lo tiene; el firmware gira la imagen 180° (ver [Valores para el firmware](#valores-para-el-firmware)) |
 | IMU | Breakout BMI088 en la tapa por J405 | BMI088 en la placa principal, en el mismo bus I2C (GPIO41/42, INT 2 y 1) | No hacen falta cable ni plataforma; queda rígido con el resto |
 | Carrier | Arnés soldado a J301 | Igual: la carrier tal cual, arnés soldado a sus filas de agujeros | Sus agujeros solo se conocen a ±1 mm (foto): una mezzanine exige medidas exactas |
 | NTC | Obligatoria (J404) | Igual | Decisión del propietario (4d1f15c) |
-| Antena | HA-901A sobre la tapa de antena: 3 M2.5 desde dentro y su coaxial por un paso de 12 mm en el eje | Igual, sobre una tapa de arriba de Ø52 | La HA-901A mide Ø43.5: cabe en la cara de arriba. El modelo no está confirmado (`hardware/bom.md`: «Helix; modelo exacto por confirmar») |
+| Antena | HA-901A sobre la tapa de antena: 3 M2.5 desde dentro y su coaxial por un paso de 12 mm en el eje | SMA hembra de panel al centro de la tapa, donde se enrosca la HA-901A (la tienda da macho, «SMA-J»), más sus 3 M2.5 | La HA-901A mide Ø43.5: cabe en la cara de arriba. El modelo no está confirmado (`hardware/bom.md`: «Helix; modelo exacto por confirmar») |
 
 ## Ejes
 
@@ -27,25 +27,29 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
 
 ## Tubo
 
-- Radio exterior 26 (Ø52), pared 1.8: radio interior 24.2. Alto 100 (z 0–100).
-- Redondeo exterior de R 4 en los cantos de arriba y de abajo.
-- Cara plana al frente, de 27.3 de ancho (|x| ≤ 13.65): por fuera en y 22.13 y por dentro en
-  y 20.33.
-- Por dentro, la cara plana (y 20.33) llega hasta |x| 13.65, no solo hasta donde la corta el
-  círculo de r 24.2 (|x| 13.13). Así el vidrio de la OLED (|x| ≤ 13.35, frente en y 20.0) queda
-  con 0.33 de aire. La pared queda de 1.8, salvo en la esquina interior de la cara plana
-  (x ±13.65), donde baja a 1.5 hasta el círculo de fuera.
+> **Endurecimiento del 08-10-2026.** El tubo pasó de Ø52 × 100 (pared de 1.8) a **Ø56 × 111
+> (pared de 2.4)**. Así todos los ajustes entre piezas impresas tienen 0.4 mm, los rieles de la
+> placa 0.25 por cara y todo lo comprado 0.5 de aire, y el coaxial curva con R 10. La placa no
+> cambió de sitio. Detalle, motivo de cada medida y comprobaciones en `mechanical/v3.0/README.md`.
+
+- Radio exterior 28 (Ø56), pared 2.4: radio interior 25.6. Alto 111: base z 0–4, tubo z 4–107 y
+  tapa z 107–111, con redondeos de R 4 en la base y en la tapa.
+- Cara plana al frente: por fuera en y 22.9 (|x| ≤ 16.11) y por dentro en y 20.5 (|x| ≤ 15.33).
+  El vidrio de la OLED (frente en y 20.0) queda con 0.5 de aire.
 - Abajo: base desmontable con la tuerca 5/8"-11 de latón (23.8 entre caras, 13.9 de alto) en el
   eje, z 0–16, como en V2.3.
   - Sus retenes van lejos del frente: delante de la tuerca bajan la placa (hasta z 8.5) y las
     clavijas de J102, J404 y J301 con sus cables.
   - Con la base quitada se enchufan la batería y la NTC por abajo, como en V2.3.
 - Arriba: tapa de antena desmontable, como la de V2.2 y V2.3, pero sujeta con tres M2.5
-  radiales: el collar de una bayoneta no cabe dentro de r 24.2 con la OLED tan cerca del frente.
-  - La HA-901A va atornillada por fuera con 3 M2.5 desde dentro, en un círculo de 26.6, y su
-    coaxial pasa por un paso de 12 mm en el eje. Es la antena supuesta: `hardware/bom.md` dice
-    «Helix; modelo exacto por confirmar».
-  - Datos en `mechanical/v2.3/parameters.json`, `antena`.
+  radiales: el collar de una bayoneta no cabe dentro del tubo con la OLED tan cerca del frente.
+  - Es la HA-901A del kit de BDLX (hélice cuádruple, Ø43.5 × 40.8; la tienda da 42.2 de alto).
+    La tienda da conector «SMA-J» (macho) y dice que se enrosca directo al SMA de la carrier:
+    falta confirmarlo en la pieza.
+  - Al centro de la tapa va un SMA hembra de panel, donde se enrosca la antena. La antena además
+    queda fija con 3 M2.5 desde dentro, en un círculo de 26.6, con arandelas ISO 7092.
+  - Si la antena resulta hembra, el parámetro `antena.conector.tipo = "hembra"` de V3.0 cambia la
+    tapa a un paso de 12 mm para una clavija macho.
 - Interior como V2.3: un chasis que se arma fuera del tubo y entra por arriba, con la tapa quitada.
   - Lleva los rieles de la placa (en sus franjas de 1 mm), las ranuras de la carrier y dos
     salientes detrás de la placa.
@@ -55,21 +59,23 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
   - La carrier entra al chasis por abajo y la sostienen dos ganchos. No puede entrar por delante
     ni por arriba: chocaría con los salientes de la OLED.
   - Detalle y comprobaciones en `mechanical/v3.0/README.md`.
-- Frente: ventana de la OLED, tecla del botón (de TPU, que se pone por fuera después del chasis) y
-  ventanita o guía de luz del LED.
-- Costado izquierdo (+X): USB-C y ranura de la microSD.
+- Frente: ventana de la OLED con una mica de 1 mm pegada por fuera, tecla del botón (de TPU, que se
+  pone por fuera después del chasis), guía de luz del LED y el logo en relieve de 0.5.
+- Costado izquierdo (+X): USB-C y ranura de la microSD, tapados por una tapa de TPU amarrada con
+  un pivote que atraviesa la pared.
+- Líneas verticales decorativas, como en V2.3.
 
 ## Pila de adelante hacia atrás (y)
 
 | Pieza | y |
 | --- | --- |
-| Cara plana, por dentro | 20.33 |
-| Componentes de la placa (cara de arriba hacia el frente), con 0.3 de aire | 15.4 a 20.03 |
+| Cara plana, por dentro | 20.5 |
+| Componentes de la placa (cara de arriba hacia el frente), con 0.5 de aire | 15.4 a 20.0 |
 | PCB principal (1.6) | 13.8 a 15.4 |
-| Aire | 13.3 a 13.8 |
-| Componentes de la carrier (6.4, hacia la placa) | 6.9 a 13.3 |
-| PCB de la carrier (1.6) | 5.3 a 6.9 |
-| Patas del SMA (no se cortan), solo bajo el SMA | 3.3 a 5.3 |
+| Aire | 13.2 a 13.8 |
+| Componentes de la carrier (6.4, hacia la placa) | 6.8 a 13.2 |
+| PCB de la carrier (1.6) | 5.2 a 6.8 |
+| Patas del SMA (no se cortan), solo bajo el SMA | 3.2 a 5.2 |
 | Celdas: ejes en x ±9.5, y −7.9; Ø18.6 | −17.2 a 1.4 |
 
 ## Placa principal v0.3
@@ -80,16 +86,18 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
   - las únicas uniones pasantes son las cuatro patas de la carcasa del USB-C (GND). Miden 0.91 mm
     en el modelo 3D (1.01 según la auditoría) y se quedan dentro de los 1.6 de la placa.
 - Contorno de trabajo: **x −18…+18 (36 de ancho) y z 8.5…80 (71.5 de alto)**. Los cantos
-  laterales corren por los rieles del chasis. Si no cabe o no rutea, se puede proponer Ø54 o 105 de
-  alto, con el motivo.
+  laterales corren por los rieles del chasis.
 - Coordenadas de KiCad: **u = 18 − x, v = 80 − z** (u de 0 a 36 de izquierda a derecha mirando
   el frente; v de 0 a 71.5 hacia abajo).
-- Alto máximo de los componentes según x, por la curva del tubo y la cara plana:
-  `h(x) = min(4.63, sqrt(24.2² − x²) − 15.7)`.
+- Alto máximo de los componentes según x, con 0.5 de aire medido en radio hasta el tubo de Ø56
+  (cara plana interior en y 20.5, radio interior 25.6):
+  `h(x) = min(20.0, sqrt(25.1² − x²)) − 15.4`.
 
-  | \|x\| | 0–13.6 | 14 | 15 | 16 | 17 | 18 |
+  | \|x\| | 0–15.17 | 15.5 | 16 | 16.5 | 17 | 17.5 y 18 |
   | --- | --- | --- | --- | --- | --- | --- |
-  | h máx. | 4.63 | 4.04 | 3.29 | 2.45 | 1.52 | 0.47 |
+  | h máx. | 4.6 | 4.34 | 3.94 | 3.51 | 3.07 | franja sin componentes |
+
+  En el tubo anterior de Ø52 era `min(4.63, sqrt(24.2² − x²) − 15.7)`, con 0.3 de aire medido en y.
 
 - **OLED:** el módulo de 4 pines I2C que ya tiene el propietario (27.5 × 27.8 × 1.6; vidrio u
   0.4–27.1 y v 4.27–23.53 del módulo; 4 agujeros de Ø2 en las esquinas; datos en
@@ -107,7 +115,7 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
     - agujeros de abajo en x ±11.75, z 70.2 (sobre la placa); los de arriba, en z 94.0.
   - Alto: el módulo lleva componentes por detrás (regulador SOT-23, unos 1.1 mm), así que va
     separado 1.3 mm de la placa. Encima van su PCB (1.6) y el vidrio (1.7): el vidrio llega a y 20.0
-    (la cara plana, por dentro, está en 20.33).
+    (la cara plana, por dentro, está en 20.5).
   - **Montaje:** pines sin el separador de plástico de 2.5 mm, con uno de 1.3 a 1.5 mm o con
     arandelas. Si el módulo viene con la tira soldada, hay que quitarle el separador. Con el de
     2.5 mm, el vidrio quedaría en y 21.2, dentro de la cara plana.
@@ -163,12 +171,12 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
   Lejos del coaxial y del SMA de la carrier.
 - **Conectores de cable:** solo en el canto de abajo (z 8.5), con la boca hacia abajo, porque a
   los lados no hay sitio para las clavijas:
-  - J102 para el pack 1S2P: el JST PH lateral de v0.2 mide 5.5 de alto y no cabe (máximo 4.63).
+  - J102 para el pack 1S2P: el JST PH lateral de v0.2 mide 5.5 de alto y no cabe (máximo 4.6).
     Pasa a JST GH de 4 pines lateral (SM04B-GHS-TB, C189895, unos 4.25 de alto), con dos contactos
     por polo: 1 y 2 a GND y 3 y 4 a VBATT_IN, unos 2 A por polo (1 A por contacto con cable
     AWG #26, según JST). El pack lleva un cable GH de 4 en AWG #26 y el firmware limita la carga
-    (ICHG) a ~1.5 A (auditoría del 08-10-2026; ver
-    [Riesgos aceptados](#riesgos-aceptados-en-la-auditoría-y-pruebas-pendientes));
+    (ICHG) a 1.5 A como mucho (auditoría del 08-10-2026; ver
+    [Valores para el firmware](#valores-para-el-firmware));
   - J404 (SH2) para la NTC;
   - J301 (SH8) para el arnés de la carrier. El arnés sube por el costado derecho, detrás del canto
     de la placa, hasta la columna de agujeros de la carrier.
@@ -187,10 +195,13 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
   - La clavija que se enrosca en él (tuerca de 5/16", hasta 9.2 entre esquinas) llega a
     y ≈ 14.2–14.8, detrás del dorso de la placa (13.8). Por eso la placa lleva una **muesca en su
     canto de arriba: x −6.2…3.8, z 73.5–80 (u 14.2–24.2, v 0–6.5)**.
-  - Entre la clavija recta (arriba en z 89.5) y el paso de la tapa (z 96–100, en el eje) solo cabe
-    una curva en S de R 5.25. Ese tramo pide un coaxial fino (1.13 mm, que admite unos 5 a 6 mm
-    en instalación fija, según los fabricantes) o un SMA acodado de perfil bajo. Un RG316 (Ø2.5)
-    pide más radio.
+  - El coaxial de la antena, desde el SMA hembra de panel de la tapa, es un RG 178 B/U de unos
+    75 mm entre conectores, con SMA macho acodado de crimpar en la carrier (su cuerpo empieza en
+    z ≥ 80.5).
+  - Va con curvas de R 10, el mínimo para instalación fija de la hoja de Lapp: al dar servicio no
+    hay que doblarlo más (para dobleces repetidos pide R 19). En el tubo de Ø52 solo cabía R 5.25.
+  - En V3.0 la carrier quedó 0.1 más atrás (PCB en y 5.2–6.8) para que su SMA quede a 0.5 de la
+    placa.
 - Se sujeta por sus cantos; no se le corta nada. Las ranuras no pueden pegarse a sus cantos
   delante de la cara ni detrás del PCB donde hay soldaduras. Ver lo aprendido en V2.3: rebaje del
   USB-C y labio cortado frente a la columna de agujeros.
@@ -245,8 +256,9 @@ Pendiente antes de pedir:
     y a 1.4 mm de su lata (v 13.2 en el modelo 3D). El PCB del módulo (desde y 16.7) pasa
     0.47 mm por encima del PCB del WROOM (hasta y 16.23), pero la lata llega a y 18.51: si la fila
     está unos 1.4 mm más lejos del canto, el módulo toca la lata.
-- **Existencias del BMI088 en JLCPCB:** 396 piezas el 08-10-2026 (API de JLCPCB, `cost_jlc.py`),
-  682 el 07-10-2026 y 4 482 el 04-10-2026. Bajan rápido: comprobarlas justo antes de pedir.
+- **Existencias del BMI088 en JLCPCB:** 409 piezas el 08-10-2026 por la tarde (396 esa mañana; API
+  de JLCPCB, `cost_jlc.py`), 682 el 07-10-2026 y 4 482 el 04-10-2026. Cambian rápido: comprobarlas
+  justo antes de pedir.
 
 La lista completa, con las medidas de la carrier, la antena GNSS y la revisión del CPL, está en
 [Antes de mandar a fabricar](../README.md#antes-de-mandar-a-fabricar).
@@ -255,7 +267,8 @@ La lista completa, con las medidas de la carrier, la antena GNSS y la revisión 
 
 Generada entera con `scripts/build.py`; el contorno, la colocación y las pistas críticas están en
 `scripts/layout.py`. Rehecha el mismo día tras una auditoría eléctrica (ver
-[Auditoría eléctrica](#auditoría-eléctrica-08-10-2026)). Nada fabricado ni medido.
+[Auditoría eléctrica](#auditoría-eléctrica-08-10-2026)) y un endurecimiento eléctrico (ver
+[Endurecimiento eléctrico](#endurecimiento-eléctrico-08-10-2026)). Nada fabricado ni medido.
 
 ### Colocación
 
@@ -325,18 +338,19 @@ Cajas de los cuerpos 3D (de `cad/placa-principal.json`), en coordenadas de placa
     - la llegada de SD_DET a Q401 por la derecha;
     - U0TXD y U0RXD hasta sus puntos de prueba;
     - una pista de GND de J401.10 a J401.6.
-- `route_rest.py` rutea el resto: 89 de 89 conexiones en la primera pasada y 1 de 1 en la segunda,
+- `route_rest.py` rutea el resto: 88 de 88 conexiones en la primera pasada y 1 de 1 en la segunda,
   después de los rellenos. `finish_pcb.py --final` quita al final las vías que quedaron sin uso
   (dos, de I2C).
-- Total: 1880 tramos (F.Cu 703 mm, In2.Cu 304 mm, B.Cu 1067 mm) y 282 vías, con las entradas finales.
+- Total: 1885 tramos (F.Cu 704 mm, In2.Cu 305 mm, B.Cu 1068 mm) y 282 vías, con las entradas del
+  endurecimiento (antes: 89 de 89 conexiones, 1880 tramos y 282 vías).
 - **Potencia por capa interna**, que en v0.2 iba solo por fuera: VSYS al TPS62903 por In2.Cu con
-  0.6 mm (12.8 mm de largo) y GNSS_5V con 0.4 mm (26.1 mm). Por fuera ya no había paso: el ruteador
-  daba vueltas de 68 a 136 mm. Según IPC-2221, en cobre interno de 0.5 oz, 0.6 mm llevan unos 0.5 A y
-  0.4 mm unos 0.37 A con 10 °C de subida. La carrier pide 160 mA. Con los picos de Wi-Fi del ESP32 y
-  la microSD, la entrada del TPS62903 puede acercarse a 0.5 A por poco tiempo (estimado, sin medir).
-- **Plano de +3V3 cortado.** In2.Cu lleva 304 mm de pistas: el bus del IMU (211 mm), GNSS_5V, I2C,
+  1.2 mm (13.7 mm de largo) y GNSS_5V con 0.6 mm (26.1 mm). Por fuera ya no había paso: el ruteador
+  daba vueltas de 68 a 136 mm. Hasta el endurecimiento eran 0.6 y 0.4 mm; los cálculos están en
+  [Endurecimiento eléctrico](#endurecimiento-eléctrico-08-10-2026).
+- **Plano de +3V3 cortado.** In2.Cu lleva 305 mm de pistas: el bus del IMU (211 mm), GNSS_5V, I2C,
   FG_ALRT_N, VSYS, ESP_EN y otras cortas.
-  - El +3V3 queda de una pieza (1740 mm²), pero las líneas de la microSD van por B.Cu, apoyadas en
+  - El +3V3 queda de una pieza (1728 mm²; 1740 antes del endurecimiento), pero las líneas de la
+    microSD van por B.Cu, apoyadas en
     él, y cruzan el bus del IMU.
   - Cada una tiene de 2.8 a 3.2 mm sin plano justo debajo (en los cruces y en los antipads de las
     vías) y 14 cambios de referencia.
@@ -351,12 +365,12 @@ Cajas de los cuerpos 3D (de `cad/placa-principal.json`), en coordenadas de placa
 | DRC de la placa (`fab/drc.rpt`) | 0 violaciones (errores y avisos), 0 sin conectar, 0 de paridad con el esquema |
 | DRC del panel (`fab/drc-panel.rpt`) | 0 violaciones, 0 sin conectar. Panel de 50 × 85.5 mm: rieles de 5 mm, 4 puentes de 5 mm con *mouse bites* (dos por canto lateral), 3 fiduciales y 4 agujeros de herramienta |
 | Puentes del panel | Centros en v 6.5 y 41 a la izquierda y en v 13 y 24 a la derecha (z 73.5, 39, 67 y 56). El condensador de potencia más cercano a un puente está a 6.0 mm (C201, del puente de v 13); U401, a 21.3 mm del puente de v 41 |
-| Reproducible, casi siempre | Después de la auditoría, dos `build.py` seguidos dieron iguales, byte a byte, los PCB, los esquemáticos, `board.json`, `plugs.json`, `panel.json`, BOM, CPL, posiciones y mapa de pines. Con las entradas finales (nota de J102 corregida) hubo cuatro corridas: dos `build.py` y dos réplicas de sus pasos. En una, el DRC de KiCad contó 90 conexiones pendientes en lugar de 89, por el relleno de zonas, y unos 10 tramos de GND y +3V3 salieron distintos; también pasaba el DRC. Las otras tres coincidieron, y son las de la rama. Los Gerber, los taladros, el netlist, el esquema en PDF y los informes solo cambian en la fecha |
-| Altos (`cad/check_heights.py`, sale con 0) | Las 106 piezas con modelo caben con 0.3 de aire y fuera de las franjas. Las más justas: J401, SW201 y SW202 0.05; U302, U303 y U201 0.06; J101 0.07; J102 0.37 |
+| Reproducible, casi siempre | Con las entradas del endurecimiento, dos `build.py` completos (uno en la rama y otro en una copia aparte) dieron iguales, byte a byte, el PCB de la placa y el del panel, los esquemáticos, `board.json`, BOM, CPL y posiciones. Después de la auditoría, dos `build.py` seguidos dieron iguales, byte a byte, los PCB, los esquemáticos, `board.json`, `plugs.json`, `panel.json`, BOM, CPL, posiciones y mapa de pines. Con las entradas finales (nota de J102 corregida) hubo cuatro corridas: dos `build.py` y dos réplicas de sus pasos. En una, el DRC de KiCad contó 90 conexiones pendientes en lugar de 89, por el relleno de zonas, y unos 10 tramos de GND y +3V3 salieron distintos; también pasaba el DRC. Las otras tres coincidieron, y son las de la rama. Los Gerber, los taladros, el netlist, el esquema en PDF y los informes solo cambian en la fecha |
+| Altos (`cad/check_heights.py`, sale con 0) | Las 106 piezas con modelo caben en el tubo de Ø56 × 111 con 0.5 de aire medido en radio, y fuera de las franjas. Las más justas, además de esos 0.5: J102 0.34; U302, U303, J401, SW201 y SW202 1.16; U201 1.18; J101 1.19. En el tubo anterior de Ø52, con 0.3 de aire medido en y, lo más justo era 0.05 |
 | Botón | Ver Desviaciones, punto 3 |
 | Guía de luz | En r 1.5 alrededor de D403 no hay nada más. Lo más cerca: el patio de R409 a 1.59 mm del centro (su cuerpo a 1.80) y el de R102 a 1.97 |
 | Muescas en el STEP | `cad/placa-principal.step`: el centro de la muesca del SMA (u 18, v 3) y el de la del USB-C quedan fuera del sólido de la placa; el redondeo de r 1.0 sí está |
-| BOM | 40 líneas, 105 piezas montadas; R409 pasa a 330 Ω (C25104, Basic según la API de JLCPCB del 08-10-2026, en `fab/costo-jlcpcb.md`). TP208 y TP209 no van al BOM (son pads) |
+| BOM | 40 líneas, 105 piezas montadas; R409 pasa a 330 Ω (C25104, Basic según la API de JLCPCB del 08-10-2026, en `fab/costo-jlcpcb.md`). En el endurecimiento, C104, C106 y C107 pasan de 22 a 10 µF (C15850, Basic). TP208 y TP209 no van al BOM (son pads) |
 | CPL | La rotación es la de KiCad, sin `jlc_rotations.json`, como en v0.2. Las piezas nuevas con orientación (J101, J102, SW401, D403 y U401) usan huellas de LCSC/EasyEDA, hechas para que su 0° sea el de JLCPCB; U102 sigue con la huella de TI de KiCad. D403 tiene los pads renumerados respecto a EasyEDA (1 = cátodo). Como en v0.2, hay que revisar la orientación y la polaridad en la vista previa de JLCPCB |
 
 ### Auditoría eléctrica (08-10-2026)
@@ -376,20 +390,61 @@ Una revisión eléctrica independiente de la placa pidió estos cambios; todos q
 Ninguna pieza cambió de sitio; solo se agregaron TP208 y TP209. La huella de J403 cambió (pads SMD), con el
 mismo origen.
 
+### Endurecimiento eléctrico (08-10-2026)
+
+Pedido del propietario: que no quede nada en el aire. Se cerró lo que se podía cerrar con valores y
+cobre, sin mover, agregar ni quitar huellas (la carcasa se comprobó con estas posiciones). Hojas: TI
+BQ25798 SLUSDV2C (rev. C, junio de 2026), Espressif ESP32-S3-WROOM-1 v1.8, Bosch BST-BMI088-DS001
+rev 1.9 y las curvas de DC bias de Samsung para CL21A226MAQNNNE y CL21A106KAYNNNE (25 °C, típicas).
+
+| Punto | Lo que dicen las hojas y el cálculo | Qué se hizo |
+| --- | --- | --- |
+| 1. Irrupción al enchufar el USB | Entre VBUS y PMID del BQ25798 solo hay la resistencia de medida de 8 mΩ (diagrama de bloques, §7.2, y pines 2–3): no hay FET de bloqueo, así que la fuente carga de golpe VBUS y PMID. Los FET de entrada son externos y opcionales (ACFET/RBFET en VAC1/VAC2, §7.3.5). Mínimos efectivos: 2 µF en VBUS y 4 µF en PMID (70 µF con el modo *backup*, que no se usa) (§6.3). Recomendados: 2 × 10 µF en VBUS y 3 × 10 µF en PMID, más 100 nF en cada uno, «para hasta 3.3 A de entrada» (§8.2.2.3). No hay otra guía de irrupción; solo un amortiguador opcional de 2 Ω + 2.2 µF si se enchufan adaptadores de más de 15 V (figura 8-1). Regla de USB 2.0 según TI (TPS2061, SLVS490K §9.1.8): limitar la irrupción si la carga al conectar supera 44 Ω ∥ 10 µF | C104 (VBUS), C106 y C107 (PMID) de 22 a 10 µF (C15850, Basic, ya en el BOM). A 5 V, el 22 µF da 10.7 µF y el 10 µF da 5.0 µF. Total: 66.2 → 30.2 µF nominales, ~32 → ~15 µF efectivos a 5 V y ~259 → ~118 µC de 0 a 5 V. VBUS queda con ~5 µF y PMID con ~10 µF efectivos. Sigue por encima de los 10 µF: ver [Riesgos aceptados](#riesgos-aceptados-en-la-auditoría-y-pruebas-pendientes) |
+| 2. Potencia por In2.Cu | Entrada del TPS62903: ~0.75 A de pico en el peor caso. Espressif pide una fuente de 0.5 A para el WROOM (355 mA de pico en TX); se suponen hasta 0.2 A de la microSD y ~40 mA del resto; con VSYS de 3.0–3.4 V el TPS62903 va al 100 %. GNSS_5V: la carrier pide 160 mA con UM980 (220 con UM982); con la antena y margen, 0.3 A. IPC-2221, interno de 0.5 oz y 10 °C de subida: 0.4 mm 0.37 A, 0.6 mm 0.50 A, 1.2 mm 0.83 A | VSYS de 0.6 a 1.2 mm, corrido a u 31.2 para pasar entre las vías de SDRV e INT (13.7 mm), con dos vías de 0.6/0.3 en el relleno y una de 0.8/0.4 junto a C116 (antes una de 0.6/0.3 en cada punta). GNSS_5V de 0.4 a 0.6 mm. Con 0.75 A, VSYS sube unos 8 °C (antes ~25); con 0.3 A, GNSS_5V unos 3 °C (antes ~6). Resistencias: 21 → 11 mΩ (VSYS, 13.7 mm) y 64 → 43 mΩ (GNSS_5V) |
+| 3. Otros riesgos aceptados | Ninguno se cierra sin piezas: la microSD no tiene resistencias en serie (desensibilización del GNSS), la entrada no lee CC y la antena, los planos y el par USB dependen de la colocación | Nada en la placa; notas en [Riesgos aceptados](#riesgos-aceptados-en-la-auditoría-y-pruebas-pendientes) |
+| 4. Valores para el firmware | Ver abajo | Los mismos en la tabla del [README](../README.md#firmware-qué-tiene-que-cambiar) |
+
+Comprobado después: ERC 0; DRC de la placa con 0 violaciones, 0 sin conectar y 0 de paridad; DRC del
+panel con 0 y 0; `route_rest.py` 88 de 88 y 1 de 1; ninguna huella cambió de sitio, de giro ni de
+cara (las 117 de la placa y las 128 del panel, comparadas con el PCB anterior); el +3V3 de In2.Cu
+sigue de una pieza; dos `build.py` con los PCB iguales byte a byte; STEP reexportado con las mismas
+cajas y `cad/check_heights.py` con los mismos márgenes. De las redes ruteadas solo cambiaron VSYS,
+GND, REGN y SD_CD_N (esta, el mismo largo en menos tramos): USB, microSD, I2C y el bus del IMU
+quedaron igual. Nada de esto se midió: son cálculos con las hojas de datos.
+
+#### Valores para el firmware
+
+Iguales a los de la tabla del [README](../README.md#firmware-qué-tiene-que-cambiar), que dice además de
+dónde sale cada uno:
+
+- **Corriente de carga (ICHG): 1.5 A como mucho.** Al arrancar, `SFET_PRESENT = 1` (REG0x14 bit 7),
+  ICHG = 1 A (el valor de encendido del BQ25798) y *watchdog* desactivado. El techo de entrada no
+  alcanza como tope por hardware: con 5 V podría dar hasta ~2.4 A a la celda si se le pidiera más.
+- **Techo de entrada:** 1.34–1.56 A por hardware (ILIM_HIZ, 10k/8.2k desde REGN; 1.45 A típ.). El
+  firmware puede bajar IINDPM, nunca subirlo; no escribir `EN_EXTILIM = 0`.
+- **Botón:** 10 s (típ.) en bajo es el reset por hardware del BQ25798, con o sin USB: abre el FET de
+  envío ~350 ms y el equipo rearranca. Los gestos, muy por debajo (apagar con 2–3 s).
+- **OLED:** girar la imagen 180°, no espejarla.
+- **Ejes del IMU** (acelerómetro y giróscopo): X carcasa = +X sensor, Y carcasa = +Z sensor y
+  Z carcasa = −Y sensor. Quieto y con el bastón vertical, Y ≈ −1 g. Deducido de la hoja de Bosch
+  (figura 6 y tabla 15) con U401 a 0° en KiCad; confirmarlo con la placa armada.
+
 ### Riesgos aceptados en la auditoría y pruebas pendientes
 
-La auditoría dejó estos puntos como riesgos aceptados o como pruebas para el primer prototipo; no
-cambian la placa:
+La auditoría dejó estos puntos como riesgos aceptados o como pruebas para el primer prototipo. El
+endurecimiento del 08-10-2026 cerró el de la potencia por In2.Cu y agregó el de la irrupción al
+enchufar el USB, que redujo sin cerrarlo:
 
 | Punto | Qué queda |
 | --- | --- |
 | Antena del WROOM | Delante de la carrier, cerca del plástico (la pared del tubo a 0.29 mm de la esquina del módulo, según V3.0) y de la OLED. **Prueba de RSSI y de caudal con todo montado.** En el agujero de la OLED del lado de la antena (x −11.75), un **M2 de nailon**. Plan B: ESP32-S3-WROOM-1U-N16R2 (C3013945, antena externa) en la misma huella |
-| Desensibilización del GNSS | Los armónicos del reloj de 40 MHz de la microSD caen en 1560 y 1600 MHz. **Medir el C/N0 con el Wi-Fi y la microSD activos** |
-| Corriente de carga | **ICHG de ~1.5 A como mucho, en el firmware** (el BQ25798 arranca con 1 A). El pack va con cable **AWG #26** en el GH 4 de J102: dos contactos por polo, de 1 A cada uno según JST |
+| Desensibilización del GNSS | Los armónicos del reloj de 40 MHz de la microSD caen en 1560 y 1600 MHz. **Medir el C/N0 con el Wi-Fi y la microSD activos.** Si cae, probar primero la menor fuerza de salida de los GPIO de la microSD, sobre todo GPIO6 (CLK): no tienen resistencias en serie y agregarlas sería una pieza nueva |
+| Corriente de carga | **ICHG de 1.5 A como mucho, en el firmware** (el BQ25798 arranca con 1 A; el techo de entrada no basta como tope, ver [Valores para el firmware](#valores-para-el-firmware)). El pack va con cable **AWG #26** en el GH 4 de J102: dos contactos por polo, de 1 A cada uno según JST |
 | Líneas de la microSD sobre las ranuras del plano de +3V3 | Aceptado (ver [Ruteo](#ruteo)) |
 | D+/D− sin ir como par | Aceptado: a 12 Mb/s (USB Full Speed) no importa, según el auditor |
-| VSYS (0.6 mm) y GNSS_5V (0.4 mm) por In2.Cu, de 0.5 oz | Aceptado: unos 0.5 A con 10 °C de subida (ver [Ruteo](#ruteo)) |
-| Entrada USB sin leer CC | Igual que en v0.2: con una fuente de 500 mA la placa pide más de lo que da y el cargador baja la corriente al caer VBUS (VINDPM) |
+| VSYS y GNSS_5V por In2.Cu, de 0.5 oz | **Cerrado en el endurecimiento:** 1.2 y 0.6 mm (antes 0.6 y 0.4), con 0.83 y 0.5 A para 10 °C de subida según IPC-2221 frente a ~0.75 y 0.3 A de peor caso (ver [Endurecimiento eléctrico](#endurecimiento-eléctrico-08-10-2026)) |
+| Entrada USB sin leer CC | Igual que en v0.2: con una fuente de 500 mA la placa pide más de lo que da y el cargador baja la corriente al caer VBUS (VINDPM). El firmware puede bajar IINDPM (ver [Valores para el firmware](#valores-para-el-firmware)) |
+| Irrupción al enchufar el USB | **Reducida, no cerrada** (ver [Endurecimiento eléctrico](#endurecimiento-eléctrico-08-10-2026)): 30.2 µF nominales y ~15 µF efectivos a 5 V entre VBUS y PMID, por encima de los 10 µF de USB 2.0. Un cargador USB-C da VBUS recién al ver las Rd; el caso que queda es un cable A–C a un puerto encendido, con un pico corto que puede hacer caer su VBUS. Cerrarlo pide piezas nuevas: un par ACFET1/RBFET1 manejado por ACDRV1 (habría que medir cuán despacio lo enciende) o un interruptor con arranque suave entre J101 y VBUS |
 | Nodos SW del cargador | Unos 9 mm por B.Cu, igual que en v0.2 |
 
 ### Riesgos de la placa

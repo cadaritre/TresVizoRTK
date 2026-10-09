@@ -25,7 +25,8 @@ RI = RO - TB['pared']
 Y_FLAT_O, Y_FLAT_I, X_FLAT = TB['plano_y_exterior'], TB['plano_y_interior'], TB['plano_x']
 H_TOTAL, R_ROUND = TB['alto_total'], TB['redondeo']
 Z_TUBE0, Z_TUBE1 = TB['z_base'], TB['z_tapa']
-CLR = HOL['general']
+CLR = HOL['ajuste_impresas']          # juego entre piezas impresas
+CLR_BUY = HOL['compradas']           # aire a piezas compradas
 
 
 # --- Primitivas ----------------------------------------------------------------
@@ -95,7 +96,7 @@ def tube_path(points, d):
 
 # --- Envolventes del tubo --------------------------------------------------------
 def outer_envelope():
-    """Exterior completo z 0-100: R26, redondeos R4 arriba y abajo, cara plana en y 22.13."""
+    """Exterior completo z 0-H_TOTAL (111): R28, redondeos R4 arriba y abajo, cara plana en y 22.9."""
     rr, h, ro = R_ROUND, H_TOTAL, RO
     c = ro - rr
     s45 = math.sqrt(0.5)
@@ -114,10 +115,10 @@ def outer_envelope():
 def interior(z0, z1, inset=0.0):
     """Hueco interior del tubo, reducido `inset` hacia dentro.
 
-    En |x| <= 13.65 llega hasta la cara plana interior (y 20.33); fuera de esa franja sigue el
-    circulo de r 24.2 (con el escalon de 0.35 en |x| 13.65 de la especificacion). Al circulo se le
-    quita antes el casquete delante de la cara plana: si no, en |x| < 9.79 el hueco pasa de la cara
-    plana exterior (y 22.13) y el frente queda abierto.
+    En |x| <= X_FLAT (15.33) llega hasta la cara plana interior (y 20.5); fuera de esa franja sigue
+    el circulo de r RI (25.6), que corta la cara plana justo en |x| 15.33. Al circulo se le quita
+    antes el casquete delante de la cara plana: si no, el hueco pasa de la cara plana exterior
+    (y 22.9) y el frente queda abierto (error de la primera version).
     """
     r = RI - inset
     xf, yf = X_FLAT - inset, Y_FLAT_I - inset
@@ -184,8 +185,36 @@ OL = PL['oled']
 
 
 def h_max(x):
-    """Alto maximo de componentes sobre la cara de la placa (especificacion v0.3)."""
-    return min(PL['h_max'], math.sqrt(max(RI ** 2 - x * x, 0.0)) - 15.7)
+    """Alto maximo de componentes sobre la cara de la placa: 0.5 de aire a la cara plana interior
+    (tope h_max) y 0.5 en radial a la pared redonda (circulo de RI - aire), no 0.5 en y: en los
+    cantos la pared va inclinada y 0.5 en y dejaba solo ~0.37 de aire."""
+    return min(PL['h_max'], math.sqrt(max((RI - PL['aire']) ** 2 - x * x, 0.0)) - PL['y_cara'])
+
+
+BOARD_JSON = MB_CAD / 'placa-principal.json'
+
+
+def board_json():
+    try:
+        return json.loads(BOARD_JSON.read_text(encoding='utf-8'))
+    except Exception:
+        return None
+
+
+def sd_axis_z():
+    """Eje de la tarjeta microSD: centro de J401 en la placa real (placa-principal.json) mas el
+    corrimiento del canal de la tarjeta (0.9, de los pivotes de la huella TF-015). Si no esta, el
+    valor de respaldo de parameters.json. Nunca sale de la ranura."""
+    sd = P['costado']['microsd']
+    bj = board_json()
+    try:
+        zz = bj['componentes']['J401']['caja']['z']
+        return round((zz[0] + zz[1]) / 2.0 + sd['desplazamiento_canal'], 2), 'J401 (placa-principal.json)'
+    except Exception:
+        return sd['z_centro'], 'respaldo (parameters.json)'
+
+
+SD_Z, SD_Z_SRC = sd_axis_z()
 
 
 def board_envelope():
@@ -218,7 +247,7 @@ def board_envelope():
     out['J101 USB-C'] = box(u['boca_x'] - u['fondo'], u['boca_x'], yf, yf + u['alto'],
                             u['z'] - u['ancho'] / 2, u['z'] + u['ancho'] / 2)
     sd = PL['microsd']
-    zc = P['costado']['microsd']['z_centro']
+    zc = SD_Z - P['costado']['microsd']['desplazamiento_canal']
     out['J401 microSD'] = box(sd['boca_x'] - sd['fondo'], sd['boca_x'], yf, yf + sd['alto'],
                               zc - sd['ancho'] / 2, zc + sd['ancho'] / 2)
     out.update(oled_stack())
@@ -256,7 +285,7 @@ def usb_overmold():
 
 def microsd_card(dx=0.0):
     t = PL['tarjeta']
-    zc = P['costado']['microsd']['z_centro']
+    zc = SD_Z
     x1 = t['x_fuera'] + dx
     return box(x1 - t['largo'], x1, t['y0'], t['y0'] + t['espesor'],
                zc - t['ancho'] / 2, zc + t['ancho'] / 2)
@@ -341,23 +370,104 @@ def s_bend(a, b, n=16):
     return pts, R
 
 
+def coax_route(n=24):
+    """Recorrido del latiguillo, del SMA acodado de la carrier al pasamuros del eje: arco a izquierdas
+    de radio R1, recto hacia atras por fuera de la celda -X, media vuelta detras de ella (radio
+    R2 = -x_recto / 2, acaba en (0, -Rv) mirando a +Y) y curva vertical de radio Rv hasta el eje.
+    Sube de z_cable a z_lazo con curvatura vertical constante en el primer arco y frenando en el
+    recto hasta y_fin_subida (pendiente nula al principio y al final)."""
+    c, rt = CX['clavija'], CX['ruta']
+    ac = c['acodada']
+    R1, Rv, zl = rt['radio_primer_arco'], rt['radio_vertical'], rt['z_lazo']
+    dx, dy = ac['direccion']
+    ex, ey, ez = c['x'] + dx * ac['largo'], c['y'] + dy * ac['largo'], ac['z_cable']
+    xy = [(c['x'] + dx * (ac['largo'] - 2.0), ey)]
+    cx1, cy1 = ex, ey - R1
+    for i in range(n + 1):
+        t = math.radians(90 + 90.0 * i / n)
+        xy.append((cx1 + R1 * math.cos(t), cy1 + R1 * math.sin(t)))
+    i_arc = len(xy) - 1                              # final del primer arco
+    xs = cx1 - R1
+    y_rise = rt['y_fin_subida']
+    for k in range(1, 9):
+        xy.append((xs, cy1 + (y_rise - cy1) * k / 8.0))
+    i_rise = len(xy) - 1                             # final de la subida
+    xy.append((xs, -Rv))
+    R2 = -xs / 2.0
+    cx2, cy2 = xs + R2, -Rv
+    for i in range(1, n + 1):
+        t = math.radians(180 + 180.0 * i / n)
+        xy.append((cx2 + R2 * math.cos(t), cy2 + R2 * math.sin(t)))
+    s_acc = [0.0]
+    for a, b in zip(xy[:-1], xy[1:]):
+        s_acc.append(s_acc[-1] + math.hypot(b[0] - a[0], b[1] - a[1]))
+    s0, sa, sr = s_acc[1], s_acc[i_arc], s_acc[i_rise]
+    A, Bl, dz = sa - s0, sr - sa, zl - ez
+    ka = 2.0 * dz / (A * (A + Bl))                   # z'' en el arco
+    kb = ka * A / Bl                                 # z'' (frenando) en el recto
+    pts = []
+    for (x, y), sv in zip(xy, s_acc):
+        if sv <= s0:
+            z = ez
+        elif sv <= sa:
+            z = ez + ka * (sv - s0) ** 2 / 2.0
+        elif sv <= sr:
+            u = sv - sa
+            z = ez + ka * A * A / 2.0 + ka * A * u - kb * u * u / 2.0
+        else:
+            z = zl
+        pts.append((x, y, z))
+    x_end = cx2 + R2
+    for i in range(1, n + 1):
+        t = math.radians(90.0 * i / n)
+        pts.append((x_end * (1 - i / n), -Rv + Rv * math.sin(t), zl + Rv * (1 - math.cos(t))))
+    return pts
+
+
+def min_bend_radius(pts):
+    """Radio de curva minimo de una poligonal fina (circunradio de cada terna de puntos)."""
+    best = float('inf')
+    for a, b, c in zip(pts[:-2], pts[1:-1], pts[2:]):
+        A, B, C = V(*a), V(*b), V(*c)
+        ab, bc, ca = (B - A).Length, (C - B).Length, (A - C).Length
+        area2 = (B - A).cross(C - A).Length
+        if area2 > 1e-9:
+            best = min(best, ab * bc * ca / (2.0 * area2))
+    return best
+
+
 def coax():
-    """Clavija SMA recta en el SMA de la carrier: tuerca hexagonal de 5/16 (se dibuja su barrido
-    al girar, Ø9.2) sobre el canon y cuerpo encima. Coaxial fino en S hasta el paso de la tapa
-    y bucle de servicio sobre la placa. Devuelve ({nombre: solido}, radio de la S)."""
+    """Clavija SMA acodada en el SMA de la carrier, recorrido del cable y conector de la tapa
+    (pasamuros SMA hembra si la antena es macho; clavija recta por el paso de 12 si es hembra).
+    Devuelve ({nombre: solido}, radio de curva minimo)."""
     c = CX['clavija']
-    nt, bd = c['tuerca'], c['cuerpo']
-    z0 = nt['z0']
-    z1 = z0 + nt['largo']
-    nut = cyl_z(nt['entre_esquinas'] / 2.0, c['x'], c['y'], z0, z1)
-    body = cyl_z(bd['diametro'] / 2.0, c['x'], c['y'], z1, z1 + bd['largo'])
-    pts, R = s_bend((c['x'], c['y'], z1 + bd['largo']), (0.0, 0.0, H_TOTAL))
-    lp = CX['bucle']
-    rc = CX['cable_diametro'] / 2.0
-    loop = Part.makeTorus(lp['radio'], rc, V(lp['centro'][0], lp['centro'][1], lp['z']), V(0, 0, 1))
-    return {'clavija SMA de la carrier': nut.fuse(body),
-            'coaxial (curva en S)': tube_path(pts, CX['cable_diametro']),
-            'coaxial: bucle de servicio': loop}, R
+    nt, ac = c['tuerca'], c['acodada']
+    z1 = nt['z0'] + nt['largo']
+    nut = cyl_z(nt['entre_esquinas'] / 2.0, c['x'], c['y'], nt['z0'], z1)
+    dx = ac['direccion'][0]
+    xa, xb = sorted((c['x'] - dx * 3.5, c['x'] + dx * (ac['largo'] - 2.0)))
+    housing = box(xa, xb, c['y'] - ac['ancho'] / 2.0, c['y'] + ac['ancho'] / 2.0, ac['z'][0], ac['z'][1])
+    boot = cyl_x(1.5, c['y'], ac['z_cable'], *sorted((c['x'] + dx * (ac['largo'] - 2.0), c['x'] + dx * ac['largo'])))
+    plug = [nut, housing, boot]
+    if ac['z'][0] > z1:                                 # cuello entre la tuerca y el cuerpo acodado
+        plug.append(cyl_z(ac.get('cuello_diametro', 5.0) / 2.0, c['x'], c['y'], z1 - 0.01, ac['z'][0] + 0.01))
+    pts = coax_route()
+    out = {'clavija SMA de la carrier': fuse_all(plug),
+           'coaxial (recorrido)': tube_path(pts, CX['cable']['diametro'])}
+    cn = ANT['conector']
+    z_in = H_TOTAL - cn['pasamuros']['panel']          # cara de dentro del panel de la tapa
+    if cn['tipo'] == 'macho':
+        pm = cn['pasamuros']
+        tnut = hex_prism(pm['tuerca_entre_caras'] / 2.0, z_in - pm['tuerca_alto'], pm['tuerca_alto'])
+        body = cyl_z(3.0, 0, 0, z_in - pm['largo_dentro'] + 3.0, z_in - pm['tuerca_alto'])
+        bt = cyl_z(1.75, 0, 0, z_in - pm['largo_dentro'], z_in - pm['largo_dentro'] + 3.0)
+        out['pasamuros SMA (dentro)'] = fuse_all([tnut, body, bt])
+        flat_y = pm['plano'] - pm['agujero'] / 2.0 - 0.05      # el cuerpo roscado lleva la misma cara plana
+        out['pasamuros SMA (fuera)'] = cyl_z(pm['rosca'] / 2.0, 0, 0, z_in, H_TOTAL + pm['largo_fuera']).cut(
+            box(-5, 5, flat_y, 5, z_in - 1, H_TOTAL + pm['largo_fuera'] + 1))
+    else:
+        out['clavija SMA del cable (antena hembra)'] = cyl_z(4.0, 0, 0, z_in - cn['pasamuros']['largo_dentro'], H_TOTAL + 2.0)
+    return out, min_bend_radius(pts)
 
 
 def nut_hex():
@@ -421,12 +531,23 @@ def plugs():
 
 
 def cable_reserves():
-    return {f'cable {k}': tube_path([tuple(p) for p in v['puntos']], v['diametro'])
-            for k, v in P['cables'].items()}
+    """Manojos de cables (reservas) y lo que sale del pack: cuerpo de la NTC y lengueta del -."""
+    cb = P['cables']
+    out = {f'cable {k}': tube_path([tuple(p) for p in v['puntos']], v['diametro'])
+           for k, v in cb.items() if isinstance(v, dict) and 'puntos' in v}
+    if 'ntc' in cb:
+        n = cb['ntc']
+        cx, cy, cz = n['centro']
+        out['cable NTC (cuerpo)'] = cyl_z(n['diametro'] / 2.0, cx, cy, cz - n['largo'] / 2.0, cz + n['largo'] / 2.0)
+    sp = cb.get('salidas_pack')
+    if sp:
+        t = sp['lengueta_neg']
+        out['cable lengueta - del pack'] = box(t['x'][0], t['x'][1], t['y'][0], t['y'][1], t['z'][0], t['z'][1])
+    return out
 
 
 def radial_screw(angle, z, head_d=5.0, shank_d=2.1, length=6.0):
-    """M2.5 avellanado radial desde fuera (cabeza a ras de la pared r 26)."""
+    """M2.5 avellanado radial desde fuera (cabeza a ras de la pared exterior, r 28)."""
     a = math.radians(angle)
     ux, uy = math.cos(a), math.sin(a)
     cone = Part.makeCone(head_d / 2, shank_d / 2, (head_d - shank_d) / 2,
@@ -510,19 +631,24 @@ def _openings_side(x, y, z, m=0.1):
     """Aberturas a proposito en la pared redonda, ensanchadas `m`."""
     cs = P['costado']
     u = cs['usb_c']
-    if x >= u['x0'] - m and y >= u['y'][0] - m and abs(z - u['z_centro']) <= u['medio_alto'] + m:
+    if abs(z - u['z_centro']) <= u['medio_alto'] + m and y >= u['y'][0] - m and \
+            ((x >= u['x0'] - m and y <= u['y'][1] + m) or x >= u['x_abierto'] - m):
         return 'tunel USB-C'
     sd = cs['microsd']
-    if x >= 15.5 - m and sd['y'][0] - m <= y <= sd['y'][1] + m and abs(z - sd['z_centro']) <= sd['ancho'] / 2 + m:
+    if x >= 15.5 - m and sd['y'][0] - m <= y <= sd['y'][1] + m and abs(z - SD_Z) <= sd['ancho'] / 2 + m:
         return 'ranura microSD'
     nl = sd['una']
     ye = sd['y'][1]
     xo = math.sqrt(RO ** 2 - ye ** 2)
     if math.hypot(x - (xo + nl['radio'] - nl['hondo']), y - ye) <= nl['radio'] + m and \
-            abs(z - sd['z_centro']) <= nl['alto'] / 2 + m:
+            abs(z - SD_Z) <= nl['alto'] / 2 + m:
         return 'rebaje de la una'
     r = math.hypot(x, y)
     a = math.atan2(y, x)
+    an = cs['tapa_puertos']['ancla']
+    da = math.atan2(math.sin(a - math.radians(an['angulo'])), math.cos(a - math.radians(an['angulo'])))
+    if abs(da) < math.pi / 2 and math.hypot(r * math.sin(da), z - an['z']) <= an['agujero'] / 2.0 + m:
+        return 'ancla de la tapa de puertos'
     head = P['base']['tornillos']['avellanado_diametro'] / 2.0
     for cfg, zs in ((P['base']['lenguetas'], P['base']['tornillos']['z']), (P['tapa']['lenguetas'], P['tapa']['tornillos_z'])):
         for ang in cfg['angulos']:
@@ -534,14 +660,14 @@ def _openings_side(x, y, z, m=0.1):
 
 def probe_zones():
     """(z0, z1, y de la sonda delantera, r del anillo, r en las ranuras). En los extremos, donde el
-    tubo tiene el rebaje de 0.9 por dentro, las sondas van en la mitad de lo que queda."""
+    tubo tiene el rebaje de 1.2 por dentro, las sondas van en la mitad de lo que queda."""
     lab = P['tubo']['laberinto']
     zb = Z_TUBE0 + lab['alto_base'] + lab['holgura']
     zt = Z_TUBE1 - lab['alto_tapa'] - lab['holgura']
     y_mid = (Y_FLAT_I + Y_FLAT_O) / 2.0
     y_out = (Y_FLAT_I + lab['ancho'] + lab['holgura'] + Y_FLAT_O) / 2.0
     r_out = (RI + lab['ancho'] + lab['holgura'] + RO) / 2.0
-    return [(math.ceil(zb + 0.4), math.floor(zt - 0.4), y_mid, (RI + RO) / 2.0, 25.6),
+    return [(math.ceil(zb + 0.4), math.floor(zt - 0.4), y_mid, (RI + RO) / 2.0, (P['tubo']['ranuras_rieles']['radio'] + RO) / 2.0),
             (Z_TUBE0 + 0.2, zb - 0.1, y_out, r_out, r_out),
             (zt + 0.1, Z_TUBE1 - 0.5, y_out, r_out, r_out)]
 
@@ -552,7 +678,7 @@ def wall_probes(tube, step=0.5):
     import numpy as np
     grooves = P['tubo']['ranuras_rieles']['angulos']
     front_x = _frange(-13.5, 13.5, step)
-    da = step / 25.1
+    da = step / ((RI + RO) / 2.0)
     res = {'cara_plana': {'puntos': 0, 'en_aberturas': 0, 'sin_material': 0, 'ejemplos': []},
            'anillo': {'puntos': 0, 'en_aberturas': 0, 'sin_material': 0, 'ejemplos': []}}
     zones = probe_zones()
@@ -567,7 +693,9 @@ def wall_probes(tube, step=0.5):
                 continue
             ring.append((x, y))
         n = max(1, int(round((z1 - z0) / step)))
-        for z in [z0 + (z1 - z0) * i / n for i in range(n + 1)]:
+        # Corridas 0.013 de los multiplos de 0.5: una seccion justo en la tangente de un agujero
+        # horizontal (el del ancla acaba en z 33.5) sale degenerada y falla entera.
+        for z in [z0 + 0.013 + (z1 - z0 - 0.026) * i / n for i in range(n + 1)]:
             polys = section_polygons(tube, z)
             for key, pts, opening in (('cara_plana', [(x, y_f) for x in front_x], lambda x, y: _openings_front(x, z, y)),
                                       ('anillo', ring, lambda x, y: _openings_side(x, y, z)
@@ -590,9 +718,9 @@ def wall_probes(tube, step=0.5):
 
 
 def wall_reference(n=720):
-    """Pared intencionada del tubo, hecha aparte (poligonos, sin interior()): circulo R26 con la
-    cara plana en y 22.13 por fuera; por dentro circulo R24.2, salvo en |x| <= 13.65, donde manda
-    la cara plana en y 20.33."""
+    """Pared intencionada del tubo, hecha aparte (poligonos, sin interior()): circulo RO (28) con
+    la cara plana en y 22.9 por fuera; por dentro circulo RI (25.6), salvo en |x| <= 15.33, donde
+    manda la cara plana en y 20.5."""
     out, inn = [], []
     for i in range(n):
         a = 2 * math.pi * i / n
@@ -668,3 +796,36 @@ def min_wall_thickness(shape, zs, region, dist=0.05):
                 if th < best:
                     best, where = th, [round(mx, 2), round(my, 2), round(z, 2)]
     return round(best, 3), where
+
+
+# --- Logo ------------------------------------------------------------------------------
+LOGO_PY = REPO / 'hardware' / 'main-board' / 'scripts' / 'logo.py'
+
+
+def logo_polygons():
+    """Logo completo (distintivo + VIZO) de hardware/main-board/scripts/logo.py, sin modificarlo,
+    en la cara plana: mirando el frente desde +Y, +X queda a la izquierda, asi que x = -u y
+    z = z_c - v (se lee bien desde delante, sin espejo). Devuelve [(contorno, [huecos])] en (x, z)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('tresvizo_logo', str(LOGO_PY))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    lg = P['frente']['logo']
+    polys, w, h = mod.full_logo(lg['ancho'], (0.0, 0.0), mirror=False)
+    tr = lambda ring: [(-u, lg['z_centro'] - v) for u, v in ring]
+    return [(tr(o), [tr(hh) for hh in hs]) for o, hs in polys], w, h
+
+
+def logo_relief():
+    """Relieve del logo: de la cara plana exterior (y 22.9) hacia fuera."""
+    lg = P['frente']['logo']
+    polys, _, _ = logo_polygons()
+    solids = []
+    for o, hs in polys:
+        f = Part.Face(Part.makePolygon([V(x, Y_FLAT_O, z) for x, z in o] + [V(o[0][0], Y_FLAT_O, o[0][1])]))
+        for hh in hs:
+            fh = Part.Face(Part.makePolygon([V(x, Y_FLAT_O, z) for x, z in hh] + [V(hh[0][0], Y_FLAT_O, hh[0][1])]))
+            f = f.cut(fh)
+        for face in f.Faces:
+            solids.append(face.extrude(V(0, lg['relieve'], 0)))
+    return fuse_all(solids)

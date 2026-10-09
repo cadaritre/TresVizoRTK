@@ -6551,7 +6551,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "22uF"
+		(property "Value" "10uF"
 			(at 294.732 40.97 0)
 			(effects
 				(font
@@ -6578,7 +6578,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "22uF 25V X5R"
+		(property "Description" "10uF 25V X5R"
 			(at 292.1 39.37 0)
 			(effects
 				(font
@@ -6587,7 +6587,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "CL21A226MAQNNNE"
+		(property "MPN" "CL21A106KAYNNNE"
 			(at 292.1 39.37 0)
 			(effects
 				(font
@@ -6596,7 +6596,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C45783"
+		(property "LCSC" "C15850"
 			(at 292.1 39.37 0)
 			(effects
 				(font
@@ -6911,7 +6911,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "22uF"
+		(property "Value" "10uF"
 			(at 320.132 40.97 0)
 			(effects
 				(font
@@ -6938,7 +6938,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "22uF 25V X5R"
+		(property "Description" "10uF 25V X5R"
 			(at 317.5 39.37 0)
 			(effects
 				(font
@@ -6947,7 +6947,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "CL21A226MAQNNNE"
+		(property "MPN" "CL21A106KAYNNNE"
 			(at 317.5 39.37 0)
 			(effects
 				(font
@@ -6956,7 +6956,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C45783"
+		(property "LCSC" "C15850"
 			(at 317.5 39.37 0)
 			(effects
 				(font
@@ -7091,7 +7091,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "22uF"
+		(property "Value" "10uF"
 			(at 332.832 40.97 0)
 			(effects
 				(font
@@ -7118,7 +7118,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "22uF 25V X5R"
+		(property "Description" "10uF 25V X5R"
 			(at 330.2 39.37 0)
 			(effects
 				(font
@@ -7127,7 +7127,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "CL21A226MAQNNNE"
+		(property "MPN" "CL21A106KAYNNNE"
 			(at 330.2 39.37 0)
 			(effects
 				(font
@@ -7136,7 +7136,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C45783"
+		(property "LCSC" "C15850"
 			(at 330.2 39.37 0)
 			(effects
 				(font

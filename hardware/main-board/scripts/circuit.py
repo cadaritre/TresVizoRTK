@@ -171,13 +171,19 @@ def build(libs):
     C(s, "chg", "47nF", "CHG_BTST1", "CHG_SW1")
     C(s, "chg", "47nF", "CHG_BTST2", "CHG_SW2")
     C(s, "chg", "4.7uF", "REGN")
-    # VBUS: TI pide >= 2 uF efectivos (2 x 10 uF); un 22 uF/25 V da ~10 uF efectivos a 5 V.
-    C(s, "chg", "22uF", "VBUS")
+    # VBUS y PMID (endurecimiento del 08-10-2026, irrupción al enchufar): en el BQ25798 entre VBUS y PMID solo
+    # hay la resistencia de medida de 8 mOhm, sin FET de bloqueo (hoja SLUSDV2C, diagrama de bloques), así que al
+    # enchufar el USB la fuente carga de golpe todo lo de VBUS y PMID. Antes eran 22 + 2 x 22 uF; ahora 10 uF en
+    # VBUS y 2 x 10 uF en PMID (C15850, Basic). Con la curva de Samsung a 25 C, un CL21A106KAYNNNE da 5.0 uF a
+    # 5 V: VBUS 5 uF (TI pide >= 2 uF efectivos) y PMID 10 uF (TI pide >= 4 uF; sugiere 3 x 10 uF para 3.3 A
+    # de entrada y aquí ILIM la limita a ~1.45 A). A 5 V pasan de ~32 a ~15 uF efectivos y de ~259 a ~118 uC de
+    # carga; USB 2.0 admite 10 uF (44 ohm || 10 uF) sin limitador, así que sigue por encima: ver «Pendientes y
+    # riesgos» en el README. Sin modo backup (pediría 70 uF efectivos en PMID).
+    # D+/D- del cargador sin conectar (sin detección BC1.2).
+    C(s, "chg", "10uF", "VBUS")
     C(s, "chg", "100nF", "VBUS")
-    # PMID: 2 x 22 uF/25 V (~10 uF efectivos cada uno a 5 V) en vez de 3 x 10 uF: más capacidad con una pieza
-    # menos y el mismo número de parte que VBUS y SYS. D+/D- del cargador sin conectar (sin detección BC1.2).
     for _ in range(2):
-        C(s, "chg", "22uF", "PMID")
+        C(s, "chg", "10uF", "PMID")
     C(s, "chg", "100nF", "PMID")
     # SYS: TI pide >= 6 uF efectivos; 2 x 22 uF + 10 uF (25 V) superan el valor de 5 x 10 uF con menos piezas.
     C(s, "chg", "22uF", "VSYS")

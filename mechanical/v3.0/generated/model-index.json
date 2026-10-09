@@ -5,12 +5,12 @@
    "etiqueta": "Base con la tuerca del baston",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 8.37,
+   "volumen_cm3": 8.98,
    "caja": [
-    -26.0,
-    26.0,
-    -26.0,
-    22.13,
+    -28.0,
+    28.0,
+    -28.0,
+    22.9,
     -0.0,
     15.9
    ]
@@ -20,14 +20,14 @@
    "etiqueta": "Tubo",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 27.78,
+   "volumen_cm3": 43.36,
    "caja": [
-    -26.0,
-    26.0,
-    -26.0,
-    22.13,
+    -28.0,
+    28.0,
+    -28.0,
+    23.4,
     4.0,
-    96.0
+    107.0
    ]
   },
   {
@@ -35,14 +35,14 @@
    "etiqueta": "Tapa de antena",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 7.71,
+   "volumen_cm3": 10.16,
    "caja": [
-    -26.0,
-    26.0,
-    -26.0,
-    22.13,
-    87.8,
-    100.0
+    -28.0,
+    28.0,
+    -28.0,
+    22.9,
+    88.0,
+    111.0
    ]
   },
   {
@@ -50,14 +50,14 @@
    "etiqueta": "Chasis",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 4.76,
+   "volumen_cm3": 6.57,
    "caja": [
-    -20.86,
-    20.86,
+    -21.74,
+    21.74,
     2.0,
-    16.35,
+    16.45,
     9.5,
-    95.7
+    106.6
    ]
   },
   {
@@ -65,44 +65,29 @@
    "etiqueta": "Tecla de TPU",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 0.08,
+   "volumen_cm3": 0.09,
    "caja": [
     -4.4,
     4.4,
-    17.3,
-    23.13,
+    17.45,
+    23.9,
     17.6,
     26.4
    ]
   },
   {
-   "nombre": "06-usb-plug-tpu",
-   "etiqueta": "Tapon de TPU del USB-C",
+   "nombre": "06-port-cover-tpu",
+   "etiqueta": "Tapa de puertos de TPU",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 0.51,
+   "volumen_cm3": 1.03,
    "caja": [
-    14.03,
-    23.85,
-    11.51,
-    22.39,
-    13.6,
-    32.4
-   ]
-  },
-  {
-   "nombre": "07-sd-plug-tpu",
-   "etiqueta": "Tapon de TPU de la microSD",
-   "valida": true,
-   "solidos": 1,
-   "volumen_cm3": 0.11,
-   "caja": [
-    17.03,
-    21.99,
-    14.63,
-    20.1,
-    33.05,
-    50.95
+    12.6,
+    27.71,
+    6.38,
+    24.8,
+    16.8,
+    48.4
    ]
   }
  ],
@@ -146,18 +131,21 @@
   "antena: antena HA-901A",
   "antena: tornillos M2.5 de la antena",
   "coaxial: clavija SMA de la carrier",
-  "coaxial: coaxial (curva en S)",
-  "coaxial: coaxial: bucle de servicio",
+  "coaxial: coaxial (recorrido)",
+  "coaxial: pasamuros SMA (dentro)",
+  "coaxial: pasamuros SMA (fuera)",
   "clavijas: clavija J102",
   "clavijas: clavija J301",
   "clavijas: clavija J404",
-  "cables: cable arnes_j301",
   "cables: cable bateria_pos_ntc",
   "cables: cable bateria_neg",
+  "cables: cable arnes_j301",
+  "cables: cable NTC (cuerpo)",
+  "cables: cable lengueta - del pack",
   "tornillos: tornillos M2.5 de base y tapa",
   "usb: funda de la clavija",
   "microsd: tarjeta puesta"
  ],
- "coaxial_radio_curva": 5.25,
+ "coaxial_radio_curva": 10.0,
  "clavijas_origen": "kicad/plugs.json (v0.3)"
 }

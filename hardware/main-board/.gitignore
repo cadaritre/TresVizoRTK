@@ -4,6 +4,8 @@
 *-backups/
 _autosave-*
 fp-info-cache
+# Historial local que KiCad 10 guarda junto al proyecto al abrirlo
+.history/
 
 # Intermedios que build.py vuelve a generar
 kicad/tresvizo-main-unrouted.*
