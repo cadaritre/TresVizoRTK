@@ -11,8 +11,8 @@ en paralelo. Lo que cambie durante el diseño se corrige aquí.
 
 | Tema | v0.2 / V2.3 | v0.3 compacta | Motivo |
 | --- | --- | --- | --- |
-| Carcasa | Tubo Ø64 × 130 con chasis de rieles | Tubo Ø56 × 111 con una cara plana al frente (empezó en Ø52 × 100) | Unos dos tercios del volumen. Se agrandó en el endurecimiento del 08-10-2026 para dejar holguras de impresión y de montaje |
-| Batería | 1 × 18650 | 2 × 18650 en paralelo (1S2P), detrás de la carrier | Doble autonomía; la placa sigue en 1S |
+| Carcasa | Tubo Ø64 × 130 con chasis de rieles | Tubo Ø56 × 116 con una cara plana al frente (empezó en Ø52 × 100) | Unos dos tercios del volumen. Se agrandó en el endurecimiento del 08-10-2026 para dejar holguras de impresión y de montaje, y el coaxial con R ≥ 12 |
+| Batería | 1 × 18650 | Pack comercial 1S2P (2 × 18650 en paralelo, con BMS y funda; 37.5 × 68 × 20 según el anuncio), detrás de la carrier | Doble autonomía; la placa sigue en 1S |
 | Panel | Placa panel-usb, OLED, botón metálico de 12 mm y cables | OLED, botón táctil, LED, USB-C y microSD en la placa principal | Sin cables al panel; el botón de 12 mm es difícil de conseguir |
 | OLED | Módulo de 4 pines por cable (J403) | El mismo módulo, soldado por sus 4 pines a la placa, girado 180° | El propietario ya lo tiene; el firmware gira la imagen 180° (ver [Valores para el firmware](#valores-para-el-firmware)) |
 | IMU | Breakout BMI088 en la tapa por J405 | BMI088 en la placa principal, en el mismo bus I2C (GPIO41/42, INT 2 y 1) | No hacen falta cable ni plataforma; queda rígido con el resto |
@@ -27,13 +27,14 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
 
 ## Tubo
 
-> **Endurecimiento del 08-10-2026.** El tubo pasó de Ø52 × 100 (pared de 1.8) a **Ø56 × 111
+> **Endurecimiento del 08-10-2026.** El tubo pasó de Ø52 × 100 (pared de 1.8) a **Ø56 × 116
 > (pared de 2.4)**. Así todos los ajustes entre piezas impresas tienen 0.4 mm, los rieles de la
-> placa 0.25 por cara y todo lo comprado 0.5 de aire, y el coaxial curva con R 10. La placa no
-> cambió de sitio. Detalle, motivo de cada medida y comprobaciones en `mechanical/v3.0/README.md`.
+> placa 0.25 por cara y todo lo comprado 0.5 de aire, y el coaxial curva con R ≥ 12. Primero quedó
+> en 111 de alto con el coaxial a R 10; subió 5 mm para R 12 (hoja actual de Lapp, abajo). La placa
+> no cambió de sitio. Detalle, motivo de cada medida y comprobaciones en `mechanical/v3.0/README.md`.
 
-- Radio exterior 28 (Ø56), pared 2.4: radio interior 25.6. Alto 111: base z 0–4, tubo z 4–107 y
-  tapa z 107–111, con redondeos de R 4 en la base y en la tapa.
+- Radio exterior 28 (Ø56), pared 2.4: radio interior 25.6. Alto 116: base z 0–4, tubo z 4–112 y
+  tapa z 112–116, con redondeos de R 4 en la base y en la tapa.
 - Cara plana al frente: por fuera en y 22.9 (|x| ≤ 16.11) y por dentro en y 20.5 (|x| ≤ 15.33).
   El vidrio de la OLED (frente en y 20.0) queda con 0.5 de aire.
 - Abajo: base desmontable con la tuerca 5/8"-11 de latón (23.8 entre caras, 13.9 de alto) en el
@@ -55,14 +56,14 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
     salientes detrás de la placa.
   - Los dos M2 de abajo de la OLED atraviesan el módulo, su separador y la placa, y roscan en esos
     salientes. Esos tornillos sujetan la OLED y la placa.
-  - Las dos celdas bajan antes por arriba a su cuna, en la pared de atrás. No hay tapa trasera.
+  - El pack baja antes por arriba a su cuna, en la pared de atrás. No hay tapa trasera.
   - La carrier entra al chasis por abajo y la sostienen dos ganchos. No puede entrar por delante
     ni por arriba: chocaría con los salientes de la OLED.
   - Detalle y comprobaciones en `mechanical/v3.0/README.md`.
 - Frente: ventana de la OLED con una mica de 1 mm pegada por fuera, tecla del botón (de TPU, que se
-  pone por fuera después del chasis), guía de luz del LED y el logo en relieve de 0.5.
-- Costado izquierdo (+X): USB-C y ranura de la microSD, tapados por una tapa de TPU amarrada con
-  un pivote que atraviesa la pared.
+  pone por fuera después del chasis), guía de luz del LED y el distintivo de TresVizo (hexágono con el 3) grabado 0.8.
+- Costado izquierdo (+X): túnel cerrado del USB-C y ranura justa de la microSD, tapados por una
+  tapa de TPU amarrada con tres anclas que atraviesan la pared (ver la placa, abajo).
 - Líneas verticales decorativas, como en V2.3.
 
 ## Pila de adelante hacia atrás (y)
@@ -76,7 +77,7 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
 | Componentes de la carrier (6.4, hacia la placa) | 6.8 a 13.2 |
 | PCB de la carrier (1.6) | 5.2 a 6.8 |
 | Patas del SMA (no se cortan), solo bajo el SMA | 3.2 a 5.2 |
-| Celdas: ejes en x ±9.5, y −7.9; Ø18.6 | −17.2 a 1.4 |
+| Pack 1S2P (20 de grueso, peor caso del anuncio) | −18.6 a 1.4 |
 
 ## Placa principal v0.3
 
@@ -160,13 +161,17 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
     - la placa lleva una muesca en u 0–3.1, a lo largo de z 25 ± 6.5 (v 48.5–61.5). Quedó en 3.1 y
       no en 3.0 porque el modelo 3D del conector mide 3.30 sobre la cara, no 3.25: con la boca en
       u 3.0, `cad/check_heights.py` daba −0.01 mm de margen; en u 3.1 da 0.07;
-    - la pared lleva un bolsillo para la funda desde x 15.0 hacia fuera, en y 13.6–20.5 y
-      z 25 ± 6.5.
+    - la pared lleva un túnel cerrado del tamaño de esa funda más 0.3 por lado (12.95 × 7.1,
+      esquinas de R 1.3), en el eje real de J101 (y 16.6, z 25.0, del STEP de la placa), desde la
+      cara de fuera hasta la boca (x 14.9). Así, sin la tapa de TPU, por fuera solo se ve el
+      receptáculo y el canto de la placa.
 - **microSD** (J401, TF-015 de empuje: 16.0 de ancho, 15.3 de fondo y 1.95 de alto) en el mismo
   costado, z ≈ 45.
   - Su alto pide |x| ≤ 16.5: la boca queda en u ≈ 1.5 mirando a +X.
-  - La pared lleva una ranura para la tarjeta (11 de ancho). La tarjeta puesta queda unos 2 a 3 mm
-    hacia dentro de la cara exterior: hace falta un rebaje para la uña o usar unas pinzas.
+  - La pared lleva una ranura justa para la tarjeta, 11.6 × 1.6 (la tarjeta, 11 × 1.0, más 0.3 por
+    lado), en el eje real de la tarjeta (z 40.88), con una muesca de 5 mm para la uña en su centro.
+    Con la muesca, el canto de la tarjeta puesta queda a 1.9 mm de la cara de fuera (sin ella, a
+    5.2). Que la uña alcance hay que probarlo en una pieza impresa.
 - **Antena del ESP32-S3-WROOM-1:** hacia el canto derecho (−X), a media altura, sin cobre debajo.
   Lejos del coaxial y del SMA de la carrier.
 - **Conectores de cable:** solo en el canto de abajo (z 8.5), con la boca hacia abajo, porque a
@@ -195,11 +200,15 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
   - La clavija que se enrosca en él (tuerca de 5/16", hasta 9.2 entre esquinas) llega a
     y ≈ 14.2–14.8, detrás del dorso de la placa (13.8). Por eso la placa lleva una **muesca en su
     canto de arriba: x −6.2…3.8, z 73.5–80 (u 14.2–24.2, v 0–6.5)**.
-  - El coaxial de la antena, desde el SMA hembra de panel de la tapa, es un RG 178 B/U de unos
-    75 mm entre conectores, con SMA macho acodado de crimpar en la carrier (su cuerpo empieza en
-    z ≥ 80.5).
-  - Va con curvas de R 10, el mínimo para instalación fija de la hoja de Lapp: al dar servicio no
-    hay que doblarlo más (para dobleces repetidos pide R 19). En el tubo de Ø52 solo cabía R 5.25.
+  - El coaxial de la antena, desde el SMA hembra de panel de la tapa (z 104), es un RG 178 B/U de
+    unos 77 mm entre los cuerpos de los conectores, con SMA macho acodado de crimpar en la carrier
+    (su cuerpo empieza en z ≥ 80.5).
+  - Va con curvas de R 12.27 como mínimo. La hoja actual de Lapp (2170002, versión 06, válida desde
+    el 30-04-2020) pide 6 × Ø en instalación fija (10.9; 11.6 con el Ø máximo) y 10 × Ø con
+    dobleces ocasionales (18–19): al dar servicio no hay que doblarlo más. En el tubo de Ø52 solo
+    cabía R 5.25.
+  - Recorrido: sale de la clavija acodada hacia −X, pasa por fuera del extremo −X del pack, por
+    detrás de él, y sube al eje por encima del pack. Queda a 0.59 mm o más de todo.
   - En V3.0 la carrier quedó 0.1 más atrás (PCB en y 5.2–6.8) para que su SMA quede a 0.5 de la
     placa.
 - Se sujeta por sus cantos; no se le corta nada. Las ranuras no pueden pegarse a sus cantos
@@ -208,9 +217,25 @@ el frente** (la cara plana) y **+X a la izquierda mirando el frente**. Medidas e
 
 ## Celdas
 
-2 × 18650 protegidas de Ø18.6 × 70, en paralelo. Ejes en (x ±9.5, y −7.9), z 17.5–87.5. Van en
-una cuna detrás de la carrier, con la NTC pegada entre las dos y los cables al canto de abajo de
-la placa (J102, J404).
+Pack comercial 1S2P de Mercado Libre: 2 × 18650 lado a lado en funda termorretráctil, con BMS
+(4.30 / 2.80 V), 5600 mAh según el anuncio, 110 g, cables rojo y negro y sin hilo de NTC
+(elegido por el propietario el 08-10-2026).
+
+- La carcasa toma como peor caso las medidas del anuncio, 37.5 × 68 × 20, con forma de estadio
+  (dos cilindros de Ø20 unidos por la funda), y le deja 0.5 de holgura a la cuna, también al
+  bajarlo por arriba. Parámetros en `celdas.pack` de `mechanical/v3.0/parameters.json`.
+- Va en x 0, de y −18.6 a 1.4 (el frente queda donde estaban las celdas sueltas; la cuna se corrió
+  1.4 hacia atrás) y de z 18.8 a 86.8. Apoya 1.3 más arriba que las celdas sueltas: su cara de
+  abajo es plana y la cabeza del retén de la tuerca llega a z 18.3.
+- Holguras: 0.5 a la cuna y al tubo, 0.5 a los topes de la tapa (lo sujetan a lo largo con 0.5 de
+  juego, sin separador impreso), 0.6 al chasis, 0.5 al retén y 1.8 a la carrier.
+- El de verdad será algo más delgado (~19): medirlo y calzarlo con espuma.
+- El BMS va abajo. Del pack sale un solo mazo de Ø3.4 (rojo, negro y los dos hilos de la NTC) por
+  detrás, baja detrás del saliente de la tuerca y corre por el piso, por el lado +X, hasta J102 y
+  J404, a 8.8 mm o más del arnés de J301.
+- A los cables del pack se les une un cable GH de 4 (AWG #26, dos hilos por polo) para J102.
+- La NTC de J404 va pegada con kapton en la cara de atrás del pack (x 1.5–4.5, z 47–55; unos 2 mm
+  de grueso), con sus hilos bajando por esa cara hasta el mazo.
 
 ## Cambios de esquema respecto a v0.2
 
@@ -251,7 +276,19 @@ Pendiente antes de pedir:
   El esquema usa GND, VCC, SCL, SDA. Hay que leer la serigrafía del módulo; si no coincide, se
   cambia `OLED_PINS` en `circuit.py`.
 - **Alto de la fila de pines de la OLED:** está a 1.4 mm del canto del módulo, sacado del plano
-  del vendedor. Conviene medirlo con calibrador.
+  del vendedor. El plano de LCD wiki del mismo módulo (MC096VX,
+  https://www.lcdwiki.com/images/1/19/MC096-015.jpg; revisado el 08-10-2026) da 1.50: cae dentro
+  de los pads de 2.4 y el canto queda a 1.3 de la lata en vez de 1.4. Conviene medirlo con calibrador.
+  - Ese plano coincide con el del vendedor: vidrio de 26.70 × 19.27 a 4.27 del canto, agujeros de
+    Ø2 a 2.0 de los cantos de los lados y del de abajo, y PCB de 27.3 × 27.8 (el del vendedor da
+    27.5 ± 0.5 de ancho).
+  - Además da los espesores que faltaban: PCB de 1.2 y vidrio de 1.5, 2.7 en total. La carcasa
+    reserva 1.6 + 1.7 = 3.3, porque hay módulos con PCB de 1.6: con un módulo como el del plano
+    quedan 1.1 de aire frente al vidrio en vez de 0.5.
+  - No acota a qué altura van los agujeros del lado de los pines (los de los tornillos a la placa),
+    y el dibujo no está a escala. El plano del vendedor los pone a 2.0 del canto, igual que la
+    placa. Hay que medirlo antes de pedir: con 0.5 de diferencia el M2 no pasa por el agujero de
+    Ø2.2 de la placa.
   - En la placa terminada, ese canto (v 11.8) queda a 0.3 mm del canto del PCB del WROOM (v 12.1)
     y a 1.4 mm de su lata (v 13.2 en el modelo 3D). El PCB del módulo (desde y 16.7) pasa
     0.47 mm por encima del PCB del WROOM (hasta y 16.23), pero la lata llega a y 18.51: si la fila
@@ -366,7 +403,7 @@ Cajas de los cuerpos 3D (de `cad/placa-principal.json`), en coordenadas de placa
 | DRC del panel (`fab/drc-panel.rpt`) | 0 violaciones, 0 sin conectar. Panel de 50 × 85.5 mm: rieles de 5 mm, 4 puentes de 5 mm con *mouse bites* (dos por canto lateral), 3 fiduciales y 4 agujeros de herramienta |
 | Puentes del panel | Centros en v 6.5 y 41 a la izquierda y en v 13 y 24 a la derecha (z 73.5, 39, 67 y 56). El condensador de potencia más cercano a un puente está a 6.0 mm (C201, del puente de v 13); U401, a 21.3 mm del puente de v 41 |
 | Reproducible, casi siempre | Con las entradas del endurecimiento, dos `build.py` completos (uno en la rama y otro en una copia aparte) dieron iguales, byte a byte, el PCB de la placa y el del panel, los esquemáticos, `board.json`, BOM, CPL y posiciones. Después de la auditoría, dos `build.py` seguidos dieron iguales, byte a byte, los PCB, los esquemáticos, `board.json`, `plugs.json`, `panel.json`, BOM, CPL, posiciones y mapa de pines. Con las entradas finales (nota de J102 corregida) hubo cuatro corridas: dos `build.py` y dos réplicas de sus pasos. En una, el DRC de KiCad contó 90 conexiones pendientes en lugar de 89, por el relleno de zonas, y unos 10 tramos de GND y +3V3 salieron distintos; también pasaba el DRC. Las otras tres coincidieron, y son las de la rama. Los Gerber, los taladros, el netlist, el esquema en PDF y los informes solo cambian en la fecha |
-| Altos (`cad/check_heights.py`, sale con 0) | Las 106 piezas con modelo caben en el tubo de Ø56 × 111 con 0.5 de aire medido en radio, y fuera de las franjas. Las más justas, además de esos 0.5: J102 0.34; U302, U303, J401, SW201 y SW202 1.16; U201 1.18; J101 1.19. En el tubo anterior de Ø52, con 0.3 de aire medido en y, lo más justo era 0.05 |
+| Altos (`cad/check_heights.py`, sale con 0) | Las 106 piezas con modelo caben en el tubo de Ø56 con 0.5 de aire medido en radio, y fuera de las franjas. Las más justas, además de esos 0.5: J102 0.34; U302, U303, J401, SW201 y SW202 1.16; U201 1.18; J101 1.19. En el tubo anterior de Ø52, con 0.3 de aire medido en y, lo más justo era 0.05 |
 | Botón | Ver Desviaciones, punto 3 |
 | Guía de luz | En r 1.5 alrededor de D403 no hay nada más. Lo más cerca: el patio de R409 a 1.59 mm del centro (su cuerpo a 1.80) y el de R102 a 1.97 |
 | Muescas en el STEP | `cad/placa-principal.step`: el centro de la muesca del SMA (u 18, v 3) y el de la del USB-C quedan fuera del sólido de la placa; el redondeo de r 1.0 sí está |
@@ -444,7 +481,7 @@ enchufar el USB, que redujo sin cerrarlo:
 | D+/D− sin ir como par | Aceptado: a 12 Mb/s (USB Full Speed) no importa, según el auditor |
 | VSYS y GNSS_5V por In2.Cu, de 0.5 oz | **Cerrado en el endurecimiento:** 1.2 y 0.6 mm (antes 0.6 y 0.4), con 0.83 y 0.5 A para 10 °C de subida según IPC-2221 frente a ~0.75 y 0.3 A de peor caso (ver [Endurecimiento eléctrico](#endurecimiento-eléctrico-08-10-2026)) |
 | Entrada USB sin leer CC | Igual que en v0.2: con una fuente de 500 mA la placa pide más de lo que da y el cargador baja la corriente al caer VBUS (VINDPM). El firmware puede bajar IINDPM (ver [Valores para el firmware](#valores-para-el-firmware)) |
-| Irrupción al enchufar el USB | **Reducida, no cerrada** (ver [Endurecimiento eléctrico](#endurecimiento-eléctrico-08-10-2026)): 30.2 µF nominales y ~15 µF efectivos a 5 V entre VBUS y PMID, por encima de los 10 µF de USB 2.0. Un cargador USB-C da VBUS recién al ver las Rd; el caso que queda es un cable A–C a un puerto encendido, con un pico corto que puede hacer caer su VBUS. Cerrarlo pide piezas nuevas: un par ACFET1/RBFET1 manejado por ACDRV1 (habría que medir cuán despacio lo enciende) o un interruptor con arranque suave entre J101 y VBUS |
+| Irrupción al enchufar el USB | **Reducida, no cerrada** (ver [Endurecimiento eléctrico](#endurecimiento-eléctrico-08-10-2026)): 30.2 µF nominales y ~15 µF efectivos a 5 V entre VBUS y PMID, por encima de los 10 µF de USB 2.0. Un cargador USB-C da VBUS recién al ver las Rd; el caso que queda es un cable A–C a un puerto encendido, con un pico corto que puede hacer caer su VBUS. Cerrarlo pide piezas nuevas: un par ACFET1/RBFET1 manejado por ACDRV1 (habría que medir cuán despacio lo enciende) o un interruptor con arranque suave entre J101 y VBUS. **El propietario lo acepta así (08-10-2026)**: se mide con el prototipo |
 | Nodos SW del cargador | Unos 9 mm por B.Cu, igual que en v0.2 |
 
 ### Riesgos de la placa

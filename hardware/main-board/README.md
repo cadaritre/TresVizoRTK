@@ -10,12 +10,12 @@
 > `hw/main-board-kicad`.
 
 La v0.3 es la versión compacta del receptor. Mantiene el concepto de la v0.2: el UM980 en su
-carrier BDLX, por cable, y el ESP32-S3-WROOM-1 en la placa. Pero va en un tubo de **Ø56 × 111** con
+carrier BDLX, por cable, y el ESP32-S3-WROOM-1 en la placa. Pero va en un tubo de **Ø56 × 116** con
 una cara plana al frente ([carcasa V3.0](../../mechanical/v3.0/README.md)). La placa mide
 **36 × 71.5 mm** (4 capas, 1.6 mm, componentes solo por la cara de arriba) y lleva lo que en la v0.2
 iba en el panel: el USB-C, la OLED (soldada a la placa), un pulsador y un LED de estado. El BMI088
 vuelve a la placa. No hay panel-usb: la placa se pide sola, en un panel de JLCPCB con un BOM y un
-CPL. La batería pasa a un pack 1S2P de dos 18650.
+CPL. La batería pasa a un pack comercial 1S2P de dos 18650.
 
 | Bloque | Pieza | Notas |
 | --- | --- | --- |
@@ -46,9 +46,10 @@ en [research/v03-compacta.md](research/v03-compacta.md); la investigación de la
 Pedido del propietario: un receptor más chico, con el panel dentro de la placa principal, dos 18650
 y la carrier tal cual. Lo que resultó al aplicarlo, con su motivo:
 
-1. **Tubo de Ø56 × 111 y placa de 36 × 71.5 mm.** Unos dos tercios del volumen de V2.3.
+1. **Tubo de Ø56 × 116 y placa de 36 × 71.5 mm.** Unos dos tercios del volumen de V2.3.
    - Empezó en Ø52 × 100. El endurecimiento del 08-10-2026 lo agrandó para dejar holguras de
-     impresión y de montaje (ver [Mecánica](#mecánica)); la placa no cambió de lugar.
+     impresión y de montaje, y el coaxial con curvas de R 12 o más (ver [Mecánica](#mecánica)); la
+     placa no cambió de lugar.
    - Los cantos laterales corren por los rieles del chasis, con una franja de 1 mm sin componentes.
    - Componentes solo por la cara de arriba: el dorso mira a la carrier a 0.5 mm.
    - El alto de cada pieza lo limitan la curva del tubo y la cara plana.
@@ -175,7 +176,7 @@ piezas Basic donde las haya y cables del kit precrimpado GH y SH) que la v0.3 co
 
 ## Mecánica
 
-Carcasa [V3.0](../../mechanical/v3.0/README.md), exploratoria y sin imprimir: tubo de Ø56 × 111
+Carcasa [V3.0](../../mechanical/v3.0/README.md), exploratoria y sin imprimir: tubo de Ø56 × 116
 (pared de 2.4) con una cara plana al frente, base desmontable con la tuerca 5/8"-11 del bastón y tapa de antena sujeta
 con tres M2.5 radiales. Dentro, un chasis que se arma fuera del tubo y entra por arriba lleva los
 rieles de la placa, las ranuras de la carrier y dos salientes para los tornillos de la OLED. Ejes:
@@ -203,28 +204,31 @@ la izquierda mirando el frente**; medidas en mm. Especificación y contrato con 
   - cara plana por dentro, 20.5; vidrio de la OLED, hasta 20.0;
   - componentes de la placa, hasta 15.4 + h(x); PCB, 13.8–15.4; aire de 0.6;
   - componentes de la carrier, 6.8–13.2; PCB de la carrier, 5.2–6.8; patas del SMA, hasta 3.2;
-  - celdas, hasta 1.4.
+  - pack 1S2P, de −18.6 a 1.4.
 - **Carrier BDLX** detrás de la placa, centrada (x −16…+16, z 17…69), con los componentes hacia la
   placa y el SMA arriba (eje en x −1.2, y 10.2). Entra al chasis por abajo y la sostienen dos
   ganchos.
-- **Celdas:** 2 × 18650 protegidas en paralelo (ejes en x ±9.5, y −7.9; z 17.5–87.5), en una cuna
-  detrás de la carrier. La NTC va pegada entre las dos y los cables bajan al canto de abajo de la
-  placa (J102, J404).
+- **Batería:** pack comercial 1S2P (2 × 18650 con BMS y funda; 37.5 × 68 × 20 según el anuncio,
+  tomado como peor caso con 0.5 de holgura), en una cuna detrás de la carrier: x 0, y −18.6…1.4,
+  z 18.8…86.8. El BMS va abajo; un solo mazo (rojo, negro y la NTC) baja por detrás y corre por el
+  piso hasta J102 y J404. La NTC va pegada con kapton en la cara de atrás del pack. Detalle en
+  [research/v03-compacta.md](research/v03-compacta.md#celdas).
 - **Antena GNSS:** la HA-901A del kit de BDLX (hélice cuádruple, Ø43.5 × 40.8; la tienda da 42.2 de
   alto).
   - La tienda da conector «SMA-J» (macho) y dice que se enrosca directo al SMA de la carrier. Falta
     confirmarlo en la antena.
   - La tapa lleva al centro un SMA hembra de panel, donde se enrosca la antena, que además queda
     fija con sus 3 M2.5 (arandelas ISO 7092).
-  - Por dentro va un cable RG 178 B/U de unos 75 mm entre conectores, con SMA macho acodado de
-    crimpar en la carrier. Sus curvas son de R 10, el mínimo para instalación fija según la hoja de
-    Lapp.
+  - Por dentro va un cable RG 178 B/U de unos 77 mm entre conectores, con SMA macho acodado de
+    crimpar en la carrier. Sus curvas son de R 12.27 o más; la hoja actual de Lapp (versión 06)
+    pide 6 × Ø (10.9–11.6) en instalación fija.
   - Si la antena resulta hembra, el parámetro `antena.conector.tipo = "hembra"` cambia la tapa a
     un paso de 12 mm para una clavija macho.
 - **Frente:** ventana de la OLED, tecla de TPU sobre SW401 (x 0, z 22) y guía de luz de Ø2 sobre
-  D403 (x −6, z 22). **Costado +X:** túnel del USB-C (z ≈ 25) y ranura de la microSD (z ≈ 40).
+  D403 (x −6, z 22). **Costado +X:** túnel cerrado del USB-C (z 25) y ranura justa de la microSD
+  (z 40.88, con muesca para la uña), con 0.3 por lado; los tapa una tapa de TPU con tres anclas.
 - **Orden de montaje** (detalle en V3.0):
-  1. celdas por arriba;
+  1. pack por arriba;
   2. carrier al chasis por abajo, con el arnés de J301 ya soldado;
   3. clavija SMA en la carrier, antes que la placa;
   4. placa al chasis por abajo, con la OLED soldada, y sus dos M2;
@@ -238,8 +242,10 @@ de clavijas de `kicad/plugs.json`:
 
 - 0 choques en posición final y los 11 barridos del montaje sin choques;
 - la guarda de la pared del tubo pasa;
-- contra la placa real, el émbolo de la tecla queda a 0.355 de SW401 y la guía de luz a 0.345 de
-  D403.
+- se cumplen los objetivos de holgura: 0.4 entre impresas, 0.25 por cara en los rieles, 0.5 a lo
+  comprado (pack incluido), coaxial con R 12.27 y mazos separados 8.8 o más;
+- contra la placa real, el émbolo de la tecla queda a 0.505 de SW401 y la guía de luz a 0.545 de
+  los componentes.
 
 Lo que no se verificó (módulo OLED real, carrier medida, cables, antena, impresión) está en el
 [README de V3.0](../../mechanical/v3.0/README.md#verificaciones).
@@ -375,7 +381,8 @@ Lo que sigue igual que en la v0.2:
 
 ## Variantes 1S / 2S
 
-La v0.3 está pensada para un pack **1S2P** (dos 18650 protegidas en paralelo): para la placa es una
+La v0.3 está pensada para un pack **1S2P** (dos 18650 en paralelo; el elegido es uno comercial con
+BMS): para la placa es una
 celda 1S de doble capacidad, con la variante 1S por defecto. Las piezas de la variante 2S siguen en
 el esquema y la tabla vale igual, pero 2S no está previsto en la v0.3: la cuna de V3.0 lleva las
 celdas en paralelo y no se buscó sitio para un BMS de equilibrado.
@@ -388,7 +395,7 @@ celdas en paralelo y no se buscó sitio para un BMS de equilibrado.
 | U103 | MAX17048G+T10 | MAX17049G+T10 (C18185545; JLCPCB tenía 50 a 9.60 USD) |
 | R112 (VPACK → VDD del medidor) | 0 Ω | sin montar |
 | R114 (+3V3 → VDD del medidor) | sin montar | 0 Ω |
-| Batería | 1S2P: 2 × 18650 protegidas en paralelo | 2 × 18650 en serie **con BMS de equilibrado** (el BQ25798 no equilibra) |
+| Batería | 1S2P: 2 × 18650 en paralelo (pack comercial con BMS) | 2 × 18650 en serie **con BMS de equilibrado** (el BQ25798 no equilibra) |
 
 - **5 V de la carrier:** el TPS63070 trabaja igual en las dos variantes.
 - **Cargador USB-C:** con 2S el cargador eleva desde 5 V y pide ~2.2 A de entrada; usar uno de 3 A.
@@ -481,8 +488,8 @@ una cotización):
 | Cable del pack (J102) | Sí | GH 4: pines 1-2 BAT−, 3-4 BAT+, dos contactos por polo con cable AWG #26. Armarlo o confirmar el del pack y medir la polaridad con multímetro. La placa tiene protección contra inversión |
 | Pinout de los conectores de la carrier | Sí, para el arnés | Leído de la serigrafía de la foto oficial; que el pin 1 sea el pad cuadrado es una suposición (no hay plano). **Antes de conectar el arnés, medir con multímetro en la carrier cuál pin es GND y cuál 5V_IN**: si estuviera al revés, los 5 V de J301 entrarían a una línea TTL del UM980 |
 | NTC de la celda | Sí, para cargar | Comprar una NTC 10k B3435 con cable (no las de 100k de impresora 3D) y crimpar o comprar un cable SH 1.0 de 2 pines. Sin ella el cargador no carga (el GPS sí funciona con el USB) |
-| Coaxial de la antena | No para la placa | RG 178 B/U de unos 75 mm entre conectores, con SMA hembra de panel en la tapa y SMA macho acodado de crimpar en la carrier. Sus curvas son de R 10, justo el mínimo fijo de la hoja de Lapp: al dar servicio no doblarlo más. Falta elegir el conector de panel y el acodado |
-| Irrupción al enchufar el USB | No, salvo que se quiera cumplir la regla de 10 µF de USB 2.0 | Reducida en el endurecimiento del 08-10-2026, no cerrada: decidir si se acepta o si se agregan piezas (par ACFET1/RBFET1 en ACDRV1 o interruptor con arranque suave). Ver [Pendientes y riesgos](#pendientes-y-riesgos) |
+| Coaxial de la antena | No para la placa | RG 178 B/U de unos 77 mm entre conectores, con SMA hembra de panel en la tapa y SMA macho acodado de crimpar en la carrier. Sus curvas son de R 12.27 o más, por encima del mínimo fijo de la hoja actual de Lapp (6 × Ø, 10.9–11.6); para dobleces repetidos pide 10 × Ø: al dar servicio no doblarlo más. Falta elegir el conector de panel y el acodado |
+| Irrupción al enchufar el USB | No | Reducida en el endurecimiento del 08-10-2026, no cerrada. **Decisión del propietario (08-10-2026): se acepta así**, sin piezas nuevas. Con el prototipo, medir la caída de VBUS al enchufar con un cable A–C a una computadora. Ver [Pendientes y riesgos](#pendientes-y-riesgos) |
 | Soldar la OLED sobre pads SMD | No | Probar el método en una placa antes de montar el módulo bueno |
 | Rebabas de los puentes del panel | No | Lijarlas antes de meter la placa en los rieles |
 | Firmware para esta placa | No para fabricar | Todavía no existe; ver [Firmware](#firmware-qué-tiene-que-cambiar) |
@@ -500,7 +507,7 @@ Lo comprobado con las herramientas (nada se ha fabricado ni medido):
 | Áreas de regla | `clavija_*`, `canto_*`, `esp32_antena` y `guia_de_luz_D403` entran en el DRC de la placa: sin violaciones |
 | Ruteo | En `build.py`, `route_rest.py` rutea 88 de 88 conexiones y, después de los rellenos, 1 de 1. Total: 1885 tramos (F.Cu 704 mm, In2.Cu 305 mm, B.Cu 1068 mm) y 282 vías, con el endurecimiento del 08-10-2026 |
 | Reproducible, casi siempre | Con las entradas del endurecimiento (08-10-2026), dos `build.py` completos, uno en la rama y otro en una copia aparte, dieron iguales byte a byte el PCB de la placa y el del panel, y también los esquemáticos, `board.json`, BOM, CPL y posiciones. Antes, con las entradas de la auditoría, se corrió cuatro veces: dos `build.py` completos y dos réplicas de sus pasos. Tres dieron el mismo PCB byte a byte, y también los mismos esquemáticos, JSON, BOM, CPL, posiciones y mapa de pines. En la cuarta, el DRC de KiCad con `--refill-zones` contó 90 conexiones pendientes en lugar de 89, y salieron unos 10 tramos de GND y +3V3 distintos; esa placa también pasaba el DRC sin violaciones. Cada script da lo mismo con la misma entrada: la variación viene del relleno de zonas y del DRC de KiCad. Los archivos de la rama son los de las tres corridas que coincidieron. Los Gerber, el netlist, el esquema en PDF y los informes solo cambian en la fecha |
-| Altos (`cad/check_heights.py`, sale con 0) | Las 106 piezas con modelo 3D (las 105 del BOM y R114) caben en el tubo de Ø56 × 111 con 0.5 mm de aire medido en radio, y fuera de las franjas. Lo más justo, además de esos 0.5: J102, 0.34 mm; U302, U303, J401, SW201 y SW202, 1.16; U201, 1.18; J101, 1.19. En el tubo anterior de Ø52, con 0.3 de aire medido en y, lo más justo era 0.05 mm |
+| Altos (`cad/check_heights.py`, sale con 0) | Las 106 piezas con modelo 3D (las 105 del BOM y R114) caben en el tubo de Ø56 con 0.5 mm de aire medido en radio, y fuera de las franjas. Lo más justo, además de esos 0.5: J102, 0.34 mm; U302, U303, J401, SW201 y SW202, 1.16; U201, 1.18; J101, 1.19. En el tubo anterior de Ø52, con 0.3 de aire medido en y, lo más justo era 0.05 mm |
 | Endurecimiento eléctrico (08-10-2026) | Ninguna huella cambió de sitio, de giro ni de cara: se compararon con el PCB anterior las 117 de la placa y las 128 del panel. El plano de +3V3 de In2.Cu sigue de una pieza (1728 mm²; antes 1740). El STEP reexportado (`cad/export_board_step.py`) da las mismas cajas de todas las piezas; `cad/placa-principal.json` se dejó como estaba, porque solo cambiaba el orden de algunas listas. Detalle en [research/v03-compacta.md](research/v03-compacta.md#endurecimiento-eléctrico-08-10-2026) |
 | Auditoría eléctrica independiente (08-10-2026) | Siete puntos, todos corregidos en `build.py`: OLED en pads SMD; puentes del panel lejos de U401 y de los condensadores de potencia; zona sin cobre de la antena ampliada; relleno de GND de J102 con 4 vías y vías dobles de VPACK; 4 vías de GND en el pad del WROOM; R409 de 330 Ω; TP208 y TP209. Lo que aceptó como riesgo está en [Pendientes y riesgos](#pendientes-y-riesgos) |
 | *Bootstrap* del cargador | BTST1 → C101: 0.9 mm; BTST2 → C102: 1.6 mm (cara superior). Retorno a SW por vía y 4.3 / 5.7 mm de B.Cu |

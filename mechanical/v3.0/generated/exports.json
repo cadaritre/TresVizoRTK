@@ -18,11 +18,11 @@
    "etiqueta": "Tubo",
    "solido_valido": true,
    "solidos": 1,
-   "triangulos": 15326,
+   "triangulos": 7364,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 43.36,
+   "volumen_cm3": 44.87,
    "stl": "02-tube.stl",
    "step": "02-tube.step"
   },
@@ -35,7 +35,7 @@
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 10.16,
+   "volumen_cm3": 10.48,
    "stl": "03-antenna-cap.stl",
    "step": "03-antenna-cap.step"
   },
@@ -48,7 +48,7 @@
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 6.57,
+   "volumen_cm3": 6.65,
    "stl": "04-chassis.stl",
    "step": "04-chassis.step"
   },
@@ -70,13 +70,26 @@
    "etiqueta": "Tapa de puertos de TPU",
    "solido_valido": true,
    "solidos": 1,
-   "triangulos": 872,
+   "triangulos": 2404,
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 1.03,
+   "volumen_cm3": 1.02,
    "stl": "06-port-cover-tpu.stl",
    "step": "06-port-cover-tpu.step"
+  },
+  {
+   "pieza": "07-logo-inlay-tpu",
+   "etiqueta": "Distintivo de TPU para el grabado",
+   "solido_valido": true,
+   "solidos": 6,
+   "triangulos": 1396,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 0.08,
+   "stl": "07-logo-inlay-tpu.stl",
+   "step": "07-logo-inlay-tpu.step"
   }
  ],
  "todas_cerradas": true,
@@ -85,15 +98,15 @@
  "limite_mm3": 0.05,
  "guarda_pared_tubo": {
   "cara_plana": {
-   "puntos": 2884,
+   "puntos": 3024,
    "en_aberturas": 348,
    "sin_material": 0,
    "ejemplos": [],
    "ok": true
   },
   "anillo": {
-   "puntos": 14101,
-   "en_aberturas": 733,
+   "puntos": 14786,
+   "en_aberturas": 869,
    "sin_material": 0,
    "ejemplos": [],
    "ok": true
@@ -102,7 +115,7 @@
   "zonas": [
    [
     7,
-    104,
+    109,
     21.7,
     26.8,
     26.8
@@ -115,8 +128,8 @@
     27.4
    ],
    [
-    105.2,
-    106.5,
+    110.2,
+    111.5,
     22.3,
     27.4,
     27.4

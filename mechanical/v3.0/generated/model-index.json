@@ -20,14 +20,14 @@
    "etiqueta": "Tubo",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 43.36,
+   "volumen_cm3": 44.87,
    "caja": [
     -28.0,
     28.0,
     -28.0,
-    23.4,
+    22.9,
     4.0,
-    107.0
+    112.0
    ]
   },
   {
@@ -35,14 +35,14 @@
    "etiqueta": "Tapa de antena",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 10.16,
+   "volumen_cm3": 10.48,
    "caja": [
     -28.0,
     28.0,
     -28.0,
     22.9,
-    88.0,
-    111.0
+    87.3,
+    116.0
    ]
   },
   {
@@ -50,14 +50,14 @@
    "etiqueta": "Chasis",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 6.57,
+   "volumen_cm3": 6.65,
    "caja": [
     -21.74,
     21.74,
     2.0,
     16.45,
     9.5,
-    106.6
+    111.6
    ]
   },
   {
@@ -80,7 +80,7 @@
    "etiqueta": "Tapa de puertos de TPU",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 1.03,
+   "volumen_cm3": 1.02,
    "caja": [
     12.6,
     27.71,
@@ -88,6 +88,21 @@
     24.8,
     16.8,
     48.4
+   ]
+  },
+  {
+   "nombre": "07-logo-inlay-tpu",
+   "etiqueta": "Distintivo de TPU para el grabado",
+   "valida": true,
+   "solidos": 6,
+   "volumen_cm3": 0.08,
+   "caja": [
+    -8.9,
+    8.9,
+    22.1,
+    22.9,
+    39.25,
+    59.75
    ]
   }
  ],
@@ -123,8 +138,7 @@
   "carrier: arnés J301: soldaduras atrás (8 agujeros)",
   "carrier: arnés J301: cables por delante (8 agujeros)",
   "carrier: arnés J301: soldaduras atrás (5 agujeros)",
-  "celdas: celda 1",
-  "celdas: celda 2",
+  "celdas: pack 1S2P (envolvente)",
   "tuerca: tuerca 5/8-11",
   "tuerca: reten M2 con arandela",
   "tuerca: perno del baston (rosca maxima)",
@@ -137,15 +151,14 @@
   "clavijas: clavija J102",
   "clavijas: clavija J301",
   "clavijas: clavija J404",
-  "cables: cable bateria_pos_ntc",
-  "cables: cable bateria_neg",
+  "cables: cable mazo_pack",
+  "cables: cable hilos_ntc",
   "cables: cable arnes_j301",
   "cables: cable NTC (cuerpo)",
-  "cables: cable lengueta - del pack",
   "tornillos: tornillos M2.5 de base y tapa",
   "usb: funda de la clavija",
   "microsd: tarjeta puesta"
  ],
- "coaxial_radio_curva": 10.0,
+ "coaxial_radio_curva": 12.27,
  "clavijas_origen": "kicad/plugs.json (v0.3)"
 }

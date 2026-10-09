@@ -1,6 +1,7 @@
 """Construye la carcasa V3.0 (tubo de 56 x 111 para la placa principal compacta v0.3).
 
-Piezas: 01-base, 02-tube, 03-antenna-cap, 04-chassis, 05-key-tpu, 06-port-cover-tpu, en su posicion final.
+Piezas: 01-base, 02-tube, 03-antenna-cap, 04-chassis, 05-key-tpu, 06-port-cover-tpu, 07-logo-inlay-tpu,
+en su posicion final.
 Ademas guarda las referencias (placa de la especificacion, carrier, celdas, tuerca, antena,
 coaxial, clavijas y cables) como objetos ref_* que no se exportan.
 
@@ -149,9 +150,53 @@ def front_openings():
     return fuse_all([win, key, led])
 
 
+def _rr_wire(x, yb, yt, zc, w, r):
+    """Contorno (en el plano x) de un rectangulo redondeado de y yb a yt y ancho w en z, radio r."""
+    r = max(0.0, min(r, (yt - yb) / 2.0 - 1e-3, w / 2.0 - 1e-3))
+    z0, z1 = zc - w / 2.0, zc + w / 2.0
+    if r <= 0:
+        pts = [V(x, yb, z0), V(x, yb, z1), V(x, yt, z1), V(x, yt, z0), V(x, yb, z0)]
+        return Part.makePolygon(pts)
+    e = []
+    def arc(cy, cz, a0):
+        import math as _m
+        ps = [V(x, cy + r * _m.sin(_m.radians(a0 + 45 * k)), cz + r * _m.cos(_m.radians(a0 + 45 * k))) for k in range(3)]
+        return Part.Arc(ps[0], ps[1], ps[2]).toShape()
+    e.append(Part.LineSegment(V(x, yb, z0 + r), V(x, yb, z1 - r)).toShape())
+    e.append(arc(yb + r, z1 - r, -90))
+    e.append(Part.LineSegment(V(x, yb + r, z1), V(x, yt - r, z1)).toShape())
+    e.append(arc(yt - r, z1 - r, 0))
+    e.append(Part.LineSegment(V(x, yt, z1 - r), V(x, yt, z0 + r)).toShape())
+    e.append(arc(yt - r, z0 + r, 90))
+    e.append(Part.LineSegment(V(x, yt - r, z0), V(x, yb + r, z0)).toShape())
+    e.append(arc(yb + r, z0 + r, 180))
+    return Part.Wire(Part.__sortEdges__(e))
+
+
+def outer_top_chamfer(yb, yt, zc, w, r, c):
+    """Chaflan a 45 grados del canto de fuera de arriba de una abertura del costado +X (techo plano en
+    y = yt): el techo salia por la cara exterior en cuna de ~44 grados. Solido reglado entre el contorno
+    de la abertura, c por dentro del canto, y el mismo contorno con el techo subido otro tanto fuera."""
+    xe = math.sqrt(RO ** 2 - yt ** 2)
+    x1, x2 = xe - c, RO + 2.0
+    return Part.makeLoft([_rr_wire(x1, yb, yt, zc, w, r), _rr_wire(x2, yb, yt + (x2 - x1), zc, w, r)], True, True)
+
+
+def inner_bottom_chamfer(yb, yt, zc, w, r, c):
+    """Chaflan a 45 grados del canto de dentro de abajo de una abertura con contorno redondeado (el
+    suelo corta la cara interior en cuna, tambien en las esquinas redondeadas). Solido reglado entre el
+    contorno, c por fuera del canto, y el mismo contorno con el suelo bajado otro tanto ya en el hueco
+    interior. No se ve desde fuera."""
+    xi = math.sqrt(RI ** 2 - yb ** 2)
+    x1, x2 = xi + c, xi - 3.0
+    d = x1 - x2
+    return Part.makeLoft([_rr_wire(x1, yb, yt, zc, w, r), _rr_wire(x2, yb - d, yt, zc, w, r)], True, True)
+
+
 def inner_edge_chamfer(y0, z0, z1, c):
     """Chaflan del canto donde el suelo plano (y = y0) de una abertura del costado +X corta la cara
-    interior del tubo: ahi quedaba una cuna de ~53 grados. Quita el triangulo de c de lado."""
+    interior del tubo: ahi queda una cuna de ~53 grados. Quita el triangulo de c de lado (no se ve desde
+    fuera)."""
     xe = math.sqrt(RI ** 2 - y0 ** 2)
     ya = y0 - c
     xa = math.sqrt(RI ** 2 - ya ** 2)
@@ -160,27 +205,27 @@ def inner_edge_chamfer(y0, z0, z1, c):
 
 
 def side_openings():
-    """Tunel de la funda del USB-C y ranura de la microSD con rebaje para la una (+X), con los
-    cantos interiores de sus suelos achaflanados, y agujero del ancla de la tapa de puertos."""
+    """Costado +X: tunel cerrado de la funda del USB-C (rectangulo redondeado, de la cara exterior a la
+    boca de J101), ranura justa de la microSD con su muesca para la una, chaflanes de los cantos de fuera
+    de arriba y agujeros de las anclas de la tapa de puertos."""
     cs = P['costado']
-    u = cs['usb_c']
-    za_u, zb_u = u['z_centro'] - u['medio_alto'], u['z_centro'] + u['medio_alto']
-    usb = box(u['x0'], RO + 2, u['y'][0], u['y'][1], za_u, zb_u).fuse(
-        box(u['x_abierto'], RO + 2, u['y'][0], RO + 2, za_u, zb_u))      # abierto hasta fuera pasada la cara plana
-    sd = cs['microsd']
-    zc, w = G.SD_Z, sd['ancho']
-    slot = box(15.5, RO + 2, sd['y'][0], sd['y'][1], zc - w / 2.0, zc + w / 2.0)
-    nl = sd['una']
-    y_e = sd['y'][1]
-    x_out = math.sqrt(RO ** 2 - y_e ** 2)
-    nail = cyl_z(nl['radio'], x_out + nl['radio'] - nl['hondo'], y_e, zc - nl['alto'] / 2.0, zc + nl['alto'] / 2.0)
+    ux0, uyc, uzc, uh, uw, ur = G.usb_tunnel()
+    usb = G.rounded_rect_x(ux0, RO + 2, uyc, uzc, uh, uw, ur)
+    usb = usb.fuse(outer_top_chamfer(uyc - uh / 2.0, uyc + uh / 2.0, uzc, uw, ur, cs['usb_c']['chaflan_entrada']))
+    ci = cs['usb_c'].get('chaflan_interior', 0.0)
+    if ci > 0:
+        usb = usb.fuse(inner_bottom_chamfer(uyc - uh / 2.0, uyc + uh / 2.0, uzc, uw, ur, ci))
+    sx0, sy0, sy1, szc, sw = G.sd_slot()
+    mu = cs['microsd']['muesca']
+    ch = cs['microsd']['chaflan_entrada']
+    slot = box(sx0, RO + 2, sy0, sy1, szc - sw / 2.0, szc + sw / 2.0)
+    notch = box(sx0, RO + 2, sy0, mu['y_sup'], szc - mu['ancho'] / 2.0, szc + mu['ancho'] / 2.0)
+    cuts = [usb, slot, notch, outer_top_chamfer(sy0, sy1, szc, sw, 0.0, ch), outer_top_chamfer(sy0, mu['y_sup'], szc, mu['ancho'], 0.0, ch)]
+    ci = cs['microsd'].get('chaflan_interior', 0.0)
+    if ci > 0:
+        cuts.append(inner_edge_chamfer(sy0, szc - sw / 2.0, szc + sw / 2.0, ci))
     an = cs['tapa_puertos']['ancla']
-    anchor = radial_hole(an['angulo'], an['z'], an['agujero'], RO + 1.0, RI - 0.5)
-    ch = cs.get('chaflan_interior', 0.0)
-    cuts = [usb, slot, nail, anchor]
-    if ch > 0:
-        cuts += [inner_edge_chamfer(u['y'][0], za_u, zb_u, ch),
-                 inner_edge_chamfer(sd['y'][0], zc - w / 2.0, zc + w / 2.0, ch)]
+    cuts += [radial_hole(an['angulo'], za, an['agujero'], RO + 1.0, RI - 0.5) for za in G.anchor_zs()]
     return fuse_all(cuts)
 
 
@@ -204,21 +249,22 @@ def rail_ledges():
 
 
 def cell_cradle():
-    """Nervios de la cuna (tres por celda, de la pared a la celda) y repisas bajo las celdas."""
+    """Cuna del pack 1S2P: tres nervios por extremo redondo (de la pared al pack: costado, atras y un
+    labio delante-fuera) que acaban a la holgura de su envolvente, y repisas bajo su parte de fuera."""
     cu, ce = P['cuna'], P['celdas']
-    rc = ce['diametro'] / 2.0 + ce['holgura']
+    pk = ce['pack']
     nv = cu['nervios']
     t = nv['espesor']
     z0, z1 = nv['z']
+    cx0, cy0 = pk['centro']
+    a_end = (pk['ancho'] - pk['grueso']) / 2.0
     parts = []
-    for cx, cy in ce['ejes']:
-        sx = 1.0 if cx > 0 else -1.0
+    for sx in (-1.0, 1.0):
+        cx, cy = cx0 + sx * a_end, cy0
         for rel in nv['angulos_rel']:
             a = math.radians(rel)
             dx, dy = sx * math.cos(a), math.sin(a)
-            L = 30.0
-            # Caja a lo largo de la direccion (dx, dy) desde el eje de la celda.
-            rib = box(0, L, -t / 2.0, t / 2.0, z0, nv.get('z_labio', z1) if rel > 0 else z1)
+            rib = box(0, 30.0, -t / 2.0, t / 2.0, z0, nv.get('z_labio', z1) if rel > 0 else z1)
             rib.rotate(V(), V(0, 0, 1), math.degrees(math.atan2(dy, dx)))
             rib.translate(V(cx, cy, 0))
             parts.append(rib)
@@ -226,9 +272,7 @@ def cell_cradle():
     for a0, a1 in rp['angulos']:
         parts.append(sector(RI + 0.8, rp['r0'], rp['z'][0], rp['z'][1], a0, a1))
     body = fuse_all(parts).common(cyl_z(RI + 0.8, 0, 0, 0, 100))
-    for cx, cy in ce['ejes']:
-        body = body.cut(cyl_z(rc, cx, cy, ce['z'][0], 200))
-    return body
+    return body.cut(G.pack_solid(ce['z'][0], 200, pk['holgura']))
 
 
 def decorative_lines():
@@ -249,7 +293,7 @@ def build_tube():
     dl = decorative_lines()
     if dl is not None:
         body = body.cut(dl)
-    body = body.fuse(G.logo_relief())
+    body = body.cut(G.logo_engrave())
     return clean(body)
 
 
@@ -419,8 +463,8 @@ def build_key():
 
 def build_port_cover():
     """Tapa de TPU atada de los puertos del costado +X: ala curva sobre la pared que tapa el tunel
-    del USB-C y la ranura de la microSD, con sus cuerpos a presion por dentro, lengueta delante,
-    bisagra fina y seta de anclaje por un agujero de 2 en la pared."""
+    del USB-C y la ranura de la microSD, con sus cuerpos a presion por dentro (la forma de las
+    aberturas), lengueta delante, bisagra fina y setas de anclaje por agujeros de 2 en la pared."""
     cs = P['costado']
     tp = cs['tapa_puertos']
     e = tp['espesor']
@@ -432,29 +476,29 @@ def build_port_cover():
     parts.append(box(lg['x0'], tp['x_frente_plano'] + 0.01, G.Y_FLAT_O, G.Y_FLAT_O + e + lg['alto'], lg['z'][0], lg['z'][1]))
     ring_usb = cyl_z(RO, 0, 0, 0, 100).cut(cyl_z(tp['cuerpos']['usb_r0'], 0, 0, -1, 101))
     ring_sd = cyl_z(RO, 0, 0, 0, 100).cut(cyl_z(tp['cuerpos']['sd_r0'], 0, 0, -1, 101))
-    u = cs['usb_c']
     m = 0.05
-    parts.append(box(u['x0'] + m, RO + 1, u['y'][0] + m, u['y'][1] - m, u['z_centro'] - u['medio_alto'] + m,
-                     u['z_centro'] + u['medio_alto'] - m).common(ring_usb).fuse(
-                 box(u['x_abierto'] + m, RO + 1, u['y'][0] + m, RO + 1, u['z_centro'] - u['medio_alto'] + m,
-                     u['z_centro'] + u['medio_alto'] - m).common(ring_usb)))
-    sd = cs['microsd']
-    parts.append(box(15.5 + m, RO + 1, sd['y'][0] + m, sd['y'][1] - m, G.SD_Z - sd['ancho'] / 2.0 + m,
-                     G.SD_Z + sd['ancho'] / 2.0 - m).common(ring_sd))
-    # Seta de anclaje: vastago por la pared y cabeza con cono de entrada por dentro.
+    ux0, uyc, uzc, uh, uw, ur = G.usb_tunnel()
+    parts.append(G.rounded_rect_x(ux0 + m, RO + 1, uyc, uzc, uh - 2 * m, uw - 2 * m, ur - m).common(ring_usb))
+    sx0, sy0, sy1, szc, sw = G.sd_slot()
+    mu = cs['microsd']['muesca']
+    sdb = box(sx0 + m, RO + 1, sy0 + m, sy1 - m, szc - sw / 2.0 + m, szc + sw / 2.0 - m).fuse(
+        box(sx0 + m, RO + 1, sy0 + m, mu['y_sup'] - m, szc - mu['ancho'] / 2.0 + m, szc + mu['ancho'] / 2.0 - m))
+    parts.append(sdb.common(ring_sd))
+    # Setas de anclaje (una por agujero): vastago por la pared y cabeza con cono de entrada por dentro.
     an = tp['ancla']
     a = math.radians(an['angulo'])
     ux, uy = math.cos(a), math.sin(a)
-    def at(r):
-        return V(ux * r, uy * r, an['z'])
     inward = V(-ux, -uy, 0)
     # La cara de apoyo de la cabeza es plana y la pared curva: se mete 0.07 para que sus bordes no
     # entren en la pared (a 1.7 del eje la pared esta 0.06 mas lejos).
     r_seat = RI - 0.07
-    parts.append(Part.makeCylinder(an['vastago'] / 2.0, RO + 0.2 - r_seat, at(RO + 0.2), inward))
     r_head = r_seat - an['cabeza_alto']
-    parts.append(Part.makeCylinder(an['cabeza_diametro'] / 2.0, an['cabeza_alto'], at(r_seat), inward))
-    parts.append(Part.makeCone(an['cabeza_diametro'] / 2.0, an['vastago'] / 2.0, an['cono'], at(r_head), inward))
+    for za_ in G.anchor_zs():
+        def at(r, zz=za_):
+            return V(ux * r, uy * r, zz)
+        parts.append(Part.makeCylinder(an['vastago'] / 2.0, RO + 0.2 - r_seat, at(RO + 0.2), inward))
+        parts.append(Part.makeCylinder(an['cabeza_diametro'] / 2.0, an['cabeza_alto'], at(r_seat), inward))
+        parts.append(Part.makeCone(an['cabeza_diametro'] / 2.0, an['vastago'] / 2.0, an['cono'], at(r_head), inward))
     body = fuse_all(parts)
     bz = tp['bisagra']
     body = body.cut(sector(RO + e + 1, RO + bz['espesor'], za - 1, zb + 1,
@@ -482,7 +526,8 @@ def main():
               ('03_antenna_cap', 'Tapa de antena', build_cap()),
               ('04_chassis', 'Chasis', build_chassis()),
               ('05_key_tpu', 'Tecla de TPU', build_key()),
-              ('06_port_cover_tpu', 'Tapa de puertos de TPU', build_port_cover())]
+              ('06_port_cover_tpu', 'Tapa de puertos de TPU', build_port_cover()),
+              ('07_logo_inlay_tpu', 'Distintivo de TPU para el grabado', G.logo_inlay())]
     doc = App.newDocument('TresVizo_V3_0')
     index = {'piezas': [], 'referencias': []}
     for name, label, shape in pieces:

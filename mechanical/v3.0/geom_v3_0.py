@@ -277,10 +277,58 @@ def oled_stack():
     return out
 
 
+def usb_axis():
+    """Eje de la clavija USB-C: centro de la caja de J101 en la placa real (placa-principal.json), en y
+    y en z. Si no esta, el de respaldo de parameters.json (funda_usb.y_centro, usb_c.z)."""
+    bj = board_json()
+    try:
+        bx_ = bj['componentes']['J101']['caja']
+        return round(sum(bx_['y']) / 2.0, 3), round(sum(bx_['z']) / 2.0, 3), 'J101 (placa-principal.json)'
+    except Exception:
+        return PL['funda_usb']['y_centro'], PL['usb_c']['z'], 'respaldo (parameters.json)'
+
+
+USB_Y, USB_Z, USB_SRC = usb_axis()
+
+
+def rounded_rect_x(x0, x1, yc, zc, h, w, r):
+    """Prisma a lo largo de X (x0 a x1) de seccion rectangulo redondeado: alto h (en y), ancho w (en z),
+    radio de esquina r."""
+    r = max(0.0, min(r, h / 2.0 - 1e-3, w / 2.0 - 1e-3))
+    L = x1 - x0
+    core = box(x0, x1, yc - h / 2.0 + r, yc + h / 2.0 - r, zc - w / 2.0, zc + w / 2.0)
+    core = core.fuse(box(x0, x1, yc - h / 2.0, yc + h / 2.0, zc - w / 2.0 + r, zc + w / 2.0 - r))
+    if r > 0:
+        for sy in (-1, 1):
+            for sz in (-1, 1):
+                core = core.fuse(Part.makeCylinder(r, L, V(x0, yc + sy * (h / 2.0 - r), zc + sz * (w / 2.0 - r)), V(1, 0, 0)))
+    return core.removeSplitter()
+
+
+def usb_tunnel():
+    """Tunel del USB-C: (x0 = boca de J101, yc, zc, alto en y, ancho en z, radio): funda + holgura por lado."""
+    u, f, c = PL['usb_c'], PL['funda_usb'], P['costado']['usb_c']
+    hh = c['holgura']
+    return u['boca_x'], USB_Y, USB_Z, f['alto'] + 2 * hh, f['ancho'] + 2 * hh, c['radio_funda'] + hh
+
+
+def sd_slot():
+    """Ranura de la microSD: (x0, y0, y1, zc, ancho en z) = tarjeta + holgura por lado, en el eje de J401."""
+    sd, t = P['costado']['microsd'], PL['tarjeta']
+    hh = sd['holgura']
+    return sd['x0'], t['y0'] - hh, t['y0'] + t['espesor'] + hh, SD_Z, t['ancho'] + 2 * hh
+
+
+def anchor_zs():
+    z = P['costado']['tapa_puertos']['ancla']['z']
+    return list(z) if isinstance(z, (list, tuple)) else [z]
+
+
 def usb_overmold():
-    f, u, c = PL['funda_usb'], PL['usb_c'], P['costado']['usb_c']
-    return box(u['boca_x'], u['boca_x'] + f['largo'], f['y_centro'] - f['alto'] / 2,
-               f['y_centro'] + f['alto'] / 2, u['z'] - f['ancho'] / 2, u['z'] + f['ancho'] / 2)
+    """Funda maxima de la clavija USB-C (12.35 x 6.5, esquinas de radio funda_usb.radio) desde la boca
+    de J101, centrada en su eje."""
+    f, u = PL['funda_usb'], PL['usb_c']
+    return rounded_rect_x(u['boca_x'], u['boca_x'] + f['largo'], USB_Y, USB_Z, f['alto'], f['ancho'], f.get('radio', 0.0))
 
 
 def microsd_card(dx=0.0):
@@ -298,9 +346,21 @@ def carrier():
 
 
 def cells():
-    r = CE['diametro'] / 2
     z0, z1 = CE['z']
-    return {f'celda {i + 1}': cyl_z(r, x, y, z0, z1) for i, (x, y) in enumerate(CE['ejes'])}
+    return {'pack 1S2P (envolvente)': pack_solid(z0, z1)}
+
+
+def pack_solid(z0, z1, off=0.0):
+    """Envolvente del pack 1S2P: estadio (dos cilindros de diametro grueso con los valles puenteados por
+    la funda) de ancho x grueso, entre z0 y z1, crecido off por todos lados en planta."""
+    pk = CE['pack']
+    cx, cy = pk['centro']
+    a = (pk['ancho'] - pk['grueso']) / 2.0
+    r = pk['grueso'] / 2.0 + off
+    s = box(cx - a, cx + a, cy - r, cy + r, z0, z1)
+    for sx in (-1, 1):
+        s = s.fuse(cyl_z(r, cx + sx * a, cy, z0, z1))
+    return s.removeSplitter()
 
 
 NUTP = P['base']['tuerca']
@@ -370,58 +430,55 @@ def s_bend(a, b, n=16):
     return pts, R
 
 
-def coax_route(n=24):
-    """Recorrido del latiguillo, del SMA acodado de la carrier al pasamuros del eje: arco a izquierdas
-    de radio R1, recto hacia atras por fuera de la celda -X, media vuelta detras de ella (radio
-    R2 = -x_recto / 2, acaba en (0, -Rv) mirando a +Y) y curva vertical de radio Rv hasta el eje.
-    Sube de z_cable a z_lazo con curvatura vertical constante en el primer arco y frenando en el
-    recto hasta y_fin_subida (pendiente nula al principio y al final)."""
+def _bspline(ctrl, k, u):
+    """Punto de un B-spline de grado k con nodos uniformes sujetos (como scipy BSpline), por de Boor."""
+    n = len(ctrl)
+    t = [0.0] * k + [i / float(n - k) for i in range(n - k + 1)] + [1.0] * k
+    u = min(max(u, 0.0), 1.0 - 1e-12)
+    j = max(i for i in range(k, n) if t[i] <= u)
+    d = [list(ctrl[j - k + i]) for i in range(k + 1)]
+    for r in range(1, k + 1):
+        for i in range(k, r - 1, -1):
+            a = (u - t[j - k + i]) / (t[i + 1 + j - r] - t[j - k + i])
+            d[i] = [(1 - a) * d[i - 1][c] + a * d[i][c] for c in range(3)]
+    return tuple(d[k])
+
+
+def coax_route(n=800):
+    """Recorrido del latiguillo, del SMA acodado de la carrier al pasamuros del eje: B-spline cubico
+    de coaxial.ruta.puntos_control (optimizado para R >= 12 con holgura a todo), con 2 mm de cable
+    dentro de la clavija acodada delante. Empieza en la salida de la clavija hacia -X y acaba vertical
+    en la cara de dentro del pasamuros."""
     c, rt = CX['clavija'], CX['ruta']
     ac = c['acodada']
-    R1, Rv, zl = rt['radio_primer_arco'], rt['radio_vertical'], rt['z_lazo']
     dx, dy = ac['direccion']
-    ex, ey, ez = c['x'] + dx * ac['largo'], c['y'] + dy * ac['largo'], ac['z_cable']
-    xy = [(c['x'] + dx * (ac['largo'] - 2.0), ey)]
-    cx1, cy1 = ex, ey - R1
-    for i in range(n + 1):
-        t = math.radians(90 + 90.0 * i / n)
-        xy.append((cx1 + R1 * math.cos(t), cy1 + R1 * math.sin(t)))
-    i_arc = len(xy) - 1                              # final del primer arco
-    xs = cx1 - R1
-    y_rise = rt['y_fin_subida']
-    for k in range(1, 9):
-        xy.append((xs, cy1 + (y_rise - cy1) * k / 8.0))
-    i_rise = len(xy) - 1                             # final de la subida
-    xy.append((xs, -Rv))
-    R2 = -xs / 2.0
-    cx2, cy2 = xs + R2, -Rv
-    for i in range(1, n + 1):
-        t = math.radians(180 + 180.0 * i / n)
-        xy.append((cx2 + R2 * math.cos(t), cy2 + R2 * math.sin(t)))
-    s_acc = [0.0]
-    for a, b in zip(xy[:-1], xy[1:]):
-        s_acc.append(s_acc[-1] + math.hypot(b[0] - a[0], b[1] - a[1]))
-    s0, sa, sr = s_acc[1], s_acc[i_arc], s_acc[i_rise]
-    A, Bl, dz = sa - s0, sr - sa, zl - ez
-    ka = 2.0 * dz / (A * (A + Bl))                   # z'' en el arco
-    kb = ka * A / Bl                                 # z'' (frenando) en el recto
-    pts = []
-    for (x, y), sv in zip(xy, s_acc):
-        if sv <= s0:
-            z = ez
-        elif sv <= sa:
-            z = ez + ka * (sv - s0) ** 2 / 2.0
-        elif sv <= sr:
-            u = sv - sa
-            z = ez + ka * A * A / 2.0 + ka * A * u - kb * u * u / 2.0
-        else:
-            z = zl
-        pts.append((x, y, z))
-    x_end = cx2 + R2
-    for i in range(1, n + 1):
-        t = math.radians(90.0 * i / n)
-        pts.append((x_end * (1 - i / n), -Rv + Rv * math.sin(t), zl + Rv * (1 - math.cos(t))))
+    ctrl = rt['puntos_control']
+    pts = [(c['x'] + dx * (ac['largo'] - 2.0), c['y'] + dy * (ac['largo'] - 2.0), ac['z_cable'])]
+    pts += [_bspline(ctrl, rt.get('grado', 3), i / float(n)) for i in range(n + 1)]
     return pts
+
+
+def coax_solid():
+    """Cable del latiguillo como barrido de un circulo por el B-spline exacto de coaxial.ruta (mas los
+    2 mm dentro de la clavija acodada). Un solo barrido liso: fundir cientos de cilindros cortos daba
+    distancias falsas en distToShape de OCC."""
+    c, rt = CX['clavija'], CX['ruta']
+    ac = c['acodada']
+    r = CX['cable']['diametro'] / 2.0
+    ctrl = rt['puntos_control']
+    k = rt.get('grado', 3)
+    n = len(ctrl)
+    knots = [i / float(n - k) for i in range(n - k + 1)]
+    mults = [k + 1] + [1] * (n - k - 1) + [k + 1]
+    bs = Part.BSplineCurve()
+    bs.buildFromPolesMultsKnots([V(*p) for p in ctrl], mults, knots, False, k)
+    t0 = bs.tangent(bs.FirstParameter)[0]
+    circ = Part.Wire(Part.makeCircle(r, bs.value(bs.FirstParameter), t0))
+    pipe = Part.Wire(bs.toShape()).makePipeShell([circ], True, True)
+    dx, dy = ac['direccion']
+    p0 = V(c['x'] + dx * (ac['largo'] - 2.0), c['y'] + dy * (ac['largo'] - 2.0), ac['z_cable'])
+    stub = Part.makeCylinder(r, 2.0, p0, V(dx, dy, 0))
+    return pipe.fuse(stub).removeSplitter()
 
 
 def min_bend_radius(pts):
@@ -452,8 +509,7 @@ def coax():
     if ac['z'][0] > z1:                                 # cuello entre la tuerca y el cuerpo acodado
         plug.append(cyl_z(ac.get('cuello_diametro', 5.0) / 2.0, c['x'], c['y'], z1 - 0.01, ac['z'][0] + 0.01))
     pts = coax_route()
-    out = {'clavija SMA de la carrier': fuse_all(plug),
-           'coaxial (recorrido)': tube_path(pts, CX['cable']['diametro'])}
+    out = {'clavija SMA de la carrier': fuse_all(plug), 'coaxial (recorrido)': coax_solid()}
     cn = ANT['conector']
     z_in = H_TOTAL - cn['pasamuros']['panel']          # cara de dentro del panel de la tapa
     if cn['tipo'] == 'macho':
@@ -531,18 +587,13 @@ def plugs():
 
 
 def cable_reserves():
-    """Manojos de cables (reservas) y lo que sale del pack: cuerpo de la NTC y lengueta del -."""
+    """Manojos de cables (reservas) y la NTC pegada en la cara de atras del pack."""
     cb = P['cables']
     out = {f'cable {k}': tube_path([tuple(p) for p in v['puntos']], v['diametro'])
            for k, v in cb.items() if isinstance(v, dict) and 'puntos' in v}
     if 'ntc' in cb:
-        n = cb['ntc']
-        cx, cy, cz = n['centro']
-        out['cable NTC (cuerpo)'] = cyl_z(n['diametro'] / 2.0, cx, cy, cz - n['largo'] / 2.0, cz + n['largo'] / 2.0)
-    sp = cb.get('salidas_pack')
-    if sp:
-        t = sp['lengueta_neg']
-        out['cable lengueta - del pack'] = box(t['x'][0], t['x'][1], t['y'][0], t['y'][1], t['z'][0], t['z'][1])
+        c = cb['ntc']['caja']
+        out['cable NTC (cuerpo)'] = box(c['x'][0], c['x'][1], c['y'][0], c['y'][1], c['z'][0], c['z'][1])
     return out
 
 
@@ -630,25 +681,29 @@ def _openings_front(x, z, y, m=0.1):
 def _openings_side(x, y, z, m=0.1):
     """Aberturas a proposito en la pared redonda, ensanchadas `m`."""
     cs = P['costado']
-    u = cs['usb_c']
-    if abs(z - u['z_centro']) <= u['medio_alto'] + m and y >= u['y'][0] - m and \
-            ((x >= u['x0'] - m and y <= u['y'][1] + m) or x >= u['x_abierto'] - m):
+    ux0, uyc, uzc, uh, uw, ur = usb_tunnel()
+    if abs(z - uzc) <= uw / 2 + m and abs(y - uyc) <= uh / 2 + m and x >= ux0 - m:
         return 'tunel USB-C'
-    sd = cs['microsd']
-    if x >= 15.5 - m and sd['y'][0] - m <= y <= sd['y'][1] + m and abs(z - SD_Z) <= sd['ancho'] / 2 + m:
+    ch = cs['usb_c']['chaflan_entrada'] + 0.3
+    if abs(z - uzc) <= uw / 2 + m and uyc + uh / 2 - m <= y <= uyc + uh / 2 + ch and math.hypot(x, y) >= RO - 2 * ch:
+        return 'chaflan del tunel'
+    sx0, sy0, sy1, szc, sw = sd_slot()
+    if x >= sx0 - m and sy0 - m <= y <= sy1 + m and abs(z - szc) <= sw / 2 + m:
         return 'ranura microSD'
-    nl = sd['una']
-    ye = sd['y'][1]
-    xo = math.sqrt(RO ** 2 - ye ** 2)
-    if math.hypot(x - (xo + nl['radio'] - nl['hondo']), y - ye) <= nl['radio'] + m and \
-            abs(z - SD_Z) <= nl['alto'] / 2 + m:
-        return 'rebaje de la una'
+    mu = cs['microsd']['muesca']
+    if x >= sx0 - m and sy0 - m <= y <= mu['y_sup'] + m and abs(z - szc) <= mu['ancho'] / 2 + m:
+        return 'muesca de la una'
+    ch = cs['microsd']['chaflan_entrada'] + 0.3
+    if math.hypot(x, y) >= RO - 2 * ch and ((sy1 - m <= y <= sy1 + ch and abs(z - szc) <= sw / 2 + m) or
+                                            (mu['y_sup'] - m <= y <= mu['y_sup'] + ch and abs(z - szc) <= mu['ancho'] / 2 + m)):
+        return 'chaflan de la ranura'
     r = math.hypot(x, y)
     a = math.atan2(y, x)
     an = cs['tapa_puertos']['ancla']
     da = math.atan2(math.sin(a - math.radians(an['angulo'])), math.cos(a - math.radians(an['angulo'])))
-    if abs(da) < math.pi / 2 and math.hypot(r * math.sin(da), z - an['z']) <= an['agujero'] / 2.0 + m:
-        return 'ancla de la tapa de puertos'
+    for za in anchor_zs():
+        if abs(da) < math.pi / 2 and math.hypot(r * math.sin(da), z - za) <= an['agujero'] / 2.0 + m:
+            return 'ancla de la tapa de puertos'
     head = P['base']['tornillos']['avellanado_diametro'] / 2.0
     for cfg, zs in ((P['base']['lenguetas'], P['base']['tornillos']['z']), (P['tapa']['lenguetas'], P['tapa']['tornillos_z'])):
         for ang in cfg['angulos']:
@@ -803,29 +858,59 @@ LOGO_PY = REPO / 'hardware' / 'main-board' / 'scripts' / 'logo.py'
 
 
 def logo_polygons():
-    """Logo completo (distintivo + VIZO) de hardware/main-board/scripts/logo.py, sin modificarlo,
-    en la cara plana: mirando el frente desde +Y, +X queda a la izquierda, asi que x = -u y
-    z = z_c - v (se lee bien desde delante, sin espejo). Devuelve [(contorno, [huecos])] en (x, z)."""
+    """Distintivo de TresVizo (hexágono con el 3, el de las carcasas V2.x) de
+    hardware/main-board/scripts/logo.py, badge() (contornos de mechanical/v2.2/logo.json), sin
+    modificarlo, en la cara plana: mirando el frente desde +Y, +X queda a la izquierda, así que x = -u y
+    z = z_c - v (se lee bien desde delante, sin espejo). Devuelve [(contorno, [huecos])] en (x, z), ancho
+    y alto."""
     import importlib.util
     spec = importlib.util.spec_from_file_location('tresvizo_logo', str(LOGO_PY))
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     lg = P['frente']['logo']
-    polys, w, h = mod.full_logo(lg['ancho'], (0.0, 0.0), mirror=False)
+    polys, w, h = mod.badge(lg['ancho'], (0.0, 0.0), mirror=False)
     tr = lambda ring: [(-u, lg['z_centro'] - v) for u, v in ring]
     return [(tr(o), [tr(hh) for hh in hs]) for o, hs in polys], w, h
 
 
-def logo_relief():
-    """Relieve del logo: de la cara plana exterior (y 22.9) hacia fuera."""
-    lg = P['frente']['logo']
+def logo_solid(y0, y1):
+    """Prisma del distintivo entre y0 e y1 (y1 > y0)."""
     polys, _, _ = logo_polygons()
     solids = []
     for o, hs in polys:
-        f = Part.Face(Part.makePolygon([V(x, Y_FLAT_O, z) for x, z in o] + [V(o[0][0], Y_FLAT_O, o[0][1])]))
+        f = Part.Face(Part.makePolygon([V(x, y0, z) for x, z in o] + [V(o[0][0], y0, o[0][1])]))
         for hh in hs:
-            fh = Part.Face(Part.makePolygon([V(x, Y_FLAT_O, z) for x, z in hh] + [V(hh[0][0], Y_FLAT_O, hh[0][1])]))
+            fh = Part.Face(Part.makePolygon([V(x, y0, z) for x, z in hh] + [V(hh[0][0], y0, hh[0][1])]))
             f = f.cut(fh)
         for face in f.Faces:
-            solids.append(face.extrude(V(0, lg['relieve'], 0)))
+            solids.append(face.extrude(V(0, y1 - y0, 0)))
     return fuse_all(solids)
+
+
+def logo_engrave():
+    """Grabado del distintivo en la cara plana exterior: de y 22.9 - profundidad hacia fuera."""
+    d = P['frente']['logo']['profundidad']
+    return logo_solid(Y_FLAT_O - d, Y_FLAT_O + 1.0)
+
+
+def logo_inlay():
+    """Incrustación del distintivo para imprimir aparte en TPU y pegar en el grabado: los mismos
+    contornos, reducidos `holgura` por lado, del fondo del grabado (y 22.9 - profundidad) hasta la cara
+    plana (queda a ras). En su posición final; export_v3_0.py la escribe también acostada para
+    imprimir. Son tantos sólidos como islas tiene el distintivo (el hexágono, el 3 y sus rayas)."""
+    lg = P['frente']['logo']
+    d, c = lg['profundidad'], lg['incrustacion']['holgura']
+    y0 = Y_FLAT_O - d
+    polys, _, _ = logo_polygons()
+    solids = []
+    for o, hs in polys:
+        f = Part.Face(Part.makePolygon([V(x, y0, z) for x, z in o] + [V(o[0][0], y0, o[0][1])]))
+        for hh in hs:
+            fh = Part.Face(Part.makePolygon([V(x, y0, z) for x, z in hh] + [V(hh[0][0], y0, hh[0][1])]))
+            f = f.cut(fh)
+        for face in f.Faces:
+            if c > 0:
+                face = face.makeOffset2D(-c, join=0)
+            for ff in face.Faces:
+                solids.append(ff.extrude(V(0, lg['incrustacion']['espesor'], 0)))
+    return Part.makeCompound(solids)

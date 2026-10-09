@@ -5,15 +5,15 @@
  "guarda_pared_tubo": {
   "sondas": {
    "cara_plana": {
-    "puntos": 11165,
+    "puntos": 11715,
     "en_aberturas": 1473,
     "sin_material": 0,
     "ejemplos": [],
     "ok": true
    },
    "anillo": {
-    "puntos": 55793,
-    "en_aberturas": 2876,
+    "puntos": 58543,
+    "en_aberturas": 3405,
     "sin_material": 0,
     "ejemplos": [],
     "ok": true
@@ -22,7 +22,7 @@
    "zonas": [
     [
      7,
-     104,
+     109,
      21.7,
      26.8,
      26.8
@@ -35,8 +35,8 @@
      27.4
     ],
     [
-     105.2,
-     106.5,
+     110.2,
+     111.5,
      22.3,
      27.4,
      27.4
@@ -44,44 +44,44 @@
    ]
   },
   "volumen": {
-   "tubo_mm3": 43355.6,
-   "esperado_mm3": 43354.9,
-   "anillo_solido_mm3": 41090.6,
-   "diferencia_mm3": 0.7,
-   "diferencia_pct": 0.002,
+   "tubo_mm3": 44867.7,
+   "esperado_mm3": 44867.2,
+   "anillo_solido_mm3": 43085.3,
+   "diferencia_mm3": 0.4,
+   "diferencia_pct": 0.001,
    "tolerancia_pct": 0.5,
    "ok": true,
-   "_nota": "esperado = anillo solido (circulo R28 con la cara plana en y 22.9, hueco R25.6 con la cara plana interior en y 20.5 para |x| <= 15.33, z 4-107) - rebajes de las uniones + apoyos del chasis + cuna - ventana con su bolsillo, tecla con su rebaje, LED, tunel USB-C, ranura microSD, rebaje de la una, agujero del ancla de la tapa de puertos, tornillos y lineas decorativas + logo en relieve."
+   "_nota": "esperado = anillo solido (circulo R28 con la cara plana en y 22.9, hueco R25.6 con la cara plana interior en y 20.5 para |x| <= 15.33, z 4-112) - rebajes de las uniones + apoyos del chasis + cuna - ventana con su bolsillo, tecla con su rebaje, LED, tunel USB-C, ranura microSD, rebaje de la una, agujero del ancla de la tapa de puertos, tornillos, lineas decorativas y distintivo grabado."
   },
   "espesor_minimo": {
    "tunel USB-C": {
-    "mm": 2.15,
+    "mm": 1.333,
     "donde": [
-     15.05,
-     20.75,
-     18.6
+     18.35,
+     21.15,
+     28.0
     ]
    },
    "ranura microSD y rebaje": {
-    "mm": 2.068,
+    "mm": 1.323,
     "donde": [
-     20.08,
-     17.45,
-     35.88
+     18.29,
+     21.2,
+     39.88
     ]
    },
-   "agujero del ancla de la tapa de puertos": {
-    "mm": 2.399,
+   "agujeros de las anclas de la tapa de puertos": {
+    "mm": 1.343,
     "donde": [
-     15.3,
-     22.9,
-     32.5
+     18.34,
+     21.16,
+     20.0
     ]
    },
    "ventana OLED (bolsillo y chaflan)": {
     "mm": 1.4,
     "donde": [
-     7.95,
+     7.8,
      21.9,
      72.82
     ]
@@ -89,7 +89,7 @@
    "tecla y LED": {
     "mm": 1.8,
     "donde": [
-     1.4,
+     1.35,
      22.3,
      18.0
     ]
@@ -113,8 +113,8 @@
    "pared normal y lineas decorativas (z 15, 60, 95)": {
     "mm": 1.9,
     "donde": [
-     -22.25,
-     -16.16,
+     19.45,
+     -19.44,
      60.0
     ]
    }
@@ -156,37 +156,37 @@
   "chasis-carrier (contactos: topes z 69 y ganchos z 17)": 0.3,
   "chasis-base": 0.4,
   "chasis-tapa": 0.4,
-  "tubo-celdas (contacto: repisas, z 17.5)": 0.0,
+  "tubo-celdas (contacto: repisas, z 18.8)": 0.0,
   "tubo-celdas por encima de las repisas (nervios)": 0.5,
   "tubo-PCB de la placa": 1.911,
   "tubo-componentes de la placa y OLED": 0.5,
-  "tubo-funda USB-C": 0.5,
+  "tubo-funda USB-C": 0.3,
   "tubo-tarjeta microSD": 1.237,
-  "tapa-OLED": 8.584,
-  "tapa-coaxial (recorrido)": 2.551,
+  "tapa-OLED": 13.553,
+  "tapa-coaxial (recorrido)": 2.907,
   "tapa-celdas": 0.5,
   "base-clavijas": 0.75,
   "base-PCB de la placa": 0.5,
-  "base-celdas": 1.621,
+  "base-celdas": 2.9,
   "base-carrier": 1.5,
-  "reten-celdas": 0.56,
+  "reten-celdas": 0.5,
   "tecla-SW401 (juego del embolo)": 0.505,
   "tecla-componentes de la placa": 1.9,
   "carrier-PCB de la placa": 0.5,
-  "carrier (patas del SMA)-celdas": 2.833,
+  "carrier (patas del SMA)-celdas": 1.8,
   "cables (reservas)-piezas": 0.5,
   "tuerca SMA-PCB con la muesca": 0.539,
-  "coaxial (recorrido)-piezas": 0.558,
-  "coaxial (recorrido)-celdas": 0.652,
+  "coaxial (recorrido)-piezas": 0.592,
+  "coaxial (recorrido)-celdas": 0.599,
   "coaxial (recorrido)-placa y OLED": 4.4,
   "clavija SMA acodada-chasis (pedido >= 0.5)": 0.5,
-  "cables (reservas)-celdas": 1.358,
-  "cables (reservas)-placa y carrier": 1.008,
+  "cables (reservas)-celdas": 8.945,
+  "cables (reservas)-placa y carrier": 2.6,
   "perno del baston (15.5)-soldaduras de la carrier": 1.2,
-  "perno del baston (15.5)-celdas": 2.0,
+  "perno del baston (15.5)-celdas": 3.3,
   "guia de luz-componentes de la placa": 0.545,
-  "tapa de puertos-chasis": 0.57,
-  "tapa de puertos-tarjeta": 1.613,
+  "tapa de puertos-chasis": 0.565,
+  "tapa de puertos-tarjeta": 1.437,
   "chasis-componentes de la carrier (sin su PCB)": 0.5,
   "rieles-PCB de la placa (sin el tope de z 80 ni los salientes)": 0.25,
   "tapa bajo el canto del tubo (labio y lenguetas)-tubo": 0.4,
@@ -194,9 +194,9 @@
   "tecla-tubo (sin la pestana pegada)": 1.7,
   "tapa-tornillos de la antena (radial, en su rebaje)": 0.5,
   "tapa-tuerca del pasamuros (radial, en su bolsillo)": 1.881,
-  "conector de la tapa (dentro)-placa, OLED y celdas": 11.574,
-  "coaxial (recorrido)-cables": 1.495,
-  "clavija SMA acodada-celdas": 5.337,
+  "conector de la tapa (dentro)-placa, OLED y celdas": 15.822,
+  "coaxial (recorrido)-cables": 32.678,
+  "clavija SMA acodada-celdas": 4.1,
   "clavija SMA acodada-placa y OLED (sin la muesca)": 0.7,
   "tuerca del baston-placa y carrier": 0.81
  },
@@ -205,7 +205,7 @@
    "compradas": {
     "mm": 0.5,
     "barrido": "celdas_por_arriba",
-    "movil": "celdas: celda 1",
+    "movil": "celdas: pack 1S2P (envolvente)",
     "obstaculo": "02-tube"
    },
    "carrier-ranuras": {
@@ -236,12 +236,7 @@
   "por_barrido": {
    "celdas_por_arriba": [
     {
-     "movil": "celdas: celda 1",
-     "obstaculo": "02-tube",
-     "mm": 0.5
-    },
-    {
-     "movil": "celdas: celda 2",
+     "movil": "celdas: pack 1S2P (envolvente)",
      "obstaculo": "02-tube",
      "mm": 0.5
     }
@@ -395,12 +390,7 @@
     },
     {
      "movil": "04-chassis",
-     "obstaculo": "celdas: celda 1",
-     "mm": 0.6
-    },
-    {
-     "movil": "04-chassis",
-     "obstaculo": "celdas: celda 2",
+     "obstaculo": "celdas: pack 1S2P (envolvente)",
      "mm": 0.6
     },
     {
@@ -432,6 +422,11 @@
      "movil": "placa: OLED pines",
      "obstaculo": "02-tube",
      "mm": 1.7
+    },
+    {
+     "movil": "placa: J101",
+     "obstaculo": "02-tube",
+     "mm": 1.764
     }
    ],
    "base_por_abajo": [
@@ -446,14 +441,9 @@
      "mm": 0.5
     },
     {
-     "movil": "tuerca: reten M2 con arandela",
-     "obstaculo": "celdas: celda 1",
-     "mm": 0.56
-    },
-    {
-     "movil": "tuerca: reten M2 con arandela",
-     "obstaculo": "celdas: celda 2",
-     "mm": 0.56
+     "movil": "01-base",
+     "obstaculo": "cables: cable mazo_pack",
+     "mm": 0.539
     },
     {
      "movil": "01-base",
@@ -461,19 +451,9 @@
      "mm": 0.75
     },
     {
-     "movil": "01-base",
-     "obstaculo": "cables: cable bateria_neg",
-     "mm": 0.783
-    },
-    {
      "movil": "tuerca: reten M2 con arandela",
-     "obstaculo": "cables: cable bateria_pos_ntc",
-     "mm": 1.044
-    },
-    {
-     "movil": "01-base",
-     "obstaculo": "cables: cable bateria_pos_ntc",
-     "mm": 1.202
+     "obstaculo": "cables: cable mazo_pack",
+     "mm": 1.371
     },
     {
      "movil": "01-base",
@@ -504,38 +484,81 @@
  "tapa_de_puertos": {
   "ancla": {
    "angulo": 19.0,
-   "z": 32.5,
+   "z": [
+    20.0,
+    32.5,
+    45.0
+   ],
    "agujero": 2.0
   },
-  "cabeza_en_su_sitio_mm": {
-   "celdas: celda 1": 10.584,
-   "celdas: celda 2": 26.248,
-   "cables: cable bateria_pos_ntc": 24.796,
-   "cables: cable bateria_neg": 18.087,
-   "01-base": 17.517,
-   "02-tube (sin la pared del agujero)": 0.802
+  "anclas": {
+   "z 20": {
+    "cabeza_en_su_sitio_mm": {
+     "celdas: pack 1S2P (envolvente)": 10.906,
+     "cables: cable mazo_pack": 13.452,
+     "cables: cable hilos_ntc": 29.256,
+     "cables: cable NTC (cuerpo)": 40.937,
+     "01-base": 8.587,
+     "02-tube (sin la pared del agujero)": 0.862
+    },
+    "cabeza_al_barrer_el_chasis_mm": 0.614,
+    "pared_entre_el_agujero_y_otras_aberturas_mm": {
+     "tunel USB-C": 2.658,
+     "ranura microSD y muesca": 15.316,
+     "lineas decorativas": 15.287
+    }
+   },
+   "z 32.5": {
+    "cabeza_en_su_sitio_mm": {
+     "celdas: pack 1S2P (envolvente)": 10.906,
+     "cables: cable mazo_pack": 25.474,
+     "cables: cable hilos_ntc": 32.099,
+     "cables: cable NTC (cuerpo)": 34.415,
+     "01-base": 17.517,
+     "02-tube (sin la pared del agujero)": 0.862
+    },
+    "cabeza_al_barrer_el_chasis_mm": 0.614,
+    "pared_entre_el_agujero_y_otras_aberturas_mm": {
+     "tunel USB-C": 3.171,
+     "ranura microSD y muesca": 5.77,
+     "lineas decorativas": 15.287
+    }
+   },
+   "z 45": {
+    "cabeza_en_su_sitio_mm": {
+     "celdas: pack 1S2P (envolvente)": 10.906,
+     "cables: cable mazo_pack": 37.22,
+     "cables: cable hilos_ntc": 32.099,
+     "cables: cable NTC (cuerpo)": 31.424,
+     "01-base": 29.079,
+     "02-tube (sin la pared del agujero)": 0.862
+    },
+    "cabeza_al_barrer_el_chasis_mm": 0.614,
+    "pared_entre_el_agujero_y_otras_aberturas_mm": {
+     "tunel USB-C": 13.32,
+     "ranura microSD y muesca": 5.263,
+     "lineas decorativas": 15.287
+    }
+   }
   },
   "cabeza_al_barrer_el_chasis_mm": 0.614,
-  "pared_entre_el_agujero_y_otras_aberturas_mm": {
-   "tunel USB-C": 2.989,
-   "ranura microSD": 5.51,
-   "lineas decorativas": 15.287
-  },
+  "cabeza_en_su_sitio_min_mm": 0.862,
+  "pared_agujeros_min_mm": 2.658,
   "abierta_girada_en_la_bisagra": {
    "135": {
     "funda_mm3": 0.0,
-    "funda_holgura": 2.079,
+    "funda_holgura": 1.616,
     "tarjeta_mm3": 0.0,
-    "tarjeta_holgura": 4.91
+    "tarjeta_holgura": 4.945
    },
    "180": {
     "funda_mm3": 0.0,
-    "funda_holgura": 3.035,
+    "funda_holgura": 2.63,
     "tarjeta_mm3": 0.0,
     "tarjeta_holgura": 5.235
    }
   },
-  "_nota": "Abierta: la parte de delante de la bisagra girada como solido rigido; en la realidad el TPU se dobla. Con 135 grados o mas deja libres la funda del USB-C (12.35 x 6.5) y la tarjeta."
+  "_nota": "Tres anclas. Abierta: la parte de delante de la bisagra girada como solido rigido; en la realidad el TPU se dobla (su duracion y el sellado hay que probarlos impresos). Con 135 grados o mas deja libres la funda del USB-C y la tarjeta."
  },
  "antena_wroom": {
   "zona_antena": {
@@ -616,19 +639,27 @@
   "cable": {
    "tipo": "RG178",
    "diametro": 1.8,
-   "_nota": "RG 178 B/U (MIL-C-17/93): FEP de Ø1.81 +- 0.13, 50 ohm. Hoja de Lapp 2170002 (12-06-2008): radio de curva minimo 10 en instalacion fija y 19 con flexiones repetidas. El recorrido da R 10.0: justo el minimo fijo, sin margen; al desmontar, no doblarlo a menos de unos 19. Alternativa: microcoaxial de 1.13 (comprobar su radio en la hoja del cable elegido)."
+   "_nota": "RG 178 B/U (MIL-C-17/93): FEP de Ø1.81 +- 0.13, 50 ohm. Hoja actual de Lapp 2170002 (DB2170002EN, version 06, valida desde 30-04-2020): radio de curva minimo 6 x Ø en instalacion fija (10.9 con Ø1.81; 11.6 con el maximo de 1.94) y 10 x Ø con flexiones ocasionales (18-19). Objetivo del recorrido: R >= 12 en todas las curvas. La hoja de 2008 daba 10 fijo."
   },
-  "radio_curva_disponible": 10.0,
-  "radio_curva_objetivo": 8.0,
-  "radio_curva_preferido": 10.0,
+  "radio_curva_disponible": 12.27,
+  "radio_curva_objetivo": 12.0,
+  "radio_curva_preferido": 12.0,
   "cumple_objetivo": true,
   "cumple_preferido": true,
-  "largo_del_recorrido_mm": 75.7,
-  "radio_max_del_eje_del_cable": 24.14,
+  "largo_del_recorrido_mm": 82.7,
+  "radio_max_del_eje_del_cable": 24.1,
   "z_del_recorrido": [
    85.0,
-   99.0
+   104.0
   ]
+ },
+ "distancias_entre_mazos": {
+  "mazo del pack (rojo, negro y NTC) / arnes de J301": 8.802,
+  "mazo del pack (rojo, negro y NTC) / coaxial": 68.547,
+  "hilos de la NTC / arnes de J301": 33.204,
+  "hilos de la NTC / coaxial": 40.017,
+  "arnes de J301 / coaxial": 52.769,
+  "cuerpo de la NTC / coaxial": 32.678
  },
  "objetivos": {
   "B1_ajustes_entre_impresas": {
@@ -662,9 +693,9 @@
    "objetivo_mm": 1.2,
    "local_minimo_mm": 1.0,
    "espesores_mm": {
-    "tunel USB-C": 2.15,
-    "ranura microSD y rebaje": 2.068,
-    "agujero del ancla de la tapa de puertos": 2.399,
+    "tunel USB-C": 1.333,
+    "ranura microSD y rebaje": 1.323,
+    "agujeros de las anclas de la tapa de puertos": 1.343,
     "ventana OLED (bolsillo y chaflan)": 1.4,
     "tecla y LED": 1.8,
     "uniones (rebajes)": 1.198,
@@ -677,11 +708,23 @@
    "por_debajo_de_1.0": {}
   },
   "B6_coaxial": {
-   "radio_curva_disponible": 10.0,
-   "radio_curva_objetivo": 8.0,
-   "radio_curva_preferido": 10.0,
+   "radio_curva_disponible": 12.27,
+   "radio_curva_objetivo": 12.0,
+   "radio_curva_preferido": 12.0,
    "cumple_objetivo": true,
    "cumple_preferido": true
+  },
+  "B7_mazos_entre_si": {
+   "objetivo_mm": 0.3,
+   "minimo_mm": 8.802,
+   "donde": "mazo del pack (rojo, negro y NTC) / arnes de J301",
+   "cumple": true,
+   "por_debajo": {}
+  },
+  "ajustes_guiados": {
+   "funda USB-C en el tunel (por lado)": 0.3,
+   "objetivo_mm": 0.3,
+   "_nota": "Pedido del propietario: aberturas justas, funda y tarjeta a 0.3 por lado; no es aire de 0.5."
   },
   "_nota": "Contactos a proposito (no cuentan): pie de los rieles en sus apoyos (z 9.5), placa contra los salientes (y 13.8) y el tope (z 80), celdas en sus repisas, base y tapa contra los cantos del tubo, tornillos en sus avellanados y arandelas en sus asientos, tecla pegada en su rebaje, tapa de puertos sobre el tubo, seta en su agujero, cuerpos de TPU en las aberturas, tuerca del baston en su hexagono (0.3 por cara), pasamuros en su agujero en D. Ajustes de posicion aparte: rieles (B2) y carrier (B4)."
  },

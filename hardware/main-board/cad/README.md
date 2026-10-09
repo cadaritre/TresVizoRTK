@@ -2,7 +2,7 @@
 
 ## v0.3 compacta (rama `hw/compact-v03`)
 
-La placa v0.3 va en el tubo de Ø56 × 111 con cara plana de `mechanical/v3.0`. Las medidas e
+La placa v0.3 va en el tubo de Ø56 × 116 con cara plana de `mechanical/v3.0`. Las medidas e
 interfaces están en [../research/v03-compacta.md](../research/v03-compacta.md). Ejes:
 
 - **z** = eje del bastón hacia arriba;

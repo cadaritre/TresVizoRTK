@@ -14,7 +14,7 @@
  "tubo": {
   "radio_exterior": 28.0,
   "pared": 2.4,
-  "alto_total": 111.0,
+  "alto_total": 116.0,
   "redondeo": 4.0,
   "_nota_redondeo": "Redondeo exterior R4 en el canto de abajo (lo lleva la base y el arranque del tubo) y en el de arriba (lo lleva la tapa).",
   "plano_y_exterior": 22.9,
@@ -22,14 +22,14 @@
   "plano_x": 15.33,
   "_nota_plano": "Cara plana por dentro en y 20.5 (vidrio de la OLED en y 20.0 + 0.5) hasta |x| 15.33, donde la corta el circulo de r 25.6; por fuera en y 22.9 hasta |x| 16.11.",
   "z_base": 4.0,
-  "z_tapa": 107.0,
+  "z_tapa": 112.0,
   "_nota_z": "Base z 0-4 (disco de 2 y anillo del redondeo), tubo z 4-107, tapa z 107-111.",
   "ranuras_rieles": {
    "angulos": [],
    "radio": 25.6,
    "z": [
     8.0,
-    107.0
+    112.0
    ],
    "_nota": "Sin ranuras: con r 25.6 los rieles caben con 0.43."
   },
@@ -41,7 +41,7 @@
    "_nota": "Uniones en escalon: labio de 0.8 pegado a la cara interior de la pared; el tubo tiene un rebaje de 1.2 (0.8 + 0.4 de juego) y le queda 1.2 por fuera."
   },
   "_nota_esquina": "Con la cara plana interior hasta donde la corta el circulo, la pared mide 2.4 tambien en la esquina.",
-  "_nota_diametro": "Ø56 x 111 (antes 52 x 100). Diametro: con pared de 2.4 (escalones de union con 0.4 de juego y 1.2 de pared) y radio interior 25.6, los rieles en C con 0.25 por cara pasan a 0.43 del tubo sin ranuras en la pared. Alto: el coaxial tiene que pasar por encima de las celdas (z 89) con radio de curva 10 y subir al pasamuros del centro de la tapa (ver coaxial).",
+  "_nota_diametro": "Ø56 x 116 (antes 52 x 100; 56 x 111 en la revision anterior). Diametro: con pared de 2.4 (escalones de union con 0.4 de juego y 1.2 de pared) y radio interior 25.6, los rieles en C con 0.25 por cara pasan a 0.43 del tubo sin ranuras en la pared. Alto: el coaxial RG178 necesita R >= 12 en todas sus curvas (hoja actual de Lapp, 6 x Ø en instalacion fija); el recorrido mas bajo que lo cumple llega al pasamuros en z 104 (con 111 llegaba en z 99 con R 10): el tubo, la tapa y lo de arriba suben 5.",
   "apoyos_chasis": {
    "r0": 21.4,
    "angulos": [
@@ -79,7 +79,7 @@
    ],
    "z": [
     11.5,
-    100.0
+    105.0
    ],
    "ancho": 1.3,
    "profundidad": 0.5,
@@ -117,7 +117,7 @@
    "arandela_espesor": 0.8,
    "cabeza_diametro": 4.0,
    "cabeza_alto": 1.6,
-   "_nota": "M2 x 8 de cabeza alomada (ISO 7045) o boton, con arandela DIN 9021 de M3 (9 x 0.8): llega a r 10.5 y pisa 1.4 de la cara trasera de la tuerca. Refuerzo del piloto (Ø4.6) hasta z 15.9, a ras de la tuerca, para que la arandela apoye plana. En r 15 la cabeza (hasta z 18.3) queda fuera de la planta de las celdas. Un segundo reten no vale: a 0 y 180 grados solo cabria un M2 de cabeza baja sin arandela (ISO 7380, k 1.1: cabeza a 0.5 de las celdas) que pisaria 0.5 mm de una esquina de la tuerca; delante esta la placa.",
+   "_nota": "M2 x 8 de cabeza alomada (ISO 7045) o boton, con arandela DIN 9021 de M3 (9 x 0.8): llega a r 10.5 y pisa 1.4 de la cara trasera de la tuerca. Refuerzo del piloto (Ø4.6) hasta z 15.9, a ras de la tuerca, para que la arandela apoye plana. La cabeza llega a z 18.3: el pack 1S2P, de cara de abajo plana, apoya en z 18.8 (0.5 encima). Un segundo reten no vale: a 0 y 180 grados solo cabria un M2 de cabeza baja sin arandela (ISO 7380, k 1.1: cabeza a 0.5 de las celdas) que pisaria 0.5 mm de una esquina de la tuerca; delante esta la placa.",
    "refuerzo_diametro": 4.6,
    "refuerzo_z_sup": 15.9
   },
@@ -182,11 +182,11 @@
    ],
    "ancho": 6.0,
    "z": [
-    97.0,
-    107.0
+    102.0,
+    112.0
    ]
   },
-  "tornillos_z": 102.0,
+  "tornillos_z": 107.0,
   "_nota_tornillos": "Mismos M2.5 avellanados radiales que la base.",
   "topes_celdas": {
    "puntos": [
@@ -201,7 +201,7 @@
    ],
    "diametro": 6.0,
    "holgura": 0.5,
-   "_nota": "Topes bajo la tapa, sobre las celdas (arriba en z 87.5), a 0.5: no las dejan subir. Fuera del recorrido del coaxial y de los tornillos de la antena."
+   "_nota": "Topes bajo la tapa, sobre el pack (arriba en z 86.8), a 0.5: lo sujetan en vertical con 0.5 de juego (68 de largo). Fuera del recorrido del coaxial y de los tornillos de la antena."
   }
  },
  "antena": {
@@ -279,39 +279,39 @@
    }
   },
   "logo": {
-   "ancho": 24.0,
+   "ancho": 18.0,
    "z_centro": 49.5,
-   "relieve": 0.5,
-   "fuente": "hardware/main-board/scripts/logo.py: full_logo() (firmware/esp32/assets/tresvizo-logo.svg, distintivo + VIZO)",
-   "_nota": "Logo en relieve de 0.5 sobre la cara plana (y 22.9 a 23.4), centrado en x 0, z 49.5: 24 x 10.85 mm, 4.1 de margen al canto de la cara plana (x 16.11). Medido con apertura y cierre morfologicos (rejilla de 0.01): a 24 mm el trazo mas fino y el hueco mas estrecho miden ~0.53 (anillo del hexagono y separacion de las rayas del 3); a 22 mm, ~0.49. Los cortes cortos de las rayas del 3 miden 0.27 a 24 mm: en MJF probablemente se cierran (solo estetico)."
+   "profundidad": 0.8,
+   "fuente": "hardware/main-board/scripts/logo.py: badge() (mechanical/v2.2/logo.json: distintivo, hexagono con el 3)",
+   "_nota": "Distintivo GRABADO 0.8 en la cara plana, como en las carcasas V2.x (pedido del propietario, 08-10-2026: no el logo completo con VIZO ni en relieve). 18 de ancho por unos 20.7 de alto, centrado en x 0, z 49.5: entre la tecla (rebaje hasta z 26.5) y el bolsillo de la ventana de la OLED (desde z 72.5). Bajo el grabado quedan 1.6 de pared.",
+   "incrustacion": {
+    "holgura": 0.1,
+    "espesor": 0.8,
+    "_nota": "Pieza aparte (07-logo-inlay-tpu) para imprimir en TPU de otro color y pegar en el grabado: los contornos del distintivo reducidos 0.1 por lado (el TPU de FDM sale algo grueso; el pegamento llena el resto) y 0.8 de espesor, a ras de la cara plana. Son 6 islas: el hexagono, el 3 y cuatro rayas de unos 2 mm2. Para imprimir: generated/stl/07-logo-inlay-tpu-para-imprimir.stl, con la cara que se ve contra la cama."
+   }
   }
  },
  "costado": {
   "usb_c": {
-   "x0": 14.4,
-   "y": [
-    13.25,
-    20.75
-   ],
-   "z_centro": 25.0,
-   "medio_alto": 6.7,
-   "_nota": "Tunel de la funda de la clavija USB-C (hasta 12.35 x 6.5, centrada en y 17.0) desde x 14.4 (0.5 delante de la boca de J101, en x 14.9), y 13.25-20.75, z 25 +-6.7: 0.5 alrededor de la funda. Desde x 16.11 (donde acaba la cara plana) se abre hasta fuera: si no, encima quedaria una cuna.",
-   "x_abierto": 16.11
+   "holgura": 0.3,
+   "radio_funda": 1.0,
+   "chaflan_entrada": 1.2,
+   "_nota": "Tunel CERRADO de seccion rectangulo redondeado: la funda maxima de la clavija (12.35 x 6.5, esquinas de R1.0) mas 0.3 por lado (12.95 x 7.1, R1.3), centrado en el eje de J101 de la placa real (y 16.6, z 25.0, de placa-principal.json), de la cara exterior a la boca del receptaculo (x 14.9). Sin cortes abiertos. Solo un chaflan de 1.2 en el canto de fuera de arriba, donde el techo del tunel salia en cuna de ~44 grados. La funda va guiada a 0.3 por lado (ajuste pedido por el propietario, no aire de 0.5). Por dentro, chaflan de 0.6 a 45 grados en el canto de abajo con la cara interior (cuna, tambien en las esquinas redondeadas: medida 0.99 sin el); no se ve desde fuera.",
+   "chaflan_interior": 0.6
   },
   "microsd": {
    "z_centro": 40.9,
-   "ancho": 12.0,
-   "y": [
-    15.45,
-    17.45
-   ],
-   "una": {
-    "radio": 1.9,
-    "hondo": 1.2,
-    "alto": 12.0
+   "desplazamiento_canal": 0.9,
+   "holgura": 0.3,
+   "x0": 15.5,
+   "muesca": {
+    "ancho": 5.0,
+    "y_sup": 20.2,
+    "_nota": "Muesca estrecha para la una en el centro de la tarjeta: 5 de ancho (z), de la ranura hasta y 20.2, atraviesa la pared. Arriba la cara exterior esta en x 19.39: el canto de la tarjeta puesta (x 17.5) queda a 1.9 de ella (antes 5.2 bajo la cara exterior)."
    },
-   "_nota": "Ranura de la tarjeta (11 x 1.0). Su eje sale de J401, nunca de la ranura: J401 (TF-015) esta en u 10.875, v 40.0, giro 270, y el canal de la tarjeta va 0.9 mm corrido del centro del cuerpo (pivotes en x -4.90 y +3.10 de la huella; +x de la huella va a +v): tarjeta en v 39.1, z 40.9. Con el STEP se toma el centro de J401 mas 0.9; z_centro es el valor de respaldo. Ranura de 12 (0.5 por lado) y rebaje para la una en el canto delantero, a todo lo ancho de la ranura: quita la cuna aguda del canto de fuera del techo.",
-   "desplazamiento_canal": 0.9
+   "chaflan_entrada": 1.2,
+   "_nota": "Ranura justa para la tarjeta (11 x 1.0) mas 0.3 por lado: 11.6 x 1.6 (y 15.65-17.25), en el eje real de J401 (z 40.88 de placa-principal.json: centro de J401 mas 0.9 de corrimiento del canal; z_centro es el respaldo). La tarjeta entra y sale recta en x. Muesca para la una en su centro y chaflan de 1.2 en los cantos de fuera de arriba (ranura y muesca), donde salian en cuna. Por dentro, chaflan de 0.8 en el canto del suelo con la cara interior (cuna de ~53 grados; no se ve desde fuera).",
+   "chaflan_interior": 0.8
   },
   "tapa_puertos": {
    "espesor": 0.9,
@@ -331,7 +331,11 @@
    },
    "ancla": {
     "angulo": 19.0,
-    "z": 32.5,
+    "z": [
+     20.0,
+     32.5,
+     45.0
+    ],
     "vastago": 1.95,
     "agujero": 2.0,
     "cabeza_diametro": 3.4,
@@ -350,10 +354,8 @@
     ],
     "alto": 1.0
    },
-   "_nota": "Una sola tapa de TPU, atada, para el tunel del USB-C y la ranura de la microSD. Ala curva de 0.9 sobre la pared (R28), de 16.5 a 54.87 grados y luego plana sobre la cara plana hasta x 14.6, z 16.8-48.4: tapa las dos aberturas con >= 1.5 alrededor. Por dentro lleva los cuerpos a presion: llenan la pared en el tunel (desde r 25.65) y en la ranura (desde r 25.8). Lengueta para tirar en el canto delantero, sobre la cara plana. Ancla en el canto trasero: seta de TPU con vastago de 2 (1.95 en el modelo, para no dejar caras coincidentes) por un agujero de 2 en la pared (19 grados, z 32.5) y cabeza de 3.4 x 1.0 por dentro con cono de entrada a 45 grados: se empuja desde fuera y se saca con pinzas. Bisagra: franja de 0.6 de espesor a 22.5 grados."
-  },
-  "chaflan_interior": 0.8,
-  "_nota_chaflan_interior": "Chaflan de 0.8 en el canto interior del suelo del tunel del USB-C y de la ranura de la microSD: ahi el plano del suelo cortaba la cara interior en cuna de ~53 grados (0.86 a 0.6 del canto)."
+   "_nota": "Una sola tapa de TPU, atada, para el tunel del USB-C y la ranura de la microSD. Ala curva de 0.9 sobre la pared (R28), de 16.5 a 54.87 grados y luego plana sobre la cara plana hasta x 14.6, z 16.8-48.4: tapa las dos aberturas con >= 1.5 alrededor. Por dentro lleva los cuerpos a presion con la forma de las aberturas nuevas: llenan la pared en el tunel (desde r 25.65) y en la ranura con su muesca (desde r 25.8). Lengueta para tirar en el canto delantero. TRES anclas en el canto trasero (19 grados; z 20, 32.5 y 45): setas de TPU con vastago de 2 (1.95 en el modelo) por agujeros de 2 en la pared y cabeza de 3.4 x 1.0 por dentro con cono de entrada a 45 grados: se empujan desde fuera y se sacan con pinzas. Bisagra: franja de 0.6 de espesor a 22.5 grados, por delante de las anclas."
+  }
  },
  "placa": {
   "_que_es": "Envolvente de la placa v0.3 mientras no exista su STEP (hardware/main-board/cad/placa-principal.step).",
@@ -419,7 +421,9 @@
    "ancho": 12.35,
    "alto": 6.5,
    "y_centro": 17.0,
-   "largo": 20.0
+   "largo": 20.0,
+   "radio": 1.0,
+   "_nota": "Funda maxima de la clavija USB-C: 12.35 x 6.5, con esquinas de R1.0 (supuesto; la norma da el maximo del rectangulo). y_centro es el respaldo: el eje sale de J101."
   },
   "microsd": {
    "ancho": 16.0,
@@ -433,7 +437,7 @@
    "espesor": 1.0,
    "y0": 15.95,
    "x_fuera": 17.5,
-   "_nota": "Tarjeta puesta: su canto queda en x 17.5, unos 2.7 mm dentro de la cara exterior (x 20.2 en y 16.35)."
+   "_nota": "Tarjeta puesta: su canto queda en x 17.5. En el plano de la tarjeta (y 16.45) la cara exterior esta en x 22.66: 5.2 de hondo; la muesca lleva la cara exterior a x 19.39 encima de la tarjeta (1.9)."
   },
   "clavijas": {
    "zona_y": [
@@ -523,23 +527,34 @@
   "_nota": "Para hardware/main-board/cad/carrier_bdlx.py: build(carrier). Eje del canon del SMA en x -1.2, y 10.1, z 69-79.5. Corrida 0.1 hacia atras (y 5.2-6.8 en vez de 5.3-6.9) para dejar 0.5 entre el SMA (cuerpo y canon, hasta y 13.3) y el dorso de la placa."
  },
  "celdas": {
+  "pack": {
+   "ancho": 37.5,
+   "largo": 68.0,
+   "grueso": 20.0,
+   "holgura": 0.5,
+   "centro": [
+    0.0,
+    -8.6
+   ],
+   "_nota": "Pack comercial 1S2P: 2 x 18650 lado a lado en funda termorretractil, BMS dentro, 37.5 x 68 x 20 (anuncio), 110 g, dos cables rojo y negro, sin hilo de NTC. Envolvente de peor caso: estadio de 37.5 de ancho y 20 de grueso (dos cilindros de Ø20 con los valles puenteados por la funda) y 68 de largo. El de verdad sera de ~19 de grueso: queda mas suelto; medirlo y calzarlo con espuma. El frente queda donde estaban las celdas (y 1.4, 0.6 al puente del chasis): la cuna se corre hacia atras."
+  },
   "ejes": [
    [
-    9.5,
-    -7.9
+    8.75,
+    -8.6
    ],
    [
-    -9.5,
-    -7.9
+    -8.75,
+    -8.6
    ]
   ],
-  "diametro": 18.6,
+  "diametro": 20.0,
   "z": [
-   17.5,
-   87.5
+   18.8,
+   86.8
   ],
   "holgura": 0.5,
-  "_nota": "2 x 18650 protegidas en paralelo (1S2P). Bajan por arriba antes que el chasis."
+  "_nota": "ejes y diametro: centros y diametro de los extremos redondos del estadio del pack (se derivan de pack). z: el pack apoya en z 18.8 (1.3 mas arriba que las celdas sueltas: su cara de abajo es plana y tapa el valle donde cabia la cabeza del reten, que llega a z 18.3) y acaba en 86.8. Baja por arriba antes que el chasis."
  },
  "cuna": {
   "nervios": {
@@ -550,11 +565,11 @@
    ],
    "espesor": 1.6,
    "z": [
-    17.5,
-    86.0
+    18.8,
+    84.5
    ],
    "z_labio": 84.0,
-   "_nota": "Por celda, tres nervios de la pared hacia la celda (angulos medidos desde su eje, 0 = hacia fuera en x): costado, atras y un labio delante-fuera que no la deja ir hacia delante. Terminan a 0.3 de la celda. El labio de delante-fuera acaba en z 84: por encima pasa el coaxial (primer arco) junto a la celda -X."
+   "_nota": "Por cada extremo redondo del pack, tres nervios de la pared hacia el pack (angulos desde el centro del extremo, 0 = hacia fuera en x): costado, atras y un labio delante-fuera que no lo deja ir hacia delante. Terminan a 0.5 de la envolvente. Hasta z 84.5 (el labio, 84): por encima pasa el coaxial."
   },
   "repisas": {
    "angulos": [
@@ -569,10 +584,10 @@
    ],
    "r0": 16.6,
    "z": [
-    16.3,
-    17.5
+    17.6,
+    18.8
    ],
-   "_nota": "La celda apoya en una repisa bajo su parte de fuera, lejos del saliente de la tuerca (r 16) y de los cables."
+   "_nota": "El pack apoya en dos repisas bajo su parte de fuera (r >= 16.6), lejos del saliente de la tuerca, del reten y de la salida de sus cables."
   }
  },
  "chasis": {
@@ -619,7 +634,7 @@
    ],
    "z": [
     9.5,
-    106.6
+    111.6
    ],
    "corte_coax_menos_x": {
     "z0": 83.0
@@ -716,8 +731,8 @@
     21.6
    ],
    "z": [
-    102.0,
-    106.6
+    107.0,
+    111.6
    ],
    "z_menos_x": [
     79.0,
@@ -775,12 +790,12 @@
   "cable": {
    "tipo": "RG178",
    "diametro": 1.8,
-   "_nota": "RG 178 B/U (MIL-C-17/93): FEP de Ø1.81 +- 0.13, 50 ohm. Hoja de Lapp 2170002 (12-06-2008): radio de curva minimo 10 en instalacion fija y 19 con flexiones repetidas. El recorrido da R 10.0: justo el minimo fijo, sin margen; al desmontar, no doblarlo a menos de unos 19. Alternativa: microcoaxial de 1.13 (comprobar su radio en la hoja del cable elegido)."
+   "_nota": "RG 178 B/U (MIL-C-17/93): FEP de Ø1.81 +- 0.13, 50 ohm. Hoja actual de Lapp 2170002 (DB2170002EN, version 06, valida desde 30-04-2020): radio de curva minimo 6 x Ø en instalacion fija (10.9 con Ø1.81; 11.6 con el maximo de 1.94) y 10 x Ø con flexiones ocasionales (18-19). Objetivo del recorrido: R >= 12 en todas las curvas. La hoja de 2008 daba 10 fijo."
   },
   "radio_curva": {
-   "objetivo": 8.0,
-   "preferido": 10.0,
-   "_nota": "Radio de curva minimo del recorrido (eje del cable). Se mide en check_v3_0.py (coaxial.radio_curva_disponible)."
+   "objetivo": 12.0,
+   "preferido": 12.0,
+   "_nota": "R >= 12 en todas las curvas (6 x Ø maximo de la hoja actual de Lapp, con margen). Se mide en check_v3_0.py sobre el recorrido muestreado."
   },
   "clavija": {
    "x": -1.2,
@@ -808,13 +823,102 @@
    }
   },
   "ruta": {
-   "radio_primer_arco": 10.5,
-   "radio_vertical": 10.0,
-   "z_lazo": 89.0,
-   "y_fin_subida": -5.8,
-   "_nota": "Primer arco (a izquierdas, saliendo de la clavija acodada hacia -X) de radio radio_primer_arco; recto por x = x_salida - radio_primer_arco hacia atras; media vuelta detras de la celda -X de radio (radio_primer_arco - x_salida)/2, que acaba en (0, -radio_vertical); curva vertical de radio_vertical hasta el eje. Sube de z_cable a z_lazo con curvatura vertical constante en el primer arco y frenando en el recto, hasta y_fin_subida (antes de pasar junto a la celda -X)."
+   "puntos_control": [
+    [
+     -9.5,
+     10.1,
+     85.0
+    ],
+    [
+     -10.5,
+     10.1,
+     85.0
+    ],
+    [
+     -12.957,
+     9.858,
+     85.032
+    ],
+    [
+     -17.344,
+     7.796,
+     85.314
+    ],
+    [
+     -21.28,
+     3.165,
+     85.866
+    ],
+    [
+     -22.81,
+     -4.643,
+     87.453
+    ],
+    [
+     -20.653,
+     -13.194,
+     84.856
+    ],
+    [
+     -15.993,
+     -18.541,
+     85.558
+    ],
+    [
+     -10.421,
+     -20.592,
+     86.781
+    ],
+    [
+     -5.247,
+     -20.066,
+     87.905
+    ],
+    [
+     -1.137,
+     -17.798,
+     88.734
+    ],
+    [
+     1.63,
+     -14.508,
+     89.496
+    ],
+    [
+     3.049,
+     -10.743,
+     90.489
+    ],
+    [
+     3.219,
+     -6.916,
+     91.988
+    ],
+    [
+     2.315,
+     -3.408,
+     94.375
+    ],
+    [
+     0.764,
+     -0.742,
+     98.165
+    ],
+    [
+     0.0,
+     0.0,
+     101.89
+    ],
+    [
+     0.0,
+     0.0,
+     104.0
+    ]
+   ],
+   "grado": 3,
+   "_nota": "B-spline cubico uniforme con nodos sujetos (como scipy.interpolate.BSpline), sacado con optimizacion (SLSQP) en scratch: empieza en la salida de la clavija acodada (-9.5, 10.1, 85) hacia -X y acaba en el pasamuros (0, 0, 104) hacia +Z. R minimo 12.25; 0.59 o mas de aire a todo (pack, nervios de la cuna, pared, puente, clavija, topes de la tapa). Pasa por fuera del extremo -X del pack, por detras de el y sube hacia el eje por encima del pack."
   },
-  "_nota": "Latiguillo: pasamuros SMA hembra (tapa) a SMA macho ACODADO de crimpar para RG178 (SMA de la carrier), con unos 75 mm de cable entre los cuerpos de los conectores (recorrido modelado: 75.9 desde 2 mm dentro de la clavija acodada hasta el pasamuros). Recorrido: la clavija acodada apunta a -X y su cable sale en (-9.5, 10.1, 85); arco a izquierdas de R 10.5 hasta x -20, recto hacia atras por fuera de la celda -X, media vuelta de R 10 detras de ella hasta (0, -10), curva vertical de R 10 hasta el eje en z 99 y sube al pasamuros. Sube a z 89 (0.6 sobre las celdas) antes de y -5.8. Radio minimo del recorrido 10.0; radio maximo del eje del cable 24.14 (0.56 al tubo).",
+  "_nota": "Latiguillo: pasamuros SMA hembra (tapa) a SMA macho ACODADO de crimpar para RG178 (SMA de la carrier), con unos 77 mm de cable entre los cuerpos de los conectores (recorrido modelado: 79 desde 2 mm dentro de la clavija acodada hasta el pasamuros). Ver ruta.",
   "detras_placa": {
    "x": [
     -6.0,
@@ -832,112 +936,82 @@
   }
  },
  "cables": {
-  "bateria_pos_ntc": {
-   "diametro": 2.5,
+  "mazo_pack": {
+   "diametro": 3.4,
    "puntos": [
     [
-     1.2,
-     -17.6,
-     88.2
+     6.8,
+     -16.8,
+     17.8
     ],
     [
-     2.8,
-     -19.4,
-     84.0
+     6.8,
+     -20.0,
+     15.5
     ],
     [
-     5.0,
+     8.6,
      -19.6,
-     70.0
-    ],
-    [
-     5.0,
-     -19.6,
-     14.0
-    ],
-    [
-     9.0,
-     -18.5,
      9.0
     ],
     [
      12.5,
      -15.5,
-     7.6
+     5.0
     ],
     [
-     17.8,
+     17.6,
      -6.0,
-     6.4
+     4.3
     ],
     [
-     18.6,
+     18.4,
      0.0,
-     5.8
+     4.2
     ],
     [
-     17.8,
+     17.6,
      8.0,
-     5.2
+     4.2
     ],
     [
      14.5,
-     14.5,
-     4.4
+     14.3,
+     4.2
     ],
     [
      8.9,
-     17.0,
-     4.0
+     16.8,
+     4.2
     ],
     [
-     2.1,
-     17.0,
-     4.0
+     4.0,
+     16.8,
+     4.2
     ]
    ],
-   "_nota": "Par + (2 hilos AWG26 de J102, Ø1.0) y par de la NTC (Ø0.8): manojo de Ø2.5. Sale de arriba del pack por el valle de atras entre las celdas, baja por x 5, y -19.6, rodea el saliente de la tuerca por +X a z 4-8 (bajo las repisas del chasis) y va por el piso a J404 (x 6.4...11.4) y J102 (x -2.0...6.2)."
+   "_nota": "Cables del pack (rojo y negro, Ø1.5 cada uno supuestos: AWG22) mas los dos hilos de la NTC desde abajo: manojo de Ø3.4. Salen del extremo del BMS, que va ABAJO (cables cortos hasta J102 y J404, y arriba queda libre el paso del coaxial), por detras (x 6.8, y -16.8), bajan por detras del saliente de la tuerca, lo rodean por +X pegados al piso (z 4.2, 0.5 sobre la base) y van por el piso a J404 (x 6.4...11.4) y J102 (x -2.0...6.2)."
   },
-  "bateria_neg": {
-   "diametro": 2.2,
+  "hilos_ntc": {
+   "diametro": 1.6,
    "puntos": [
     [
-     20.0,
-     -4.1,
-     15.9
+     3.0,
+     -19.4,
+     47.0
     ],
     [
-     19.2,
-     -2.0,
-     10.0
+     3.0,
+     -19.4,
+     21.0
     ],
     [
-     19.0,
-     2.0,
-     7.6
-    ],
-    [
-     16.1,
-     7.8,
-     7.2
-    ],
-    [
-     13.0,
-     13.6,
-     6.4
-    ],
-    [
-     7.0,
-     16.2,
-     6.2
-    ],
-    [
-     2.1,
-     16.4,
-     6.2
+     6.6,
+     -18.4,
+     18.4
     ]
    ],
-   "_nota": "Par - (2 hilos AWG26, Ø2.2) desde la lengueta del pack bajo la celda +X, mas alla de r 16 (a 345 grados), por encima del manojo + hasta J102."
+   "_nota": "Dos hilos de la NTC (Ø0.8): de la NTC por la cara de atras del pack, pegados con kapton, hasta el manojo del pack abajo."
   },
   "arnes_j301": {
    "diametro": 3.0,
@@ -971,41 +1045,21 @@
    "_nota": "Arnes de J301 (8 hilos SH): de la clavija por el piso hacia -X, sube detras de la placa por x -17.4 hasta la columna de 8 agujeros de la carrier."
   },
   "ntc": {
-   "centro": [
-    0.0,
-    -13.0,
-    50.0
-   ],
-   "diametro": 3.0,
-   "largo": 8.0,
-   "_nota": "NTC con su funda, pegada entre las celdas en el valle de atras."
-  },
-  "salidas_pack": {
-   "pos": [
-    1.2,
-    -17.1,
-    88.6
-   ],
-   "neg": [
-    20.0,
-    -4.1,
-    16.4
-   ],
-   "lengueta_neg": {
+   "caja": {
     "x": [
-     13.0,
-     20.2
+     1.5,
+     4.5
     ],
     "y": [
-     -5.1,
-     -3.1
+     -20.6,
+     -18.6
     ],
     "z": [
-     17.15,
-     17.45
+     47.0,
+     55.0
     ]
    },
-   "_nota": "Salidas del pack: + arriba (tira de niquel con los hilos soldados en el valle de atras), - abajo por una lengueta que sale de bajo la celda +X mas alla de r 16."
+   "_nota": "NTC (con su funda) pegada con kapton en la cara de ATRAS del pack, a media altura, entre los nervios de atras: unos 2 de grueso."
   }
  }
 }

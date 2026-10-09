@@ -51,6 +51,18 @@ for obj in doc.Objects:
                    'autointersecciones': bool(mesh.hasSelfIntersections()),
                    'volumen_cm3': round(obj.Shape.Volume / 1000.0, 2), 'stl': stl.name, 'step': step.name})
 
+# El distintivo de TPU, ademas, acostado para imprimir: la cara que se ve (y 22.9) contra la cama
+# (z 0), centrado en el origen. Gira -90 grados en X: z' = -y, y' = z.
+for obj in doc.Objects:
+    if obj.Name.lstrip('_') == '07_logo_inlay_tpu':
+        sh = obj.Shape.copy()
+        sh.rotate(App.Vector(0, 0, 0), App.Vector(1, 0, 0), -90)
+        bb = sh.BoundBox
+        sh.translate(App.Vector(-(bb.XMin + bb.XMax) / 2, -(bb.YMin + bb.YMax) / 2, -bb.ZMin))
+        m = MeshPart.meshFromShape(Shape=sh, LinearDeflection=args.linear_deflection,
+                                   AngularDeflection=args.angular_deflection, Relative=False)
+        m.write(str(OUT / 'stl' / '07-logo-inlay-tpu-para-imprimir.stl'))
+
 # Interferencias entre piezas impresas en su posicion final. Las piezas comparten caras de
 # contacto (volumen 0); se admite 0.05 mm3 por pareja por redondeos de OCC.
 LIMITE_MM3 = 0.05
