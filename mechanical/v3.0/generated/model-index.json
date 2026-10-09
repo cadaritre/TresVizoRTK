@@ -20,7 +20,7 @@
    "etiqueta": "Tubo",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 44.91,
+   "volumen_cm3": 45.3,
    "caja": [
     -28.0,
     28.0,
@@ -101,8 +101,8 @@
     8.9,
     22.1,
     22.9,
-    39.25,
-    59.75
+    46.05,
+    66.55
    ]
   },
   {
@@ -118,6 +118,36 @@
     20.1,
     17.02,
     32.98
+   ]
+  },
+  {
+   "nombre": "09-band-bottom-tpu",
+   "etiqueta": "Banda de TPU de abajo",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 12.39,
+   "caja": [
+    -29.7,
+    29.7,
+    -29.7,
+    24.6,
+    -0.0,
+    40.0
+   ]
+  },
+  {
+   "nombre": "10-band-top-tpu",
+   "etiqueta": "Banda de TPU de arriba",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 13.23,
+   "caja": [
+    -29.7,
+    29.7,
+    -29.7,
+    24.6,
+    76.0,
+    116.0
    ]
   }
  ],
@@ -174,6 +204,59 @@
   "usb: funda de la clavija",
   "microsd: tarjeta puesta"
  ],
+ "bandas": {
+  "09-band-bottom-tpu": {
+   "z": [
+    0.0,
+    40.0
+   ],
+   "redondeos": {
+    "fuera": {
+     "aristas": 23,
+     "radio_pedido": 1.0,
+     "radio": 1.0
+    },
+    "dentro_entrada": {
+     "aristas": 3,
+     "radio_pedido": 0.5,
+     "radio": 0.5
+    }
+   }
+  },
+  "10-band-top-tpu": {
+   "z": [
+    76.0,
+    116.0
+   ],
+   "redondeos": {
+    "fuera": {
+     "aristas": 20,
+     "radio_pedido": 1.0,
+     "radio": 1.0
+    },
+    "dentro_entrada": {
+     "aristas": 4,
+     "radio_pedido": 0.5,
+     "radio": 0.5
+    }
+   }
+  },
+  "cotas": {
+   "tapa_puertos": {
+    "angulo_ala": 16.5,
+    "atras": 0.939,
+    "z_fondo": 15.861,
+    "x_delante": 9.1,
+    "radio": 2.0
+   },
+   "oled": {
+    "x": 14.215,
+    "z_arriba": 88.777,
+    "lados": 1.293,
+    "radio": 2.0
+   }
+  }
+ },
  "coaxial_radio_curva": 12.27,
  "clavijas_origen": "kicad/plugs.json (v0.3)"
 }

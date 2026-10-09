@@ -178,7 +178,9 @@ piezas Basic donde las haya y cables del kit precrimpado GH y SH) que la v0.3 co
 
 Carcasa [V3.0](../../mechanical/v3.0/README.md), exploratoria y sin imprimir: tubo de Ø56 × 116
 (pared de 2.4) con una cara plana al frente, base desmontable con la tuerca 5/8"-11 del bastón y tapa de antena sujeta
-con tres M2.5 radiales. Dentro, un chasis que se arma fuera del tubo y entra por arriba lleva los
+con tres M2.5 radiales. Por fuera, dos bandas de protección de TPU de 40 mm, abajo y arriba (unos
+Ø60 en las bandas), con aberturas para los tornillos, la tecla, la tapa de puertos y la OLED.
+Dentro, un chasis que se arma fuera del tubo y entra por arriba lleva los
 rieles de la placa, las ranuras de la carrier y dos salientes para los tornillos de la OLED. Ejes:
 **z = eje del bastón hacia arriba** (z 0 en la cara de apoyo), **+Y hacia la cara plana**, **+X a
 la izquierda mirando el frente**; medidas en mm. Especificación y contrato con la placa en

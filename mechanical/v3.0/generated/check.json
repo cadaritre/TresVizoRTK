@@ -44,10 +44,10 @@
    ]
   },
   "volumen": {
-   "tubo_mm3": 44908.9,
-   "esperado_mm3": 44908.4,
+   "tubo_mm3": 45298.6,
+   "esperado_mm3": 45298.0,
    "anillo_solido_mm3": 43085.3,
-   "diferencia_mm3": 0.4,
+   "diferencia_mm3": 0.6,
    "diferencia_pct": 0.001,
    "tolerancia_pct": 0.5,
    "ok": true,
@@ -55,19 +55,19 @@
   },
   "espesor_minimo": {
    "tunel USB-C": {
-    "mm": 1.333,
+    "mm": 1.343,
     "donde": [
-     18.35,
-     21.15,
-     28.0
+     18.34,
+     21.16,
+     22.0
     ]
    },
    "ranura microSD y rebaje": {
-    "mm": 1.755,
+    "mm": 1.766,
     "donde": [
      21.1,
-     18.4,
-     35.88
+     18.41,
+     45.88
     ]
    },
    "agujeros de las anclas de la tapa de puertos": {
@@ -89,7 +89,7 @@
    "tecla y LED": {
     "mm": 1.8,
     "donde": [
-     1.35,
+     1.33,
      22.3,
      18.0
     ]
@@ -110,12 +110,12 @@
      8.5
     ]
    },
-   "pared normal y lineas decorativas (z 15, 60, 95)": {
+   "pared normal y lineas decorativas (z 15, 70, 95)": {
     "mm": 1.9,
     "donde": [
      19.45,
      -19.44,
-     60.0
+     70.0
     ]
    }
   },
@@ -191,7 +191,10 @@
   "tarjeta_por_el_costado": [],
   "tapa_de_puertos_por_fuera": [],
   "marco_sobre_el_usb_c_por_fuera": [],
-  "funda_usb_c_por_el_costado": []
+  "funda_usb_c_por_el_costado": [],
+  "banda_de_abajo_por_abajo": [],
+  "banda_de_arriba_por_arriba": [],
+  "tornillos_radiales_por_las_bandas": []
  },
  "holguras": {
   "chasis-tubo (contacto: pie de los rieles en sus repisas, z 9.5)": 0.0,
@@ -254,7 +257,16 @@
   "marco-PCB (contacto: labio bajo el dorso y fondo de las ranuras)": 0.0,
   "marco sin resorte-J101 (abertura del collar)": 0.1,
   "marco-funda USB-C (tunel del marco, por lado)": 0.3,
-  "marco-funda USB-C (collar y labio detras de la boca, en x)": 0.2
+  "marco-funda USB-C (collar y labio detras de la boca, en x)": 0.2,
+  "banda de abajo-tapa de puertos (pedido >= 0.5)": 0.5,
+  "banda de abajo-tecla (pedido >= 1.0)": 1.1,
+  "banda de abajo-distintivo de TPU": 6.057,
+  "banda de arriba-distintivo de TPU": 15.271,
+  "banda de abajo-guia de luz del LED": 1.5,
+  "banda de abajo-tornillos de la base": 0.7,
+  "banda de arriba-tornillos de la tapa": 0.7,
+  "banda de arriba-lamina de la ventana": 1.141,
+  "banda de arriba-antena": 0.85
  },
  "holguras_laterales_en_barridos": {
   "minimos_por_categoria": {
@@ -561,7 +573,7 @@
     "pared_entre_el_agujero_y_otras_aberturas_mm": {
      "tunel USB-C": 2.658,
      "ranura microSD y muesca": 15.316,
-     "lineas decorativas": 15.287
+     "lineas decorativas": 25.968
     }
    },
    "z 32.5": {
@@ -577,7 +589,7 @@
     "pared_entre_el_agujero_y_otras_aberturas_mm": {
      "tunel USB-C": 3.171,
      "ranura microSD y muesca": 5.77,
-     "lineas decorativas": 15.287
+     "lineas decorativas": 17.606
     }
    },
    "z 45": {
@@ -605,14 +617,31 @@
     "funda_mm3": 0.0,
     "funda_holgura": 1.616,
     "tarjeta_mm3": 0.0,
-    "tarjeta_holgura": 5.122
+    "tarjeta_holgura": 5.122,
+    "banda_de_abajo_estirada_mm3": 0.0
    },
    "180": {
     "funda_mm3": 0.0,
     "funda_holgura": 2.63,
     "tarjeta_mm3": 0.0,
-    "tarjeta_holgura": 5.235
+    "tarjeta_holgura": 5.235,
+    "banda_de_abajo_estirada_mm3": 128.243
    }
+  },
+  "abierta_con_la_banda_puesta": {
+   "angulo_maximo_grados": 155.47,
+   "choca_a_los_grados": 155.5,
+   "funda_holgura": 2.63,
+   "funda_mm3": 0.0,
+   "tarjeta_holgura": 5.235,
+   "tarjeta_mm3": 0.0,
+   "banda_holgura": 0.0,
+   "cerrada_a_la_banda_impresa_mm": 0.5,
+   "cerrada_a_la_banda_estirada_mm": 0.5,
+   "angulo_maximo_con_la_banda_impresa_grados": 158.78,
+   "objetivo_grados": 135.0,
+   "cumple": true,
+   "_nota": "Parte de delante de la bisagra girada como solido rigido contra la banda de abajo ESTIRADA (como esta montada: por fuera llega a r 30.02); con la medida de impresion (por fuera r 29.7) llega algo mas. Pasos de 1 grado y biseccion. Lo que la para es el canto de atras de la muesca de la banda."
   },
   "_nota": "Tres anclas. Abierta: la parte de delante de la bisagra girada como solido rigido; en la realidad el TPU se dobla (su duracion y el sellado hay que probarlos impresos). Con 135 grados o mas deja libres la funda del USB-C y la tarjeta."
  },
@@ -3046,6 +3075,220 @@
   ],
   "_nota": "Origenes en la piel exterior del tubo (r 28) dentro de cada abertura, en rejilla de 0.2 mm con desplazamiento aleatorio (semilla fija) para cada una de las 49 direcciones (-X inclinado de -30 a 30 grados en y y en z); de_frente: rejilla fija de 0.05 mm, rayos paralelos a -X. Tapa de puertos abierta 150 grados. \"otro\" es todo lo que no es J101, J401, la tarjeta, el tubo, el marco, la tapa de puertos o el canto de la PCB bajo J101 (x 14.9, y 13.8-15.4, z 18.5-31.5). Teselacion de 0.04 mm cerca de las aberturas."
  },
+ "bandas": {
+  "piezas": {
+   "09-band-bottom-tpu": {
+    "z": [
+     0.0,
+     40.0
+    ],
+    "volumen_cm3": 12.39,
+    "solidos": 1,
+    "valida": true,
+    "caja": [
+     -29.7,
+     29.7,
+     -29.7,
+     24.6,
+     0.0,
+     40.0
+    ]
+   },
+   "10-band-top-tpu": {
+    "z": [
+     76.0,
+     116.0
+    ],
+    "volumen_cm3": 13.23,
+    "solidos": 1,
+    "valida": true,
+    "caja": [
+     -29.7,
+     29.7,
+     -29.7,
+     24.6,
+     76.0,
+     116.0
+    ]
+   }
+  },
+  "espesor_mm": 2.0,
+  "apriete_por_lado_mm": 0.3,
+  "por_fuera_del_cuerpo_mm": 1.7,
+  "apriete_mm3": {
+   "01-base / 09-band-bottom-tpu": 78.273,
+   "02-tube / 09-band-bottom-tpu": 1605.528,
+   "02-tube / 10-band-top-tpu": 1721.851,
+   "03-antenna-cap / 10-band-top-tpu": 78.273
+  },
+  "aberturas": {
+   "agujeros de los tornillos de la base": {
+    "diametro": 6.4,
+    "z": 8.5,
+    "angulos": [
+     210.0,
+     270.0,
+     330.0
+    ],
+    "holgura_a_la_cabeza_mm": 0.7
+   },
+   "ventana de la tecla y el LED": {
+    "diametro_tecla": 11.0,
+    "diametro_led": 5.0,
+    "holgura_a_la_tecla_mm": 1.1,
+    "holgura_a_la_guia_de_luz_mm": 1.5
+   },
+   "muesca de la tapa de puertos": {
+    "angulo_ala": 16.5,
+    "atras": 0.939,
+    "z_fondo": 15.861,
+    "x_delante": 9.1,
+    "radio": 2.0,
+    "holgura_a_la_tapa_cerrada_mm": 0.5,
+    "sitio_para_la_una_delante_de_la_lengueta_mm": 3.5
+   },
+   "desague (holgura al agujero)": 2.65,
+   "agujeros de los tornillos de la tapa": {
+    "diametro": 6.4,
+    "z": 107.0,
+    "angulos": [
+     0.0,
+     180.0,
+     270.0
+    ],
+    "holgura_a_la_cabeza_mm": 0.7
+   },
+   "muesca de la OLED": {
+    "x": 14.215,
+    "z_arriba": 88.777,
+    "lados": 1.293,
+    "radio": 2.0,
+    "holgura_al_bolsillo_mm": 1.0,
+    "holgura_a_la_lamina_mm": 1.141
+   }
+  },
+  "anillo_completo_banda_de_abajo": {
+   "z": [
+    0.0,
+    15.861
+   ],
+   "alto_mm": 15.861,
+   "objetivo_mm": 12.0,
+   "_nota": "Sin muesca ni ventana; solo los tres agujeros de los tornillos de la base."
+  },
+  "cara_de_arriba_de_la_tapa": {
+   "banda_por_encima_de_z_116_mm3": 0.0,
+   "banda_por_dentro_de_su_contorno_de_apriete_mm3": 0.0,
+   "holgura_a_la_antena_mm": 0.85,
+   "holgura_a_los_tornillos_de_la_antena_mm": 6.8
+  },
+  "tapa_de_puertos_abierta": {
+   "angulo_maximo_grados": 155.47,
+   "choca_a_los_grados": 155.5,
+   "funda_holgura": 2.63,
+   "funda_mm3": 0.0,
+   "tarjeta_holgura": 5.235,
+   "tarjeta_mm3": 0.0,
+   "banda_holgura": 0.0,
+   "cerrada_a_la_banda_impresa_mm": 0.5,
+   "cerrada_a_la_banda_estirada_mm": 0.5,
+   "angulo_maximo_con_la_banda_impresa_grados": 158.78,
+   "objetivo_grados": 135.0,
+   "cumple": true,
+   "_nota": "Parte de delante de la bisagra girada como solido rigido contra la banda de abajo ESTIRADA (como esta montada: por fuera llega a r 30.02); con la medida de impresion (por fuera r 29.7) llega algo mas. Pasos de 1 grado y biseccion. Lo que la para es el canto de atras de la muesca de la banda."
+  },
+  "al_ponerlas": {
+   "metodo": "Banda estirada (contorno interior = el del cuerpo + 0.02, espesor 2) barrida en pasos de 0.5 mm contra lo que sobresale del contorno del cuerpo + 0.01 de cada pieza y referencia, sin la tecla ni los M2.5 radiales (van despues, por la ventana y los agujeros).",
+   "banda_estirada_dentro_del_contorno_mm3": {
+    "abajo": 0.0,
+    "arriba": 0.0
+   },
+   "lo_que_sobresale": {
+    "06-port-cover-tpu (lo que sobresale)": 594.4,
+    "usb: funda de la clavija (lo que sobresale)": 989.12
+   },
+   "recorrido_mm": {
+    "abajo": 42.0,
+    "arriba": 82.8,
+    "tornillos": 8.0
+   },
+   "holgura_minima_al_ponerla_mm": {
+    "abajo": {
+     "06-port-cover-tpu (lo que sobresale)": {
+      "mm": 0.5,
+      "a_mm_de_su_sitio": 0.0
+     },
+     "usb: funda de la clavija (lo que sobresale)": {
+      "mm": 2.964,
+      "a_mm_de_su_sitio": 0.0
+     }
+    },
+    "arriba": {}
+   },
+   "tornillos_por_los_agujeros_holgura_mm": {
+    "M2.5 a 210 grados, z 8.5": 0.7,
+    "M2.5 a 270 grados, z 8.5": 0.7,
+    "M2.5 a 330 grados, z 8.5": 0.7,
+    "M2.5 a 0 grados, z 107": 0.7,
+    "M2.5 a 180 grados, z 107": 0.7,
+    "M2.5 a 270 grados, z 107": 0.7
+   },
+   "cantos_de_las_cabezas_de_los_tornillos_sobre_la_pared_mm": 0.111,
+   "con_la_tecla_puesta": [
+    {
+     "movil": "09-band-bottom-tpu (estirada)",
+     "obstaculo": "05-key-tpu (lo que sobresale)",
+     "mm3_max": 19.242,
+     "a_mm": 8.5
+    }
+   ],
+   "con_los_tornillos_radiales_puestos": [
+    {
+     "movil": "09-band-bottom-tpu (estirada)",
+     "obstaculo": "tornillos: tornillos M2.5 de base y tapa (lo que sobresale)",
+     "mm3_max": 0.821,
+     "a_mm": 20.5
+    },
+    {
+     "movil": "10-band-top-tpu (estirada)",
+     "obstaculo": "tornillos: tornillos M2.5 de base y tapa (lo que sobresale)",
+     "mm3_max": 0.821,
+     "a_mm": 16.0
+    }
+   ],
+   "_nota": "Orden: cada banda sobre el tubo (con la tapa de puertos ya puesta) antes de cerrar con la base o la tapa; la base y la tapa entran por dentro de ella y sus M2.5 radiales y la tecla van despues, por los agujeros y la ventana, como en el servicio. Con todo armado no pasaria limpia: la tecla asoma 1.0 y los cantos de las cabezas de los M2.5 (planas, sobre la pared curva de R28) asoman 0.11 (diagnosticos con_la_tecla_puesta y con_los_tornillos_radiales_puestos). El TPU pasaria por encima de 0.11 estirandose, pero el modelo no lo cuenta."
+  },
+  "distintivo_entre_las_bandas": {
+   "z": [
+    45.94,
+    66.66
+   ],
+   "a_la_banda_de_abajo_mm": 5.94,
+   "al_bolsillo_de_la_lamina_mm": 5.86,
+   "objetivo_mm": 2.0
+  },
+  "rayas_entre_las_bandas": {
+   "z": [
+    41.5,
+    74.5
+   ],
+   "a_la_banda_de_abajo_mm": 1.5,
+   "a_la_banda_de_arriba_mm": 1.5,
+   "objetivo_mm": 1.5
+  },
+  "cumple": {
+   "tapa de puertos >= 0.5": true,
+   "tecla >= 1.0": true,
+   "anillo completo >= 12": true,
+   "tapa de puertos abre >= 135": true,
+   "distintivo >= 2 a la banda y al bolsillo": true,
+   "rayas >= 1.5 a las bandas": true,
+   "nada sobre la cara de arriba de la tapa": true,
+   "barridos de las bandas limpios": true
+  },
+  "todo_cumple": true,
+  "_nota": "Bandas con su medida de impresion (como en el documento): el solape con el tubo, la base y la tapa es el apriete (no cuenta como choque). Barridos y tapa de puertos abierta, con la banda estirada (ver al_ponerlas.metodo)."
+ },
  "distancias_entre_mazos": {
   "mazo del pack (rojo, negro y NTC) / arnes de J301": 8.802,
   "mazo del pack (rojo, negro y NTC) / coaxial": 68.547,
@@ -3086,14 +3329,14 @@
    "objetivo_mm": 1.2,
    "local_minimo_mm": 1.0,
    "espesores_mm": {
-    "tunel USB-C": 1.333,
-    "ranura microSD y rebaje": 1.755,
+    "tunel USB-C": 1.343,
+    "ranura microSD y rebaje": 1.766,
     "agujeros de las anclas de la tapa de puertos": 1.343,
     "ventana OLED (bolsillo y chaflan)": 1.4,
     "tecla y LED": 1.8,
     "uniones (rebajes)": 1.198,
     "tornillos radiales de base y tapa": 2.239,
-    "pared normal y lineas decorativas (z 15, 60, 95)": 1.9
+    "pared normal y lineas decorativas (z 15, 70, 95)": 1.9
    },
    "por_debajo_de_1.2": {
     "uniones (rebajes)": 1.198
@@ -3114,6 +3357,27 @@
    "cumple": true,
    "por_debajo": {}
   },
+  "bandas_de_tpu": {
+   "cumple": {
+    "tapa de puertos >= 0.5": true,
+    "tecla >= 1.0": true,
+    "anillo completo >= 12": true,
+    "tapa de puertos abre >= 135": true,
+    "distintivo >= 2 a la banda y al bolsillo": true,
+    "rayas >= 1.5 a las bandas": true,
+    "nada sobre la cara de arriba de la tapa": true,
+    "barridos de las bandas limpios": true
+   },
+   "todo_cumple": true,
+   "apriete_mm3": {
+    "01-base / 09-band-bottom-tpu": 78.273,
+    "02-tube / 09-band-bottom-tpu": 1605.528,
+    "02-tube / 10-band-top-tpu": 1721.851,
+    "03-antenna-cap / 10-band-top-tpu": 78.273
+   },
+   "angulo_maximo_de_la_tapa_de_puertos_grados": 155.47,
+   "anillo_completo_mm": 15.861
+  },
   "ajustes_guiados": {
    "funda USB-C en el tunel (por lado)": 0.3,
    "tarjeta trabada en la ranura (por lado)": 0.3,
@@ -3122,7 +3386,7 @@
    "cumple": true,
    "_nota": "Pedido del propietario: aberturas justas, funda y tarjeta a 0.3 por lado; no es aire de 0.5."
   },
-  "_nota": "Contactos a proposito (no cuentan): pie de los rieles en sus apoyos (z 9.5), placa contra los salientes (y 13.8) y el tope (z 80), celdas en sus repisas, base y tapa contra los cantos del tubo, tornillos en sus avellanados y arandelas en sus asientos, tecla pegada en su rebaje, tapa de puertos sobre el tubo, seta en su agujero, cuerpos de TPU en las aberturas, tuerca del baston en su hexagono (0.3 por cara), pasamuros en su agujero en D, marco del USB-C con el labio bajo el dorso de la placa y el fondo de sus ranuras en el canto, resorte del marco sobre el blindaje de J101 (apriete a proposito). Ajustes de posicion aparte: rieles (B2) y carrier (B4)."
+  "_nota": "Contactos a proposito (no cuentan): pie de los rieles en sus apoyos (z 9.5), placa contra los salientes (y 13.8) y el tope (z 80), celdas en sus repisas, base y tapa contra los cantos del tubo, tornillos en sus avellanados y arandelas en sus asientos, tecla pegada en su rebaje, tapa de puertos sobre el tubo, seta en su agujero, cuerpos de TPU en las aberturas, tuerca del baston en su hexagono (0.3 por cara), pasamuros en su agujero en D, marco del USB-C con el labio bajo el dorso de la placa y el fondo de sus ranuras en el canto, resorte del marco sobre el blindaje de J101 (apriete a proposito), bandas de TPU sobre el tubo, la base y la tapa (apriete de 0.3 por lado, ver bandas). Ajustes de posicion aparte: rieles (B2) y carrier (B4)."
  },
  "bloqueos_al_sacar_el_chasis_con_la_tecla_puesta": [
   {
@@ -3134,5 +3398,5 @@
  ],
  "total_choques": 0,
  "guarda_pared_ok": true,
- "numero_de_barridos": 13
+ "numero_de_barridos": 16
 }

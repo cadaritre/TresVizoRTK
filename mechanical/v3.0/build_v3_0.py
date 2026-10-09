@@ -1,7 +1,7 @@
-"""Construye la carcasa V3.0 (tubo de 56 x 111 para la placa principal compacta v0.3).
+"""Construye la carcasa V3.0 (tubo de 56 x 116 para la placa principal compacta v0.3).
 
 Piezas: 01-base, 02-tube, 03-antenna-cap, 04-chassis, 05-key-tpu, 06-port-cover-tpu, 07-logo-inlay-tpu,
-08-usb-bezel, en su posicion final.
+08-usb-bezel, 09-band-bottom-tpu y 10-band-top-tpu, en su posicion final (las bandas, con su medida de impresion).
 Ademas guarda las referencias (placa de la especificacion, carrier, celdas, tuerca, antena,
 coaxial, clavijas y cables) como objetos ref_* que no se exportan.
 
@@ -530,7 +530,21 @@ def references():
     return refs
 
 
+def build_bands(index):
+    """Bandas de TPU (09 abajo, 10 arriba) con su medida de impresion: el solape de `bandas.apriete` con el
+    tubo, la base y la tapa es el apriete. Anota en el indice los redondeos conseguidos y las cotas."""
+    out = {}
+    for which in ('abajo', 'arriba'):
+        info = {}
+        out[which] = G.band(which, info=info)
+        index.setdefault('bandas', {})[G.BAND_NAMES[which]] = {'z': list(G.band_z(which)), 'redondeos': info}
+    index['bandas']['cotas'] = {k: {kk: round(vv, 3) for kk, vv in v.items()} for k, v in G.band_dims().items()}
+    return out
+
+
 def main():
+    index = {'piezas': [], 'referencias': []}
+    bands = build_bands(index)
     pieces = [('01_base', 'Base con la tuerca del baston', build_base()),
               ('02_tube', 'Tubo', build_tube()),
               ('03_antenna_cap', 'Tapa de antena', build_cap()),
@@ -538,9 +552,10 @@ def main():
               ('05_key_tpu', 'Tecla de TPU', build_key()),
               ('06_port_cover_tpu', 'Tapa de puertos de TPU', build_port_cover()),
               ('07_logo_inlay_tpu', 'Distintivo de TPU para el grabado', G.logo_inlay()),
-              ('08_usb_bezel', 'Marco del USB-C', G.usb_bezel())]
+              ('08_usb_bezel', 'Marco del USB-C', G.usb_bezel()),
+              ('09_band_bottom_tpu', 'Banda de TPU de abajo', bands['abajo']),
+              ('10_band_top_tpu', 'Banda de TPU de arriba', bands['arriba'])]
     doc = App.newDocument('TresVizo_V3_0')
-    index = {'piezas': [], 'referencias': []}
     for name, label, shape in pieces:
         o = doc.addObject('Part::Feature', name)
         o.Label, o.Shape = label, shape

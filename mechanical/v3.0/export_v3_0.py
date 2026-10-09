@@ -63,15 +63,34 @@ for obj in doc.Objects:
                                    AngularDeflection=args.angular_deflection, Relative=False)
         m.write(str(OUT / 'stl' / '07-logo-inlay-tpu-para-imprimir.stl'))
 
+# Las bandas de TPU, ademas, de pie sobre su canto entero (sin soportes), centradas en el origen: la de abajo
+# como esta (canto de z 0 contra la cama, la muesca arriba); la de arriba dada vuelta (canto de z 116 contra
+# la cama, la muesca de la OLED arriba). Gira 180 grados en X.
+for obj in doc.Objects:
+    nm_ = obj.Name.lstrip('_')
+    if nm_ in ('09_band_bottom_tpu', '10_band_top_tpu'):
+        sh = obj.Shape.copy()
+        if nm_.startswith('10'):
+            sh.rotate(App.Vector(0, 0, 0), App.Vector(1, 0, 0), 180)
+        bb = sh.BoundBox
+        sh.translate(App.Vector(-(bb.XMin + bb.XMax) / 2, -(bb.YMin + bb.YMax) / 2, -bb.ZMin))
+        m = MeshPart.meshFromShape(Shape=sh, LinearDeflection=args.linear_deflection,
+                                   AngularDeflection=args.angular_deflection, Relative=False)
+        m.write(str(OUT / 'stl' / (nm_.replace('_', '-') + '-para-imprimir.stl')))
+
 # Interferencias entre piezas impresas en su posicion final. Las piezas comparten caras de
-# contacto (volumen 0); se admite 0.05 mm3 por pareja por redondeos de OCC.
+# contacto (volumen 0); se admite 0.05 mm3 por pareja por redondeos de OCC. Las bandas de TPU se dibujan
+# con su medida de impresion: su solape con el tubo, la base y la tapa es el apriete (no cuenta; se informa
+# aparte, como en V2.2). Contra el resto de piezas cuentan como cualquier otra.
 LIMITE_MM3 = 0.05
-overlaps, names = [], [r['pieza'] for r in report]
+overlaps, grip, names = [], [], [r['pieza'] for r in report]
 for i in range(len(shapes)):
     for j in range(i + 1, len(shapes)):
         common = shapes[i].common(shapes[j])
         volume = common.Volume if common.Solids else 0.0
-        if volume > LIMITE_MM3:
+        if G.band_grip_pair(names[i], names[j]):
+            grip.append({'a': names[i], 'b': names[j], 'mm3': round(volume, 3)})
+        elif volume > LIMITE_MM3:
             overlaps.append({'a': names[i], 'b': names[j], 'mm3': round(volume, 3)})
 
 # Guarda barata de la pared del tubo (sondas cada 1 mm): una pared que falta no es una
@@ -82,6 +101,7 @@ guard_ok = bool(guard and guard['cara_plana']['ok'] and guard['anillo']['ok'])
 
 result = {'piezas': report, 'todas_cerradas': all_closed, 'interferencias': overlaps,
           'sin_interferencias': not overlaps, 'limite_mm3': LIMITE_MM3,
+          'apriete_de_las_bandas': grip,
           'guarda_pared_tubo': guard, 'guarda_pared_ok': guard_ok,
           'deflexion_lineal': args.linear_deflection, 'deflexion_angular': args.angular_deflection}
 (OUT / 'exports.json').write_text(json.dumps(result, indent=1, ensure_ascii=False), encoding='utf-8')

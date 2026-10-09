@@ -23,7 +23,7 @@
   "_nota_plano": "Cara plana por dentro en y 20.5 (vidrio de la OLED en y 20.0 + 0.5) hasta |x| 15.33, donde la corta el circulo de r 25.6; por fuera en y 22.9 hasta |x| 16.11.",
   "z_base": 4.0,
   "z_tapa": 112.0,
-  "_nota_z": "Base z 0-4 (disco de 2 y anillo del redondeo), tubo z 4-107, tapa z 107-111.",
+  "_nota_z": "Base z 0-4 (disco de 2 y anillo del redondeo), tubo z 4-112, tapa z 112-116.",
   "ranuras_rieles": {
    "angulos": [],
    "radio": 25.6,
@@ -78,12 +78,12 @@
     ]
    ],
    "z": [
-    11.5,
-    105.0
+    41.5,
+    74.5
    ],
    "ancho": 1.3,
    "profundidad": 0.5,
-   "_nota": "Como V2.3: grupos de 5 rayas a 9 grados, simetricos respecto al eje frente-atras, entre las uniones. Atras: lejos de la cara plana, el logo, la tapa de puertos, su ancla y las aberturas. Bajo cada raya quedan 1.9 de pared. Empiezan en z 11.5, por encima de las cabezas de los M2.5 de la base (z 8, Ø5) a 210 y 330 grados."
+   "_nota": "Como V2.3: grupos de 5 rayas a 9 grados, simetricos respecto al eje frente-atras, solo ENTRE LAS BANDAS de TPU (como V2.3, 'en z 34-98, entre las bandas'): z 41.5-74.5, 1.5 por encima del canto de arriba de la banda de abajo (z 40) y 1.5 por debajo del de abajo de la banda de arriba (z 76). Atras: lejos de la cara plana, el logo, la tapa de puertos, su ancla y las aberturas. Bajo cada raya quedan 1.9 de pared. Antes iban de z 11.5 a 105 y quedaban tapadas por las bandas."
   }
  },
  "base": {
@@ -280,10 +280,10 @@
   },
   "logo": {
    "ancho": 18.0,
-   "z_centro": 49.5,
+   "z_centro": 56.3,
    "profundidad": 0.8,
    "fuente": "hardware/main-board/scripts/logo.py: badge() (mechanical/v2.2/logo.json: distintivo, hexagono con el 3)",
-   "_nota": "Distintivo GRABADO 0.8 en la cara plana, como en las carcasas V2.x (pedido del propietario, 08-10-2026: no el logo completo con VIZO ni en relieve). 18 de ancho por unos 20.7 de alto, centrado en x 0, z 49.5: entre la tecla (rebaje hasta z 26.5) y el bolsillo de la ventana de la OLED (desde z 72.5). Bajo el grabado quedan 1.6 de pared.",
+   "_nota": "Distintivo GRABADO 0.8 en la cara plana, como en las carcasas V2.x (pedido del propietario, 08-10-2026: no el logo completo con VIZO ni en relieve). 18 de ancho por unos 20.7 de alto, centrado en x 0, z 56.3 (z 45.9-66.7): entre las bandas de TPU, en el medio del hueco entre el canto de arriba de la banda de abajo (z 40) y el bolsillo de la lamina de la OLED (desde z 72.52): quedan 5.9 a cada lado (pedido: 2 o mas). Antes iba en z 49.5 y la banda de abajo lo tapaba. Bajo el grabado quedan 1.6 de pared.",
    "incrustacion": {
     "holgura": 0.1,
     "espesor": 0.8,
@@ -1131,6 +1131,52 @@
     ]
    },
    "_nota": "NTC (con su funda) pegada con kapton en la cara de ATRAS del pack, a media altura, entre los nervios de atras: unos 2 de grueso."
+  }
+ },
+ "bandas": {
+  "_que_es": "Piezas 09 y 10: dos bandas de proteccion de TPU de 40 mm, abajo (z 0-40) y arriba (z 76-116), con el mismo concepto que las de V2.2 y V2.3 adaptado a V3.0: siguen el contorno del cuerpo (circulo R28 cortado por la cara plana en y 22.9) y van montadas por fuera, sobre la superficie. Se ponen en el tubo con la tapa de puertos ya puesta, la de abajo por abajo y la de arriba por arriba, ANTES de la base, la tapa, sus seis M2.5 radiales y la tecla, que van despues por dentro de ellas, por sus agujeros y por su ventana (como en el servicio): con todo armado no pasarian limpias (la tecla asoma 1.0 y los cantos de las cabezas avellanadas, planas sobre la pared curva, 0.11). Con ellas puestas se abren la base y la tapa.",
+  "alto": 40.0,
+  "_nota_alto": "Alto de cada banda (pedido del propietario: 4 cm abajo y 4 cm arriba). La de abajo va de z 0 a 40; la de arriba, de tubo.alto_total - 40 (z 76) a tubo.alto_total (z 116), a ras de la cara de arriba de la tapa.",
+  "espesor": 2.0,
+  "_nota_espesor": "Espesor de la banda impresa, como V2.2 y V2.3. Por fuera queda 1.7 por encima del cuerpo (2.0 - 0.3 de apriete).",
+  "apriete": 0.3,
+  "_nota_apriete": "Por lado: el contorno interior es el del cuerpo desplazado 0.3 hacia dentro (0.6 en diametro, como V2.2 y V2.3). El TPU se estira y aprieta. El modelo dibuja la banda con su medida de impresion: el solape de 0.3 con el tubo, la base y la tapa es el apriete (contacto a proposito, no choque).",
+  "redondeo": 1.0,
+  "_nota_redondeo": "Redondeo de todos los cantos de fuera: los dos cantos libres de cada banda y los bordes de las aberturas (ventana, agujeros y muescas).",
+  "entrada": 0.5,
+  "_nota_entrada": "Redondeo del canto de dentro que entra primero al ponerla (el de arriba de la banda de abajo y el de abajo de la banda de arriba): ayuda a pasar por encima del canto vivo de fuera del extremo del tubo (z 4 y z 112) y de la cara plana. El canto de dentro del lado que va contra la cama queda vivo.",
+  "radio_esquinas": 2.0,
+  "_nota_radio_esquinas": "Radio de las esquinas de las dos muescas, para que el TPU no se rasgue desde una esquina viva. La holgura de cada muesca se cumple en esa esquina; en los lados rectos queda algo mas (radio - (radio - holgura) / raiz de 2).",
+  "holgura_barrido": 0.02,
+  "_nota_holgura_barrido": "Solo para las comprobaciones: banda ESTIRADA (contorno interior = el del cuerpo + 0.02, espesor 2.0) en los barridos y al abrir la tapa de puertos. El 0.02 evita caras coincidentes en los booleanos; no es una holgura de diseno.",
+  "abajo": {
+   "tornillos_diametro": 6.4,
+   "_nota_tornillos_diametro": "Agujeros pasantes sobre los tres M2.5 avellanados de la base (z 8.5; 210, 270 y 330 grados): cabeza de 5 + 0.7 por lado (el TPU de FDM saca los agujeros algo mas chicos). Los tornillos salen por ellos y la base se quita por abajo sin sacar la banda.",
+   "ventana_tecla": {
+    "diametro_tecla": 11.0,
+    "_nota_diametro_tecla": "Ventana sobre la tecla: la pestana de 8.8 + 1.1 por lado (pedido: 1.0 o mas, que la banda no toque nunca la tecla). La tecla entra y sale por ella con la banda puesta.",
+    "diametro_led": 5.0,
+    "_nota_diametro_led": "Sobre la guia de luz de 2 del LED (x -6): 1.5 por lado.",
+    "_nota": "Una sola ventana: la envolvente convexa (sin cuspides) de los dos circulos, centrados en la tecla (x 0, z 22) y en el LED (x -6, z 22)."
+   },
+   "muesca_tapa_puertos": {
+    "holgura": 0.5,
+    "_nota_holgura": "Holgura minima a la tapa de puertos de TPU (pieza que se mueve: pedido 0.5 o mas), en la esquina redondeada de atras y abajo; en los lados rectos queda 0.94. Rodea el ala, la bisagra, el ancla y la lengueta.",
+    "una": 3.5,
+    "_nota_una": "Sitio para la una delante de la lengueta (su canto en x 12.6): el canto de delante de la muesca va en x 9.1, en todo el alto de la muesca.",
+    "_nota": "Muesca abierta hacia el canto de arriba alrededor de la huella de la tapa de puertos: de un plano paralelo al canto de atras del ala (16.5 grados) a 0.94 por detras hasta x 9.1 en la cara plana, desde z 15.86 (0.94 bajo el ala) hasta arriba. Debajo queda el anillo completo de z 0 a 15.86 (pedido: 12 o mas). La tapa se abre con la banda puesta (ver check.json, bandas)."
+   },
+   "_nota": "Banda de abajo, z 0-40. Por dentro es recta hasta z 0 (no abraza el redondeo R4 de la base): asi la base sale por abajo con la banda puesta; toca el canto de la base solo donde el R4 pasa de r 27.7 (z 2.5-4). El desague (y 19.2) queda dentro del contorno del cuerpo, lejos de la banda."
+  },
+  "arriba": {
+   "tornillos_diametro": 6.4,
+   "_nota_tornillos_diametro": "Agujeros sobre los tres M2.5 avellanados de la tapa (z 107; 0, 180 y 270 grados), como los de abajo: la tapa se quita por arriba sin sacar la banda.",
+   "muesca_oled": {
+    "holgura": 1.0,
+    "_nota_holgura": "Holgura minima al bolsillo de la lamina de la ventana de la OLED (0.8 mas grande por lado que la ventana), en las esquinas redondeadas; en los lados rectos queda 1.29 (a la lamina, 0.1 mas). Que la banda no tape la pantalla al mirarla de lado.",
+    "_nota": "Muesca abierta hacia el canto de abajo: x +-14.21, de z 76 a 88.78."
+   },
+   "_nota": "Banda de arriba, z 76-116, a ras de la cara de arriba de la tapa. Por dentro es recta hasta z 116: no tapa la cara de arriba de la tapa ni llega a la antena (r 21.75) ni a sus tornillos (por dentro de la tapa)."
   }
  }
 }

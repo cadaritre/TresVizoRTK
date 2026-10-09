@@ -22,7 +22,7 @@
    "cerrada": true,
    "no_manifold": false,
    "autointersecciones": false,
-   "volumen_cm3": 44.91,
+   "volumen_cm3": 45.3,
    "stl": "02-tube.stl",
    "step": "02-tube.step"
   },
@@ -103,12 +103,60 @@
    "volumen_cm3": 0.32,
    "stl": "08-usb-bezel.stl",
    "step": "08-usb-bezel.step"
+  },
+  {
+   "pieza": "09-band-bottom-tpu",
+   "etiqueta": "Banda de TPU de abajo",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 11880,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 12.39,
+   "stl": "09-band-bottom-tpu.stl",
+   "step": "09-band-bottom-tpu.step"
+  },
+  {
+   "pieza": "10-band-top-tpu",
+   "etiqueta": "Banda de TPU de arriba",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 10806,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 13.23,
+   "stl": "10-band-top-tpu.stl",
+   "step": "10-band-top-tpu.step"
   }
  ],
  "todas_cerradas": true,
  "interferencias": [],
  "sin_interferencias": true,
  "limite_mm3": 0.05,
+ "apriete_de_las_bandas": [
+  {
+   "a": "01-base",
+   "b": "09-band-bottom-tpu",
+   "mm3": 78.273
+  },
+  {
+   "a": "02-tube",
+   "b": "09-band-bottom-tpu",
+   "mm3": 1605.528
+  },
+  {
+   "a": "02-tube",
+   "b": "10-band-top-tpu",
+   "mm3": 1721.851
+  },
+  {
+   "a": "03-antenna-cap",
+   "b": "10-band-top-tpu",
+   "mm3": 78.273
+  }
+ ],
  "guarda_pared_tubo": {
   "cara_plana": {
    "puntos": 3024,

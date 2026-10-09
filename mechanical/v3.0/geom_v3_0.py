@@ -1046,3 +1046,186 @@ def logo_inlay():
             for ff in face.Faces:
                 solids.append(ff.extrude(V(0, lg['incrustacion']['espesor'], 0)))
     return Part.makeCompound(solids)
+
+
+# --- Bandas de TPU (piezas 09 y 10) ----------------------------------------------------------
+BD = P['bandas']
+BAND_NAMES = {'abajo': '09-band-bottom-tpu', 'arriba': '10-band-top-tpu'}
+# Contactos con apriete a proposito: cada banda abraza estas piezas (0.3 por lado). No son choques.
+BAND_GRIP = {('09-band-bottom-tpu', '01-base'), ('09-band-bottom-tpu', '02-tube'),
+             ('10-band-top-tpu', '02-tube'), ('10-band-top-tpu', '03-antenna-cap')}
+
+
+def band_grip_pair(a, b):
+    return (a, b) in BAND_GRIP or (b, a) in BAND_GRIP
+
+
+def body_section(z=0.0):
+    """Seccion exterior del cuerpo en el plano z: circulo RO cortado por la cara plana (y Y_FLAT_O)."""
+    c = Part.Face(Part.Wire(Part.makeCircle(RO, V(0, 0, z))))
+    return c.cut(box(-RO - 1, RO + 1, Y_FLAT_O, RO + 1, z - 1, z + 1)).Faces[0]
+
+
+def body_prism(z0, z1, d=0.0):
+    """Prisma del contorno del cuerpo desplazado d (con arcos), de z0 a z1. Todo el cuerpo (base, tubo y
+    tapa, con sus redondeos R4) queda dentro del de d = 0."""
+    s = body_section(z0)
+    return (s.makeOffset2D(d, 0) if abs(d) > 1e-9 else s).extrude(V(0, 0, z1 - z0))
+
+
+def band_z(which):
+    h = BD['alto']
+    return (0.0, h) if which == 'abajo' else (H_TOTAL - h, H_TOTAL)
+
+
+def band_inner_offset(stretched=False):
+    """Contorno interior de la banda respecto al del cuerpo: -apriete impresa; + holgura_barrido estirada."""
+    return BD['holgura_barrido'] if stretched else -BD['apriete']
+
+
+def side_offset(c, R):
+    """Holgura en los lados rectos de una muesca de esquinas de radio R para que en la esquina (con la
+    esquina viva del obstaculo dentro del arco) quede c."""
+    return c if R <= c else R - (R - c) / math.sqrt(2.0)
+
+
+def _radial_cyl(angle, z, d, r0=24.0, r1=34.0):
+    a = math.radians(angle)
+    u = V(math.cos(a), math.sin(a), 0)
+    return Part.makeCylinder(d / 2.0, r1 - r0, V(u.x * r0, u.y * r0, z), u)
+
+
+def _hull2(c1, r1, c2, r2, y0, y1):
+    """Envolvente convexa de dos circulos del plano xz (centro (x, z), radio), extruida de y0 a y1."""
+    (x1, z1), (x2, z2) = c1, c2
+    d = math.hypot(x2 - x1, z2 - z1)
+    ux, uz = (x2 - x1) / d, (z2 - z1) / d
+    nx, nz = -uz, ux
+    cb = (r1 - r2) / d
+    sb = math.sqrt(1.0 - cb * cb)
+    q = []
+    for s in (1, -1):
+        ex, ez = ux * cb + s * nx * sb, uz * cb + s * nz * sb
+        q.append(((x1 + r1 * ex, z1 + r1 * ez), (x2 + r2 * ex, z2 + r2 * ez)))
+    (a1, a2), (b1, b2) = q
+    poly = [V(a1[0], y0, a1[1]), V(a2[0], y0, a2[1]), V(b2[0], y0, b2[1]), V(b1[0], y0, b1[1])]
+    quad = Part.Face(Part.makePolygon(poly + [poly[0]])).extrude(V(0, y1 - y0, 0))
+    return fuse_all([cyl_y(r1, x1, z1, y0, y1), cyl_y(r2, x2, z2, y0, y1), quad]).removeSplitter()
+
+
+def band_dims():
+    """Cotas de las aberturas de las bandas que salen de los parametros (para el modelo y el informe)."""
+    tp, R = P['costado']['tapa_puertos'], BD['radio_esquinas']
+    mt, mo = BD['abajo']['muesca_tapa_puertos'], BD['arriba']['muesca_oled']
+    s_tp = side_offset(mt['holgura'], R)
+    w = P['frente']['ventana_oled']
+    s_o = side_offset(mo['holgura'], R)
+    hx = w['x'] + w['bolsillo']['margen'] + s_o
+    return {'tapa_puertos': {'angulo_ala': tp['angulos'][0], 'atras': s_tp, 'z_fondo': tp['z'][0] - s_tp,
+                             'x_delante': tp['lengueta']['x0'] - mt['una'], 'radio': R},
+            'oled': {'x': hx, 'z_arriba': w['z'][1] + w['bolsillo']['margen'] + s_o, 'lados': s_o, 'radio': R}}
+
+
+def _cover_notch(z_top):
+    """Muesca de la banda de abajo alrededor de la tapa de puertos, abierta hacia arriba: detras, un plano
+    paralelo al canto de atras del ala (radial a angulo_ala) desplazado `atras`; delante, x >= x_delante
+    (sitio para la una); abajo, z >= z_fondo; esquinas de abajo de radio R."""
+    d = band_dims()['tapa_puertos']
+    a0, s, zb, xf, R = d['angulo_ala'], d['atras'], d['z_fondo'], d['x_delante'], d['radio']
+    zt = z_top + 1.0
+
+    def behind(v0, z0):            # p . n0 >= v0, con n0 normal al radio de a0 hacia el frente
+        b = box(-60, 60, v0, 60, z0, zt)
+        b.rotate(V(), V(0, 0, 1), a0)
+        return b
+    A = behind(-s, zb + R).common(box(xf, 60, -5, 60, zb + R, zt))
+    B = behind(-s + R, zb).common(box(xf + R, 60, -5, 60, zb, zt))
+    au = math.radians(a0)
+    u0, n0 = V(math.cos(au), math.sin(au), 0), V(-math.sin(au), math.cos(au), 0)
+    org = n0 * (-s + R) + u0 * 20.0
+    corner_back = Part.makeCylinder(R, 15.0, V(org.x, org.y, zb + R), u0)
+    corner_front = cyl_y(R, xf + R, zb + R, 15.0, 35.0)
+    return fuse_all([A, B, corner_back, corner_front]).removeSplitter()
+
+
+def _oled_notch(z_bot):
+    """Muesca de la banda de arriba alrededor de la ventana de la OLED y su bolsillo, abierta hacia abajo;
+    esquinas de arriba de radio R. Solo corta la parte plana de la banda (|x| < 16.11)."""
+    d = band_dims()['oled']
+    hx, zt, R = d['x'], d['z_arriba'], d['radio']
+    y0, y1 = Y_FLAT_O - 3.0, Y_FLAT_O + 6.0
+    return fuse_all([box(-hx, hx, y0, y1, z_bot - 1, zt - R), box(-hx + R, hx - R, y0, y1, z_bot - 1, zt),
+                     cyl_y(R, -hx + R, zt - R, y0, y1), cyl_y(R, hx - R, zt - R, y0, y1)]).removeSplitter()
+
+
+def band_openings(which):
+    z0, z1 = band_z(which)
+    if which == 'abajo':
+        ab = BD['abajo']
+        cuts = [_radial_cyl(a, P['base']['tornillos']['z'], ab['tornillos_diametro']) for a in P['base']['lenguetas']['angulos']]
+        k, l, vt = P['frente']['tecla'], P['frente']['led'], ab['ventana_tecla']
+        cuts.append(_hull2((k['x'], k['z']), vt['diametro_tecla'] / 2.0, (l['x'], l['z']), vt['diametro_led'] / 2.0,
+                           Y_FLAT_O - 3.0, Y_FLAT_O + 6.0))
+        cuts.append(_cover_notch(z1))
+    else:
+        ar = BD['arriba']
+        cuts = [_radial_cyl(a, P['tapa']['tornillos_z'], ar['tornillos_diametro']) for a in P['tapa']['lenguetas']['angulos']]
+        cuts.append(_oled_notch(z0))
+    return fuse_all(cuts)
+
+
+def _on_offset_surface(face, d, tol=2e-3):
+    """La cara esta en la superficie lateral a distancia |d| del contorno del cuerpo (tres puntos)."""
+    wire = body_section(0.0).OuterWire
+    try:
+        u0, u1, v0, v1 = face.ParameterRange
+        pts = [face.valueAt(u0 + (u1 - u0) * a, v0 + (v1 - v0) * b) for a, b in ((0.25, 0.25), (0.5, 0.5), (0.75, 0.6))]
+    except Exception:
+        return False
+    return all(abs(wire.distToShape(Part.Vertex(V(p.x, p.y, 0)))[0] - abs(d)) < tol for p in pts)
+
+
+def _edges_on_surface(body, d, z_only=None):
+    """Aristas vivas del borde de la superficie lateral a distancia d: las que separan una cara de esa
+    superficie de otra que no lo es (cantos libres y bordes de las aberturas). Con z_only, solo las de ese z."""
+    ids = set(f.hashCode() for f in body.Faces if _on_offset_surface(f, d))
+    out = []
+    for e in body.Edges:
+        anc = body.ancestorsOfType(e, Part.Face)
+        if len(anc) != 2 or sum(1 for f in anc if f.hashCode() in ids) != 1:
+            continue
+        if z_only is not None:
+            bb = e.BoundBox
+            if abs(bb.ZMin - z_only) > 1e-4 or abs(bb.ZMax - z_only) > 1e-4:
+                continue
+        out.append(e)
+    return out
+
+
+def band(which, stretched=False, info=None):
+    """Banda de TPU ('abajo' o 'arriba'). Anillo entre el contorno del cuerpo desplazado -apriete (dentro) y
+    -apriete + espesor (fuera, con la esquina de la cara plana en arco), recto por dentro en todo su alto (no
+    abraza los redondeos R4: la base y la tapa salen con la banda puesta), menos las aberturas. Cantos de fuera
+    redondeados `redondeo` y canto de dentro que entra primero redondeado `entrada`. Con stretched=True, la
+    banda estirada sobre el cuerpo (contorno interior = cuerpo + holgura_barrido, mismo espesor), para los
+    barridos. `info` (dict) recibe los redondeos conseguidos."""
+    z0, z1 = band_z(which)
+    d_in = band_inner_offset(stretched)
+    d_out = d_in + BD['espesor']
+    ring = body_prism(z0, z1, d_out).cut(body_prism(z0 - 1, z1 + 1, d_in))
+    body = clean(ring.cut(band_openings(which)))
+    info = {} if info is None else info
+    for key, d, r, z_only in (('fuera', d_out, BD['redondeo'], None),
+                              ('dentro_entrada', d_in, BD['entrada'], z1 if which == 'abajo' else z0)):
+        edges = _edges_on_surface(body, d, z_only)
+        info[key] = {'aristas': len(edges), 'radio_pedido': r, 'radio': None}
+        for rr in (r, 0.8 * r, 0.6 * r):
+            try:
+                f = body.makeFillet(rr, edges)
+                if f.isValid() and len(f.Solids) == 1:
+                    body = f
+                    info[key]['radio'] = round(rr, 3)
+                    break
+            except Exception as ex:
+                info[key]['error'] = str(ex)[:120]
+    return clean(body)
