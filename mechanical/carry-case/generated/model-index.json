@@ -25,7 +25,7 @@
    "material": "PA12-HP negro",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 123.76,
+   "volumen_cm3": 123.74,
    "caja": [
     -88.5,
     88.5,
@@ -36,7 +36,7 @@
    ],
    "malla_cerrada": true,
    "no_manifold": false,
-   "triangulos": 25960
+   "triangulos": 29284
   },
   {
    "pieza": "03-latch-left",
@@ -122,16 +122,16 @@
    "solidos": 42,
    "volumen_cm3": 0.62,
    "caja": [
-    -30.89,
-    30.86,
-    -24.66,
-    24.56,
+    -27.9,
+    27.86,
+    -26.26,
+    26.17,
     64.5,
     65.7
    ],
    "malla_cerrada": true,
    "no_manifold": false,
-   "triangulos": 17648
+   "triangulos": 20580
   },
   {
    "pieza": "07-hinge-pin-left",

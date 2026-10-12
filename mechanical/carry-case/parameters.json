@@ -260,27 +260,27 @@
   ]
  },
  "label": {
-  "font": "Ubuntu-B.ttf",
-  "font_dir": "/Applications/FreeCAD.app/Contents/Resources/fonts",
-  "_nota_fuente": "Ubuntu Bold, la que trae FreeCAD (Ubuntu Font Licence 1.0: se puede usar en productos). Logo: el completo de www.tresvizo.com (hexagono con el 3 y VIZO) de firmware/esp32/assets/tresvizo-logo.svg.",
-  "logo_width": 40.0,
+  "font": "Inter-SemiBold.otf",
+  "font_dir": "/Applications/Android Studio.app/Contents/jbr/Contents/Home/lib/fonts",
+  "_nota_fuente": "Inter SemiBold (pedido del propietario, 12-10-2026: letra tipo Apple). Inter es la alternativa libre a la San Francisco de Apple; la San Francisco no se puede usar en un producto (su licencia solo permite maquetas de interfaces para plataformas de Apple). Inter va con licencia SIL Open Font License 1.1 (se puede usar en productos) y se toma de la que trae Android Studio (version 3.019); si cambia de sitio, vale la misma de https://rsms.me/inter. Logo: el completo de www.tresvizo.com (hexagono con el 3 y VIZO) de firmware/esp32/assets/tresvizo-logo.svg.",
+  "logo_width": 46.0,
   "logo_center": [
    0.0,
-   15.63
+   15.89
   ],
   "name": "MeridianV",
-  "name_width": 62.0,
-  "name_baseline": -8.27,
+  "name_width": 56.0,
+  "name_baseline": -8.29,
   "subtitle": [
    "TRIPLE BAND",
    "RTK RECEIVER"
   ],
-  "subtitle_cap": 4.4,
+  "subtitle_cap": 5.0,
   "subtitle_baselines": [
-   -17.67,
-   -24.67
+   -18.29,
+   -26.29
   ],
-  "_nota": "Rotulo discreto (pedido del propietario, 12-10-2026: el primero, de 124 de ancho, era enorme): un bloque de 62 x 49.4 en el panel rebajado del centro de la tapa, con el logo de 40 de ancho (a 36 las rayitas del 3 quedaban de menos de 0.8, poco para el TPU), MeridianV de 62 y TRIPLE BAND / RTK RECEIVER en dos lineas de 4.4 de alto de mayuscula (trazo de unos 0.9). Las letras van en huecos CIEGOS de 1.2 en la tapa (no la atraviesan; quedan 1.5 de techo debajo) y son piezas sueltas de TPU azul (pieza 09, 42 piezas: cada letra, los puntos de las i y las piezas del logo) que se meten en su hueco con una gota de pegamento, a ras de la cara (pedido del propietario, 12-10-2026, en vez de las letras pasantes del forro con puentes). El hueco va 0.05 mas grande por lado que la letra dibujada y la pieza de TPU 0.1 mas chica por lado: 0.15 de juego (el TPU de FDM sale algo grueso). Las contraformas (el ojo de la e, la R, la O, el interior del hexagono) son parte de la tapa y quedan negras.",
+  "_nota": "Rotulo discreto (pedido del propietario, 12-10-2026: el primero, de 124 de ancho, era enorme; despues, letra tipo Apple, logo un poco mas grande y MeridianV un poco mas chico): un bloque de 56 x 52.6 en el panel rebajado del centro de la tapa, con el logo de 46 de ancho, MeridianV de 56 y TRIPLE BAND / RTK RECEIVER en dos lineas de 5.0 de alto de mayuscula (Inter es mas delgada que Ubuntu Bold: con 5.0 el trazo vertical mide unos 0.9, lo minimo razonable para el TPU). Las letras van en huecos CIEGOS de 1.2 en la tapa (no la atraviesan; quedan 1.5 de techo debajo) y son piezas sueltas de TPU azul (pieza 09: cada letra, los puntos de las i y las piezas del logo) que se meten en su hueco con una gota de pegamento, a ras de la cara. El hueco va 0.05 mas grande por lado que la letra dibujada y la pieza de TPU 0.1 mas chica por lado: 0.15 de juego (el TPU de FDM sale algo grueso). Las contraformas (el ojo de la e, la R, la O, el interior del hexagono) son parte de la tapa y quedan negras.",
   "panel": {
    "size": [
     86.0,

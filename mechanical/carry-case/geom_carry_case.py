@@ -250,7 +250,7 @@ def _dedupe(ring_pts, eps=0.02):
 
 
 def text_polys(text, baseline, width=None, cap=None, cx=0.0):
-    """Contornos de `text` en Ubuntu Bold, de `width` de ancho o con `cap` de alto de mayuscula,
+    """Contornos de `text` en la fuente del rotulo, de `width` de ancho o con `cap` de alto de mayuscula,
     centrado en cx y con la linea base en `baseline` (x a la derecha, y hacia atras).
     Devuelve [(contorno, [huecos])]."""
     from matplotlib.textpath import TextPath
@@ -265,11 +265,46 @@ def text_polys(text, baseline, width=None, cap=None, cx=0.0):
         k = cap / TextPath((0, 0), 'H', size=10.0, prop=fp).get_extents().height
     xm = (ext.x0 + ext.x1) / 2.0
     rings = []
-    for poly in path.to_polygons(closed_only=True):
+    for poly in _flatten(path):
         r = _dedupe([(cx + (x - xm) * k, baseline + y * k) for x, y in poly])
         if len(r) >= 3:
             rings.append(r)
     return _logo_module()._nest(rings)
+
+
+def _flatten(path, n=16):
+    """Contornos cerrados de un Path de matplotlib con las curvas de Bezier muestreadas en n tramos
+    (to_polygons deja las cubicas de las fuentes OTF en pocos tramos y se ven facetadas)."""
+    from matplotlib.path import Path as MPath
+    rings, cur, p0 = [], [], None
+    for verts, code in path.iter_segments(curves=True, simplify=False):
+        v = [tuple(verts[i:i + 2]) for i in range(0, len(verts), 2)]
+        if code == MPath.MOVETO:
+            if len(cur) >= 3:
+                rings.append(cur)
+            cur, p0 = [v[0]], v[0]
+        elif code == MPath.LINETO:
+            cur.append(v[0])
+        elif code == MPath.CURVE3:
+            a, (c, e) = cur[-1], v
+            for i in range(1, n + 1):
+                t = i / n
+                cur.append(((1 - t) ** 2 * a[0] + 2 * (1 - t) * t * c[0] + t * t * e[0],
+                            (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * c[1] + t * t * e[1]))
+        elif code == MPath.CURVE4:
+            a, (c1, c2, e) = cur[-1], v
+            for i in range(1, n + 1):
+                t = i / n
+                u = 1 - t
+                cur.append((u ** 3 * a[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t ** 3 * e[0],
+                            u ** 3 * a[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t ** 3 * e[1]))
+        elif code == MPath.CLOSEPOLY:
+            if len(cur) >= 3:
+                rings.append(cur)
+            cur = []
+    if len(cur) >= 3:
+        rings.append(cur)
+    return rings
 
 
 def logo_polys():

@@ -118,13 +118,19 @@ haría falta un cordón de silicona comprado.
 
 ### Rótulo: letras de TPU en huecos de la tapa
 
-Bloque discreto de 62 × 49.4 en un panel rebajado 0.8 en el centro de la tapa:
+Bloque discreto de 56 × 52.6 en un panel rebajado 0.8 en el centro de la tapa:
 
-- el logo completo de TresVizo (hexágono con el 3 y VIZO), de 40 de ancho;
-- **MeridianV**, de 62;
-- **TRIPLE BAND / RTK RECEIVER** en dos líneas de 4.4 de alto de mayúscula.
+- el logo completo de TresVizo (hexágono con el 3 y VIZO), de 46 de ancho;
+- **MeridianV**, de 56;
+- **TRIPLE BAND / RTK RECEIVER** en dos líneas de 5.0 de alto de mayúscula, con trazos de unos 0.9.
 
-La fuente es Ubuntu Bold, la que trae FreeCAD (Ubuntu Font Licence).
+**Letra:** Inter SemiBold, tipo Apple.
+
+- La San Francisco de Apple no se puede usar en un producto: su licencia solo permite maquetas de interfaces.
+- Inter es su alternativa libre (SIL Open Font License 1.1).
+- Se toma la que trae Android Studio (versión 3.019). Si cambia de sitio, vale la misma de
+  [rsms.me/inter](https://rsms.me/inter) (`label.font_dir`).
+- Las curvas de la fuente se muestrean en 16 tramos para que no salgan facetadas.
 
 Las letras van en **huecos ciegos de 1.2**: no atraviesan la tapa y debajo quedan 1.5 de techo.
 Son **piezas sueltas de TPU azul** (09), 42 en total: cada letra, los puntos de las i y las seis
