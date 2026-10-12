@@ -1,0 +1,339 @@
+{
+ "units": "mm",
+ "_version": "carry-case 1 (12-10-2026): todo impreso, sin tornillos",
+ "_que_es": "Estuche rigido pequeño tipo Pelican para el receptor Meridian V v0.3 (carcasa V3.0 con sus bandas de TPU y la antena HA-901A) y un compartimento para el cargador y extras. Todo impreso, sin tornilleria: base, tapa, cierres y pernos en PA12-HP negro (MJF); junta y forro de la tapa con las letras en TPU azul #008AFC.",
+ "_ejes": "Origen en el centro de la huella, z 0 = apoyo de la base. +X a la derecha mirando el frente, -Y = frente (cierres y candado), +Y = atras (bisagra), +Z arriba. u = distancia hacia fuera desde la cara exterior de la pared (en el frente u = -63.5 - y).",
+ "box": {
+  "x": 172.0,
+  "y": 140.0,
+  "corner_radius": 10.0,
+  "wall": 2.5,
+  "floor": 3.0,
+  "top": 3.5,
+  "z_parting": 44.5,
+  "z_top": 66.5,
+  "parting_gap": 0.4,
+  "top_fillet": 3.0,
+  "bottom_fillet": 2.0,
+  "_nota": "Por fuera 172 x 140 x 66.5 sin cierres, bisagra, costillas ni argolla (con todo unos 184 x 165). La union va en z 44.5: la base tiene 41.5 de hondo por dentro y la tapa 18.5. Cerrada, el canto de la tapa queda 0.4 por encima del de la base: lo que aprieta es el labio de la junta, no plastico contra plastico. El largo deja 2.6 entre los extremos del receptor con antena (156.8) y el reborde interior del canto, y 4.6 hasta la pared."
+ },
+ "parting_band": {
+  "proud": 1.5,
+  "height": 7.0,
+  "chamfer": 1.2,
+  "_nota": "Banda de 1.5 que sobresale alrededor de la union, en la base (z 37.5-44.5) y en la tapa (z 44.9-51.9), como el reborde de los Pelican. Rigidiza el canto y protege la union de golpes."
+ },
+ "rim": {
+  "base_ledge": [
+   2.4,
+   5.0
+  ],
+  "base_ledge_height": 5.0,
+  "lid_ledge": [
+   2.4,
+   5.6
+  ],
+  "lid_ledge_height": 7.0,
+  "_nota": "Engrosado del canto por dentro (u desde la cara exterior) para que quepan la lengueta (base) y la ranura de la junta (tapa)."
+ },
+ "seal": {
+  "groove": [
+   1.3,
+   4.3
+  ],
+  "groove_depth": 4.6,
+  "tongue": [
+   1.8,
+   3.8
+  ],
+  "tongue_height": 2.15,
+  "strip_thickness": 1.0,
+  "lip_thickness": 0.9,
+  "lip_length": 2.6,
+  "lip_tilt_deg": 20.0,
+  "lip_tip_u": 2.8,
+  "_nota": "Junta de labio de TPU (pieza aparte): una tira de 3.0 x 1.0 que entra a presion en el fondo de la ranura de la tapa y un labio de 0.9 x 2.6 inclinado 20 grados hacia fuera. La lengueta de la base (2.0 de ancho) empuja la punta del labio y lo dobla 0.6 con la tapa cerrada: sella contra polvo y salpicaduras y empuja la tapa contra los cierres. No es estanca como un Pelican con junta torica: para eso haria falta un cordon de silicona comprado."
+ },
+ "bottom_recess": {
+  "depth": 1.2,
+  "border": 8.0,
+  "radius": 2.0,
+  "skids_y": [
+   -30.0,
+   30.0
+  ],
+  "skid_width": 6.0,
+  "skid_x": [
+   -60.0,
+   60.0
+  ],
+  "_nota": "Abajo un borde de 8 que hace de pie y dos patines a lo largo, con el centro rebajado 1.2."
+ },
+ "side_panels": {
+  "depth": 0.6,
+  "y": [
+   -33.0,
+   33.0
+  ],
+  "z": [
+   8.0,
+   34.5
+  ],
+  "radius": 4.0,
+  "_nota": "Paneles rebajados en los costados de la base, entre las costillas."
+ },
+ "receiver": {
+  "band_radius": 29.7,
+  "band_flat": 24.6,
+  "tube_radius": 28.0,
+  "length": 116.0,
+  "antenna_radius": 21.75,
+  "antenna_length": 40.8,
+  "bands_z": [
+   [
+    0.0,
+    40.0
+   ],
+   [
+    76.0,
+    116.0
+   ]
+  ],
+  "x_bottom": -78.4,
+  "y_axis": -28.5,
+  "z_axis": 35.7,
+  "fcstd": "mechanical/v3.0/generated/TresVizo-V3.0.FCStd",
+  "_nota": "El receptor va acostado a lo largo de X (el lado largo), delante, con la cara plana (pantalla, tecla y LED) hacia arriba, la base con la tuerca a la izquierda y la antena HA-901A a la derecha. Con la antena (Ø43.5 x 40.8, atornillada en la tapa de antena) mide 156.8: de x -78.4 a 78.4. z_axis es su eje APOYADO en la cuna (las bandas tocan el fondo de las costillas). Envolvente de V3.0 con bandas: R 29.7 (Ø59.4) con la cara plana en 24.6, y Ø56 entre las bandas (z 40-76 del receptor). Coordenadas del receptor (x, y, z) a las del estuche: X = x_bottom + z, Y = y_axis + x, Z = z_axis + y (la tapa de puertos queda hacia atras)."
+ },
+ "cradle": {
+  "band_rib_z": [
+   6.4,
+   33.4,
+   82.4,
+   109.4
+  ],
+  "stop_rib_z": [
+   [
+    41.0,
+    44.0
+   ],
+   [
+    72.0,
+    75.0
+   ]
+  ],
+  "antenna_rib_z": 136.4,
+  "rib_thickness": 3.0,
+  "clearance": 0.8,
+  "tube_clearance": 1.0,
+  "antenna_clearance": 1.5,
+  "above_axis": 2.5,
+  "_nota": "Costillas en U (z del receptor), con holgura (pedido del propietario: que no quede justo). Cuatro bajo las bandas de TPU con R 30.5 (0.8 mas que la banda) y el centro 0.8 mas alto que el eje: el receptor apoya en el fondo y le quedan 0.8 a los lados y 1.6 arriba de la boca; la boca mide 60.8 para 59.4. Dos entre las bandas, contra el tubo de Ø56, con R 29 y el centro 0.5 mas alto: 1.0 a los lados y 0.5 por debajo; no lo tocan, solo hacen de tope a lo largo contra los cantos de las bandas, con 1.0 de juego hacia cada lado. Una bajo la antena con R 23.25 y el centro 0.75 mas alto (1.5 a los lados, 0.75 por debajo), solo para que no cabecee si el estuche se cae; la antena no carga nada. Lo que lo sujeta son las almohadillas de TPU de la tapa."
+ },
+ "bay": {
+  "width": 78.0,
+  "_nota": "Hueco del receptor de 78 de fondo (en Y): entre las costillas del medio (z 43.5-72.5 del receptor) quedan unos 11 a cada lado del tubo para meter los dedos y sacarlo."
+ },
+ "divider": {
+  "thickness": 2.5,
+  "notch_z_rcv": [
+   45.0,
+   71.0
+  ],
+  "notch_z": 22.0,
+  "notch_radius": 6.0
+ },
+ "extras": {
+  "cross_x": 14.0,
+  "cross_thickness": 4.0,
+  "cross_height": 30.0,
+  "microsd_count": 4,
+  "microsd_pitch": 13.0,
+  "microsd_width": 11.4,
+  "microsd_slot": 1.0,
+  "microsd_depth": 13.0,
+  "_nota": "Compartimento detras del receptor, de 163 x 54.5 x 60 de alto (41.5 en la base + 19 en la tapa), partido por un tabique bajo en x 14: a la derecha un hueco de 65.5 x 54.5 para el cargador (los de 20-30 W con patas caben de sobra) y a la izquierda uno de 93.5 x 54.5 para el cable enrollado, un adaptador o una llave. En el tabique, 4 ranuras para tarjetas microSD (asoman 2 para sacarlas con la uña)."
+ },
+ "hinge": {
+  "axis_out": 7.0,
+  "axis_dz": 0.2,
+  "knuckle_radius": 5.0,
+  "segment_x": [
+   -40.0,
+   40.0
+  ],
+  "segment_length": 60.0,
+  "knuckles": 5,
+  "knuckle_gap": 0.5,
+  "pin_d": 4.0,
+  "bore_base": 4.3,
+  "bore_lid": 4.4,
+  "pin_head_d": 7.5,
+  "pin_head_h": 2.2,
+  "head_pocket_clear": 0.3,
+  "barb_d": 4.8,
+  "barb_len": 2.0,
+  "barb_pocket_d": 6.5,
+  "barb_pocket_h": 2.5,
+  "slot_w": 1.2,
+  "slot_len": 8.0,
+  "_nota": "Dos bisagras de 60 con 5 nudillos de Ø10 (base, tapa, base, tapa, base). El perno es IMPRESO (pieza 07, PA12): Ø4 con cabeza de Ø7.5 que entra en un rebaje del nudillo de fuera, y punta partida (ranura de 1.2 x 8) con una uña de Ø4.8 que se cierra al pasar por los nudillos (agujeros de 4.3 en la base y 4.4 en la tapa) y se abre al salir en el rebaje del ultimo: queda trabado. Para sacarlo, apretar las dos mitades de la punta con unas pinzas y empujar. El eje va 7 por fuera de la pared: la tapa abre 180 grados sin tocar la base."
+ },
+ "latch": {
+  "x_centers": [
+   -48.0,
+   48.0
+  ],
+  "width": 24.0,
+  "side_gap": 0.3,
+  "pivot_u": 4.0,
+  "pivot_v": -15.0,
+  "barrel_radius": 3.5,
+  "pin_d": 3.5,
+  "bore": 3.8,
+  "pin_head_d": 6.0,
+  "pin_head_h": 1.8,
+  "barb_d": 4.2,
+  "barb_len": 1.8,
+  "slot_w": 1.0,
+  "slot_len": 6.0,
+  "ear_thickness": 4.0,
+  "hook_v": 6.0,
+  "hook_thickness": 2.6,
+  "hook_tip_u": 2.0,
+  "hook_chamfer": 1.2,
+  "plate_u": 8.6,
+  "plate_thickness": 2.4,
+  "plate_v0": -13.0,
+  "lip_u": 12.5,
+  "lip_height": 1.8,
+  "keeper_u": 8.4,
+  "keeper_v": [
+   2.4,
+   6.0
+  ],
+  "keeper_inner_top_v": 5.5,
+  "keeper_corner": 0.5,
+  "keeper_width": 22.0,
+  "open_deg": 60.0,
+  "_nota": "Cierre de una pieza que gira sobre un perno IMPRESO (pieza 08, PA12, Ø3.5 con cabeza y punta partida como el de la bisagra) que pasa por las dos costillas de la base que lo flanquean. El gancho apoya en el canto de fuera del tope de la tapa, 3.9 por fuera del eje: el empuje del labio de la junta lo mantiene cerrado contra el tope (sobre centro). Para abrirlo hay que hundir la tapa 0.38 mas (el gancho baja antes de soltar) y se nota el clic. Al cerrarlo, el chaflan de la punta empuja la tapa hacia abajo."
+ },
+ "lanyard": {
+  "y": [
+   -9.0,
+   9.0
+  ],
+  "u": 8.5,
+  "z_below_parting": 19.0,
+  "slot_u": [
+   1.5,
+   6.0
+  ],
+  "slot_y": [
+   -6.0,
+   6.0
+  ],
+  "_nota": "Argolla en el costado izquierdo de la base para un mosqueton o una correa (paso de 4.5 x 12)."
+ },
+ "liner": {
+  "thickness": 1.6,
+  "clearance": 0.2,
+  "letter_proud": 0.1,
+  "letter_clearance": 0.05,
+  "nub_radius": 0.6,
+  "nub_length": 12.0,
+  "pad_squeeze": 0.5,
+  "pad_x_clear": 13.0,
+  "pad_z_min": 52.0,
+  "_nota": "Forro de TPU azul que va pegado al techo de la tapa por dentro: una placa de 1.6 con las letras y el logo en relieve que entran desde dentro por las ventanas del techo y quedan a ras por fuera (0.1 de mas). Asi las letras son UNA sola pieza, no hay que pegar letra por letra. Se mete a presion: entra justo en la tapa y lo sujetan 6 topes de 0.6. Abajo lleva dos almohadillas sobre los hombros de las bandas del receptor (0.5 de apriete con el receptor apoyado en la cuna): son lo que lo sujeta. Tienen un hueco en medio para no tocar la pantalla, la tecla ni el LED.",
+  "pad_z_rcv": [
+   [
+    6.0,
+    34.0
+   ],
+   [
+    82.0,
+    110.0
+   ]
+  ],
+  "nub_x": [
+   -45.0,
+   45.0
+  ]
+ },
+ "label": {
+  "font": "Ubuntu-B.ttf",
+  "font_dir": "/Applications/FreeCAD.app/Contents/Resources/fonts",
+  "_nota_fuente": "Ubuntu Bold, la que trae FreeCAD (Ubuntu Font Licence 1.0: se puede usar en productos). Logo: el completo de www.tresvizo.com (hexagono con el 3 y VIZO) de firmware/esp32/assets/tresvizo-logo.svg.",
+  "logo_width": 40.0,
+  "logo_center": [
+   0.0,
+   15.63
+  ],
+  "name": "MeridianV",
+  "name_width": 62.0,
+  "name_baseline": -8.27,
+  "subtitle": [
+   "TRIPLE BAND",
+   "RTK RECEIVER"
+  ],
+  "subtitle_cap": 4.4,
+  "subtitle_baselines": [
+   -17.67,
+   -24.67
+  ],
+  "bridge": 0.9,
+  "bridge_small": 0.7,
+  "bridge_extend": 0.5,
+  "_nota": "Rotulo discreto (pedido del propietario, 12-10-2026: el primero, de 124 de ancho, era enorme): un bloque de 62 x 49.4 en el panel rebajado del centro de la tapa, con el logo de 40 de ancho (a 36 las rayitas del 3 quedaban de menos de 0.8, poco para el TPU), MeridianV de 62 y TRIPLE BAND / RTK RECEIVER en dos lineas de 4.4 de alto de mayuscula (trazo de unos 0.9). Como las letras entran por dentro, cada contraforma (el ojo de la e, la a, la d, la R, la B, el interior del hexagono, la O) es una isla del techo y necesita un puente que la una al resto: 0.9 de ancho en el logo y en MeridianV, 0.7 en las lineas chicas (14 puentes). Se ven como una raya negra fina que corta el trazo, al estilo de las letras de plantilla (esténcil).",
+  "panel": {
+   "size": [
+    86.0,
+    62.0
+   ],
+   "center": [
+    0.0,
+    0.0
+   ],
+   "radius": 6.0,
+   "depth": 0.8,
+   "_nota": "Panel rebajado 0.8 en el centro de la tapa donde va el rotulo, como la placa de un Pelican."
+  }
+ },
+ "ribs": {
+  "proud": 3.0,
+  "width": 4.0,
+  "side_y": [
+   -40.0,
+   40.0
+  ],
+  "back_x": [
+   -40.0,
+   40.0
+  ],
+  "lid_proud": 2.5,
+  "lid_side_y": [
+   -40.0,
+   40.0
+  ],
+  "lid_back_x": [
+   0.0
+  ],
+  "corner_proud": 1.6,
+  "_nota": "Detalle rugged como los Pelican: costillas verticales de 4 x 3 en la base (los cierres van entre dos de ellas, que ademas son sus orejas; dos en cada costado; dos atras que sostienen las bisagras y una bajo el candado), defensas de 1.6 en las cuatro esquinas de la base y de la tapa, y costillas de 2.5 en la tapa alineadas con las de la base."
+ },
+ "padlock": {
+  "tab_x_base": [
+   0.6,
+   4.6
+  ],
+  "tab_x_lid": [
+   -4.6,
+   -0.6
+  ],
+  "u": 11.5,
+  "hole": 6.0,
+  "hole_u": 7.0,
+  "_nota": "Orejas para candado o precinto al frente, en el centro: agujero de 6 que pasa por la de la base y la de la tapa cuando estan cerradas."
+ }
+}

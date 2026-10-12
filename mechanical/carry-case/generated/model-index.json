@@ -1,0 +1,195 @@
+{
+ "piezas": [
+  {
+   "pieza": "01-base",
+   "etiqueta": "Base",
+   "material": "PA12-HP negro",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 194.6,
+   "caja": [
+    -94.5,
+    89.0,
+    -81.5,
+    82.0,
+    -0.0,
+    52.0
+   ],
+   "malla_cerrada": true,
+   "no_manifold": false,
+   "triangulos": 13080
+  },
+  {
+   "pieza": "02-lid",
+   "etiqueta": "Tapa",
+   "material": "PA12-HP negro",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 122.79,
+   "caja": [
+    -88.5,
+    88.5,
+    -81.5,
+    82.0,
+    37.4,
+    66.5
+   ],
+   "malla_cerrada": true,
+   "no_manifold": false,
+   "triangulos": 25980
+  },
+  {
+   "pieza": "03-latch-left",
+   "etiqueta": "Cierre izquierdo",
+   "material": "PA12-HP negro",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 2.83,
+   "caja": [
+    -60.0,
+    -36.0,
+    -82.5,
+    -70.5,
+    26.0,
+    54.9
+   ],
+   "malla_cerrada": true,
+   "no_manifold": false,
+   "triangulos": 600
+  },
+  {
+   "pieza": "04-latch-right",
+   "etiqueta": "Cierre derecho",
+   "material": "PA12-HP negro",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 2.83,
+   "caja": [
+    36.0,
+    60.0,
+    -82.5,
+    -70.5,
+    26.0,
+    54.9
+   ],
+   "malla_cerrada": true,
+   "no_manifold": false,
+   "triangulos": 600
+  },
+  {
+   "pieza": "05-seal-tpu",
+   "etiqueta": "Junta de labio de TPU",
+   "material": "TPU",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 3.14,
+   "caja": [
+    -84.7,
+    84.7,
+    -68.7,
+    68.7,
+    46.06,
+    49.5
+   ],
+   "malla_cerrada": true,
+   "no_manifold": false,
+   "triangulos": 1280
+  },
+  {
+   "pieza": "06-liner-tpu",
+   "etiqueta": "Forro de la tapa con las letras (TPU azul)",
+   "material": "TPU azul #008AFC",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 44.84,
+   "caja": [
+    -83.3,
+    83.3,
+    -67.3,
+    67.3,
+    52.0,
+    65.8
+   ],
+   "malla_cerrada": true,
+   "no_manifold": false,
+   "triangulos": 17648
+  },
+  {
+   "pieza": "07-hinge-pin-left",
+   "etiqueta": "Perno de bisagra impreso (left)",
+   "material": "PA12-HP negro",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 0.78,
+   "caja": [
+    -69.7,
+    -10.3,
+    73.25,
+    80.75,
+    40.95,
+    48.45
+   ],
+   "malla_cerrada": true,
+   "no_manifold": false,
+   "triangulos": 860
+  },
+  {
+   "pieza": "07-hinge-pin-right",
+   "etiqueta": "Perno de bisagra impreso (right)",
+   "material": "PA12-HP negro",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 0.78,
+   "caja": [
+    10.3,
+    69.7,
+    73.25,
+    80.75,
+    40.95,
+    48.45
+   ],
+   "malla_cerrada": true,
+   "no_manifold": false,
+   "triangulos": 860
+  },
+  {
+   "pieza": "08-latch-pin-left",
+   "etiqueta": "Perno de cierre impreso (left)",
+   "material": "PA12-HP negro",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 0.36,
+   "caja": [
+    -66.3,
+    -29.9,
+    -77.0,
+    -71.0,
+    26.5,
+    32.5
+   ],
+   "malla_cerrada": true,
+   "no_manifold": false,
+   "triangulos": 906
+  },
+  {
+   "pieza": "08-latch-pin-right",
+   "etiqueta": "Perno de cierre impreso (right)",
+   "material": "PA12-HP negro",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 0.36,
+   "caja": [
+    29.9,
+    66.3,
+    -77.0,
+    -71.0,
+    26.5,
+    32.5
+   ],
+   "malla_cerrada": true,
+   "no_manifold": false,
+   "triangulos": 906
+  }
+ ],
+ "tornilleria": "ninguna: pernos impresos (07 y 08)"
+}

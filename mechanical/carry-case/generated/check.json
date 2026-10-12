@@ -1,0 +1,366 @@
+{
+ "piezas": {
+  "01_base": {
+   "material": "PA12",
+   "volumen_cm3": 194.6,
+   "peso_g": 196.5
+  },
+  "02_lid": {
+   "material": "PA12",
+   "volumen_cm3": 122.79,
+   "peso_g": 124.0
+  },
+  "03_latch_left": {
+   "material": "PA12",
+   "volumen_cm3": 2.83,
+   "peso_g": 2.9
+  },
+  "04_latch_right": {
+   "material": "PA12",
+   "volumen_cm3": 2.83,
+   "peso_g": 2.9
+  },
+  "05_seal_tpu": {
+   "material": "TPU",
+   "volumen_cm3": 3.14,
+   "peso_g": 3.8
+  },
+  "06_liner_tpu": {
+   "material": "TPU",
+   "volumen_cm3": 44.84,
+   "peso_g": 53.8
+  },
+  "07_hinge_pin_left": {
+   "material": "PA12",
+   "volumen_cm3": 0.78,
+   "peso_g": 0.8
+  },
+  "07_hinge_pin_right": {
+   "material": "PA12",
+   "volumen_cm3": 0.78,
+   "peso_g": 0.8
+  },
+  "08_latch_pin_left": {
+   "material": "PA12",
+   "volumen_cm3": 0.36,
+   "peso_g": 0.4
+  },
+  "08_latch_pin_right": {
+   "material": "PA12",
+   "volumen_cm3": 0.36,
+   "peso_g": 0.4
+  }
+ },
+ "total_cm3": {
+  "PA12": 325.3,
+  "TPU": 48.0
+ },
+ "peso_total_g": 386,
+ "medidas_exteriores": [
+  183.5,
+  164.5,
+  66.5
+ ],
+ "cerrado_contactos": {
+  "01_base / 05_seal_tpu": {
+   "volumen_mm3": 335.371,
+   "esperado": "labio de la junta doblado por la lengueta (0.6)"
+  },
+  "06_liner_tpu / receptor": {
+   "volumen_mm3": 550.943,
+   "esperado": "almohadillas de TPU sobre los hombros de las bandas (0.5 de apriete)"
+  }
+ },
+ "receptor": {
+  "desplazamientos_sin_tocar_mm3": {
+   "apoyado (posicion del modelo)": 0.0,
+   "+0.75 a lo largo (hacia la antena)": 0.0,
+   "-0.75 a lo largo (hacia la base)": 0.0,
+   "+0.5 de lado (hacia atras), subido 0.4": 0.0,
+   "-0.5 de lado (hacia el frente), subido 0.4": 0.0
+  },
+  "tope_a_lo_largo_mm3": {
+   "+1.5": 29.87,
+   "-1.5": 29.87
+  },
+  "holgura_bandas_costillas": 0.8000000000000007,
+  "antena_a_la_base": 0.75
+ },
+ "apertura_tapa_mm3": {
+  "5": 0.0,
+  "10": 0.0,
+  "15": 0.0,
+  "20": 0.0,
+  "25": 0.0,
+  "30": 0.0,
+  "35": 0.0,
+  "40": 0.0,
+  "45": 0.0,
+  "50": 0.0,
+  "55": 0.0,
+  "60": 0.0,
+  "65": 0.0,
+  "70": 0.0,
+  "75": 0.0,
+  "80": 0.0,
+  "85": 0.0,
+  "90": 0.0,
+  "95": 0.0,
+  "100": 0.0,
+  "105": 0.0,
+  "110": 0.0,
+  "115": 0.0,
+  "120": 0.0,
+  "125": 0.0,
+  "130": 0.0,
+  "135": 0.0,
+  "140": 0.0,
+  "145": 0.0,
+  "150": 0.0,
+  "155": 0.0,
+  "160": 0.0,
+  "165": 0.0,
+  "170": 0.0,
+  "175": 0.0,
+  "180": 0.0
+ },
+ "perno_bisagra_con_tapa_mm3": {
+  "left": 0.0,
+  "right": 0.0
+ },
+ "cierre_giro": [
+  {
+   "grados": 0,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 2,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 1.986,
+   "penetracion_tapa": 0.13
+  },
+  {
+   "grados": 4,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 4.814,
+   "penetracion_tapa": 0.24
+  },
+  {
+   "grados": 6,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 6.922,
+   "penetracion_tapa": 0.33
+  },
+  {
+   "grados": 8,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 7.982,
+   "penetracion_tapa": 0.4
+  },
+  {
+   "grados": 10,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 7.417,
+   "penetracion_tapa": 0.44
+  },
+  {
+   "grados": 12,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 4.534,
+   "penetracion_tapa": 0.46
+  },
+  {
+   "grados": 14,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.021,
+   "penetracion_tapa": 0.07
+  },
+  {
+   "grados": 16,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 18,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 20,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 22,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 24,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 26,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 28,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 30,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 32,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 34,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 36,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 38,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 40,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 42,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 44,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 46,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 48,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 50,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 52,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 54,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 56,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 58,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  },
+  {
+   "grados": 60,
+   "con_base_mm3": 0.0,
+   "con_tapa_mm3": 0.0,
+   "penetracion_tapa": 0.0
+  }
+ ],
+ "cierre_hundimiento_max": 0.46,
+ "cierre_suelta_a_grados": 16,
+ "pernos": {
+  "07_hinge_pin_left": {
+   "01_base": 0.0,
+   "02_lid": 0.0
+  },
+  "07_hinge_pin_right": {
+   "01_base": 0.0,
+   "02_lid": 0.0
+  },
+  "08_latch_pin_left": {
+   "01_base": 0.0,
+   "03_latch_left": 0.0
+  },
+  "08_latch_pin_right": {
+   "01_base": 0.0,
+   "04_latch_right": 0.0
+  }
+ },
+ "rotulo": {
+  "logo": {
+   "piezas": 10,
+   "puentes": 2,
+   "ancho_puente": 0.9,
+   "piezas_con_trazo_menor_de_0.8": 0
+  },
+  "nombre": {
+   "piezas": 11,
+   "puentes": 3,
+   "ancho_puente": 0.9,
+   "piezas_con_trazo_menor_de_0.8": 0
+  },
+  "subtitulo 1": {
+   "piezas": 10,
+   "puentes": 6,
+   "ancho_puente": 0.7,
+   "piezas_con_trazo_menor_de_0.8": 0
+  },
+  "subtitulo 2": {
+   "piezas": 11,
+   "puentes": 3,
+   "ancho_puente": 0.7,
+   "piezas_con_trazo_menor_de_0.8": 0
+  }
+ },
+ "fallos": []
+}
