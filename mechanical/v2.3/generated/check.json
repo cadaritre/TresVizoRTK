@@ -1,0 +1,39 @@
+{
+ "choques_piezas": [],
+ "choques_referencias": [],
+ "holguras": {
+  "chasis-tubo": 0.0,
+  "chasis-tapa": 0.206,
+  "chasis-plataforma": 0.706,
+  "chasis-base": 1.094,
+  "chasis-coaxial": 0.5,
+  "chasis-carrier": 0.0,
+  "carrier-18650": 0.318,
+  "placa-carrier": 0.9,
+  "chasis-18650": 1.0,
+  "tubo-18650": 0.0
+ },
+ "choques_entre_referencias": [
+  {
+   "a": "clavija:J101_cables",
+   "b": "clavija:J502_cables",
+   "mm3": 29.544
+  },
+  {
+   "a": "clavija:J502_clavija",
+   "b": "panel_usb:pusb_J502",
+   "mm3": 18.915
+  },
+  {
+   "a": "panel_usb:PCB_panel_usb",
+   "b": "panel_usb:pusb_J501",
+   "mm3": 0.085
+  }
+ ],
+ "collar": {
+  "radio_limite": 25.65,
+  "radio_max_vertices": 25.5,
+  "fuera": []
+ },
+ "antena_plastico_mm3": 0.0
+}

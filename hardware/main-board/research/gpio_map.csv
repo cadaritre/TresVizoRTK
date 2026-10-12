@@ -1,0 +1,40 @@
+gpio,function,direction,net_name,keeps_firmware_assignment,constraints_notes
+0,BOOT (pulsador a GND),input,BOOT_N,yes,Pin de arranque: LOW en reset = modo de descarga. Pull-up debil interno [M tabla 4-1]; 10 kOhm externo recomendado y sin condensadores grandes [H]. En la Thing Plus tambien enciende el LED STAT; aqui sin LED
+1,PPS del UM980 (interrupcion),input,GNSS_PPS,new,Pulso bajo de ~60 us al encender [S tabla 2-2]: sin efecto en una entrada. ADC1_CH0. 100-470 Ohm en serie; la misma senal sale a UM980_AUX por 470 Ohm. Validar la latencia de la marca de tiempo antes de depender del PPS (AGENTS.md)
+2,INT del BQ25792,input,CHG_INT_N,new,Drenador abierto con pulso bajo de 256 us [T]: 10 kOhm de pull-up a 3V3 (no a REGN); interrupcion por flanco de bajada
+3,libre (punto de prueba),none,TP_GPIO3,new,Pin de arranque sin pulls internos; con los eFuse por defecto se ignora pero la hoja pide que no quede en alta impedancia [M seccion 4.4]: 10 kOhm a GND
+4,RESET_N del UM980,output (open-drain),GNSS_RESET_N,new,Solo tira a LOW; pulso >= 5 ms [U]. Pull-up interno del UM980 no documentado: 10 kOhm a VCC del UM980. El pulso bajo de 60 us al encender llega con el UM980 apagado
+5,COM3 TXD del UM980 -> RX del ESP32,input,GNSS_COM3_TXD,new,UART1 RX. UM980 pin 30 (TXD3); LVTTL 3.3 V
+6,COM3 RXD del UM980 <- TX del ESP32,output,GNSS_COM3_RXD,new,UART1 TX a UM980 pin 31 (RXD3). 1 kOhm en serie y TX en entrada mientras GPIO14 este alto: evita alimentar al UM980 por su E/S
+7,LED de estado rojo (catodo),output,LED_R_K,new,Sumidero con resistencia; anodo comun a 3V3. PWM (LEDC). Pulso de 60 us al encender: invisible
+8,I2C SDA,bidirectional,I2C_SDA,yes,OLED 0x3C/0x3D; MAX17048 0x36; BQ25792 0x6B: sin choques. 2.2-4.7 kOhm de pull-up a 3V3. 100 kHz en el firmware
+9,I2C SCL,output,I2C_SCL,yes,Igual que SDA
+10,PUSH: lectura del boton del panel (activo bajo),input,PWR_BTN_SENSE_N,yes,INPUT_PULLUP como hoy. El boton tambien va a QON del BQ25792 (pull-up interno de 200 kOhm que en reposo da 3.6-3.8 V [T]): unir por un diodo Schottky con el anodo en GPIO10
+11,SPI MOSI del BMI088 (SDI pin 9),output,IMU_MOSI,new,Pin nativo FSPID; es el PICO de la Thing Plus
+12,SPI SCK del BMI088 (SCK pin 8),output,IMU_SCK,new,Pin nativo FSPICLK; SCK de la Thing Plus. BMI088: modo 0 o 3 y hasta 10 MHz
+13,SPI MISO del BMI088 (SDO1 pin 15 + SDO2 pin 10),input,IMU_MISO,new,Pin nativo FSPIQ; POCI de la Thing Plus
+14,Corte del UM980 (HIGH = apagado),output,GNSS_PWR_OFF,yes,Antes OFF del Mk2 con la misma polaridad: el firmware 0.8.x lo pone LOW al arrancar (UM980 encendido) y HIGH al apagar. Puerta de un MOSFET P (3V3 -> VCC del UM980) con pull-up: apagado en reset. Tiene pulso bajo de 60 us al encender [S tabla 2-2] y el UM980 pide rampa desde < 0.4 V y > 500 ms entre apagado y encendido [U]: filtrar la puerta con RC y descargar VCC del UM980 (constraints.md 3.2)
+15,CSB1: seleccion del acelerometro del BMI088 (pin 14),output,IMU_CS_ACC_N,new,El BMI088 trae pull-up interno de 75-125 kOhm a VDDIO; el externo es opcional. XTAL_32K_P sin cristal. El primer flanco de subida pasa el acelerometro a SPI
+16,CSB2: seleccion del giroscopo del BMI088 (pin 5),output,IMU_CS_GYR_N,new,Pull-up interno como CSB1. XTAL_32K_N sin cristal
+17,INT1 del acelerometro del BMI088 (pin 16),input,IMU_INT1,new,Configurar push-pull activo alto en el BMI088
+18,INT3 del giroscopo del BMI088 (pin 12),input,IMU_INT3,new,Idem. GPIO18 da pulso bajo y alto al encender: sin efecto en una entrada
+19,USB D-,bidirectional,USB_DN,yes,USB-Serial/JTAG por defecto [S p. 25]. 22-33 Ohm en serie y ESD; al USB-C de la placa (PANEL_USBD opcional por 0 Ohm)
+20,USB D+,bidirectional,USB_DP,yes,Idem; D+ varia al encender: prever pull-up externo si molesta [H]
+21,LED de estado verde (catodo),output,LED_G_K,new,Sumidero con resistencia; PWM
+26,no disponible,none,NC_PSRAM_CS,no,En -N4R2 va a la PSRAM integrada [M p. 12 nota b]. No conectar
+33,SD_MMC D3,bidirectional,SD_D3,yes,10 kOhm de pull-up a 3V3 (bus SD). Libre en N4R2: 33-37 solo se usan con PSRAM/flash octal [S tabla 2-14]
+34,SD_MMC CMD,bidirectional,SD_CMD,yes,10 kOhm de pull-up
+35,ALRT del MAX17048,input,FG_ALRT_N,yes,La Thing Plus ya lo cablea asi (red ESP35/~ALRT) aunque el firmware no lo usa. Drenador abierto: 10 kOhm de pull-up
+36,LED de estado azul (catodo),output,LED_B_K,new,Sumidero con resistencia; PWM
+37,LED del anillo del boton,output,BTN_LED_EN,new,Puerta de un MOSFET N en el lado bajo del anillo; PWM. Sin pulso al encender
+38,SD_MMC CLK,output,SD_CLK,yes,Pista corta. El modo de descarga por USB-OTG lo pone LOW [H]: sin efecto
+39,SD_MMC D0,bidirectional,SD_D0,yes,10 kOhm de pull-up. Es MTCK: con los eFuse por defecto el JTAG va por USB y el pin queda como GPIO [S tabla 2-4]
+40,SD_MMC D1,bidirectional,SD_D1,yes,10 kOhm de pull-up. MTDO; el modo de descarga por USB-OTG lo pone HIGH [H]
+41,libre (punto de prueba),none,TP_GPIO41,new,MTDI. En la Thing Plus es LP_CTL (control del riel de perifericos en reposo)
+42,EVENT del UM980 desde el ESP32 (opcional),output,GNSS_EVENT,new,MTMS. Por 1 kOhm al EVENT del UM980 (pin 51) que tambien sale a UM980_AUX; sin montar si no se usa
+43,UART2 TX -> COM2 RXD del UM980 (pin 26),output,GNSS_COM2_RXD,yes,Es U0TXD (pull-up debil en reset): la ROM imprime su registro de arranque por aqui y le llega al UM980 en cada reinicio (se puede silenciar con eFuse o GPIO46). 1 kOhm en serie
+44,UART2 RX <- COM2 TXD del UM980 (pin 27),input,GNSS_COM2_TXD,yes,U0RXD
+45,Habilita el riel de perifericos 3V3_P (OLED y microSD),output,PERIPH_EN,yes,Pin de arranque con pull-down debil: debe estar LOW en reset (VDD_SPI de 3.3 V) [M tabla 4-4]. 100 kOhm a GND y conmutador activo en alto. El firmware lo pone HIGH al empezar
+46,no usar,none,NC_GPIO46,no,Pin de arranque con pull-down debil (modo de descarga y registro de la ROM) [M tablas 4-1 y 4-3]. En la Thing Plus es el dato del WS2812. Sin conexion
+47,SD_MMC D2,bidirectional,SD_D2,yes,10 kOhm de pull-up
+48,Deteccion de tarjeta microSD,input,SD_DET,yes,El firmware espera HIGH con tarjeta (INPUT_PULLDOWN). El zocalo TF-015 cierra a GND con tarjeta: MOSFET P inversor (connectors.md) o cambio de firmware

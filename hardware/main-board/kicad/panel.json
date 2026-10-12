@@ -1,0 +1,73 @@
+{
+ "boards": [
+  {
+   "name": "main",
+   "file": "tresvizo-main.kicad_pcb",
+   "at": [
+    107.0,
+    107.0
+   ]
+  }
+ ],
+ "gap": 2.0,
+ "rails": [
+  5.0,
+  5.0,
+  5.0,
+  5.0
+ ],
+ "tabs": [
+  {
+   "board": "main",
+   "edge": "left",
+   "offset": 6.5,
+   "width": 5.0
+  },
+  {
+   "board": "main",
+   "edge": "left",
+   "offset": 41.0,
+   "width": 5.0
+  },
+  {
+   "board": "main",
+   "edge": "right",
+   "offset": 13.0,
+   "width": 5.0
+  },
+  {
+   "board": "main",
+   "edge": "right",
+   "offset": 24.0,
+   "width": 5.0
+  }
+ ],
+ "mousebite": {
+  "drill": 0.6,
+  "pitch": 0.9,
+  "offset": 0.0
+ },
+ "keepout": 1.0,
+ "marks": {
+  "tooling_drill": 2.0,
+  "tooling_inset": [
+   2.5,
+   2.5
+  ],
+  "fiducial_inset": [
+   6.0,
+   3.85
+  ]
+ },
+ "texts": [
+  {
+   "text": "JLCJLCJLCJLC",
+   "layer": "B.SilkS",
+   "at": [
+    125.0,
+    182.5
+   ],
+   "size": 1.0
+  }
+ ]
+}

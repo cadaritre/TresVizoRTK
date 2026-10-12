@@ -1,0 +1,29 @@
+# Estado local de KiCad
+*.kicad_prl
+*.lck
+*-backups/
+_autosave-*
+fp-info-cache
+# Historial local que KiCad 10 guarda junto al proyecto al abrirlo
+.history/
+
+# Intermedios que build.py vuelve a generar
+kicad/tresvizo-main-unrouted.*
+fab/gerbers-*/
+fab/jlc_parts_cache.json
+
+# Pesados y regenerables: caché de easyeda2kicad, modelos STEP de LCSC (61 MB; los .wrl sí se
+# guardan) y el STEP de la placa (lo genera build.py)
+.easyeda_cache/
+kicad/lib/lcsc.3dshapes/*.step
+fab/*.step
+
+# STEP de referencia para la carcasa (los exporta la comprobación en FreeCAD; pesados)
+cad/*.step
+
+# Salidas para revisar o fabricar que build.py rehace en cada vuelta (Gerber, vistas y esquema): se
+# guardan en git solo en los hitos (pedido a JLCPCB, versión cerrada) con «git add -f».
+fab/*-gerbers-jlcpcb.zip
+fab/*-top.png
+fab/*-bottom.png
+fab/*-schematic.pdf

@@ -1,0 +1,13 @@
+{
+ "pieza": "09-logo-inlay-tpu",
+ "material": "TPU",
+ "piezas_sueltas": 6,
+ "ancho_desenrollado_mm": 33.554,
+ "ancho_plano_original_mm": 32.0,
+ "alto_mm": 36.841,
+ "espesor_mm": 0.8,
+ "radio_desenrollado_mm": 31.6,
+ "holgura_por_lado_mm": 0.0,
+ "solidos_validos": true,
+ "mallas_cerradas_por_pieza": true
+}

@@ -1,0 +1,262 @@
+{
+ "piezas": [
+  {
+   "nombre": "01-base",
+   "etiqueta": "Base con la tuerca del baston",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 8.98,
+   "caja": [
+    -28.0,
+    28.0,
+    -28.0,
+    22.9,
+    -0.0,
+    15.9
+   ]
+  },
+  {
+   "nombre": "02-tube",
+   "etiqueta": "Tubo",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 45.3,
+   "caja": [
+    -28.0,
+    28.0,
+    -28.0,
+    22.9,
+    4.0,
+    112.0
+   ]
+  },
+  {
+   "nombre": "03-antenna-cap",
+   "etiqueta": "Tapa de antena",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 10.48,
+   "caja": [
+    -28.0,
+    28.0,
+    -28.0,
+    22.9,
+    87.3,
+    116.0
+   ]
+  },
+  {
+   "nombre": "04-chassis",
+   "etiqueta": "Chasis",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 6.59,
+   "caja": [
+    -21.74,
+    21.74,
+    2.0,
+    16.45,
+    9.5,
+    111.6
+   ]
+  },
+  {
+   "nombre": "05-key-tpu",
+   "etiqueta": "Tecla de TPU",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 0.09,
+   "caja": [
+    -4.4,
+    4.4,
+    17.45,
+    23.9,
+    17.6,
+    26.4
+   ]
+  },
+  {
+   "nombre": "06-port-cover-tpu",
+   "etiqueta": "Tapa de puertos de TPU",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 0.99,
+   "caja": [
+    12.6,
+    27.71,
+    6.38,
+    24.8,
+    16.8,
+    48.4
+   ]
+  },
+  {
+   "nombre": "07-logo-inlay-tpu",
+   "etiqueta": "Distintivo de TPU para el grabado",
+   "valida": true,
+   "solidos": 6,
+   "volumen_cm3": 0.08,
+   "caja": [
+    -8.9,
+    8.9,
+    22.1,
+    22.9,
+    46.05,
+    66.55
+   ]
+  },
+  {
+   "nombre": "08-usb-bezel",
+   "etiqueta": "Marco del USB-C",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 0.32,
+   "caja": [
+    8.0,
+    22.24,
+    11.84,
+    20.1,
+    17.02,
+    32.98
+   ]
+  },
+  {
+   "nombre": "09-band-bottom-tpu",
+   "etiqueta": "Banda de TPU de abajo",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 12.52,
+   "caja": [
+    -29.7,
+    29.7,
+    -29.7,
+    24.6,
+    -0.0,
+    40.0
+   ]
+  },
+  {
+   "nombre": "10-band-top-tpu",
+   "etiqueta": "Banda de TPU de arriba",
+   "valida": true,
+   "solidos": 1,
+   "volumen_cm3": 13.37,
+   "caja": [
+    -29.7,
+    29.7,
+    -29.7,
+    24.6,
+    76.0,
+    116.0
+   ]
+  }
+ ],
+ "referencias": [
+  "placa: PCB",
+  "placa: componentes (envolvente h(x))",
+  "placa: SW401",
+  "placa: J101 USB-C",
+  "placa: J401 microSD",
+  "placa: OLED PCB",
+  "placa: OLED separador y componentes de atras",
+  "placa: OLED vidrio",
+  "placa: OLED cinta flexible",
+  "placa: OLED pines",
+  "placa: OLED tornillos M2",
+  "carrier: PCB",
+  "carrier: USB-C (sobresale del canto +X)",
+  "carrier: UM980 y su placa azul",
+  "carrier: LEDs RTK/PVT",
+  "carrier: pasivos C12-C14/L1",
+  "carrier: SMA cuerpo",
+  "carrier: u.FL P3",
+  "carrier: IC de 8 pines",
+  "carrier: pasivos del canto -X",
+  "carrier: D6/R4",
+  "carrier: GH8 vertical",
+  "carrier: CON1 GH5 lateral",
+  "carrier: electrónica central",
+  "carrier: IC izquierdo y pasivos",
+  "carrier: SMA cañón",
+  "carrier: pila de botón",
+  "carrier: patas del SMA (atrás)",
+  "carrier: arnés J301: soldaduras atrás (8 agujeros)",
+  "carrier: arnés J301: cables por delante (8 agujeros)",
+  "carrier: arnés J301: soldaduras atrás (5 agujeros)",
+  "celdas: pack 1S2P (envolvente)",
+  "tuerca: tuerca 5/8-11",
+  "tuerca: reten M2 con arandela",
+  "tuerca: perno del baston (rosca maxima)",
+  "antena: antena HA-901A",
+  "antena: tornillos M2.5 de la antena",
+  "coaxial: clavija SMA de la carrier",
+  "coaxial: coaxial (recorrido)",
+  "coaxial: pasamuros SMA (dentro)",
+  "coaxial: pasamuros SMA (fuera)",
+  "clavijas: clavija J102",
+  "clavijas: clavija J301",
+  "clavijas: clavija J404",
+  "cables: cable mazo_pack",
+  "cables: cable hilos_ntc",
+  "cables: cable arnes_j301",
+  "cables: cable NTC (cuerpo)",
+  "tornillos: tornillos M2.5 de base y tapa",
+  "usb: funda de la clavija",
+  "microsd: tarjeta puesta"
+ ],
+ "bandas": {
+  "09-band-bottom-tpu": {
+   "z": [
+    0.0,
+    40.0
+   ],
+   "redondeos": {
+    "fuera": {
+     "aristas": 20,
+     "radio_pedido": 1.0,
+     "radio": 1.0
+    },
+    "dentro_entrada": {
+     "aristas": 3,
+     "radio_pedido": 0.5,
+     "radio": 0.5
+    }
+   }
+  },
+  "10-band-top-tpu": {
+   "z": [
+    76.0,
+    116.0
+   ],
+   "redondeos": {
+    "fuera": {
+     "aristas": 16,
+     "radio_pedido": 1.0,
+     "radio": 1.0
+    },
+    "dentro_entrada": {
+     "aristas": 4,
+     "radio_pedido": 0.5,
+     "radio": 0.5
+    }
+   }
+  },
+  "cotas": {
+   "tapa_puertos": {
+    "angulo_ala": 16.5,
+    "atras": 0.939,
+    "z_fondo": 15.861,
+    "x_delante": 9.1,
+    "radio": 2.0
+   },
+   "oled": {
+    "x": 14.215,
+    "z_arriba": 88.777,
+    "lados": 1.293,
+    "radio": 2.0
+   }
+  }
+ },
+ "coaxial_radio_curva": 12.27,
+ "clavijas_origen": "kicad/plugs.json (v0.3)"
+}

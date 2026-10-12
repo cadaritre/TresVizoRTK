@@ -9,6 +9,9 @@
 | [v2.2/generated/stl](v2.2/generated/stl/) | Imprimir: cinco piezas rígidas y dos bandas de TPU. |
 | [v2.2/generated/step](v2.2/generated/step/) | STEP por pieza para otros CAD, en posición cerrada. |
 | [v2.2/SCREW-BOM.md](v2.2/SCREW-BOM.md) | Compra: 15 tornillos, la tuerca de latón del jalón y el conector de carga JST-XH. Los dos del IMU, avellanados. |
+| [v2.3](v2.3/README.md) | **Exploratoria:** chasis deslizable para la placa principal v0.2. La V3.0 copia su arquitectura. |
+| [v3.0](v3.0/README.md) | **Exploratoria:** tubo de Ø56 × 116 con una cara plana, para la placa principal v0.3. |
+| [carry-case](carry-case/README.md) | **Estuche** rígido tipo Pelican para el receptor v0.3 con su antena y un compartimento de extras: todo impreso (PA12 y TPU), sin tornillos. No se ha impreso. |
 | [AUDITORIA-V1.md](AUDITORIA-V1.md) | Por qué se rehízo la carcasa desde cero. |
 | [referencias](referencias/) | Cotas de los componentes comprados y datum del BMI088. |
 

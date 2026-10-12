@@ -1,0 +1,203 @@
+{
+ "piezas": [
+  {
+   "pieza": "01-base",
+   "etiqueta": "Base con la tuerca del baston",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 5122,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 8.98,
+   "stl": "01-base.stl",
+   "step": "01-base.step"
+  },
+  {
+   "pieza": "02-tube",
+   "etiqueta": "Tubo",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 7328,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 45.3,
+   "stl": "02-tube.stl",
+   "step": "02-tube.step"
+  },
+  {
+   "pieza": "03-antenna-cap",
+   "etiqueta": "Tapa de antena",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 6084,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 10.48,
+   "stl": "03-antenna-cap.stl",
+   "step": "03-antenna-cap.step"
+  },
+  {
+   "pieza": "04-chassis",
+   "etiqueta": "Chasis",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 1930,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 6.59,
+   "stl": "04-chassis.stl",
+   "step": "04-chassis.step"
+  },
+  {
+   "pieza": "05-key-tpu",
+   "etiqueta": "Tecla de TPU",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 812,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 0.09,
+   "stl": "05-key-tpu.stl",
+   "step": "05-key-tpu.step"
+  },
+  {
+   "pieza": "06-port-cover-tpu",
+   "etiqueta": "Tapa de puertos de TPU",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 2392,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 0.99,
+   "stl": "06-port-cover-tpu.stl",
+   "step": "06-port-cover-tpu.step"
+  },
+  {
+   "pieza": "07-logo-inlay-tpu",
+   "etiqueta": "Distintivo de TPU para el grabado",
+   "solido_valido": true,
+   "solidos": 6,
+   "triangulos": 1396,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 0.08,
+   "stl": "07-logo-inlay-tpu.stl",
+   "step": "07-logo-inlay-tpu.step"
+  },
+  {
+   "pieza": "08-usb-bezel",
+   "etiqueta": "Marco del USB-C",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 544,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 0.32,
+   "stl": "08-usb-bezel.stl",
+   "step": "08-usb-bezel.step"
+  },
+  {
+   "pieza": "09-band-bottom-tpu",
+   "etiqueta": "Banda de TPU de abajo",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 8974,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 12.52,
+   "stl": "09-band-bottom-tpu.stl",
+   "step": "09-band-bottom-tpu.step"
+  },
+  {
+   "pieza": "10-band-top-tpu",
+   "etiqueta": "Banda de TPU de arriba",
+   "solido_valido": true,
+   "solidos": 1,
+   "triangulos": 7702,
+   "cerrada": true,
+   "no_manifold": false,
+   "autointersecciones": false,
+   "volumen_cm3": 13.37,
+   "stl": "10-band-top-tpu.stl",
+   "step": "10-band-top-tpu.step"
+  }
+ ],
+ "todas_cerradas": true,
+ "interferencias": [],
+ "sin_interferencias": true,
+ "limite_mm3": 0.05,
+ "apriete_de_las_bandas": [
+  {
+   "a": "01-base",
+   "b": "09-band-bottom-tpu",
+   "mm3": 78.273
+  },
+  {
+   "a": "02-tube",
+   "b": "09-band-bottom-tpu",
+   "mm3": 1605.446
+  },
+  {
+   "a": "02-tube",
+   "b": "10-band-top-tpu",
+   "mm3": 1722.181
+  },
+  {
+   "a": "03-antenna-cap",
+   "b": "10-band-top-tpu",
+   "mm3": 78.273
+  }
+ ],
+ "guarda_pared_tubo": {
+  "cara_plana": {
+   "puntos": 3024,
+   "en_aberturas": 348,
+   "sin_material": 0,
+   "ejemplos": [],
+   "ok": true
+  },
+  "anillo": {
+   "puntos": 14786,
+   "en_aberturas": 877,
+   "sin_material": 0,
+   "ejemplos": [],
+   "ok": true
+  },
+  "paso_mm": 1.0,
+  "zonas": [
+   [
+    7,
+    109,
+    21.7,
+    26.8,
+    26.8
+   ],
+   [
+    4.2,
+    5.8,
+    22.3,
+    27.4,
+    27.4
+   ],
+   [
+    110.2,
+    111.5,
+    22.3,
+    27.4,
+    27.4
+   ]
+  ]
+ },
+ "guarda_pared_ok": true,
+ "deflexion_lineal": 0.05,
+ "deflexion_angular": 0.25
+}

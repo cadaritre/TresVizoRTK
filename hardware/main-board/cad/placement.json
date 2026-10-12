@@ -1,0 +1,343 @@
+{
+ "nota": "Posiciones de la placa v0.2 (ESP32-S3-WROOM-1, J301 SH 8) en los ejes de la carcasa, con el dorso de la placa en y 1.5 como los STEP de esta carpeta (mm). z = eje del jalón hacia arriba, +Y hacia el panel, +X a la izquierda mirando el panel. En V2.3 la placa va chasis.desplazamiento_placa_y (1.0 mm) más hacia el panel, y la carrier, la 18650 y el chasis los fija mechanical/v2.3/parameters.json. bateria_18650_1s, coaxial_supuesto, carcasa_v22 y holguras_medidas son del primer estudio, en V2.2.",
+ "placa_principal": {
+  "x": [
+   -23.0,
+   23.0
+  ],
+  "y_dorso": 1.5,
+  "y_cara_componentes": 3.1,
+  "z": [
+   23.5,
+   87.5
+  ],
+  "de_kicad": "x = 23 - u, z = 87.5 - v (u, v desde la esquina superior izquierda vista desde el panel)",
+  "radio_max_con_componentes": 23.208,
+  "agujeros": [
+   {
+    "ref": "H1",
+    "x": 11.0,
+    "z": 77.9,
+    "taladro": 2.7,
+    "sin_cobre_d": 5.2,
+    "tornillo": "M2.5"
+   },
+   {
+    "ref": "H2",
+    "x": -17.4,
+    "z": 83.8,
+    "taladro": 2.7,
+    "sin_cobre_d": 5.2,
+    "tornillo": "M2.5"
+   }
+  ],
+  "franjas_sin_componentes_rieles": {
+   "ancho": 2.5,
+   "tramos": [
+    {
+     "x": [
+      20.5,
+      23.0
+     ],
+     "z": [
+      72.4,
+      87.5
+     ],
+     "area": "riel_1"
+    },
+    {
+     "x": [
+      20.5,
+      23.0
+     ],
+     "z": [
+      39.0,
+      53.5
+     ],
+     "area": "riel_2"
+    },
+    {
+     "x": [
+      -23.0,
+      -20.5
+     ],
+     "z": [
+      39.0,
+      87.5
+     ],
+     "area": "riel_3"
+    }
+   ],
+   "nota": "Áreas riel_* del DRC: sin componentes. El canto +X se corta frente al ESP32-S3-WROOM-1. En V2.3 las lengüetas de los rieles pisan solo +X en z 72.4-87.5 y -X en z 39-87.5, y la placa entra por abajo"
+  },
+  "antena_esp32_sin_cobre": {
+   "x": [
+    16.3,
+    23.0
+   ],
+   "z": [
+    53.8,
+    71.8
+   ],
+   "nota": "ESP32-S3-WROOM-1: sin cobre en ninguna capa; nada de plástico al lado"
+  },
+  "boton_nada_delante": {
+   "x": [
+    -5.5,
+    5.5
+   ],
+   "z": [
+    38.0,
+    49.0
+   ]
+  },
+  "boton_max_2mm": {
+   "x": [
+    -8.1,
+    8.1
+   ],
+   "z": [
+    35.4,
+    51.6
+   ]
+  },
+  "cables_oled_max_8_15mm": {
+   "x": [
+    -7.25,
+    7.25
+   ],
+   "z": [
+    78.5,
+    85.0
+   ]
+  },
+  "altura_max_componentes": 10.0,
+  "clavijas": [
+   {
+    "ref": "J101",
+    "familia": "GH",
+    "pines": 8,
+    "alto_mm": 4.35,
+    "zona_x": [
+     -6.32,
+     6.93
+    ],
+    "zona_z": [
+     87.15,
+     93.25
+    ]
+   },
+   {
+    "ref": "J102",
+    "familia": "PH",
+    "pines": 2,
+    "alto_mm": 4.5,
+    "zona_x": [
+     -21.54,
+     -13.64
+    ],
+    "zona_z": [
+     16.37,
+     23.87
+    ]
+   },
+   {
+    "ref": "J301",
+    "familia": "SH",
+    "pines": 8,
+    "alto_mm": 2.95,
+    "zona_x": [
+     -7.07,
+     3.93
+    ],
+    "zona_z": [
+     17.96,
+     23.96
+    ]
+   },
+   {
+    "ref": "J402",
+    "familia": "GH",
+    "pines": 4,
+    "alto_mm": 4.35,
+    "zona_x": [
+     13.95,
+     20.05
+    ],
+    "zona_z": [
+     42.58,
+     50.83
+    ]
+   },
+   {
+    "ref": "J403",
+    "familia": "SH",
+    "pines": 4,
+    "alto_mm": 2.95,
+    "zona_x": [
+     -1.76,
+     4.24
+    ],
+    "zona_z": [
+     73.0,
+     80.0
+    ]
+   },
+   {
+    "ref": "J404",
+    "familia": "SH",
+    "pines": 2,
+    "alto_mm": 2.95,
+    "zona_x": [
+     -13.39,
+     -8.39
+    ],
+    "zona_z": [
+     17.86,
+     23.86
+    ]
+   },
+   {
+    "ref": "J405",
+    "familia": "GH",
+    "pines": 7,
+    "alto_mm": 4.35,
+    "zona_x": [
+     7.9,
+     19.9
+    ],
+    "zona_z": [
+     87.05,
+     93.15
+    ]
+   }
+  ],
+  "clavijas_detalle": "kicad/plugs.json (coordenadas de placa) y cad/clavijas.step (en ejes de la carcasa)"
+ },
+ "bateria_18650_1s": {
+  "eje_x": 0.0,
+  "eje_y": -19.6,
+  "d": 18.6,
+  "z": [
+   22.0,
+   91.0
+  ],
+  "nota": "frente en y -10.3: 0.4 mm detrás del carrier"
+ },
+ "panel_usb": {
+  "x": [
+   -10.4,
+   10.4
+  ],
+  "y": [
+   11.5,
+   30.41
+  ],
+  "z_cara_inferior": 90.17,
+  "z_cara_componentes": 91.77,
+  "de_kicad": "u = x + 10.4, v = 31.3 - y",
+  "usb_c": {
+   "cara_y": 31.7,
+   "sobresale_del_canto": 1.29,
+   "eje_z": 93.42,
+   "carcasa_x": [
+    -4.47,
+    4.47
+   ],
+   "carcasa_z": [
+    91.82,
+    95.02
+   ]
+  },
+  "agujeros_m2": [
+   [
+    -7.9,
+    25.0
+   ],
+   [
+    7.9,
+    25.0
+   ]
+  ],
+  "j502_gh8": {
+   "boca": "hacia -Y en y 11.73",
+   "alto_z": 96.12
+  }
+ },
+ "coaxial_supuesto": {
+  "d": 3.0,
+  "recorrido": [
+   [
+    -2.6,
+    -4.4,
+    92.4
+   ],
+   [
+    -2.6,
+    -4.4,
+    96.0
+   ],
+   [
+    0.0,
+    -17.5,
+    97.5
+   ],
+   [
+    0.0,
+    -17.5,
+    113.9
+   ]
+  ]
+ },
+ "carcasa_v22": {
+  "r_interior_tubo": 29.5,
+  "r_collar": 26.0,
+  "collar_inferior_z": [
+   8.0,
+   21.0
+  ],
+  "collar_superior_z": [
+   111.91,
+   124.91
+  ],
+  "cuello_desde_z": 99.41,
+  "base_z": 15.91,
+  "plataforma_imu_z": 99.91,
+  "ranura_propuesta_base_bajo_j102": {
+   "x": [
+    -21.5,
+    -13.5
+   ],
+   "y": [
+    2.5,
+    8.5
+   ],
+   "hondo": 3.0
+  }
+ },
+ "holguras_medidas": {
+  "placa_carrier": 0.4,
+  "carrier_bateria": 0.4,
+  "base_cables_j102": 0.46,
+  "boton_cara_placa": 2.51,
+  "sma_carrier_placa": 1.4,
+  "collar_margen": 2.79
+ },
+ "carrier_bdlx": {
+  "medida": "Foto rectificada del propietario del 05-10-2026, con cinta métrica y sin calibrador: ±1 mm",
+  "pcb": [
+   32.0,
+   52.0,
+   1.6
+  ],
+  "grueso_total": 8.0,
+  "agujeros_d": 3.2,
+  "en_v2_3": "Envolvente de 9 mm (medida más 1 mm) en mechanical/v2.3/parameters.json, chasis.carrier",
+  "componentes": "carrier_bdlx.py (cara de componentes hacia la placa, SMA arriba)",
+  "cantos_sin_margen": [
+   "USB-C: sobresale ~0.9 mm del canto +X, z 23.0-32.4 en V2.3, 3.3 mm de alto sobre la cara",
+   "Columna de 8 agujeros pegada al canto -X (x -20.3, z 24.1-41.4 en V2.3): ahí se suelda el arnés de J301 y las soldaduras asoman ~1 mm por detrás",
+   "Pasivos a 0.7 mm del canto -X; pila de botón y conector de 8 pines a 1 mm; placa azul del UM980 a 0.5 mm del canto +X"
+  ]
+ }
+}
