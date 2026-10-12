@@ -25,7 +25,7 @@
    "material": "PA12-HP negro",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 122.79,
+   "volumen_cm3": 123.76,
    "caja": [
     -88.5,
     88.5,
@@ -36,7 +36,7 @@
    ],
    "malla_cerrada": true,
    "no_manifold": false,
-   "triangulos": 25980
+   "triangulos": 25960
   },
   {
    "pieza": "03-latch-left",
@@ -97,18 +97,37 @@
   },
   {
    "pieza": "06-liner-tpu",
-   "etiqueta": "Forro de la tapa con las letras (TPU azul)",
-   "material": "TPU azul #008AFC",
+   "etiqueta": "Forro de la tapa con las almohadillas (TPU)",
+   "material": "TPU",
    "valida": true,
    "solidos": 1,
-   "volumen_cm3": 44.84,
+   "volumen_cm3": 43.29,
    "caja": [
     -83.3,
     83.3,
     -67.3,
     67.3,
     52.0,
-    65.8
+    63.0
+   ],
+   "malla_cerrada": true,
+   "no_manifold": false,
+   "triangulos": 444
+  },
+  {
+   "pieza": "09-letters-tpu",
+   "etiqueta": "Letras y logo de TPU para los huecos de la tapa",
+   "material": "TPU azul #008AFC",
+   "valida": true,
+   "solidos": 42,
+   "volumen_cm3": 0.62,
+   "caja": [
+    -30.89,
+    30.86,
+    -24.66,
+    24.56,
+    64.5,
+    65.7
    ],
    "malla_cerrada": true,
    "no_manifold": false,

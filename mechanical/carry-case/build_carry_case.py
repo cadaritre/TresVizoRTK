@@ -1,7 +1,7 @@
 """Genera el estuche del receptor: modelo de FreeCAD, STEP y STL de cada pieza e indice del modelo.
 
 Piezas: 01-base, 02-lid, 03-latch-left, 04-latch-right, 07-hinge-pin-left/right y 08-latch-pin-left/right
-(PA12-HP); 05-seal-tpu y 06-liner-tpu (TPU). Sin tornilleria: los pernos son impresos.
+(PA12-HP); 05-seal-tpu, 06-liner-tpu y 09-letters-tpu (TPU). Sin tornilleria: los pernos son impresos.
 Referencias (no se imprimen): el receptor V3.0 en su sitio.
 
 Uso:
@@ -45,7 +45,9 @@ parts.append(('04_latch_right', 'Cierre derecho', G.latch(G.LT['x_centers'][1]),
 log('junta')
 parts.append(('05_seal_tpu', 'Junta de labio de TPU', G.seal(), 'TPU'))
 log('forro')
-parts.append(('06_liner_tpu', 'Forro de la tapa con las letras (TPU azul)', G.liner(), 'TPU azul #008AFC'))
+parts.append(('06_liner_tpu', 'Forro de la tapa con las almohadillas (TPU)', G.liner(), 'TPU'))
+log('letras')
+parts.append(('09_letters_tpu', 'Letras y logo de TPU para los huecos de la tapa', G.letters(), 'TPU azul #008AFC'))
 log('pernos')
 for xc, side in zip(G.HG['segment_x'], ('left', 'right')):
     parts.append((f'07_hinge_pin_{side}', f'Perno de bisagra impreso ({side})', G.hinge_pin(xc), 'PA12-HP negro'))
@@ -97,11 +99,12 @@ def write_flat(shape, fname, flip):
     m.write(str(OUT / 'stl' / fname))
 
 
-# Junta: la tira contra la cama y el labio hacia arriba. Forro para FDM: placa contra la cama y letras
-# hacia arriba, sin las almohadillas (van aparte, para no imprimir soportes de TPU).
+# Junta: la tira contra la cama y el labio hacia arriba. Forro para FDM: placa contra la cama, sin las
+# almohadillas (van aparte, para no imprimir soportes de TPU). Letras: la cara que se ve contra la cama.
 write_flat(parts[4][2], '05-seal-tpu-para-imprimir.stl', True)
 write_flat(G.liner(with_pads=False), '06-liner-tpu-sin-almohadillas-fdm.stl', False)
 write_flat(G.liner_pads(), '06b-liner-pads-tpu-fdm.stl', True)
+write_flat(next(sh for n, _, sh, _ in parts if n == '09_letters_tpu'), '09-letters-tpu-para-imprimir.stl', True)
 
 (OUT / 'model-index.json').write_text(json.dumps({'piezas': index, 'tornilleria': 'ninguna: pernos impresos (07 y 08)'}, indent=1, ensure_ascii=False) + '\n',
                                       encoding='utf-8')

@@ -238,14 +238,12 @@
  "liner": {
   "thickness": 1.6,
   "clearance": 0.2,
-  "letter_proud": 0.1,
-  "letter_clearance": 0.05,
   "nub_radius": 0.6,
   "nub_length": 12.0,
   "pad_squeeze": 0.5,
   "pad_x_clear": 13.0,
   "pad_z_min": 52.0,
-  "_nota": "Forro de TPU azul que va pegado al techo de la tapa por dentro: una placa de 1.6 con las letras y el logo en relieve que entran desde dentro por las ventanas del techo y quedan a ras por fuera (0.1 de mas). Asi las letras son UNA sola pieza, no hay que pegar letra por letra. Se mete a presion: entra justo en la tapa y lo sujetan 6 topes de 0.6. Abajo lleva dos almohadillas sobre los hombros de las bandas del receptor (0.5 de apriete con el receptor apoyado en la cuna): son lo que lo sujeta. Tienen un hueco en medio para no tocar la pantalla, la tecla ni el LED.",
+  "_nota": "Forro de TPU que va pegado al techo de la tapa por dentro: una placa de 1.6 que entra justo y la sujetan 6 topes de 0.6. Abajo lleva dos almohadillas sobre los hombros de las bandas del receptor (0.5 de apriete con el receptor apoyado en la cuna): son lo que lo sujeta. Tienen un hueco en medio para no tocar la pantalla, la tecla ni el LED. Ya no lleva las letras (van sueltas, pieza 09).",
   "pad_z_rcv": [
    [
     6.0,
@@ -282,10 +280,7 @@
    -17.67,
    -24.67
   ],
-  "bridge": 0.9,
-  "bridge_small": 0.7,
-  "bridge_extend": 0.5,
-  "_nota": "Rotulo discreto (pedido del propietario, 12-10-2026: el primero, de 124 de ancho, era enorme): un bloque de 62 x 49.4 en el panel rebajado del centro de la tapa, con el logo de 40 de ancho (a 36 las rayitas del 3 quedaban de menos de 0.8, poco para el TPU), MeridianV de 62 y TRIPLE BAND / RTK RECEIVER en dos lineas de 4.4 de alto de mayuscula (trazo de unos 0.9). Como las letras entran por dentro, cada contraforma (el ojo de la e, la a, la d, la R, la B, el interior del hexagono, la O) es una isla del techo y necesita un puente que la una al resto: 0.9 de ancho en el logo y en MeridianV, 0.7 en las lineas chicas (14 puentes). Se ven como una raya negra fina que corta el trazo, al estilo de las letras de plantilla (esténcil).",
+  "_nota": "Rotulo discreto (pedido del propietario, 12-10-2026: el primero, de 124 de ancho, era enorme): un bloque de 62 x 49.4 en el panel rebajado del centro de la tapa, con el logo de 40 de ancho (a 36 las rayitas del 3 quedaban de menos de 0.8, poco para el TPU), MeridianV de 62 y TRIPLE BAND / RTK RECEIVER en dos lineas de 4.4 de alto de mayuscula (trazo de unos 0.9). Las letras van en huecos CIEGOS de 1.2 en la tapa (no la atraviesan; quedan 1.5 de techo debajo) y son piezas sueltas de TPU azul (pieza 09, 42 piezas: cada letra, los puntos de las i y las piezas del logo) que se meten en su hueco con una gota de pegamento, a ras de la cara (pedido del propietario, 12-10-2026, en vez de las letras pasantes del forro con puentes). El hueco va 0.05 mas grande por lado que la letra dibujada y la pieza de TPU 0.1 mas chica por lado: 0.15 de juego (el TPU de FDM sale algo grueso). Las contraformas (el ojo de la e, la R, la O, el interior del hexagono) son parte de la tapa y quedan negras.",
   "panel": {
    "size": [
     86.0,
@@ -298,7 +293,10 @@
    "radius": 6.0,
    "depth": 0.8,
    "_nota": "Panel rebajado 0.8 en el centro de la tapa donde va el rotulo, como la placa de un Pelican."
-  }
+  },
+  "pocket_depth": 1.2,
+  "pocket_clearance": 0.05,
+  "inlay_clearance": 0.1
  },
  "ribs": {
   "proud": 3.0,

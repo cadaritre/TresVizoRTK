@@ -7,8 +7,8 @@
   },
   "02_lid": {
    "material": "PA12",
-   "volumen_cm3": 122.79,
-   "peso_g": 124.0
+   "volumen_cm3": 123.76,
+   "peso_g": 125.0
   },
   "03_latch_left": {
    "material": "PA12",
@@ -27,8 +27,13 @@
   },
   "06_liner_tpu": {
    "material": "TPU",
-   "volumen_cm3": 44.84,
-   "peso_g": 53.8
+   "volumen_cm3": 43.29,
+   "peso_g": 51.9
+  },
+  "09_letters_tpu": {
+   "material": "TPU",
+   "volumen_cm3": 0.62,
+   "peso_g": 0.7
   },
   "07_hinge_pin_left": {
    "material": "PA12",
@@ -52,8 +57,8 @@
   }
  },
  "total_cm3": {
-  "PA12": 325.3,
-  "TPU": 48.0
+  "PA12": 326.3,
+  "TPU": 47.0
  },
  "peso_total_g": 386,
  "medidas_exteriores": [
@@ -339,27 +344,29 @@
  "rotulo": {
   "logo": {
    "piezas": 10,
-   "puentes": 2,
-   "ancho_puente": 0.9,
    "piezas_con_trazo_menor_de_0.8": 0
   },
   "nombre": {
    "piezas": 11,
-   "puentes": 3,
-   "ancho_puente": 0.9,
    "piezas_con_trazo_menor_de_0.8": 0
   },
   "subtitulo 1": {
    "piezas": 10,
-   "puentes": 6,
-   "ancho_puente": 0.7,
    "piezas_con_trazo_menor_de_0.8": 0
   },
   "subtitulo 2": {
    "piezas": 11,
-   "puentes": 3,
-   "ancho_puente": 0.7,
    "piezas_con_trazo_menor_de_0.8": 0
+  },
+  "letras_tpu": {
+   "piezas": 42,
+   "z_cara": 65.7,
+   "z_panel": 65.7,
+   "hueco": 1.2,
+   "techo_bajo_el_hueco": 1.5,
+   "con_tapa_mm3": 0.0,
+   "juego_por_lado": 0.15000000000000002,
+   "material_de_tapa_dentro_de_los_huecos_mm3": 0.0
   }
  },
  "fallos": []

@@ -299,53 +299,6 @@ def _nearest_on_ring(p, ring_pts):
     return best
 
 
-def _densify(ring_pts, step=0.25):
-    """Puntos cada `step` como maximo, para que haya candidatos en medio de los tramos rectos."""
-    out = []
-    n = len(ring_pts)
-    for i in range(n):
-        a, b = ring_pts[i], ring_pts[(i + 1) % n]
-        k = max(1, int(math.ceil(math.hypot(b[0] - a[0], b[1] - a[1]) / step)))
-        out += [(a[0] + (b[0] - a[0]) * j / k, a[1] + (b[1] - a[1]) * j / k) for j in range(k)]
-    return out
-
-
-def bridges(polys, width):
-    """Un puente por contraforma, entre el hueco y el contorno de fuera de su letra: de los tramos que
-    miden hasta 1.4 veces el mas corto, el mas vertical (corta un trazo horizontal, como en las letras de
-    plantilla) y, si hay varios, el de mas arriba. Devuelve [(a, b)]."""
-    out = []
-    for outer, holes in polys:
-        outer = _densify(outer)
-        for hole in holes:
-            hole = _densify(hole)
-            cands = []
-            for p in hole:
-                d, q = _nearest_on_ring(p, outer)
-                cands.append((d, p, q))
-            for p in outer:
-                d, q = _nearest_on_ring(p, hole)
-                cands.append((d, q, p))
-            dmin = min(c[0] for c in cands)
-            ok = [c for c in cands if c[0] <= 1.4 * dmin + 1e-9]
-            vert = max(abs(c[2][1] - c[1][1]) / max(c[0], 1e-9) for c in ok)
-            ok = [c for c in ok if abs(c[2][1] - c[1][1]) / max(c[0], 1e-9) >= vert - 0.02]
-            d, a, b = max(ok, key=lambda c: (round(c[1][1] + c[2][1], 1), -c[0]))
-            out.append((a, b))
-    return out
-
-
-def bridge_face(a, b, width, extend):
-    dx, dy = b[0] - a[0], b[1] - a[1]
-    L = math.hypot(dx, dy)
-    ux, uy = dx / L, dy / L
-    nx, ny = -uy * width / 2.0, ux * width / 2.0
-    a2 = (a[0] - ux * extend, a[1] - uy * extend)
-    b2 = (b[0] + ux * extend, b[1] + uy * extend)
-    return poly_face([(a2[0] + nx, a2[1] + ny, 0), (b2[0] + nx, b2[1] + ny, 0),
-                      (b2[0] - nx, b2[1] - ny, 0), (a2[0] - nx, a2[1] - ny, 0)])
-
-
 def glyph_face(outer, holes):
     wires = []
     for r in [outer] + list(holes):
@@ -355,12 +308,12 @@ def glyph_face(outer, holes):
 
 
 def label_groups():
-    """[(nombre, poligonos, ancho del puente)] del rotulo de la tapa."""
+    """[(nombre, poligonos)] del rotulo de la tapa."""
     lb = P['label']
-    out = [('logo', logo_polys(), lb['bridge']),
-           ('nombre', text_polys(lb['name'], lb['name_baseline'], width=lb['name_width']), lb['bridge'])]
+    out = [('logo', logo_polys()),
+           ('nombre', text_polys(lb['name'], lb['name_baseline'], width=lb['name_width']))]
     for i, (line, base) in enumerate(zip(lb['subtitle'], lb['subtitle_baselines'])):
-        out.append((f'subtitulo {i + 1}', text_polys(line, base, cap=lb['subtitle_cap']), lb['bridge_small']))
+        out.append((f'subtitulo {i + 1}', text_polys(line, base, cap=lb['subtitle_cap'])))
     return out
 
 
@@ -379,33 +332,22 @@ def _offset(face, d):
     return glyph_face(outer, [r for r in rings if r is not outer])
 
 
-def label_solids(z0, z1, grow, bridge_grow):
-    """Prismas del rotulo entre z0 y z1: letras desplazadas `grow` por lado y con los puentes (anchos
-    + 2 * bridge_grow) quitados. Devuelve (compuesto, datos de los puentes)."""
-    lb = P['label']
-    solids, info = [], []
-    for name, polys, bw in label_groups():
-        brs = bridges(polys, bw)
-        bfaces = [bridge_face(a, b, bw + 2 * bridge_grow, lb['bridge_extend']) for a, b in brs]
-        bcut = Part.makeCompound([f.extrude(V(0, 0, z1 - z0 + 2)) for f in bfaces]) if bfaces else None
+def label_solids(z0, z1, grow):
+    """Prismas del rotulo entre z0 y z1, una pieza por isla (letra, punto de la i, raya del logo),
+    desplazados `grow` por lado. Devuelve un compuesto."""
+    solids = []
+    for name, polys in label_groups():
         for outer, holes in polys:
             f = _offset(glyph_face(outer, holes), grow)
             s = f.extrude(V(0, 0, z1 - z0))
-            if bcut is not None:
-                s = s.cut(_moved(bcut, -1))
+            s.translate(V(0, 0, z0))
             solids.append(s)
-        for a, b in brs:
-            info.append({'grupo': name, 'ancho': bw, 'largo': round(math.hypot(b[0] - a[0], b[1] - a[1]), 2),
-                         'centro': [round((a[0] + b[0]) / 2, 2), round((a[1] + b[1]) / 2, 2)]})
-    comp = Part.makeCompound([s for s in solids])
-    comp.translate(V(0, 0, z0))
-    return comp, info
+    return Part.makeCompound(solids)
 
 
-def _moved(shape, dz):
-    s = shape.copy()
-    s.translate(V(0, 0, dz))
-    return s
+def label_face_z():
+    """z de la cara del panel rebajado de la tapa, donde van las letras."""
+    return ZT - P['label']['panel']['depth']
 
 
 # --- Base ------------------------------------------------------------------------
@@ -650,8 +592,9 @@ def lid():
     panel = box(pcx - pw / 2.0, pcx + pw / 2.0, pcy - ph / 2.0, pcy + ph / 2.0, ZT - pn['depth'], ZT + 1)
     panel = panel.makeFillet(pn['radius'], [e for e in panel.Edges if e.BoundBox.ZLength > 0.1 and e.BoundBox.XLength < 1e-6 and e.BoundBox.YLength < 1e-6])
     holes.append(panel)
-    win, _ = label_solids(Z_CEIL - 0.5, ZT + 0.5, lc['letter_clearance'], 0.0)
-    holes.append(win)
+    lb = P['label']
+    zf = label_face_z()
+    holes.append(label_solids(zf - lb['pocket_depth'], ZT + 0.5, lb['pocket_clearance']))
     t = t.cut(Part.makeCompound(holes))
     return clean(t)
 
@@ -715,13 +658,18 @@ def liner_pads():
 
 def liner(with_pads=True):
     lc = P['liner']
-    plate = prism(T + lc['clearance'], Z_CEIL - lc['thickness'], Z_CEIL)
-    z_face = ZT - P['label']['panel']['depth']
-    cols, info = label_solids(Z_CEIL - 0.2, z_face + lc['letter_proud'], -lc['letter_clearance'], lc['letter_clearance'])
-    s = plate.fuse(cols)
+    s = prism(T + lc['clearance'], Z_CEIL - lc['thickness'], Z_CEIL)
     if with_pads:
         s = s.fuse(liner_pads())
     return clean(s)
+
+
+def letters():
+    """Letras y logo de TPU para meter en los huecos de la tapa: tantos solidos como islas tiene el
+    rotulo, a ras de la cara del panel."""
+    lb = P['label']
+    zf = label_face_z()
+    return label_solids(zf - lb['pocket_depth'], zf, -lb['inlay_clearance'])
 
 
 # --- Pernos impresos (PA12) ------------------------------------------------------------------

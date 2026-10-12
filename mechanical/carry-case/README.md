@@ -2,7 +2,9 @@
 
 > **Estado:** geometría generada con scripts y comprobada en FreeCAD 1.1.3 contra el modelo
 > real de la carcasa V3.0 (piezas 01–10, con las bandas de TPU) y la antena HA-901A. Primera
-> versión del 12-10-2026. **No se ha impreso ni montado nada.** Rama `hw/compact-v03`.
+> versión del 12-10-2026. El mismo día las letras de la tapa pasaron a piezas sueltas de TPU en
+> huecos ciegos (pedido del propietario); la base no cambió. **No se ha impreso ni montado nada.**
+> Rama `hw/compact-v03`.
 > Resultados en [Verificaciones](#verificaciones).
 
 > **Antes de imprimir todo:**
@@ -14,12 +16,12 @@
 >    El modelo comprueba sólidos rígidos: no sabe cuánto se doblan la uña del perno ni el labio de la junta.
 > 2. **Probar la junta de TPU** en un tramo, con el TPU que se vaya a usar: cuánto cuesta cerrar y si sella.
 >    Si cuesta demasiado, adelgazar el labio (`seal.lip_thickness`).
-> 3. **Probar el forro con las letras** en un recorte de la tapa: que las letras entren por dentro
->    y queden a ras.
+> 3. **Probar unas letras de TPU** (09) en los huecos de la tapa: que entren con el juego de 0.15
+>    por lado y queden a ras.
 
 Estuche pequeño para llevar el receptor Meridian V v0.3 con su antena y, aparte, el cargador y
 extras. Lleva el logo de TresVizo y "MeridianV / TRIPLE BAND / RTK RECEIVER" en la tapa, con
-letras de TPU azul.
+letras de TPU azul metidas en huecos.
 
 Sin tornillería: bisagras y cierres con **pernos impresos** de punta partida, como los estuches
 "rugged box" imprimibles. Esos usan pernos impresos, trozos de filamento o piezas a presión, y
@@ -53,9 +55,10 @@ Medidas y notas de cada decisión en [parameters.json](parameters.json).
 | 07-hinge-pin (perno de bisagra) | PA12-HP negro | 2 | 0.8 cm³ c/u | ~0.8 g c/u |
 | 08-latch-pin (perno de cierre) | PA12-HP negro | 2 | 0.4 cm³ c/u | ~0.4 g c/u |
 | 05-seal-tpu (junta de labio) | TPU | 1 | 3.1 cm³ | ~4 g |
-| 06-liner-tpu (forro con las letras) | TPU azul #008AFC | 1 | 44.8 cm³ | ~54 g |
+| 06-liner-tpu (forro con almohadillas) | TPU | 1 | 43.3 cm³ | ~52 g |
+| 09-letters-tpu (letras y logo) | TPU azul #008AFC | 42 piezas | 0.6 cm³ | ~0.7 g |
 
-Total **325 cm³ de PA12 (~329 g) y 48 cm³ de TPU (~57 g): unos 386 g**. MJF imprime macizo, así que el
+Total **326 cm³ de PA12 (~330 g) y 47 cm³ de TPU (~56 g): unos 386 g**. MJF imprime macizo, así que el
 peso es el volumen por la densidad (1.01 y 1.2). En FDM, con relleno, la base y la tapa pesarían menos.
 
 ## Cómo va
@@ -113,7 +116,7 @@ como el de la bisagra). El perno pasa por las dos costillas de la base que lo fl
 Sella contra polvo y salpicaduras. **No es estanca** como un Pelican con junta tórica: para eso
 haría falta un cordón de silicona comprado.
 
-### Rótulo: letras de TPU en una sola pieza
+### Rótulo: letras de TPU en huecos de la tapa
 
 Bloque discreto de 62 × 49.4 en un panel rebajado 0.8 en el centro de la tapa:
 
@@ -123,22 +126,15 @@ Bloque discreto de 62 × 49.4 en un panel rebajado 0.8 en el centro de la tapa:
 
 La fuente es Ubuntu Bold, la que trae FreeCAD (Ubuntu Font Licence).
 
-Cómo se hace:
+Las letras van en **huecos ciegos de 1.2**: no atraviesan la tapa y debajo quedan 1.5 de techo.
+Son **piezas sueltas de TPU azul** (09), 42 en total: cada letra, los puntos de las i y las seis
+piezas del logo.
 
-- **Ventanas:** las letras y el logo están **calados** en el techo de la tapa.
-- **Forro (06):** una placa de TPU azul de 1.6 que va pegada al techo por dentro. Lleva las
-  letras en relieve, que entran **desde dentro** por las ventanas y quedan a ras por fuera (0.1
-  de más). Son **una sola pieza**: no hay que pegar letra por letra.
-  - Holgura de 0.05 por lado en la tapa y en el forro: 0.1 entre la letra y la ventana.
-- **Sujeción:** el forro entra justo en la tapa y lo retienen 6 topes de 0.6.
-
-**Lo que se ve:** como las letras entran por dentro, cada contraforma es una isla del techo y
-necesita un **puente** que la una al resto. Son las de la e, a, d, R, P, B, A, D, el interior del
-hexágono y la O.
-
-- Hay 14 puentes, de 0.9 de ancho en el logo y MeridianV y de 0.7 en las líneas chicas.
-- Se ven como una raya negra fina que corta el trazo, al estilo de las letras de plantilla (esténcil).
-- La otra opción, sin puentes, son letras sueltas pegadas una por una: unas 40 piezas.
+- Se meten en su hueco con una gota de pegamento y quedan a ras de la cara.
+- **Holgura:** el hueco va 0.05 más grande por lado que la letra dibujada y la pieza 0.1 más chica
+  por lado. Quedan 0.15 de juego, porque el TPU de FDM sale algo grueso.
+- Las contraformas (el ojo de la e, la R, la O, el interior del hexágono) son parte de la tapa y quedan negras.
+- Las letras quedan completas, sin puentes.
 
 ### Detalle rugged
 
@@ -157,23 +153,26 @@ hexágono y la O.
 ## Cómo se arma
 
 1. **Junta:** meter la tira de la junta (05) en la ranura de la tapa, con el labio hacia abajo, empujándola con el dedo todo alrededor.
-2. **Forro:** meter el forro (06) en la tapa con las letras hacia el techo, haciendo coincidir cada letra con su
-   ventana. Apretar hasta que pase los topes y las letras queden a ras por fuera. Si queda flojo,
-   unas gotas de pegamento de contacto en el borde.
-3. **Bisagra:** poner la tapa sobre la base y meter los dos pernos de bisagra (07), cada uno desde su extremo de
+2. **Forro:** meter el forro (06) en la tapa con las almohadillas hacia fuera y apretar hasta que pase los topes.
+   Si queda flojo, unas gotas de pegamento de contacto en el borde.
+3. **Letras:** meter cada letra (09) en su hueco, con una gota de pegamento instantáneo en gel en el
+   fondo, y apretar hasta que quede a ras.
+4. **Bisagra:** poner la tapa sobre la base y meter los dos pernos de bisagra (07), cada uno desde su extremo de
    fuera, hasta que la cabeza entre en su rebaje y la punta trabe del otro lado.
-4. **Cierres:** poner cada cierre (03, 04) entre sus dos costillas y meter su perno (08) desde el lado del centro del estuche.
+5. **Cierres:** poner cada cierre (03, 04) entre sus dos costillas y meter su perno (08) desde el lado del centro del estuche.
 
 ## Impresión
 
 - **PA12-HP negro (MJF), como la carcasa V3.0:** base, tapa, cierres y pernos. MJF no necesita
   soportes ni orientación especial.
   - Los pernos son piezas chicas (Ø4 × 60 y Ø3.5 × 36): pedirlos aparte o junto con lo demás.
-- **TPU:** junta y forro. El forro tiene que ser **azul #008AFC**, como las bandas del receptor.
+- **TPU:** junta, forro y letras. Las letras tienen que ser **azul #008AFC**, como las bandas del receptor.
   - Para TPU por FDM sin soportes:
     - `stl/05-seal-tpu-para-imprimir.stl`: la tira contra la cama y el labio hacia arriba;
-    - `stl/06-liner-tpu-sin-almohadillas-fdm.stl`: la placa contra la cama y las letras hacia arriba;
-    - `stl/06b-liner-pads-tpu-fdm.stl`: las 4 almohadillas aparte, para pegarlas.
+    - `stl/06-liner-tpu-sin-almohadillas-fdm.stl`: la placa contra la cama;
+    - `stl/06b-liner-pads-tpu-fdm.stl`: las 4 almohadillas aparte, para pegarlas;
+    - `stl/09-letters-tpu-para-imprimir.stl`: las 42 letras, con la cara que se ve contra la cama
+      (salen en espejo; al voltearlas quedan bien). Capas de 0.2: son 6.
   - En polvo (MJF o SLS) vale `stl/06-liner-tpu.stl` de una pieza.
 
 Archivos en [generated](generated): `TresVizo-CarryCase.FCStd` (con el receptor de referencia), `step/`, `stl/`,
@@ -194,7 +193,8 @@ Archivos en [generated](generated): `TresVizo-CarryCase.FCStd` (con el receptor 
 - **Cierres:** de 0 a 60 grados no tocan la base. El gancho hunde la tapa como máximo 0.46 (a los
   12 grados) y suelta a los 16.
 - **Pernos:** puestos, no chocan con nada.
-- **Rótulo:** ninguna pieza con trazo de menos de 0.8.
+- **Rótulo:** ninguna pieza con trazo de menos de 0.8. Las 42 letras quedan a ras, no tocan la
+  tapa y no queda material de la tapa dentro de los huecos.
 - **Mallas:** todas las piezas son un sólido válido con la malla cerrada.
 
 **No se comprobó** (pendiente de la impresión de prueba):
@@ -202,7 +202,7 @@ Archivos en [generated](generated): `TresVizo-CarryCase.FCStd` (con el receptor 
 - la fuerza de la uña de los pernos;
 - cuánto empuja de verdad el labio de TPU, ni si sella;
 - la fuerza del clic de los cierres;
-- el ajuste real de las letras en las ventanas, con las tolerancias de MJF y del TPU.
+- el ajuste real de las letras en sus huecos, con las tolerancias de MJF y del TPU.
 
 ## Regenerar
 

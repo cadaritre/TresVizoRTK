@@ -138,9 +138,9 @@ for n in [x for x in case_names if x.startswith(('07', '08'))]:
         if v >= EPS:
             fails.append(f'perno {n} choca con {k} ({v:.3f} mm3)')
 
-# --- 6. Rotulo: trazos finos y puentes ----------------------------------------------------------
+# --- 6. Rotulo: trazos finos, letras en sus huecos y a ras ---------------------------------------
 label = {}
-for name, polys, bw in G.label_groups():
+for name, polys in G.label_groups():
     thin = 0
     for o, hs in polys:
         f = G.glyph_face(o, hs)
@@ -150,8 +150,24 @@ for name, polys, bw in G.label_groups():
                 thin += 1
         except Exception:
             thin += 1
-    label[name] = {'piezas': len(polys), 'puentes': len(G.bridges(polys, bw)), 'ancho_puente': bw,
-                   'piezas_con_trazo_menor_de_0.8': thin}
+    label[name] = {'piezas': len(polys), 'piezas_con_trazo_menor_de_0.8': thin}
+    if thin:
+        fails.append(f'rotulo {name}: {thin} piezas con trazo de menos de 0.8')
+let = S['09_letters_tpu']
+zf = G.label_face_z()
+lb = G.P['label']
+label['letras_tpu'] = {'piezas': len(let.Solids), 'z_cara': round(let.BoundBox.ZMax, 3), 'z_panel': round(zf, 3),
+                       'hueco': lb['pocket_depth'], 'techo_bajo_el_hueco': round(zf - lb['pocket_depth'] - G.Z_CEIL, 2),
+                       'con_tapa_mm3': round(vol(let, S['02_lid']), 3),
+                       'juego_por_lado': lb['pocket_clearance'] + lb['inlay_clearance']}
+if abs(let.BoundBox.ZMax - zf) > 1e-3:
+    fails.append('las letras no quedan a ras del panel')
+# Cada letra tiene que llenar su hueco: la letra agrandada el juego tiene que caber y llenar.
+lid_solid = S['02_lid']
+pocket_fill = vol(G.label_solids(zf - lb['pocket_depth'] + 0.01, zf - 0.01, lb['pocket_clearance'] - 0.01), lid_solid)
+label['letras_tpu']['material_de_tapa_dentro_de_los_huecos_mm3'] = round(pocket_fill, 3)
+if pocket_fill >= EPS:
+    fails.append(f'quedo material de la tapa dentro de los huecos de las letras ({pocket_fill:.3f} mm3)')
 
 # --- 7. Volumenes, peso y medidas --------------------------------------------------------------
 dens = {'PA12': 1.01, 'TPU': 1.2}
