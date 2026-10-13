@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import meridian_flasher as mf  # noqa: E402
 
-MERIDIANV, RADIO = mf.MODELS
+MERIDIANV, RADIO, MERIDIANV_V03 = mf.MODELS
 
 
 def fake_app(hardware_id=b'', version=b'0.7.14', size=4096):
@@ -136,6 +136,23 @@ class CommandTests(unittest.TestCase):
         with self.assertRaises(mf.FlasherError):
             mf.flash_command(['esptool.py'], 'COM3', 'app.bin', 'boot.bin', True)
 
+    def test_v03_board_uses_its_own_flash(self):
+        # Placa v0.3: WROOM-1-N16R2, 16 MB, con los mismos argumentos que `pio run -t upload`.
+        command = mf.flash_command(['esptool.py'], 'COM3', 'app.bin', 'boot.bin', False, flash_args=MERIDIANV_V03.flash_args)
+        self.assertEqual(command[command.index('--flash_size') + 1], '16MB')
+        self.assertEqual(command[command.index('--flash_mode') + 1], 'dio')
+        self.assertEqual(command[command.index('16MB') + 1:], ['0xe000', 'boot.bin', '0x10000', 'app.bin'])
+        # La Thing Plus sigue en 4 MB, también sin pasar flash_args (llamadas viejas).
+        self.assertIn('4MB', mf.flash_command(['esptool.py'], 'COM3', 'a', 'b', False, flash_args=MERIDIANV.flash_args))
+        self.assertIn('4MB', mf.flash_command(['esptool.py'], 'COM3', 'a', 'b', False))
+        # Mismo producto, otra placa: se distinguen por hardware_id y por entorno.
+        self.assertEqual(MERIDIANV_V03.name, MERIDIANV.name)
+        self.assertNotEqual(MERIDIANV_V03.hardware_id, MERIDIANV.hardware_id)
+        self.assertEqual(mf.status_model({'hardware_id': MERIDIANV_V03.hardware_id}), MERIDIANV_V03)
+        self.assertEqual(mf.model_by_hardware_id(fake_app(MERIDIANV_V03.hardware_id.encode())), MERIDIANV_V03)
+        self.assertEqual(MERIDIANV_V03.build_dir.name, 'meridianv_v03')
+        self.assertEqual(len({m.env for m in mf.MODELS}), len(mf.MODELS))
+
     def test_progress(self):
         self.assertEqual(mf.parse_progress('Writing at 0x0001c000... (12 %)'), 12)
         self.assertEqual(mf.parse_progress('Writing at 0x0001c000... (100%)'), 100)
@@ -167,6 +184,17 @@ class RealBuildTests(unittest.TestCase):
         self.assertEqual(signed.app, (folder / 'firmware.bin').read_bytes())
         # Con openssl en la Mac, la firma se comprueba de verdad.
         self.assertIn(signed.signature_ok, (True, None), signed.signature_message)
+
+    def test_v03_images(self):
+        folder = MERIDIANV_V03.build_dir
+        if not (folder / 'firmware-signed.bin').is_file():
+            self.skipTest('falta la compilación de la placa v0.3: pio run -e meridianv_v03')
+        for name in ('firmware.bin', 'firmware-signed.bin'):
+            info = mf.inspect_image(folder / name)
+            self.assertEqual(info.model, MERIDIANV_V03, name)
+            self.assertEqual(mf.image_hardware_id(info.app), MERIDIANV_V03.hardware_id)
+        # Mientras las apps comparen con 1 966 080 bytes (max_image_bytes).
+        self.assertLessEqual(len((folder / 'firmware.bin').read_bytes()), 1966080)
 
     def test_radio_image(self):
         image = RADIO.build_dir / 'firmware.bin'

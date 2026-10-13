@@ -110,8 +110,9 @@ void cancel(const char* why) {
 void tick() {
     // Esperando la confirmación del receptor tras enviar la coordenada.
     if (!strcmp(state.load(), "applying")) {
-        JsonDocument control;gnss_control::status(control.to<JsonObject>());
-        if(control["job_id"].as<uint32_t>()!=applyingJob) {
+        // Antes armaba el estado completo del GPS en un JsonDocument en cada
+        // pasada del bucle (cada ~2 ms) solo para leer el número de trabajo.
+        if(gnss_control::currentJob()!=applyingJob) {
             stop("cancelled","Sustituido por otra operación del GPS.");return;
         }
         if (gnss_control::busy()) return;

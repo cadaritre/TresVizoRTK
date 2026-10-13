@@ -6,20 +6,37 @@
 #include <freertos/stream_buffer.h>
 #include <mbedtls/base64.h>
 #include <atomic>
-#define SD_CONFIGURED  // Socket SDIO integrado en la Thing Plus.
+#define SD_CONFIGURED  // SDMMC de 4 bits: zócalo de la Thing Plus o TF-015 (J401) de la placa v0.3.
 namespace sd_recorder {
 namespace {
 std::atomic<bool> shutdownRequested{false};
 std::atomic<bool> recording{false},closing{false};std::atomic<unsigned> inFlight{0};std::atomic<uint32_t> dropped{0};
 SemaphoreHandle_t mutex=nullptr;StreamBufferHandle_t queue=nullptr;
-const char* phase="not_configured";String id;uint32_t written=0;std::atomic<bool> available{false};
+// `phase`, `written` y la copia del identificador se leen sin el mutex: el estado
+// se consulta una vez por segundo desde BLE, HTTP y la OLED, y el escritor puede
+// tener el mutex ocupado mientras la tarjeta termina una escritura, un flush o un
+// renombrado (cientos de ms en una tarjeta lenta). Con portMAX_DELAY ahí, una
+// tarjeta lenta paraba /api/status y, con él, el bucle del Bluetooth.
+std::atomic<const char*> phase{"not_configured"};String id;std::atomic<uint32_t> written{0};std::atomic<bool> available{false};
+portMUX_TYPE idLock=portMUX_INITIALIZER_UNLOCKED;char idCopy[25]={};
+void publishId(){portENTER_CRITICAL(&idLock);strncpy(idCopy,id.c_str(),sizeof(idCopy)-1);idCopy[sizeof(idCopy)-1]=0;portEXIT_CRITICAL(&idLock);}
+// Las órdenes que tocan la tarjeta esperan al escritor como mucho esto: se
+// ejecutan con el mutex del instrumento tomado y no deben retener al Bluetooth.
+constexpr uint32_t kRequestWaitMs=500;
+// La polaridad de la detección es del perfil de placa: en la Thing Plus y en la
+// v0.3 (inversor Q401) el pin está en HIGH con tarjeta. Sin pin de detección la
+// tarjeta cuenta como presente; si falta de verdad, el montaje falla y lo dice.
+bool cardPresent(){
+ if(board_profile::kSdDetect<0)return true;
+ return (digitalRead(board_profile::kSdDetect)==HIGH)!=board_profile::kSdDetectActiveLow;
+}
 #ifdef SD_CONFIGURED
 fs::SDMMCFS& card = SD_MMC;
 File file;uint32_t flushed=0;bool stopRequested=false;
 void manifest(const char* state){
  File metadata=card.open(("/sessions/"+id+"/manifest.json").c_str(),FILE_WRITE);
  if(!metadata)return;
- JsonDocument doc;doc["id"]=id;doc["state"]=state;doc["bytes"]=written;doc["dropped_bytes"]=dropped.load();doc["rinex_available"]=false;doc["ppk_accuracy_validated"]=false;doc["source"]="esp32_uart";doc["antenna_metadata_confirmed"]=false;
+ JsonDocument doc;doc["id"]=id;doc["state"]=state;doc["bytes"]=written.load();doc["dropped_bytes"]=dropped.load();doc["rinex_available"]=false;doc["ppk_accuracy_validated"]=false;doc["source"]="esp32_uart";doc["antenna_metadata_confirmed"]=false;
  serializeJson(doc,metadata);metadata.flush();metadata.close();
 }
 void worker(void*){
@@ -27,7 +44,7 @@ void worker(void*){
  for(;;){
   size_t n=xStreamBufferReceive(queue,buffer,sizeof(buffer),pdMS_TO_TICKS(20));
   xSemaphoreTake(mutex,portMAX_DELAY);
-  if(digitalRead(board_profile::kSdDetect)!=HIGH){
+  if(!cardPresent()){
    available=false;
    if(file){
     // No renombrar como completa una sesión cuya tarjeta se retiró. Drenar
@@ -38,13 +55,13 @@ void worker(void*){
   }
   if(file && n){
    size_t count=file.write(buffer,n);written+=count;
-   if(count!=n || written>=64*1024*1024){dropped+=n-count;recording=false;stopRequested=true;closing=true;phase="partial";}
+   if(count!=n || written.load()>=64*1024*1024){dropped+=n-count;recording=false;stopRequested=true;closing=true;phase="partial";}
   }
   if(file && millis()-flushed>2000){file.flush();flushed=millis();}
   if(file && stopRequested && !inFlight && !xStreamBufferBytesAvailable(queue)){
-   file.flush();file.close();bool complete=!dropped && strcmp(phase,"partial")!=0;
+   file.flush();file.close();bool complete=!dropped && strcmp(phase.load(),"partial")!=0;
    if(complete)complete=card.rename(("/sessions/"+id+"/stream.part").c_str(),("/sessions/"+id+"/stream.bin").c_str());
-   phase=complete?"closed":"partial";manifest(phase);stopRequested=false;closing=false;
+   phase=complete?"closed":"partial";manifest(phase.load());stopRequested=false;closing=false;
   }
   xSemaphoreGive(mutex);
  }
@@ -54,26 +71,27 @@ void worker(void*){
 bool active(){return recording||closing;}
 const char* displayState(){
  if(!mutex)return "not_configured";
- if(digitalRead(board_profile::kSdDetect)!=HIGH)return "card_missing";
+ if(!cardPresent())return "card_missing";
  if(closing)return "closing";
  if(recording)return "recording";
- if(xSemaphoreTake(mutex,0)!=pdTRUE)return "busy";
- const char* result=phase; // phase siempre apunta a literales, nunca al archivo.
- xSemaphoreGive(mutex);return result;
+ // phase siempre apunta a literales, nunca al archivo, y es atómico.
+ return phase.load();
 }
 bool prepareShutdown(){
  shutdownRequested=true;
  if(!mutex)return true;
  if(xSemaphoreTake(mutex,0)!=pdTRUE)return false;
- if(file){recording=false;closing=true;stopRequested=true;if(strcmp(phase,"partial")!=0)phase="closing";}
+ if(file){recording=false;closing=true;stopRequested=true;if(strcmp(phase.load(),"partial")!=0)phase="closing";}
  const bool ready=!file && !active() && !inFlight;
  xSemaphoreGive(mutex);return ready;
 }
 void begin(){
  mutex=xSemaphoreCreateMutex();if(!mutex)return;
 #ifdef SD_CONFIGURED
- pinMode(board_profile::kSdDetect, INPUT_PULLDOWN);
- if(digitalRead(board_profile::kSdDetect)!=HIGH){phase="card_missing";return;}
+ // Pull interno solo si la placa no trae uno (v0.3: R407, 100 kΩ a GND).
+ if(board_profile::kSdDetect>=0)pinMode(board_profile::kSdDetect, !board_profile::kSdDetectInternalPull ? INPUT
+   : board_profile::kSdDetectActiveLow ? INPUT_PULLUP : INPUT_PULLDOWN);
+ if(!cardPresent()){phase="card_missing";return;}
  if(!card.setPins(board_profile::kSdClock,board_profile::kSdCommand,board_profile::kSdD0,
                   board_profile::kSdD1,board_profile::kSdD2,board_profile::kSdD3)){
   phase="pin_setup_failed";return;
@@ -103,23 +121,26 @@ void feed(const uint8_t* data,size_t length){
 }
 void status(JsonObject out){
  if(!mutex){out["state"]="start_failed";return;}
- xSemaphoreTake(mutex,portMAX_DELAY);
- const bool present=digitalRead(board_profile::kSdDetect)==HIGH;
- out["state"]=phase;out["available"]=available && present;out["card_present"]=present;
+ // Sin el mutex: todo lo que se publica es atómico o una copia (ver `phase`).
+ const bool present=cardPresent();
+ out["state"]=phase.load();out["available"]=available && present;out["card_present"]=present;
  out["shutdown_pending"]=shutdownRequested.load();
  out["interface"]="sdmmc_4bit";out["active"]=recording.load();out["closing"]=closing.load();
- out["session_id"]=id;out["bytes"]=written;out["dropped_bytes"]=dropped.load();
+ char session[sizeof(idCopy)];portENTER_CRITICAL(&idLock);memcpy(session,idCopy,sizeof(session));portEXIT_CRITICAL(&idLock);
+ out["session_id"]=session;out["bytes"]=written.load();out["dropped_bytes"]=dropped.load();
  out["storage"]="microsd"; // Identificador técnico conservado para clientes existentes.
  out["storage_label"]="Memoria interna del dispositivo";
  out["max_session_bytes"]=64*1024*1024;out["rinex_available"]=false;
- xSemaphoreGive(mutex);
 }
 int request(const String& method,const String& path,JsonVariantConst body,JsonDocument& out){
  if(method=="GET" && path=="/api/recording"){status(out.to<JsonObject>());return 200;}
  if(!mutex){out["message"]="No se pudo iniciar la memoria interna del dispositivo.";return 503;}
- if(path!="/api/recording/stop" && (!available || digitalRead(board_profile::kSdDetect)!=HIGH)){out["message"]="Memoria interna del dispositivo no disponible. Revisa el almacenamiento y reinicia el equipo; no se borra ni formatea automáticamente.";return 503;}
+ if(path!="/api/recording/stop" && (!available || !cardPresent())){out["message"]="Memoria interna del dispositivo no disponible. Revisa el almacenamiento y reinicia el equipo; no se borra ni formatea automáticamente.";return 503;}
 #ifdef SD_CONFIGURED
- xSemaphoreTake(mutex,portMAX_DELAY);int code=400;
+ if(xSemaphoreTake(mutex,pdMS_TO_TICKS(kRequestWaitMs))!=pdTRUE){
+  out["error"]="busy";out["message"]="La memoria interna del dispositivo está terminando una escritura. Intenta de nuevo en un momento.";return 503;
+ }
+ int code=400;
  if(method=="GET" && path=="/api/recording/sessions") {
   auto rows=out["sessions"].to<JsonArray>();File directory=card.open("/sessions");
   for(unsigned i=0;directory&&i<32;++i){File folder=directory.openNextFile();if(!folder)break;
@@ -127,7 +148,7 @@ int request(const String& method,const String& path,JsonVariantConst body,JsonDo
     String identity=folder.name();identity=identity.substring(identity.lastIndexOf('/')+1);
     String root="/sessions/"+identity;bool complete=card.exists((root+"/stream.bin").c_str());
     File stream=card.open((root+(complete?"/stream.bin":"/stream.part")).c_str());
-    if(stream){auto row=rows.add<JsonObject>();row["session_id"]=identity;row["bytes"]=stream.size();row["state"]=(identity==id && file)?phase:(complete?"closed":"interrupted");stream.close();}
+    if(stream){auto row=rows.add<JsonObject>();row["session_id"]=identity;row["bytes"]=stream.size();row["state"]=(identity==id && file)?phase.load():(complete?"closed":"interrupted");stream.close();}
    }folder.close();
   }directory.close();code=200;
  }
@@ -135,7 +156,7 @@ int request(const String& method,const String& path,JsonVariantConst body,JsonDo
   if(shutdownRequested||recording||file||gnss_control::busy()){code=409;out["message"]="Espera a que termine la operación del GPS o el cierre de la grabación antes de iniciar otra sesión.";}
   else if(card.totalBytes()-card.usedBytes()<8*1024*1024){code=409;out["message"]="Espacio insuficiente.";}
   else {
-   char name[25];snprintf(name,sizeof(name),"%08lx%08lx%08lx",(unsigned long)esp_random(),(unsigned long)esp_random(),(unsigned long)esp_random());id=name;
+   char name[25];snprintf(name,sizeof(name),"%08lx%08lx%08lx",(unsigned long)esp_random(),(unsigned long)esp_random(),(unsigned long)esp_random());id=name;publishId();
    String folder="/sessions/"+id;
    if(card.exists(folder.c_str())||!card.mkdir(folder.c_str())){code=503;out["message"]="No se pudo crear la sesión en la memoria interna del dispositivo.";}
    else {
@@ -150,7 +171,7 @@ int request(const String& method,const String& path,JsonVariantConst body,JsonDo
   else {
    recording=false;stopRequested=true;closing=true;
    // Repetir stop no debe convertir un cierre fallido en uno completo.
-   if(strcmp(phase,"partial")!=0)phase="closing";
+   if(strcmp(phase.load(),"partial")!=0)phase="closing";
    code=202;
   }
  }

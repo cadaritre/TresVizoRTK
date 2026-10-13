@@ -39,12 +39,30 @@ int main(){
   assert(host=="second.test");assert(std::string(ntrip_input::failure.load()).empty());throw Done();return false;
  };
  runWorker();assert(attempts==2 && hostSocketRequests.empty());
- // Sustituir sourcetable durante connect: no GET antiguo ni tabla en la nueva sesión.
- ntrip_input::stopForUser();
+ // Sourcetable por una conexión aparte (0.9.0): pedirla no suelta el NTRIP activo
+ // ni cambia la fuente, y empezar otra conexión NTRIP mientras llega no la cancela.
+ assert(start(first)==202 && ntrip_input::active() && selected=="ntrip");
+ uint32_t streaming=ntrip_input::generation;
+ out.clear();
  assert(ntrip_input::sourcetableRequest("POST",body("{\"host\":\"table.test\",\"port\":2101}").as<JsonVariantConst>(),out)==202);
- hostOnConnect=[&](const std::string&){assert(start(second)==202);return true;};
- WiFiClient client;ntrip_input::fetchSourcetable(client);hostOnConnect={};
- assert(ntrip_input::active() && !ntrip_input::tableWanted && hostSocketRequests.empty());
+ assert(ntrip_input::active() && ntrip_input::generation==streaming && selected=="ntrip" && out["ntrip_kept"]==true && out["separate_connection"]==true);
+ assert(ntrip_input::tableTaskRunning && ntrip_input::tableWanted && std::string(ntrip_input::tableState.load())=="loading");
+ hostSocketRequests.clear();
+ hostSocketInput="SOURCETABLE 200 OK\r\nSTR;MOUNT1;Id;RTCM 3.3;1005(10);2;GPS+GLO;NET;MEX;19.4;-99.1;0;0;x\r\nENDSOURCETABLE\r\n";
+ hostOnConnect=[&](const std::string& host){assert(host=="table.test");assert(start(second)==202);return true;};
+ {WiFiClient client;ntrip_input::fetchSourcetable(client);}hostOnConnect={};
+ assert(ntrip_input::active() && ntrip_input::config.host=="second.test" && !ntrip_input::tableWanted);
+ assert(hostSocketRequests.size()==1 && hostSocketRequests[0].rfind("GET / HTTP/1.0",0)==0);
+ assert(std::string(ntrip_input::tableState.load())=="ready" && ntrip_input::mountCount==1 && ntrip_input::mounts[0].name=="MOUNT1");
+ // Una petición nueva sustituye a la que está en curso: la vieja no deja tabla.
+ assert(ntrip_input::sourcetableRequest("POST",body("{\"host\":\"old.test\",\"port\":2101}").as<JsonVariantConst>(),out)==202);
+ hostSocketRequests.clear();
+ hostOnConnect=[&](const std::string&){assert(ntrip_input::sourcetableRequest("POST",body("{\"host\":\"new.test\",\"port\":2101}").as<JsonVariantConst>(),out)==202);return true;};
+ {WiFiClient client;ntrip_input::fetchSourcetable(client);}hostOnConnect={};
+ assert(hostSocketRequests.empty() && ntrip_input::tableWanted && ntrip_input::mountCount==0);
+ assert(ntrip_input::tableHost=="new.test");
+ ntrip_input::tableWanted=false;ntrip_input::tableTaskRunning=false;   // en el equipo, la tarea al salir
+ hostSocketInput.clear();
  // Cambio durante lectura de RTCM: el callback de la trama anterior no la envía.
  std::string frame="\xd3\x00\x04\x3e\xd0\x00\x00"s;
  const uint32_t crc=gnss::crc24q(reinterpret_cast<const uint8_t*>(frame.data()),frame.size());
@@ -69,7 +87,9 @@ int main(){
  ntrip_input::stopForUser();ntrip_input::tick();assert(!ntrip_input::active());
  ntrip_input::userStopped=false;wantsBase=true;ntrip_input::tick();assert(!ntrip_input::active());
  wantsBase=false;gnssBusy=true;ntrip_input::tick();assert(!ntrip_input::active());
- gnssBusy=false;ntrip_input::tick();assert(ntrip_input::active());
+ // F9: sin enlace la autoconexión espera; no vuelve a pedir la conexión en ciclo.
+ gnssBusy=false;WiFi.state=0;ntrip_input::tick();assert(!ntrip_input::active());
+ WiFi.state=WL_CONNECTED;ntrip_input::tick();assert(ntrip_input::active());
  base=true;ntrip_input::tick();assert(!ntrip_input::active());
  assert(start(second)==409);
  std::puts("ntrip_priority_integration: OK");

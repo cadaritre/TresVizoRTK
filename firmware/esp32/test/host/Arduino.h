@@ -50,6 +50,7 @@ inline SemaphoreHandle_t xSemaphoreCreateMutex(){static HostMutex locks[16];stat
 inline int xSemaphoreTake(SemaphoreHandle_t m,int){assert(m && !m->held);m->held=true;return pdTRUE;}
 inline void xSemaphoreGive(SemaphoreHandle_t m){assert(m && m->held);m->held=false;}
 inline int xTaskCreate(void(*)(void*),const char*,unsigned,void*,int,void*){return pdPASS;}
+inline void vTaskDelete(void*){}
 inline std::function<void()> hostOnDelay;
 inline void vTaskDelay(uint32_t ms){hostMillis+=ms;if(hostOnDelay)hostOnDelay();}
 struct HardwareSerial {

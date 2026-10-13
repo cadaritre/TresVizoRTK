@@ -22,7 +22,14 @@ struct Snapshot {
     uint32_t correction_queue_bytes = 0, correction_queue_high_water_bytes = 0, correction_queue_capacity_bytes = 0;
     // Salud del binario nativo Unicore (OBSVMB y efemerides usadas para PPK).
     uint32_t native_valid = 0, native_invalid = 0;
+    // Mayor tiempo, en ms, que una corrección esperó en la cola porque había una
+    // orden de configuración en curso por la misma UART (desde 0.9.0). Mientras
+    // el receptor contesta una orden no se empieza otra trama RTCM; si esto se
+    // acerca a los 2 s de caducidad, configurar el GPS cuesta correcciones.
+    uint32_t correction_hold_max_ms = 0;
     bool enabled = false, start_failed = false;
+    // La placa enciende el GNSS por GPIO (v0.3: GPIO45 → TPS63070) y se encendió.
+    bool power_switched = false;
 };
 void begin();
 bool enqueueCorrections(const uint8_t* data, size_t length);

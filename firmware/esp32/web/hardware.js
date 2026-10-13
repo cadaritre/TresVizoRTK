@@ -57,10 +57,13 @@ function renderRecording(sd, pending = false) {
 function renderHardwareState(data) {
   const power=data?.subsystems?.power;
   const powerNode=document.getElementById("power-state");
+  // La placa v0.3 lee su cargador (BQ25798); la Thing Plus manda null.
+  const charger=typeof power?.charging!=="boolean" ? "Estado del cargador no disponible"
+    : power.charging ? "Cargando" : power.usb_present ? "USB conectado, sin cargar" : "Sin USB";
   if(powerNode) powerNode.textContent=!power ? "Sin comunicación" : power.shutdown_pending
     ? (power.state==="power_still_present" ? "Corte solicitado: el equipo sigue alimentado. Desconecta las fuentes externas para apagarlo." : "Apagando: cerrando memoria interna…")
-    : power.gauge_available ? `${power.percent.toFixed(0)} % · ${power.voltage_v.toFixed(2)} V${power.low_battery ? " · Batería baja" : ""} · Estado del cargador no disponible`
-    : "Batería sin lectura · Estado del cargador no disponible";
+    : power.gauge_available ? `${power.percent.toFixed(0)} % · ${power.voltage_v.toFixed(2)} V${power.low_battery ? " · Batería baja" : ""} · ${charger}`
+    : `Batería sin lectura · ${charger}`;
   const offButton=document.getElementById("power-off");
   if(offButton) offButton.disabled=!power || power.shutdown_pending;
   text("diag-board", data?.board || (data ? "No informada por este firmware" : "—"));

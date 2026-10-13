@@ -3,6 +3,7 @@
 #include "board_profile.h"
 #include "local_display.h"
 #include "power_manager.h"
+#include "imu_probe.h"
 #include "ntrip_input.h"
 #include "gnss_control.h"
 #include "gnss_sky.h"
@@ -20,6 +21,7 @@
 #include "telemetry_ws.h"
 #include "health_packet.h"
 #include "gnss_visible.h"
+#include "device_identity.h"
 
 #include <Preferences.h>
 #include <WiFi.h>
@@ -27,14 +29,20 @@
 #include <atomic>
 #include <esp_system.h>
 #include <esp_timer.h>
+#include <esp_mac.h>
 
 namespace instrument {
 namespace {
 Preferences preferences;
-// El equipo se llama MeridianV y el nombre no se edita: la red que emite debe
-// ser reconocible en campo sin consultar a nadie. 3Vizo es la marca del panel.
-constexpr const char* kDeviceName = "MeridianV";
+// El equipo se llama como su modelo y el nombre no se edita: la red que emite
+// debe ser reconocible en campo sin consultar a nadie. 3Vizo es la marca del
+// panel. El MeridianV conserva «MeridianV» (`kPerUnitNetworkName` = false):
+// hay apps y radios en campo que lo buscan por ese nombre.
+constexpr const char* kDeviceName = board_profile::kModel;
 String deviceName = kDeviceName;
+// Identidad de la unidad, calculada una vez en begin() con la MAC de fábrica.
+device_identity::Identity unitIdentity;
+String hostName;
 String stationSsid;
 String stationPassword;
 String apKey;
@@ -53,6 +61,8 @@ bool apReady = false;
 bool pendingNetwork = false;
 uint32_t networkChangedAt = 0;
 uint32_t lastConnectionAttempt = 0;
+// Escaneos seguidos sin ver ninguna red guardada (config_rules::rescanDelayMs).
+uint32_t scanMisses = 0;
 // Red elegida a mano. Si está a la vista se prefiere a la de mejor señal: al
 // encender el equipo se une a la mejor, y sin esto no había forma de quedarse
 // en otra. Se guarda en NVS para que valga también tras reiniciar.
@@ -621,6 +631,23 @@ void status(JsonDocument& response) {
     response["hardware_id"] = board_profile::kHardwareId;
     response["board"] = board_profile::kName;
     response["device_name"] = deviceName;
+    // Identidad del receptor (docs/api-contract/receiver-identity.md): qué
+    // modelo y qué unidad. Las apps recuerdan la unidad por `serial`.
+    response["model"] = board_profile::kModel;
+    if (unitIdentity.serial[0]) {
+        response["serial"] = unitIdentity.serial;
+        response["unit_name"] = unitIdentity.unitName;
+    } else {
+        response["serial"] = nullptr;
+        response["unit_name"] = nullptr;
+    }
+    JsonObject capabilities = response["capabilities"].to<JsonObject>();
+    capabilities["gnss_module"] = board_profile::kGnssModule;
+    capabilities["lora_radio"] = board_profile::kLoraIntegrated;
+    capabilities["imu"] = board_profile::kImu;
+    capabilities["battery_chemistry"] = board_profile::kBatteryChemistry;
+    capabilities["removable_storage"] = board_profile::kRemovableStorage;
+    capabilities["ip_rating"] = board_profile::kIpRating;
     response["phase"] = "commissioning";
     response["uptime_ms"] = static_cast<uint64_t>(esp_timer_get_time() / 1000);
     memory_health::status(response["memory"].to<JsonObject>());
@@ -725,6 +752,9 @@ void status(JsonDocument& response) {
     sd_recorder::status(response["subsystems"]["microsd"].as<JsonObject>());
     local_display::status(response["subsystems"]["display"].to<JsonObject>());
     power_manager::status(response["subsystems"]["power"].to<JsonObject>());
+    // `state` sigue en not_integrated: no hay driver de IMU. La placa v0.3 añade
+    // lo que comprobó al arrancar (identificador de chip del BMI088).
+    imu_probe::status(response["subsystems"]["imu"].as<JsonObject>());
     response["solution"]["fix"] = nullptr;
     response["solution"]["latitude_deg"] = nullptr;
     response["solution"]["longitude_deg"] = nullptr;
@@ -741,6 +771,13 @@ void status(JsonDocument& response) {
     health["tx_gpio"] = TRESVIZO_GNSS_TX;
     health["baud"] = TRESVIZO_GNSS_BAUD;
     health["state"] = gnss.start_failed ? "start_failed" : "not_integrated";
+    health["module"] = board_profile::kGnssModule;
+    // Placa v0.3: el 5 V de la carrier lo enciende GPIO45 (aditivo, solo HTTP/USB).
+    if (board_profile::kGnssPowerEnable >= 0) {
+        health["power_gpio"] = board_profile::kGnssPowerEnable;
+        health["power_on"] = gnss.power_switched;
+        health["pps_gpio"] = board_profile::kGnssPps;
+    }
     health["accepted_gga"] = gnss.accepted;
     health["rejected_gga"] = gnss.rejected;
     health["line_overflows"] = gnss.overflow;
@@ -758,6 +795,7 @@ void status(JsonDocument& response) {
     health["correction_queue_bytes"] = gnss.correction_queue_bytes;
     health["correction_queue_high_water_bytes"] = gnss.correction_queue_high_water_bytes;
     health["correction_queue_capacity_bytes"] = gnss.correction_queue_capacity_bytes;
+    health["correction_hold_max_ms"] = gnss.correction_hold_max_ms;
     // Salud del binario nativo Unicore; es el formato de OBSVMB usado para PPK.
     health["native_frames_valid"] = gnss.native_valid;
     health["native_frames_invalid"] = gnss.native_invalid;
@@ -907,15 +945,25 @@ void begin() {
         apKey = preferences.getString("ap_password", "");
     }
     if (!config_rules::password(apKey.c_str())) apKey = kDefaultApPassword;
-    // Sin sufijo de MAC: el nombre es del producto, no de la unidad. Si algún día
-    // hay dos equipos encendidos en la misma obra, sus redes se verán iguales.
-    deviceName = kDeviceName;
-    networkName = kDeviceName;
+    // MeridianV: sin sufijo de MAC; el nombre es del producto, no de la unidad,
+    // y las apps y los radios en campo lo buscan así. MeridianVI: el nombre de la
+    // unidad, porque base y rover del mismo modelo trabajan juntos en la obra.
+    uint8_t mac[device_identity::kMacBytes] = {};
+    if (esp_efuse_mac_get_default(mac) == ESP_OK)
+        device_identity::make(mac, board_profile::kModel, board_profile::kModelCode, unitIdentity);
+    const bool perUnit = board_profile::kPerUnitNetworkName && unitIdentity.unitName[0];
+    deviceName = perUnit ? String(unitIdentity.unitName) : String(kDeviceName);
+    networkName = deviceName;
+    hostName = perUnit ? String(unitIdentity.hostname) : String("meridianv");
     WiFi.setAutoReconnect(true);
-    WiFi.setHostname("meridianv");
-    // Nombre en la red local: "meridianv.local" sigue funcionando aunque el
-    // DHCP reparta otra dirección en la siguiente conexión.
-    MDNS.begin("meridianv");
+    WiFi.setHostname(hostName.c_str());
+    // Nombre en la red local: "meridianv.local" (MeridianVI: "meridianvi-f1a2.local")
+    // sigue funcionando aunque el DHCP reparta otra dirección.
+    MDNS.begin(hostName.c_str());
+    // Las apps reconocen el equipo por el nombre de la **instancia** _http._tcp,
+    // con el prefijo «meridianv». Sin fijarla, ESP-IDF usa el nombre de máquina;
+    // se fija igual para no depender de ese respaldo.
+    MDNS.setInstanceName(hostName);
     MDNS.addService("http", "tcp", 80);
     WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
     apReady = WiFi.softAP(networkName.c_str(), apKey.c_str(), 1, false, 4);
@@ -957,23 +1005,31 @@ void tick() {
             scanFinishedAt = now;
             // Los resultados se aprovechan venga el escaneo de donde venga: si
             // el equipo está suelto, se une sin pedir otro barrido.
-            if (networkCount && !stationPaused && WiFi.status() != WL_CONNECTED && !joinBestVisible()) {
-                lastConnectionAttempt = now;
+            if (networkCount && !stationPaused && WiFi.status() != WL_CONNECTED) {
+                if (joinBestVisible()) scanMisses = 0;
+                else { lastConnectionAttempt = now; ++scanMisses; }
             }
         } else if (found == WIFI_SCAN_FAILED || config_rules::elapsed(now, scanStartedAt, 20000)) {
             scanState = ScanState::failed;
             scanFinishedAt = now;
             lastConnectionAttempt = now;
+            ++scanMisses;
         }
     }
+    if (WiFi.status() == WL_CONNECTED) scanMisses = 0;
+    // Una decisión del usuario vuelve a empezar la espera desde 30 s.
+    if (joinRequested) scanMisses = 0;
     if (networkCount && !stationPaused && scanState != ScanState::running && WiFi.status() != WL_CONNECTED &&
-        (joinRequested || config_rules::elapsed(now, lastConnectionAttempt, 30000))) {
+        (joinRequested || config_rules::elapsed(now, lastConnectionAttempt,
+                                                config_rules::rescanDelayMs(scanMisses, WiFi.softAPgetStationNum() > 0)))) {
         joinRequested = false;
         startScan();
     }
 }
 
 const String& apPassword() { return apKey; }
+const String& mdnsHost() { return hostName; }
+const device_identity::Identity& identity() { return unitIdentity; }
 bool stationConfigured() { return stationPresent.load(); }
 // Nota: informa de que hay al menos una red guardada, no de que haya enlace.
 const String& apName() { return networkName; }

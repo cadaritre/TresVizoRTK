@@ -1,6 +1,6 @@
 {
  "_meta": {
-  "origin": "Armadas a mano a partir del código del firmware 0.8.0 (src/instrument.cpp y los módulos que rellenan cada respuesta), no grabadas de un equipo. Receptor en RTK fijo con NTRIP. Para grabar las de un equipo: check_contract.py device --port … --record archivo.json"
+  "origin": "Armadas a mano a partir del código del firmware 0.8.0 (src/instrument.cpp y los módulos que rellenan cada respuesta), no grabadas de un equipo. Receptor en RTK fijo con NTRIP. Para grabar las de un equipo: check_contract.py device --port … --record archivo.json GET /api/radio (añadida el 12-10-2026): radio externo sin conectar, de src/radio_module.cpp#status."
  },
  "GET /api/status": {
   "status": 200,
@@ -608,6 +608,20 @@
    "boot_confirmed": true,
    "previous_image_present": true,
    "previous_image_signature_required": true
+  }
+ },
+ "GET /api/radio": {
+  "status": 200,
+  "body": {
+   "state": "not_connected",
+   "port": 2102,
+   "role": null,
+   "frames_to_radio": 0,
+   "frames_from_radio": 0,
+   "frames_rejected": 0,
+   "frames_dropped": 0,
+   "connections": 0,
+   "refused_connections": 0
   }
  }
 }

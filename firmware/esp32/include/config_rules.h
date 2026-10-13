@@ -42,4 +42,23 @@ inline bool password(const char* value) {
 
 inline bool refresh(uint32_t value) { return value == 1000 || value == 2000 || value == 5000; }
 inline bool elapsed(uint32_t now, uint32_t then, uint32_t period) { return now - then >= period; }
+
+// Espera entre escaneos automáticos de la red externa cuando no se ve ninguna de
+// las guardadas. Cada escaneo recorre los canales y **corta el AP propio unos
+// segundos**: en campo, con las redes guardadas fuera de alcance, el teléfono
+// conectado al AP del equipo perdía el panel y el WebSocket cada 30 s.
+//
+// 30 s tras el primer intento fallido, luego el doble hasta 4 min. Con alguien
+// conectado al AP, nunca menos de 2 min. Una decisión del usuario (guardar,
+// conectar, escanear) o un enlace conseguido vuelve a empezar desde 30 s.
+constexpr uint32_t kRescanBaseMs = 30000;
+constexpr uint32_t kRescanMaxMs = 240000;
+constexpr uint32_t kRescanWithApClientsMs = 120000;
+inline uint32_t rescanDelayMs(uint32_t misses, bool apClients) {
+    uint32_t delay = kRescanBaseMs;
+    for (uint32_t i = 1; i < misses && delay < kRescanMaxMs; ++i) delay *= 2;
+    if (delay > kRescanMaxMs) delay = kRescanMaxMs;
+    if (apClients && delay < kRescanWithApClientsMs) delay = kRescanWithApClientsMs;
+    return delay;
+}
 }

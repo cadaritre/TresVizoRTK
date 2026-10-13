@@ -20,12 +20,12 @@ namespace gnss {
 //
 // Con el byte crudo, el parser de RTCM ve también el texto y el binario Unicore,
 // y no pasa nada: una trama solo sale si cuadra su CRC24Q, y ante una cabecera
-// falsa se resincroniza en el siguiente 0xD3 que ya tiene guardado. Lo que sí
-// puede pasar es un **retraso**: un 0xD3 dentro del binario Unicore con una
-// longitud plausible detrás hace esperar al parser hasta completarla, así que una
-// trama real puede salir hasta 1029 bytes después de empezar (≈ 90 ms a 115200
-// baudios). No se pierde. El texto que reciben los parsers NMEA es exactamente
-// el de antes: el filtro no cambia.
+// falsa se resincroniza en el siguiente 0xD3 que ya tiene guardado. Hasta 0.8.3
+// un 0xD3 dentro del binario Unicore con una longitud plausible detrás hacía
+// esperar al parser hasta completarla (una trama real salía hasta 1029 bytes
+// tarde). Desde 0.9.0 la trama real sale en cuanto se completa y cuadra su CRC:
+// la cabecera falsa queda abandonada (`Rtcm3Parser::abandoned`, regla 1 de rtcm3.h). El texto que
+// reciben los parsers NMEA es exactamente el de antes: el filtro no cambia.
 //
 // Sin Arduino: se prueba en la PC (test/receiver_stream_test.cpp).
 class ReceiverStream {
@@ -35,7 +35,7 @@ public:
 
     template<class RtcmConsumer, class TextConsumer>
     void feed(uint8_t byte, uint32_t nowMs, RtcmConsumer rtcmFrame, TextConsumer text) {
-        rtcm.feed(byte, rtcmFrame);
+        rtcm.feedAt(byte, nowMs, rtcmFrame);
         filter.feed(byte, nowMs, text);
     }
 };

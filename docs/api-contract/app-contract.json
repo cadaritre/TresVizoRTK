@@ -16,7 +16,7 @@
       "note": "Por HTTP la piden las dos apps cada `refresh_ms`; por BLE, cada 30 s si hay latido. Todo es opcional para las apps salvo `firmware_version` y el interior de `alerts[]`, pero **un tipo distinto en cualquier clave declarada tumba la respuesta entera** en las dos.",
       "firmware": {
         "dispatch": ["src/instrument.cpp"],
-        "writers": {"": ["src/instrument.cpp#status"], "memory": ["src/memory_health.cpp#status"], "telemetry_stream": ["src/telemetry_ws.cpp#status"], "corrections": ["src/correction_router.cpp#status"], "corrections_out": ["src/correction_output.cpp#status"], "subsystems.ble": ["src/ble_transport.cpp#status"], "subsystems.ntrip": ["src/ntrip_input.cpp#status"], "subsystems.microsd": ["src/sd_recorder.cpp#status"]}
+        "writers": {"": ["src/instrument.cpp#status"], "memory": ["src/memory_health.cpp#status"], "telemetry_stream": ["src/telemetry_ws.cpp#status"], "corrections": ["src/correction_router.cpp#status"], "corrections_out": ["src/correction_output.cpp#status"], "subsystems.ble": ["src/ble_transport.cpp#status"], "subsystems.radio": ["src/radio_module.cpp#status"], "subsystems.ntrip": ["src/ntrip_input.cpp#status"], "subsystems.microsd": ["src/sd_recorder.cpp#status"]}
       },
       "response": [
         {"path": "api_version", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Ninguna app la compara todavía; es la versión que sube si un cambio rompe el contrato."},
@@ -24,6 +24,16 @@
         {"path": "hardware_id", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Respaldo de GET /api/update para la carga de firmware. Identificador de placa: no se escribe a mano en las apps."},
         {"path": "board", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Nombre de placa que enseñan las apps al rechazar una imagen de otra placa."},
         {"path": "device_name", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "model", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["MeridianV", "MeridianVI"], "unknown_values_ok": true, "note": "Desde 0.9.0 (receiver-identity.md (12-10-2026)). Sin la clave, la app supone MeridianV. Un modelo desconocido se enseña tal cual."},
+        {"path": "serial", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "8 hex mayúsculas: los 4 bytes bajos de la MAC base de fábrica. Las apps recuerdan la unidad por esta clave, no por la dirección BLE."},
+        {"path": "unit_name", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Modelo + guion + 4 últimos hex del serial. En MeridianVI es también el SSID, el nombre BLE y la OLED; el MeridianV sigue anunciando «MeridianV»."},
+        {"path": "capabilities", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Lo que tiene el equipo. Una clave que falta = no se sabe (la app se comporta como hoy)."},
+        {"path": "capabilities.gnss_module", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["UM980", "LG290P"], "unknown_values_ok": true, "note": "Decide qué ajustes del GNSS ofrece la app."},
+        {"path": "capabilities.lora_radio", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "true = radio LoRa integrado (MeridianVI): la pantalla de radio usa /api/radio en vez del «TresVizo Radio XXXX»."},
+        {"path": "capabilities.imu", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Chip de la IMU o null si no hay o no se sabe."},
+        {"path": "capabilities.battery_chemistry", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["li-ion", "lifepo4"], "unknown_values_ok": true, "note": "Informativa: el porcentaje sigue viniendo del firmware."},
+        {"path": "capabilities.removable_storage", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "false en MeridianVI (microSD interna): la app no pide «saca la tarjeta»."},
+        {"path": "capabilities.ip_rating", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Solo informativo; null si no hay clasificación declarada."},
         {"path": "phase", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
         {"path": "uptime_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
         {"path": "free_heap_bytes", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
@@ -96,7 +106,7 @@
         {"path": "alerts[].message", "type": "string", "nullable": false, "optional": false, "apps": ["ios", "android"]},
         {"path": "subsystems", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
         {"path": "subsystems.gnss", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
-        {"path": "subsystems.gnss.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["not_integrated", "start_failed", "waiting_data", "receiving", "stale"], "unknown_values_ok": true, "note": "`not_integrated` y `start_failed` bloquean los trabajos del receptor en las dos apps."},
+        {"path": "subsystems.gnss.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["not_integrated", "start_failed", "waiting_data", "receiving", "stale", "pins_pending"], "unknown_values_ok": true, "note": "`not_integrated` y `start_failed` bloquean los trabajos del receptor en las dos apps. `pins_pending` (0.9.0): perfil de placa sin pines de UART; no hay receptor."},
         {"path": "subsystems.gnss.accepted_gga", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
         {"path": "subsystems.gnss.rejected_gga", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
         {"path": "subsystems.gnss.uart_errors", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
@@ -133,6 +143,29 @@
         {"path": "subsystems.ble.telemetry_skipped", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
         {"path": "subsystems.ble.max_loop_gap_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
         {"path": "subsystems.ble.max_request_dispatch_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["android"]},
+        {"path": "subsystems.radio", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "Solo por Wi-Fi: por BLE no entra en el recorte (`ble: false`), la pantalla de radio pide /api/radio."},
+        {"path": "subsystems.radio.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "values": ["connected", "not_connected", "start_failed", "pins_pending"], "unknown_values_ok": true, "note": "Radio externo: connected/not_connected/start_failed. Integrado (0.9.0): connected (chip iniciado), start_failed o pins_pending."},
+        {"path": "subsystems.radio.integrated", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "0.9.0: true = radio dentro del equipo (MeridianVI)."},
+        {"path": "subsystems.radio.role", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "values": ["base", "rover", "idle"], "unknown_values_ok": true, "note": "Sigue al modo del receptor; null sin radio."},
+        {"path": "subsystems.radio.network", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.channel", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.frequency_hz", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.power_dbm", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.rssi_dbm", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "Null si no se sabe, nunca 0."},
+        {"path": "subsystems.radio.snr_db", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.packets_sent", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.packets_received", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.packets_lost", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.packets_foreign", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.frames_to_radio", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.frames_from_radio", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.frames_rejected", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.frames_dropped", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.radio_version", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "Null en el integrado."},
+        {"path": "subsystems.radio.radio_id", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "Null en el integrado."},
+        {"path": "subsystems.radio.hardware", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
+        {"path": "subsystems.radio.air", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "values": ["transmitting", "receiving", "listening", "idle", "radio_error"], "unknown_values_ok": true},
+        {"path": "subsystems.radio.last_status_age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "Solo el radio externo (latido por Wi-Fi). El integrado no la manda."},
         {"path": "subsystems.ntrip", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
         {"path": "subsystems.ntrip.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["stopped", "starting", "stopping", "connecting", "streaming", "waiting_network", "retry_wait"], "unknown_values_ok": true},
         {"path": "subsystems.ntrip.error", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
@@ -614,9 +647,78 @@
       "firmware": {"dispatch": ["src/instrument.cpp"], "readers": ["src/instrument.cpp#request"]},
       "response": [],
       "request": [
-        {"path": "source", "type": "string", "apps": ["ios", "android"], "optional": false, "note": "none, ble o ntrip."}
+        {"path": "source", "type": "string", "apps": ["ios", "android"], "optional": false, "values": ["none", "ble", "ntrip", "radio"], "note": "none, ble, ntrip o radio (radio desde 0.8.0: el aparato aparte o, en MeridianVI, el integrado). iOS manda radio solo si hay radio."}
       ],
       "request_exact_keys": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/radio",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "Pantalla «Radio LoRa» de iOS (12-10-2026). Todo opcional y tolerante. Con capabilities.lora_radio = true es el radio integrado (MeridianVI, docs/radio/LORA_INTEGRATED.md); si no, el aparato aparte.",
+      "firmware": {"dispatch": ["src/instrument.cpp"], "writers": {"": ["src/radio_module.cpp#status"]}},
+      "response": [
+        {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["connected", "not_connected", "start_failed", "pins_pending"], "unknown_values_ok": true, "note": "Radio externo: connected/not_connected/start_failed. Integrado (0.9.0): connected (chip iniciado), start_failed o pins_pending."},
+        {"path": "integrated", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "0.9.0: true = radio dentro del equipo (MeridianVI)."},
+        {"path": "role", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["base", "rover", "idle"], "unknown_values_ok": true, "note": "Sigue al modo del receptor; null sin radio."},
+        {"path": "network", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "channel", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "frequency_hz", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "power_dbm", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "rssi_dbm", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Null si no se sabe, nunca 0."},
+        {"path": "snr_db", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "packets_sent", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "packets_received", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "packets_lost", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "packets_foreign", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "frames_to_radio", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "frames_from_radio", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "frames_rejected", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "frames_dropped", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "radio_version", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Null en el integrado."},
+        {"path": "radio_id", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Null en el integrado."},
+        {"path": "hardware", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "air", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["transmitting", "receiving", "listening", "idle", "radio_error"], "unknown_values_ok": true},
+        {"path": "last_status_age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Solo el radio externo (latido por Wi-Fi). El integrado no la manda."}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/radio",
+      "channels": ["http", "ble", "usb"],
+      "apps": ["ios", "android"],
+      "note": "202 y el estado; el radio lo aplica en su vuelta siguiente (integrado: milisegundos). Claves de más o fuera de rango: 400 invalid_setting. Externo sin radio: 409 radio_not_connected; el integrado guarda y aplica igual.",
+      "firmware": {"dispatch": ["src/instrument.cpp"], "writers": {"": ["src/radio_module.cpp#status"]}, "readers": ["src/radio_module.cpp#request"]},
+      "response": [
+        {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["connected", "not_connected", "start_failed", "pins_pending"], "unknown_values_ok": true, "note": "Radio externo: connected/not_connected/start_failed. Integrado (0.9.0): connected (chip iniciado), start_failed o pins_pending."},
+        {"path": "integrated", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "0.9.0: true = radio dentro del equipo (MeridianVI)."},
+        {"path": "role", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["base", "rover", "idle"], "unknown_values_ok": true, "note": "Sigue al modo del receptor; null sin radio."},
+        {"path": "network", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "channel", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "frequency_hz", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "power_dbm", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "rssi_dbm", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Null si no se sabe, nunca 0."},
+        {"path": "snr_db", "type": "number", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "packets_sent", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "packets_received", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "packets_lost", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "packets_foreign", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "frames_to_radio", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "frames_from_radio", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "frames_rejected", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "frames_dropped", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "radio_version", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Null en el integrado."},
+        {"path": "radio_id", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Null en el integrado."},
+        {"path": "hardware", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
+        {"path": "air", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["transmitting", "receiving", "listening", "idle", "radio_error"], "unknown_values_ok": true},
+        {"path": "last_status_age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Solo el radio externo (latido por Wi-Fi). El integrado no la manda."}
+      ],
+      "request": [
+        {"path": "network", "type": "integer", "apps": ["ios", "android"], "optional": true, "note": "0–255."},
+        {"path": "channel", "type": "integer", "apps": ["ios", "android"], "optional": true, "note": "0–12 (903–927 MHz)."},
+        {"path": "power_dbm", "type": "integer", "apps": ["ios", "android"], "optional": true, "note": "0–30, a la salida de la E22."}
+      ]
     },
     {
       "method": "POST",
@@ -1182,6 +1284,7 @@
       "name": "hardware_id",
       "why": "Identifica la placa. Cambió en 0.8.0 (Tiny → Thing Plus) y el firmware rechaza `/api/update/begin` si no coincide.",
       "current_value": "tresvizo-thingplus-s3-4m-v1",
+      "v03_value": "tresvizo-meridianv-v03-s3-16m-v1 (placa principal v0.3, entorno meridianv_v03, desde 0.9.0; include/board_profile_v03.h). Mismo producto (`model` MeridianV), otra imagen.",
       "firmware_source": "include/board_profile.h (TRESVIZO_HARDWARE_ID) y byte 320 de la imagen firmada",
       "exposed_in": [
         {"route": "GET /api/update", "path": "hardware_id"},
@@ -1195,7 +1298,7 @@
     {
       "name": "board",
       "why": "Nombre legible de la placa; cambia con ella.",
-      "current_value": "SparkFun Thing Plus ESP32-S3 WRL-24408",
+      "current_value": "SparkFun Thing Plus ESP32-S3 WRL-24408", "v03_value": "TresVizo MeridianV v0.3 (ESP32-S3-WROOM-1-N16R2)",
       "firmware_source": "include/board_profile.h (kName)",
       "exposed_in": [
         {"route": "GET /api/status", "path": "board"}
@@ -1225,6 +1328,7 @@
       "name": "ap_ssid",
       "why": "Nombre del Wi-Fi propio del equipo. Hoy es kDeviceName; depende del producto, no de la app.",
       "current_value": "MeridianV",
+      "meridianvi_value": "unit_name, p. ej. «MeridianVI-F1A2» (desde 0.9.0, receiver-identity.md). Un SSID por unidad: la igualdad con «MeridianV» de Android no lo encuentra.",
       "firmware_source": "src/instrument.cpp (networkName = kDeviceName)",
       "exposed_in": [
         {"route": "GET /api/status", "path": "wifi.ap_ssid"},
@@ -1249,6 +1353,7 @@
     },
     {
       "name": "mdns_instance",
+      "meridianvi_value": "meridianvi-f1a2 (unit_name en minúsculas, desde 0.9.0). Empieza por «meridianv»: el filtro por prefijo de las apps lo encuentra.",
       "why": "Nombre mDNS del servicio _http._tcp. Depende del producto.",
       "current_value": "meridianv",
       "firmware_source": "src/instrument.cpp (MDNS.begin(\"meridianv\"))",
@@ -1258,11 +1363,12 @@
         {"app": "android", "where": "core/network/.../discovery/LocalNetworkDiscovery.kt:78", "severity": "media", "note": "Ídem; se puede escribir la dirección a mano."}
       ]
     },
-    {"name": "ble_name", "why": "Nombre anunciado por BLE (= ap_ssid). Las apps escanean por UUID de servicio; el nombre solo se enseña.", "current_value": "MeridianV", "firmware_source": "src/ble_transport.cpp (BLEDevice::init(instrument::apName()))", "exposed_in": []},
+    {"name": "ble_name", "why": "Nombre anunciado por BLE (= ap_ssid). Las apps escanean por UUID de servicio; el nombre solo se enseña.", "current_value": "MeridianV", "meridianvi_value": "unit_name («MeridianVI-F1A2»). Desde 0.9.0 la respuesta de escaneo lleva además datos de fabricante (0xFFFF, «TV», versión 1, modelo 5/6, serial BE): receiver-identity.md.", "firmware_source": "src/ble_transport.cpp (BLEDevice::init(instrument::apName()))", "exposed_in": []},
     {
       "name": "max_image_bytes",
       "why": "Tamaño de la partición OTA: depende de la tabla de particiones de la placa.",
       "current_value": 1966080,
+      "v03_value": "4194304 (partitions_v03.csv: dos ranuras de 4 MB). La imagen de la v0.3 se mantiene por debajo de 1 966 080 mientras las apps comparen con esa cifra.",
       "firmware_source": "partitions.csv (app0/app1 = 0x1e0000)",
       "exposed_in": [
         {"route": "GET /api/update", "path": "max_image_bytes"}

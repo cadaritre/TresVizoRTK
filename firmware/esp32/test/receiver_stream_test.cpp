@@ -128,10 +128,10 @@ int main() {
             startsAt.push_back(stream.size());
             stream.insert(stream.end(), frame.begin(), frame.end());
         }
-        // Texto de cola, más largo que la trama RTCM más larga: una cabecera
-        // falsa del binario hace esperar al parser hasta completar su longitud,
-        // así que lo último **se retrasa** hasta 1029 bytes; aquí se comprueba
-        // que se retrasa y no que se pierde.
+        // Texto de cola, más largo que la trama RTCM más larga: hasta 0.8.3 una
+        // cabecera falsa del binario hacía esperar al parser hasta completar su
+        // longitud y lo último **se retrasaba** hasta 1029 bytes. Se conserva la
+        // cola para comprobar que nada se pierde aunque la cabecera falsa quede abierta.
         const std::string last = nmea("GNGGA,120100.00,4000.0000000,N,00300.0000000,W,4,20,0.6,650.000,M,50.000,M,1.0,0000");
         for (size_t tail = 0; tail <= kMaxRtcmFrameBytes; tail += last.size(), ++ggaSent)
             stream.insert(stream.end(), last.begin(), last.end());
@@ -150,6 +150,8 @@ int main() {
             const size_t end = startsAt[i] + sent[i].size() - 1;
             if (out.deliveredAt[i] - end > worstDelayBytes) worstDelayBytes = out.deliveredAt[i] - end;
         }
+        // Desde 0.9.0 la trama real tapa a la cabecera falsa: sale con su último byte.
+        assert(worstDelayBytes == 0);
         // El binario Unicore se sigue reconociendo y apartando.
         assert(out.nativeValid == unicoreSent && out.nativeInvalid == 0);
         // El texto es el mismo que con el filtro solo, y las GGA llegan todas.

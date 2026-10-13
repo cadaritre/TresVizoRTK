@@ -1,5 +1,12 @@
 # Cargador de firmware por USB
 
+**Desde 0.9.0:** también carga el MeridianV con la **placa principal v0.3** (entorno
+`meridianv_v03`, hardware `tresvizo-meridianv-v03-s3-16m-v1`, ESP32-S3-WROOM-1-N16R2 de 16 MB).
+En la ventana aparecen dos «MeridianV»: el de la Thing Plus y el de la placa v0.3; cada imagen
+solo se acepta para su placa. La primera carga de una placa v0.3 nueva es **Instalación
+completa** (bootloader y tabla de particiones de 16 MB). Arranque y pruebas de banco:
+[docs/board-v03-bringup.md](../../docs/board-v03-bringup.md).
+
 **Desde 0.8.0:** el MeridianV de este cargador es la **SparkFun Thing Plus ESP32-S3 WRL-24408**, hardware `tresvizo-thingplus-s3-4m-v1`. No usar su imagen en la Tiny. El hardware se lee del campo firmado en byte 320; ya no se identifica buscando una cadena suelta dentro del binario. La placa nueva requiere **Instalación completa**. Ver [cableado y montaje](../../hardware/wiring.md).
 
 

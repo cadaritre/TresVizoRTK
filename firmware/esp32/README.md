@@ -1,6 +1,135 @@
 # Firmware inicial del instrumento
 
-**Alimentación — 02/10/2026:** LiPo 1S 3.7 V / 3000 mAh confirmada. Lectura MAX17048 y apagado coordinado Mk2 implementados; falta identificar el elevador de 5 V y validar físicamente el conjunto con UM980. Ver `hardware/wiring.md` desde la raíz. La carga es autónoma por hardware; USB impide el corte total de batería.
+**Alimentación — 02/10/2026:** LiPo 1S 3.7 V / 3000 mAh confirmada. Lectura MAX17048 y apagado coordinado Mk2 implementados; falta identificar el elevador de 5 V y validar físicamente el conjunto con UM980. Ver `hardware/wiring.md` desde la raíz. La carga es autónoma por hardware; USB impide el corte total de batería. (Thing Plus. La placa v0.3 tiene su propia alimentación: ver 0.9.0.)
+
+## 0.9.0 — Identidad del receptor, auditoría de fluidez y placa v0.3 (12/10/2026)
+
+Dos entornos para el mismo producto, el **MeridianV**:
+
+- **`esp32s3_usb`**: la SparkFun Thing Plus, igual que antes.
+- **`meridianv_v03`**: la placa principal v0.3 compacta que se mandó a JLCPCB (`hardware/main-board`,
+  commit 97000ef).
+
+Lo genérico es lo mismo que el firmware 0.9.0 del MeridianVI (repositorio aparte), sin nada de su
+hardware (LG290P, LoRa integrado, LiFePO4, botón Hall).
+
+### Identidad del receptor
+
+Definida en [receiver-identity.md](../../docs/api-contract/receiver-identity.md).
+
+- `/api/status` añade `model` (`MeridianV`), `serial` (los 4 bytes bajos de la MAC de fábrica),
+  `unit_name` (`MeridianV-XXXX`) y `capabilities`:
+  - `gnss_module` UM980;
+  - `lora_radio` false;
+  - `imu` null en la Thing Plus y `BMI088` en la v0.3;
+  - `battery_chemistry` li-ion;
+  - `removable_storage` true;
+  - `ip_rating` null.
+- Todo entra en el recorte BLE (`ble_status_keys.h` regenerado; 3654 de 4096 bytes en el peor caso).
+- La respuesta de escaneo BLE lleva el nombre y los datos de fabricante: 0xFFFF, «TV», versión 1,
+  modelo 5 y serial.
+- El equipo **sigue anunciando `MeridianV`** en BLE, SSID y mDNS. La OLED enseña `unit_name`.
+- Contrato: claves de identidad (`ios` y `android`), `GET`/`POST /api/radio` y `subsystems.radio`
+  con `"ble": false` (las lee iOS y Android). `/api/radio` añade `integrated: false`, que el radio
+  del MeridianV es el aparato aparte. `check_contract.py`: 726 comprobaciones, cumple.
+
+### Auditoría de fluidez
+
+Informe en el repositorio del MeridianVI, `docs/firmware-audit-meridianvi.md`. Lo que aplica al
+MeridianV:
+
+- **F1:** el estado de la microSD ya no bloquea `/api/status` ni el Bluetooth. Se publica con
+  atómicos. Las órdenes que tocan la tarjeta esperan al escritor como mucho 500 ms y si no,
+  contestan 503 `busy`.
+- **F2:** el watchdog vigila también el bucle principal (`-DTRESVIZO_TASK_WDT`, en los dos
+  entornos).
+- **F3:** sin redes guardadas a la vista, los escaneos Wi-Fi se espacian: 30 s, luego el doble
+  hasta 4 min, y 2 min como mínimo con alguien en el AP. Cada escaneo cortaba el AP propio.
+- **F4:** `subsystems.gnss.correction_hold_max_ms` mide cuánto esperan las correcciones por una
+  orden de configuración (solo diagnóstico).
+- **F5 y F6:** menos trabajo por pasada en el promedio de base y por trama RTCM.
+- **F8 (pendiente en la auditoría, hecho aquí):** el caster local lee la cabecera de un rover
+  por pasadas. Ya no frena hasta 2 s la publicación al caster externo.
+- **F9 (pendiente en la auditoría, hecho aquí):** la autoconexión NTRIP espera a que haya Wi-Fi.
+  Sin red ya no se suelta y se vuelve a pedir cada 60 s.
+
+Arreglos posteriores, iguales a los del MeridianVI:
+
+- **Sourcetable:** va por una conexión y una tarea aparte (`ntrip_table`, se crea al pedirla y
+  termina sola). Pedir la lista de puntos de montaje ya no suelta el NTRIP activo ni deja la
+  fuente en «none». Respuesta aditiva: `separate_connection` y `ntrip_kept`.
+- **Parser RTCM** (`lib/gnss/src/rtcm3.h`, el mismo archivo que en el MeridianVI):
+  - una trama a medias se descarta en cuanto detrás se completa otra con CRC correcto
+    (`abandoned`);
+  - con reloj (`feedAt`), una trama a medias sin bytes nuevos durante 1 s se descarta
+    (`expired`; antes, 2 s solo por BLE);
+  - lo usan BLE, NTRIP y la UART del UM980. El rover del radio externo (`firmware/radio`) sigue
+    con `feed` sin reloj: ese proyecto lo está cambiando otra persona (enlace USB);
+  - `subsystems.ble` y `subsystems.ntrip` añaden `rtcm_partial_abandoned` y
+    `rtcm_partial_expired`;
+  - el retraso de una trama real detrás de una cabecera falsa en la UART pasa de hasta 1029
+    bytes a 0.
+
+F7 (búfer de 16 KiB para el LG290P) no aplica.
+
+### Placa v0.3
+
+Pines del netlist, cambios respecto de la Thing Plus, cargador y pruebas de banco en
+[docs/board-v03-bringup.md](../../docs/board-v03-bringup.md).
+
+- Perfil en `include/board_profile_v03.h`, elegido por `-DTRESVIZO_BOARD_V03`. Es el único sitio
+  con pines de esa placa. `tools/board_check/check_v03_pins.py` lo compara con el netlist de
+  97000ef y falla si algo no coincide.
+- Hardware:
+  - WROOM-1-N16R2 (16 MB QIO, PSRAM quad);
+  - particiones de 2 × 4 MB (`partitions_v03.csv`);
+  - `hardware_id` `tresvizo-meridianv-v03-s3-16m-v1`, que conocen el cargador USB, el
+    empaquetador (`firmware_package.py meridianv_v03`) y la OTA.
+- Pines:
+
+  | Función | Pines |
+  | --- | --- |
+  | UART del UM980 | RX9 / TX8 |
+  | 5 V del GNSS | GPIO45, encendido antes de abrir la UART |
+  | PPS / EVENT / RESET_N | 10 / 11 / 12, sin manejar |
+  | I2C | 13 / 14 |
+  | SD_MMC | 6, 7, 5, 4, 16, 15; detección en 17, en alto |
+  | Botón | 18 |
+  | LED | 48 |
+  | BMI088 | Wire1 en 41 / 42, INT en 2 y 1 |
+
+- Cargador BQ25798 (`include/bq25798.h`, probado con un bus simulado):
+  - comprueba que es un BQ25798 y que VREG es 4.2 V (1S Li-ion);
+  - escribe solo SFET_PRESENT, watchdog desactivado e ICHG = 1 A (nunca más de 1.5 A);
+  - apaga con el modo *ship* tras cerrar la microSD y con el botón suelto;
+  - si VREG no es 4.2 V, deshabilita la carga.
+- Medidor MAX17048 como en la Thing Plus.
+- Apagado automático a 3.45 V sostenidos 60 s sin USB.
+- La OLED gira la imagen 180° en el lienzo. El BMI088 solo se identifica (identificador de chip):
+  no hay driver.
+
+### Verificado
+
+Desde `firmware/esp32`, `pio run -e esp32s3_usb -e meridianv_v03` y `pio run` en
+`firmware/radio`. Compilan los tres sin avisos propios:
+
+- Thing Plus: 1 746 353 bytes, 88.8 % de su ranura.
+- v0.3: 1 751 325 bytes, 41.8 % de 4 MB y por debajo de los 1 966 080 que comparan las apps.
+
+Desde la raíz:
+
+- `python3 tools/firmware_tests/run_native.py`: 40 suites. Nuevas: `bq25798_test` y
+  `device_identity_test`. Ampliadas: `rtcm3_test`, `receiver_stream_test`,
+  `ntrip_priority_integration_test`, `output_priority_integration_test`, `config_rules_test` y
+  `json_allowlist_test`.
+- `python3 tools/api_contract/check_contract.py`.
+- `python3 -m unittest discover -s tools/api_contract -p 'test_*.py'`.
+- `python3 -m unittest discover -s tools/flasher -p 'test_*.py'`.
+- `python3 -m unittest discover -s tools/board_check`.
+- `python3 tools/board_check/check_v03_pins.py`.
+
+**Sin probar en equipo: todo.** No hay placa v0.3 todavía y no se cargó nada en la Thing Plus.
+
 ## 0.8.3 — Prioridad del operador (04/10/2026)
 
 Las órdenes GNSS sustituyen el trabajo anterior; NTRIP, publicación y caster local aceptan cambios sin «detener primero». DNS, conexión y envío TCP son cancelables por una nueva decisión. Se descartan las respuestas y tramas de sesiones sustituidas, y un promedio cancelado no aplica después una base. La elección explícita de ninguna fuente también se respeta tras reiniciar.

@@ -8,6 +8,9 @@ void begin();
 void feed(const char* data, size_t length);
 void tick(HardwareSerial& uart);
 bool busy();
+// Número del trabajo vigente (el último lanzado), sin armar un JSON ni tomar más
+// que el mutex propio. Lo usa el promedio de base, que lo consulta en cada pasada.
+uint32_t currentJob();
 // Cancela solo ese trabajo (0: el vigente), sin cortar un comando UART a medias.
 void cancel(uint32_t expectedJob = 0);
 bool baseRequested();

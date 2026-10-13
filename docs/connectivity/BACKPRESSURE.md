@@ -13,6 +13,11 @@ está, cuánto cabe, qué pasa al llenarse, qué caduca y dónde se ve.
 | RTCM hacia el UM980 | `gnss_receiver.cpp` + `lib/protocol/src/rtcm_queue.h` | **8 KiB** por bytes | **Se van las tramas más viejas, enteras** | 2 s o cambio de fuente | `correction_frames_evicted`, `_expired`, `_queue_bytes`, `_high_water_bytes`; salud bytes 17–19 |
 | UART RX del UM980 | controlador | 8 KiB | Desborde del controlador | — | `uart_errors`, `line_overflows` |
 | Grabación microSD | `sd_recorder.cpp` | búfer de flujo | Se tira lo que no cabe | — | `recording.dropped_bytes` |
+| Trama RTCM a medias (BLE, NTRIP, UART) | `lib/gnss/src/rtcm3.h` | 1 trama (1029 B) | Una trama completa con CRC correcto detrás la tapa al instante (0.9.0) | 1 s sin bytes nuevos (0.9.0; antes 2 s, solo BLE) | `rtcm_partial_abandoned` y `rtcm_partial_expired` en `subsystems.ble` y `subsystems.ntrip` (solo HTTP/USB) |
+
+Desde 0.9.0, `subsystems.gnss.correction_hold_max_ms` dice cuánto llegó a esperar una corrección
+en la cola hacia el UM980 porque había una orden de configuración en curso por la misma UART
+(auditoría 0.9.0, F4; ver `firmware/esp32/README.md`).
 
 **Por qué 8 KiB para el RTCM.** La UART al UM980 va a 115200 baudios (≈11.5 kB/s). Una época
 MSM de cuatro constelaciones con 1005/1033/1230 son 6 a 10 tramas y unos 2–6 kB, y llega de

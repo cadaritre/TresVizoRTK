@@ -1,0 +1,12 @@
+# MeridianV, placa v0.3: ESP32-S3-WROOM-1-N16R2, flash de 16 MB (hardware/main-board).
+# NVS y otadata en las mismas direcciones que la Thing Plus (partitions.csv): los
+# ajustes y la elección de partición se leen igual. Dos ranuras OTA de 4 MB; la
+# imagen ronda 1.75 MB y las apps todavía comparan con 1 966 080 bytes
+# (`max_image_bytes`, docs/api-contract/app-contract.json): mientras no lean el
+# valor del equipo, la imagen tiene que seguir por debajo de esa cifra. El resto
+# de la flash (~7.9 MB) queda sin asignar.
+# Name, Type, SubType, Offset, Size, Flags
+nvs,data,nvs,0x9000,0x5000,
+otadata,data,ota,0xe000,0x2000,
+app0,app,ota_0,0x10000,0x400000,
+app1,app,ota_1,0x410000,0x400000,

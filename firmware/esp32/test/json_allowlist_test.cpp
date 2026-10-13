@@ -67,6 +67,17 @@ int main() {
             assert(!deserializeJson(fixtures, buffer.str()));
             JsonDocument status;
             status.set(fixtures["GET /api/status"]["body"]);
+            // Identidad del receptor (0.9.0, receiver-identity.md), con los valores
+            // más largos que puede mandar hoy: tiene que caber y llegar por BLE.
+            status["model"] = "MeridianVI";
+            status["serial"] = "A10BF1A2";
+            status["unit_name"] = "MeridianVI-F1A2";
+            status["capabilities"]["gnss_module"] = "LG290P";
+            status["capabilities"]["lora_radio"] = true;
+            status["capabilities"]["imu"] = "BMI088";   // la placa v0.3 lo lleva
+            status["capabilities"]["battery_chemistry"] = "lifepo4";
+            status["capabilities"]["removable_storage"] = false;
+            status["capabilities"]["ip_rating"] = "IP67";
             const size_t full = bleBytes(status.as<JsonVariantConst>());
             protocol::keepOnly(status.as<JsonVariant>(), protocol::kBleStatusKeys, protocol::kBleStatusKeyCount);
             const size_t trimmed = bleBytes(status.as<JsonVariantConst>());
@@ -76,6 +87,8 @@ int main() {
             assert(status["firmware_version"].is<const char*>());
             assert(status["subsystems"]["ble"]["protocol_version"].is<int>());
             assert(status["subsystems"]["radio"].isNull());   // no lo lee ninguna app
+            assert(status["unit_name"] == "MeridianVI-F1A2" && status["capabilities"]["gnss_module"] == "LG290P");
+            assert(status["capabilities"]["lora_radio"] == true && status["capabilities"]["imu"] == "BMI088");
         }
     }
     std::puts("json_allowlist_test: OK");

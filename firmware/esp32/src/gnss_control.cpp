@@ -280,6 +280,11 @@ bool boolField(JsonVariantConst body,const char* name,bool& target){
 }
 void begin(){mutex=xSemaphoreCreateMutex();}
 bool busy(){return running || draining;}
+uint32_t currentJob(){
+    if(!mutex)return 0;
+    xSemaphoreTake(mutex,portMAX_DELAY);const uint32_t id=job;xSemaphoreGive(mutex);
+    return id;
+}
 bool baseRequested(){return wantsBase;}
 void cancel(uint32_t expectedJob) {
     if(!mutex)return;
@@ -720,6 +725,11 @@ void status(JsonObject out){
     out["waiting_command_reply"]=draining.load();
     out["mode"]=mode;out["version"]=version;out["error"]=failure;out["saved"]=profileState.saved;
     out["base_coordinates_verified"]=false;out["source"]="esp32_uart";
+    // Aditivo (0.9.0): qué acciones de POST /api/gnss/control admite este receptor.
+    JsonArray actions=out["supported_actions"].to<JsonArray>();
+    for(const char* a:{"query","rover","raw_profile","config_query","stop_outputs","reconcile","telemetry",
+                       "mask","constellations","dgps_timeout","outputs","rtcm_base","save"})actions.add(a);
+    out["receiver"]="UM980";
     xSemaphoreGive(mutex);
 }
 

@@ -216,7 +216,9 @@ class DeviceTests(unittest.TestCase):
         body = self.recorded["GET /api/status"]["body"]
         self.assertGreater(cc.ble_message_bytes(200, body), 4096)
         route = next(r for r in self.contract["routes"] if r["path"] == "/api/status" and r["method"] == "GET")
-        trimmed = cc.keep_only(body, sorted({e["path"] for e in route["response"]}))
+        # El recorte real: sin lo marcado `ble: false` (subsystems.radio, solo Wi-Fi).
+        trimmed = cc.keep_only(body, cc.ble_status_paths(route))
+        self.assertNotIn("radio", trimmed["subsystems"])
         self.assertLessEqual(cc.ble_message_bytes(200, trimmed), 3800)
         report = self.run_device(self.recorded, ble_size=True)
         self.assertEqual(report.errors, [])

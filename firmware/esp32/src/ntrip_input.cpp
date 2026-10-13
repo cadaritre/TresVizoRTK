@@ -36,8 +36,10 @@ std::atomic<bool> userStopped{false};
 Preferences store;
 bool storeReady=false;
 
-// Sourcetable del caster. Se resuelve en el mismo worker porque la radio y el
-// socket son uno solo; pedirla mientras se transmite cortaría las correcciones.
+// Sourcetable del caster. Desde 0.9.0 va por una conexión aparte, en su propia
+// tarea (ntrip_table, se crea al pedirla y termina sola): hasta 0.8.3 compartía el
+// socket del worker y pedirla soltaba el NTRIP activo y dejaba la fuente en «none»
+// sin decirlo. Ahora la conexión NTRIP sigue y la lista llega por su lado.
 constexpr size_t kMaxMounts=24;
 struct Mount {String name,format,country;bool needsGga=false;};
 Mount mounts[kMaxMounts];
@@ -45,8 +47,13 @@ size_t mountCount=0;
 std::atomic<bool> tableWanted{false};
 std::atomic<uint32_t> tableGeneration{0};
 std::atomic<const char*> tableState{"idle"};
+// Hay una tarea ntrip_table viva. Se cambia siempre con `lock` tomado, junto con
+// `tableWanted`, para que una petición nueva no se quede sin tarea que la atienda.
+std::atomic<bool> tableTaskRunning{false};
 String tableHost;uint16_t tablePort=2101;
 std::atomic<bool> wanted{false};std::atomic<uint32_t> generation{0},frames{0},rejected{0},bytes{0},reconnects{0},crcErrors{0};
+// Tramas a medias que el parser soltó (0.9.0): tapadas por una completa o sin bytes en 1 s.
+std::atomic<uint32_t> partialAbandoned{0},partialExpired{0};
 std::atomic<const char*> state{"stopped"}, failure{""};
 bool valid(JsonVariantConst field,size_t max,bool empty=false){
  if(!field.is<const char*>())return false;
@@ -152,11 +159,11 @@ void publishState(uint32_t id,const char* next,const char* error="") {
  if(current(id)){state=next;failure=error;}
  xSemaphoreGive(lock);
 }
-bool currentTable(uint32_t id){return tableWanted && !wanted && tableGeneration==id;}
+bool currentTable(uint32_t id){return tableWanted && tableGeneration==id;}
 void fetchSourcetable(WiFiClient& client){
  String host;uint16_t port;uint32_t id;
  xSemaphoreTake(lock,portMAX_DELAY);
- if(!tableWanted || wanted){xSemaphoreGive(lock);return;}
+ if(!tableWanted){xSemaphoreGive(lock);return;}
  host=tableHost;port=tablePort;id=tableGeneration;
  if(WiFi.status()!=WL_CONNECTED){tableState="waiting_network";xSemaphoreGive(lock);vTaskDelay(pdMS_TO_TICKS(100));return;}
  tableState="loading";mountCount=0;
@@ -184,9 +191,22 @@ void fetchSourcetable(WiFiClient& client){
  if(currentTable(id)){tableState=connected?(mountCount?"ready":"empty"):"failed";tableWanted=false;}
  xSemaphoreGive(lock);
 }
+// La tarea de la sourcetable: atiende las peticiones (la última manda) y se borra
+// cuando no queda ninguna. Su socket no es el de la conexión NTRIP.
+void tableWorker(void*){
+ WiFiClient client;
+ for(;;){
+  xSemaphoreTake(lock,portMAX_DELAY);
+  if(!tableWanted){tableTaskRunning=false;xSemaphoreGive(lock);break;}
+  xSemaphoreGive(lock);
+  fetchSourcetable(client);
+ }
+ vTaskDelete(nullptr);
+}
 // Handler y tick llaman con lock tomado. No se espera al socket anterior.
+// La sourcetable no se toca: va por su propia conexión.
 void startConnection(bool explicitChoice) {
- ++generation;tableWanted=false;++tableGeneration;tableState="idle";
+ ++generation;
  // Incluso NTRIP -> NTRIP invalida las correcciones encoladas del caster viejo.
  correction_router::select("none");
  if(explicitChoice)correction_router::choose("ntrip");else correction_router::select("ntrip");
@@ -195,8 +215,6 @@ void startConnection(bool explicitChoice) {
 void worker(void*) {
  WiFiClient client;gnss::Rtcm3Parser parser;unsigned backoff=1000;uint32_t lastGeneration=UINT32_MAX;
  for(;;){
-  // La sourcetable solo se pide cuando no hay flujo: comparten socket y radio.
-  if(tableWanted && !wanted){fetchSourcetable(client);continue;}
   if(!wanted){
    xSemaphoreTake(lock,portMAX_DELAY);if(!wanted)state="stopped";xSemaphoreGive(lock);
    vTaskDelay(pdMS_TO_TICKS(25));continue;
@@ -249,16 +267,16 @@ void worker(void*) {
    if(accepted && headersDone && current(id)){
     publishState(id,"streaming");parser.reset();uint32_t last=millis();backoff=1000;
     while(current(id) && WiFi.status()==WL_CONNECTED && (client.connected()||client.available()) && millis()-last<10000){
-     const auto badBefore=parser.rejected;
+     const auto badBefore=parser.rejected;const auto abandonedBefore=parser.abandoned,expiredBefore=parser.expired;
      for(int n=0;n<2048 && current(id) && client.available();++n){
       int b=client.read();if(b<0)break;++bytes;
-      parser.feed(uint8_t(b),[&](const uint8_t* p,size_t size){
+      parser.feedAt(uint8_t(b),millis(),[&](const uint8_t* p,size_t size){
        xSemaphoreTake(lock,portMAX_DELAY);
        if(current(id)) {last=millis();if(correction_router::submit(correction_router::Source::Ntrip,p,size))++frames;else ++rejected;}
        xSemaphoreGive(lock);
       });
      }
-     crcErrors+=parser.rejected-badBefore;
+     crcErrors+=parser.rejected-badBefore;partialAbandoned+=parser.abandoned-abandonedBefore;partialExpired+=parser.expired-expiredBefore;
      vTaskDelay(1);
     }
     publishState(id,"retry_wait","stream_ended_or_no_valid_rtcm");
@@ -276,14 +294,13 @@ void stopForUser(){
  if(!lock)return;
  xSemaphoreTake(lock,portMAX_DELAY);
  userStopped=true;wanted=false;++generation;
- tableWanted=false;++tableGeneration;tableState="idle";
  correction_router::select("none");config.password="";failure="";state="stopped";
  xSemaphoreGive(lock);
 }
 void releaseForBase(){
  if(!lock)return;
  xSemaphoreTake(lock,portMAX_DELAY);
- wanted=false;++generation;tableWanted=false;++tableGeneration;tableState="idle";
+ wanted=false;++generation;
  correction_router::select("none");failure=(gnss_control::isBase() || gnss_control::baseRequested())?"receiver_is_base":"";state="stopped";
  xSemaphoreGive(lock);
 }
@@ -295,7 +312,12 @@ void tick(){
   if(wanted)releaseForBase();
   return;
  }
- if(!wanted && !tableWanted && autoConnect && !userStopped && lastUsed>=0 &&
+ // Solo con enlace: sin red, la conexión se soltaba a los 60 s (no_network_timeout)
+ // y la autoconexión la volvía a pedir enseguida, en ciclo, mientras no hubiera
+ // Wi-Fi (auditoría 0.9.0, F9). Ahora espera al enlace; la orden del usuario
+ // (POST /api/ntrip/input) sigue aceptándose sin red, como antes.
+ if(!wanted && autoConnect && !userStopped && lastUsed>=0 &&
+    WiFi.status()==WL_CONNECTED &&
     !firmware_update::busy() && !gnss_control::busy() && gnss_control::isRover() &&
     correction_router::ntripAllowed()){
   xSemaphoreTake(lock,portMAX_DELAY);applyProfile(profiles[lastUsed]);startConnection(false);xSemaphoreGive(lock);
@@ -313,7 +335,7 @@ void begin(){
  if(!ready){wanted=false;state="stopped";correction_router::select("none");}
 }
 bool active(){return wanted;}
-void status(JsonObject out){out["state"]=state.load();out["error"]=failure.load();out["available"]=ready;out["enabled"]=wanted.load();out["network_configured"]=instrument::stationConfigured();out["frames_forwarded"]=frames.load();out["frames_dropped"]=rejected.load();out["bytes_received"]=bytes.load();out["reconnects"]=reconnects.load();out["rtcm_crc_errors"]=crcErrors.load();out["tls_supported"]=false;out["gga_vrs_supported"]=false;out["credentials_persisted"]=false;}
+void status(JsonObject out){out["state"]=state.load();out["error"]=failure.load();out["available"]=ready;out["enabled"]=wanted.load();out["network_configured"]=instrument::stationConfigured();out["frames_forwarded"]=frames.load();out["frames_dropped"]=rejected.load();out["bytes_received"]=bytes.load();out["reconnects"]=reconnects.load();out["rtcm_crc_errors"]=crcErrors.load();out["rtcm_partial_abandoned"]=partialAbandoned.load();out["rtcm_partial_expired"]=partialExpired.load();out["tls_supported"]=false;out["gga_vrs_supported"]=false;out["credentials_persisted"]=false;}
 int request(const String& method,JsonVariantConst body,JsonDocument& out){
  if(method=="GET"){status(out.to<JsonObject>());return 200;}
  if(method!="POST"||!body.is<JsonObjectConst>())return 400;
@@ -421,9 +443,20 @@ int sourcetableRequest(const String& method,JsonVariantConst body,JsonDocument& 
   for(char c:host)if(!isalnum(static_cast<unsigned char>(c))&&c!='.'&&c!='-')return 400;
   if(!ready)return 503;
   if(!instrument::stationConfigured()){out["message"]="No hay red Wi-Fi configurada. El equipo no puede consultar el caster.";return 409;}
-  stopForUser();
+  // No se suelta el NTRIP activo ni se cambia la fuente de correcciones.
   xSemaphoreTake(lock,portMAX_DELAY);tableHost=host;tablePort=uint16_t(body["port"].as<unsigned>());
-  mountCount=0;tableState="loading";++tableGeneration;tableWanted=true;xSemaphoreGive(lock);
+  mountCount=0;tableState="loading";++tableGeneration;tableWanted=true;
+  bool started=tableTaskRunning;
+  if(!started && xTaskCreate(tableWorker,"ntrip_table",6144,nullptr,1,nullptr)==pdPASS)started=tableTaskRunning=true;
+  if(!started){tableWanted=false;tableState="failed";}
+  xSemaphoreGive(lock);
+  if(!started){
+   out["error"]="no_memory";
+   out["message"]="No hay memoria para abrir la conexión de la lista de puntos de montaje. La conexión NTRIP sigue como estaba.";
+   out["ntrip_kept"]=wanted.load();
+   return 503;
+  }
+
  }
  if(!lock)return 503;
  xSemaphoreTake(lock,portMAX_DELAY);
@@ -437,6 +470,10 @@ int sourcetableRequest(const String& method,JsonVariantConst body,JsonDocument& 
   o["requires_gga"]=mounts[i].needsGga;
  }
  out["truncated"]=mountCount==kMaxMounts;
+ // Aditivo (0.9.0, las mismas claves que el MeridianVI): la consulta va por una
+ // conexión aparte y la conexión NTRIP que hubiera sigue activa.
+ out["separate_connection"]=true;
+ out["ntrip_kept"]=wanted.load();
  xSemaphoreGive(lock);
  return method=="POST"?202:200;
 }

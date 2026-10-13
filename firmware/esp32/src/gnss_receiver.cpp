@@ -45,6 +45,8 @@ struct Outbound { uint16_t length; uint8_t bytes[protocol::RtcmFrameQueue<kCorre
 // Fuera de la pila de la tarea: la trama son 1029 bytes.
 Outbound outbound = {};
 constexpr size_t kBlock = 512;
+// Solo gnss_rx: desde cuándo una corrección espera a que termine una orden.
+uint32_t holdStartedMs = 0, holdMaxMs = 0;
 uint8_t rawBlock[kBlock];
 char textBlock[kBlock];
 
@@ -104,7 +106,19 @@ void acquire(void*) {
         if (!outbound.length) gnss_control::tick(uart);
         // Las órdenes de configuración al UM980 van por la misma UART: mientras
         // haya una en curso no se empieza otra trama, para no intercalar bytes.
-        if (!gnss_control::busy() && !outbound.length) {
+        const bool commandOwnsUart = gnss_control::busy();
+        if (commandOwnsUart && !outbound.length) {
+            // Cuánto esperan las correcciones por una orden (diagnóstico, F4 de
+            // la auditoría 0.9.0). No cambia el planificador.
+            portENTER_CRITICAL(&correctionsLock);
+            const bool waiting = corrections.usedBytes() > 0;
+            portEXIT_CRITICAL(&correctionsLock);
+            const uint32_t nowMs = millis();
+            if (!waiting) holdStartedMs = 0;
+            else if (!holdStartedMs) holdStartedMs = nowMs ? nowMs : 1;
+            else if (nowMs - holdStartedMs > holdMaxMs) holdMaxMs = nowMs - holdStartedMs;
+        } else holdStartedMs = 0;
+        if (!commandOwnsUart && !outbound.length) {
             // La caducidad y la generación se miran **al sacar**, antes del
             // primer byte. Una trama empezada se termina siempre: dejarla a
             // medias en la UART le costaría al UM980 también la siguiente.
@@ -135,6 +149,7 @@ void acquire(void*) {
         state.overflow = parser.overflow;
         state.native_valid = stream.filter.native_valid;
         state.native_invalid = stream.filter.native_invalid;
+        state.correction_hold_max_ms = holdMaxMs;
         portEXIT_CRITICAL(&lock);
         vTaskDelay(1);
     }
@@ -143,6 +158,20 @@ void acquire(void*) {
 }
 void begin() {
 #ifdef TRESVIZO_GNSS_CONFIGURED
+    // Placa v0.3: el 5 V de la carrier lo enciende el ESP32 (GPIO45 → EN del
+    // TPS63070, R301 de 100 kΩ a GND). Antes de abrir la UART, para no meterle
+    // tensión a la carrier apagada por su RXD2 (GPIO8 sigue en alta impedancia
+    // hasta uart.begin). RESET_N (drenador abierto) y PPS quedan como entradas:
+    // la BDLX no saca RESET_N y el firmware todavía no usa el PPS.
+    if (board_profile::kGnssReset >= 0) pinMode(board_profile::kGnssReset, INPUT);
+    if (board_profile::kGnssPps >= 0) pinMode(board_profile::kGnssPps, INPUT);
+    if (board_profile::kGnssPowerEnable >= 0) {
+        digitalWrite(board_profile::kGnssPowerEnable, HIGH);
+        pinMode(board_profile::kGnssPowerEnable, OUTPUT);
+        portENTER_CRITICAL(&lock);
+        state.power_switched = true;
+        portEXIT_CRITICAL(&lock);
+    }
     if (uart.setRxBufferSize(8192) != 8192) {
         portENTER_CRITICAL(&lock);
         state.start_failed = true;
@@ -174,7 +203,12 @@ void begin() {
 }
 bool enqueueCorrections(const uint8_t* data, size_t length) {
 #ifdef TRESVIZO_GNSS_CONFIGURED
-    if (length > 1029 || length < 6 || !snapshot().enabled) return false;
+    // Solo la bandera: `snapshot()` copia la instantánea entera y la cola, y esto
+    // corre por cada trama desde la tarea de Bluetooth, NTRIP o radio.
+    portENTER_CRITICAL(&lock);
+    const bool enabled = state.enabled;
+    portEXIT_CRITICAL(&lock);
+    if (length > 1029 || length < 6 || !enabled) return false;
     // Siempre entra: si no cabe, la cola desaloja las tramas más viejas y lo
     // cuenta (`correction_frames_evicted`). La nueva vale más que la atrasada.
     size_t evicted = 0;

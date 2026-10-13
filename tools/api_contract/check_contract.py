@@ -476,6 +476,8 @@ def validate_contract(contract: dict) -> list[str]:
                 for flag in ("nullable", "optional"):
                     if section == "response" and not isinstance(entry.get(flag), bool):
                         problems.append(f"{where}: falta `{flag}` (true/false).")
+                if "ble" in entry and not isinstance(entry["ble"], bool):
+                    problems.append(f"{where}: `ble` tiene que ser true/false.")
             # Los contenedores de una clave declarada también tienen que estar declarados
             # («networks[].ssid» cuelga de «networks», que es un arreglo).
             declared = {canonical(e["path"]): e.get("type") for e in route.get(section, []) if e.get("path") in paths}
@@ -750,6 +752,18 @@ def keep_only(value, paths: list[str], prefix: str = ""):
     return value
 
 
+def ble_status_paths(route: dict) -> list[str]:
+    """Lo que entra al recorte BLE de /api/status: todo menos lo marcado `"ble": false`
+    (las apps lo leen solo por Wi-Fi) y lo que cuelga de ello. Igual que
+    generate_ble_status_keys.py."""
+    entries = route.get("response", [])
+    wifi_only = [e["path"] for e in entries if e.get("ble") is False]
+
+    def excluded(path: str) -> bool:
+        return any(path == w or path.startswith(w + ".") or path.startswith(w + "[]") for w in wifi_only)
+    return sorted({e["path"] for e in entries if not excluded(e["path"])})
+
+
 def ble_message_bytes(status: int, body) -> int:
     """Bytes del JSON que el equipo mandaría por BLE: `{"id":…,"status":…,"body":…}`
     compacto, con el `id` más largo posible y sin secretos."""
@@ -773,7 +787,7 @@ def validate_body(route: dict, status: int, body, ble_limit: int | None = None) 
         # Por BLE el estado va recortado a lo que leen las apps (ble_status_keys.h).
         sent = body
         if route.get("method", "GET") == "GET" and route.get("path") == "/api/status":
-            sent = keep_only(body, sorted({entry["path"] for entry in route.get("response", [])}))
+            sent = keep_only(body, ble_status_paths(route))
         size = ble_message_bytes(status, sent)
         if size > ble_limit:
             errors.append(f"{label}: por BLE la respuesta mediría {size} bytes y el máximo es {ble_limit}: "

@@ -37,5 +37,23 @@ int main(){
  correction_output::serveCaster();assert(correction_output::listeningGeneration!=listener && hostListeners.size()==2);
  assert(correction_output::casterRequest("POST",body("{\"action\":\"start\",\"mountpoint\":\"C\",\"port\":80,\"password\":\"\"}").as<JsonVariantConst>(),out)==400);
  assert(correction_output::casterConfig.mount=="B");
+ // F8 (auditoría 0.9.0): la cabecera del rover se lee por pasadas. Una cabecera
+ // a medias no detiene la tarea ni recibe respuesta; al completarse, se acepta.
+ hostSocketRequests.clear();hostSocketInput="GET /B HTTP/1.0\r\nUser-Agent: NTRIP rover\r\n";
+ bool offered=false;hostOnAccept=[&](){if(offered)return WiFiClient();offered=true;return WiFiClient(-1);};
+ const uint32_t before=hostMillis;correction_output::serveCaster();
+ assert(hostMillis==before && correction_output::pendingRover && hostSocketRequests.empty());
+ correction_output::serveCaster();
+ assert(hostMillis==before && correction_output::pendingRover && hostSocketRequests.empty());
+ hostSocketInput+="\r\n";correction_output::serveCaster();
+ assert(!correction_output::pendingRover && hostSocketRequests.size()==1 && hostSocketRequests[0]=="ICY 200 OK\r\n\r\n");
+ assert(correction_output::casterClients==1);
+ // Un rover que no termina su cabecera se descarta a los 2 s, sin haber esperado dentro.
+ hostSocketRequests.clear();hostSocketInput="GET /B";offered=false;
+ correction_output::serveCaster();assert(correction_output::pendingRover);
+ hostMillis+=correction_output::kRoverHeaderMs;correction_output::serveCaster();
+ // Como antes de 0.9.0: con lo recibido al vencer el plazo se decide (aquí, el prefijo basta).
+ assert(!correction_output::pendingRover && hostSocketRequests.size()==1 && hostSocketRequests[0]=="ICY 200 OK\r\n\r\n");
+ hostOnAccept={};
  correction_output::closeCaster();std::puts("output_priority_integration: OK");
 }

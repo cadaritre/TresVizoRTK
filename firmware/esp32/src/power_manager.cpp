@@ -1,6 +1,9 @@
+#include "board_profile.h"
+// Alimentación de la Thing Plus (Soft Power Switch Mk2 + MAX17048). La placa
+// v0.3 compila power_manager_v03.cpp con la misma interfaz.
+#if !defined(TRESVIZO_BOARD_V03)
 #include "power_manager.h"
 #include "power_sequence.h"
-#include "board_profile.h"
 #include "sd_recorder.h"
 #include "firmware_update.h"
 #include <Arduino.h>
@@ -64,3 +67,4 @@ void status(JsonObject out){
     out["push_gpio"]=board_profile::kPowerPush;out["off_gpio"]=board_profile::kPowerOff;
 }
 }
+#endif  // !TRESVIZO_BOARD_V03

@@ -3,6 +3,7 @@
 #include "board_profile.h"
 #include "local_display.h"
 #include "power_manager.h"
+#include "imu_probe.h"
 #include "ntrip_input.h"
 #include "correction_output.h"
 #include "base_survey.h"
@@ -22,6 +23,9 @@
 #include "ble_transport.h"
 #include "firmware_update.h"
 #include "web_assets.h"
+#ifdef TRESVIZO_TASK_WDT
+#include <esp_task_wdt.h>
+#endif
 
 namespace {
 httpd_handle_t server = nullptr;
@@ -150,7 +154,7 @@ void handleSerialLine() {
         output["body"]["station_ssid"] = WiFi.SSID();
         output["body"]["station_url"] = WiFi.status() == WL_CONNECTED
             ? String("http://") + WiFi.localIP().toString() : String();
-        output["body"]["mdns_url"] = "http://meridianv.local";
+        output["body"]["mdns_url"] = String("http://") + instrument::mdnsHost() + ".local";
         serialReply(output);
         return;
     }
@@ -187,9 +191,12 @@ void pollSerial() {
 }
 
 void setup() {
-    // Alimentación de periféricos y señales del Soft Power Switch Mk2.
+    // Botón y corte de alimentación de la placa: Soft Power Switch Mk2 (Thing
+    // Plus) o cargador BQ25798 y LED de estado (v0.3).
     power_manager::begin();
     local_display::begin();
+    // v0.3: identificador de chip del BMI088 por Wire1 (sin IMU, no hace nada).
+    imu_probe::begin();
     Serial.setRxBufferSize(2048);
     Serial.begin(115200);
     Serial.setTxTimeoutMs(50);
@@ -241,9 +248,22 @@ void setup() {
     } else Serial.println("Error al iniciar el servidor web. Consola USB disponible.");
     local_display::servicesReady();
     Serial.printf("TresVizo RTK %s. Consola JSON USB disponible.\n", instrument::kVersion);
+#ifdef TRESVIZO_TASK_WDT
+    // El bucle principal también lo vigila el watchdog (5 s, el del SDK), igual
+    // que `gnss_rx`. Aquí viven el Bluetooth, la consola USB, el botón de
+    // apagado y el cierre de la memoria: colgado, el equipo seguía encendido y
+    // sordo, y ni siquiera se apagaba con el botón. Nada de lo que corre en el
+    // bucle espera más de ~1.5 s (mutex del instrumento 1 s, memoria 0.5 s).
+    // Se suscribe al final de setup(): el arranque (prueba de PSRAM, BLE,
+    // Wi-Fi) no cuenta.
+    esp_task_wdt_add(nullptr);
+#endif
 }
 
 void loop() {
+#ifdef TRESVIZO_TASK_WDT
+    esp_task_wdt_reset();
+#endif
     if (instrumentMutex) {
         pollSerial();
         ble_transport::tick();

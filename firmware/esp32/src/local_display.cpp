@@ -54,7 +54,10 @@ void drawStatus(bool shutdown) {
     const auto gnss=gnss_receiver::snapshot();
     const auto text=display_status::build(gnss,esp_timer_get_time(),correction_router::sourceCode(),
                                           correction_router::ageMs(),sd_recorder::displayState());
-    display.setCursor(0,0);display.print("MeridianV ");display.print(instrument::kVersion);
+    // El nombre de la unidad («MeridianV-F1A2 0.9.0» son 20 caracteres: 120 px).
+    const auto& unit=instrument::identity();
+    display.setCursor(0,0);display.print(unit.unitName[0]?unit.unitName:board_profile::kModel);
+    display.print(" ");display.print(instrument::kVersion);
     display.drawFastHLine(0,10,128,kWhite);
     display.setTextSize(2);line(13,text.fix);
     display.setTextSize(1);line(31,text.satellites);
@@ -146,11 +149,17 @@ void begin() {
     // Conservar alimentación estable en Qwiic: una OLED de cuatro pines no
     // expone RESET y puede tener su propio circuito de encendido. Recuperar
     // el controlador con comandos completos, sin pulsar su alimentación.
-    digitalWrite(board_profile::kPeripheralEnable,HIGH);
-    pinMode(board_profile::kPeripheralEnable,OUTPUT);
-    delay(10);
+    // La placa v0.3 no tiene regulador de periféricos: la OLED va a +3V3.
+    if (board_profile::kPeripheralEnable>=0) {
+        digitalWrite(board_profile::kPeripheralEnable,HIGH);
+        pinMode(board_profile::kPeripheralEnable,OUTPUT);
+        delay(10);
+    }
     bootAt=millis();
     if (!display.getBuffer()) { phase="allocation_failed";stopped=true;return; }
+    // Placa v0.3: el módulo va girado 180° (pines abajo). Se gira el dibujo en el
+    // lienzo y no con comandos del controlador: vale igual para SSD1306 y SSD1315.
+    display.setRotation(board_profile::kOledRotation);
     // Única tarea dueña de Wire. El arranque lento de otros servicios no la bloquea.
     if (xTaskCreate(worker,"oled",4096,nullptr,1,nullptr)!=pdPASS) { phase="task_failed";stopped=true; }
 }
@@ -170,5 +179,6 @@ void status(JsonObject out) {
     if (address.load()) out["i2c_address"]=address.load();
     else out["i2c_address"]=nullptr;
     out["sda_gpio"]=board_profile::kSda;out["scl_gpio"]=board_profile::kScl;
+    out["rotation_deg"]=board_profile::kOledRotation*90;
 }
 }

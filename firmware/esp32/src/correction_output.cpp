@@ -52,6 +52,16 @@ std::atomic<uint16_t> listeningPort{0};
 // Fuera de la pila de la tarea: la trama es grande y el stack son 4 KiB.
 Frame outbound;
 char request[513];
+// Rover que acaba de conectar al caster propio y todavía no termina su cabecera.
+// Se lee por pasadas de la tarea, sin bucle propio: hasta 0.8.3 se esperaba aquí
+// hasta 2 s y mientras tanto la publicación al caster externo no avanzaba y sus
+// tramas podían caducar (auditoría 0.9.0, F8). Búfer propio: `request` lo usa
+// el apretón de manos de la publicación en la misma tarea.
+WiFiClient pendingRover;
+uint32_t pendingSince=0;
+size_t pendingBytes=0;
+char roverRequest[513];
+constexpr uint32_t kRoverHeaderMs=2000;
 
 bool valid(JsonVariantConst field,size_t max,bool empty=false){
  if(!field.is<const char*>())return false;
@@ -90,6 +100,8 @@ bool authorized(const char* headers,const String& mount,const String& password){
 }
 
 void closeCaster(){
+ if(pendingRover)pendingRover.stop();
+ pendingRover=WiFiClient();pendingBytes=0;roverRequest[0]=0;
  for(size_t i=0;i<kMaxClients;++i)if(clients[i])clients[i].stop();
  if(listener){listener->stop();delete listener;listener=nullptr;}
  listeningPort=0;casterClients=0;
@@ -120,32 +132,38 @@ void serveCaster(){
   listener->begin();listener->setNoDelay(true);
   listeningPort=c.port;listeningGeneration=id;
  }
- if(WiFiClient incoming=listener->available()){
-  size_t n=0;const uint32_t start=millis();
-  while(casterCurrent(id)&&millis()-start<2000&&n<sizeof(request)-1){
-   if(!incoming.available()){vTaskDelay(1);continue;}
-   const int b=incoming.read();
+ if(!pendingRover){
+  if(WiFiClient incoming=listener->available()){pendingRover=incoming;pendingSince=millis();pendingBytes=0;roverRequest[0]=0;}
+ }
+ if(pendingRover){
+  // Lo que haya llegado, sin esperar: la cabecera se completa en otra pasada.
+  bool complete=false;
+  while(pendingRover.available()&&pendingBytes<sizeof(roverRequest)-1){
+   const int b=pendingRover.read();
    if(b<0)break;
-   request[n++]=char(b);request[n]=0;
-   if(n>=4&&!memcmp(request+n-4,"\r\n\r\n",4))break;
+   roverRequest[pendingBytes++]=char(b);roverRequest[pendingBytes]=0;
+   if(pendingBytes>=4&&!memcmp(roverRequest+pendingBytes-4,"\r\n\r\n",4)){complete=true;break;}
   }
-  request[n]=0;
-  if(!casterCurrent(id)){incoming.stop();return;}
-  if(authorized(request,c.mount,c.password)){
-   size_t slot=kMaxClients;
-   for(size_t i=0;i<kMaxClients;++i)if(!clients[i]){slot=i;break;}
-   if(slot<kMaxClients){
-    const char* accepted="ICY 200 OK\r\n\r\n";
-    if(cancellable_connection::write(incoming,reinterpret_cast<const uint8_t*>(accepted),strlen(accepted),[id](){return casterCurrent(id);}))clients[slot]=incoming;
+  const bool bufferFull=pendingBytes>=sizeof(roverRequest)-1;
+  const bool expired=millis()-pendingSince>=kRoverHeaderMs;
+  if(complete||bufferFull||expired||!pendingRover.connected()){
+   WiFiClient incoming=pendingRover;pendingRover=WiFiClient();
+   if(authorized(roverRequest,c.mount,c.password)){
+    size_t slot=kMaxClients;
+    for(size_t i=0;i<kMaxClients;++i)if(!clients[i]){slot=i;break;}
+    if(slot<kMaxClients){
+     const char* accepted="ICY 200 OK\r\n\r\n";
+     if(cancellable_connection::write(incoming,reinterpret_cast<const uint8_t*>(accepted),strlen(accepted),[id](){return casterCurrent(id);}))clients[slot]=incoming;
+    } else {
+     const char* full="HTTP/1.0 503 Service Unavailable\r\n\r\n";
+     cancellable_connection::write(incoming,reinterpret_cast<const uint8_t*>(full),strlen(full),[id](){return casterCurrent(id);},200);incoming.stop();
+    }
    } else {
-    const char* full="HTTP/1.0 503 Service Unavailable\r\n\r\n";
-    cancellable_connection::write(incoming,reinterpret_cast<const uint8_t*>(full),strlen(full),[id](){return casterCurrent(id);},200);incoming.stop();
+    const char* denied="HTTP/1.0 401 Unauthorized\r\n\r\n";
+    cancellable_connection::write(incoming,reinterpret_cast<const uint8_t*>(denied),strlen(denied),[id](){return casterCurrent(id);},200);incoming.stop();
    }
-  } else {
-   const char* denied="HTTP/1.0 401 Unauthorized\r\n\r\n";
-   cancellable_connection::write(incoming,reinterpret_cast<const uint8_t*>(denied),strlen(denied),[id](){return casterCurrent(id);},200);incoming.stop();
+   memset(roverRequest,0,sizeof(roverRequest));pendingBytes=0;
   }
-  memset(request,0,sizeof(request));
  }
  uint32_t live=0;
  for(size_t i=0;i<kMaxClients;++i){

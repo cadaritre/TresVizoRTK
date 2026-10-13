@@ -20,10 +20,20 @@ HEADER = ROOT / 'firmware' / 'esp32' / 'lib' / 'protocol' / 'src' / 'ble_status_
 
 
 def status_paths(contract):
+    """Claves de GET /api/status que viajan por BLE. Una entrada con `"ble": false`
+    (y lo que cuelga de ella) la leen las apps solo por Wi-Fi: no entra al recorte."""
     for route in contract['routes']:
         if route.get('path') == '/api/status' and route.get('method', 'GET') == 'GET':
-            return sorted({entry['path'] for entry in route.get('response', [])})
+            return ble_paths(route)
     raise SystemExit('El contrato no tiene GET /api/status.')
+
+
+def ble_paths(route):
+    entries = route.get('response', [])
+    wifi_only = [e['path'] for e in entries if e.get('ble') is False]
+    def excluded(path):
+        return any(path == w or path.startswith(w + '.') or path.startswith(w + '[]') for w in wifi_only)
+    return sorted({e['path'] for e in entries if not excluded(e['path'])})
 
 
 def render(paths):

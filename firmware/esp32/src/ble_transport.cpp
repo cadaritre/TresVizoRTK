@@ -42,6 +42,8 @@ std::atomic<bool> connected{false}, authorized{false}, advertise{false};
 // después de un corte de corriente, no volver sola en la siguiente jornada.
 std::atomic<bool> enabled{true};
 std::atomic<uint32_t> generation{0}, dropped{0}, correctionAccepted{0}, correctionRejected{0}, correctionDropped{0};
+// Tramas a medias que el parser soltó (0.9.0): tapadas por una completa o sin bytes en 1 s.
+std::atomic<uint32_t> correctionAbandoned{0}, correctionExpired{0};
 // MTU ATT negociado con el telefono y la conexion a la que se refiere. Hasta
 // que el telefono lo negocia rige el minimo, 23.
 std::atomic<uint16_t> attMtu{protocol::kMinimumAttMtu}, connectionId{0};
@@ -101,6 +103,11 @@ Preferences settings;
 String pending;
 protocol::BleResponseTx responseTx;
 uint16_t messageId = 0, sampleSequence = 0;
+// Potencia que se declara en la respuesta de escaneo (AD 0x0A). La del
+// controlador por omisión en ESP32-S3 (ESP_PWR_LVL_P9): +9 dBm.
+constexpr int8_t kAdvertisedTxPowerDbm = 9;
+// Bytes de la respuesta de escaneo propia; 0 = la de la biblioteca (sin MAC).
+size_t scanResponseBytes = 0;
 uint32_t lastEpoch = UINT32_MAX, lastSample = 0, lastHealth = 0, lastSolution = 0;
 uint32_t responseGeneration = 0;
 
@@ -158,7 +165,7 @@ class CommandCallbacks : public BLECharacteristicCallbacks {
 };
 class CorrectionCallbacks : public BLECharacteristicCallbacks {
     gnss::Rtcm3Parser parser;
-    uint32_t seenGeneration = 0, lastByte = 0, sourceGeneration = 0;
+    uint32_t seenGeneration = 0, sourceGeneration = 0;
     void onWrite(BLECharacteristic* characteristic) override {
         // El teléfono actúa de puente: recibe RTCM de un caster por datos
         // móviles y lo escribe aquí cuando el equipo no tiene red propia.
@@ -166,14 +173,19 @@ class CorrectionCallbacks : public BLECharacteristicCallbacks {
         // al menos no se admite mientras el equipo trabaja como base, donde
         // recibir correcciones ajenas no tiene ningún sentido legítimo.
         if (!enabled || !authorized || correction_output::active()) return;
-        if (seenGeneration != generation.load() || sourceGeneration != correction_router::generation() || millis() - lastByte > 2000) parser.reset();
+        // Otra sesión u otra fuente: lo que quedara a medias no es de esta. Una trama
+        // a medias sin bytes nuevos en 1 s, o tapada por una completa, la descarta
+        // el propio parser (`feedAt`, lib/gnss/src/rtcm3.h, desde 0.9.0; antes, 2 s aquí).
+        if (seenGeneration != generation.load() || sourceGeneration != correction_router::generation()) parser.reset();
         sourceGeneration = correction_router::generation();
-        seenGeneration = generation.load(); lastByte = millis();
+        seenGeneration = generation.load();
         const auto data = characteristic->getValue();
-        for (uint8_t byte : data) parser.feed(byte, [](const uint8_t* frame, size_t length) {
+        const uint32_t now = millis();
+        for (uint8_t byte : data) parser.feedAt(byte, now, [](const uint8_t* frame, size_t length) {
             if (!correction_router::submit(correction_router::Source::Ble, frame, length)) ++correctionDropped;
         });
         correctionAccepted = parser.accepted; correctionRejected = parser.rejected;
+        correctionAbandoned = parser.abandoned; correctionExpired = parser.expired;
     }
 };
 // El intervalo que de verdad quedo tras negociar (el telefono decide).
@@ -401,8 +413,27 @@ void begin(Dispatch dispatch, Authenticate authenticate) {
             advertisedAddressIsRandom = true;
         }
     }
+    // Anuncio: banderas y el servicio a04c0001 (las apps escanean filtrando por
+    // él). Respuesta de escaneo: el nombre local y, desde 0.9.0, los datos de
+    // fabricante con modelo y serial (receiver-identity.md), para que la lista
+    // de equipos diga «MeridianVI · F1A2» antes de conectar. La potencia de
+    // emisión va solo si cabe en los 31 bytes (con «MeridianV» sí).
     advertising->addServiceUUID(serviceId);
     advertising->setScanResponse(true);
+    const auto& unit = instrument::identity();
+    uint8_t scan[device_identity::kAdvertisingPayloadBytes];
+    const size_t scanBytes = unit.serial[0]
+        ? device_identity::scanResponse(unit, instrument::apName().c_str(), true, kAdvertisedTxPowerDbm, scan) : 0;
+    if (scanBytes) {
+        BLEAdvertisementData primary;
+        primary.setFlags(ESP_BLE_ADV_FLAG_GEN_DISC | ESP_BLE_ADV_FLAG_BREDR_NOT_SPT);
+        primary.setCompleteServices(BLEUUID(serviceId));
+        advertising->setAdvertisementData(primary);
+        BLEAdvertisementData response;
+        response.addData(std::string(reinterpret_cast<const char*>(scan), scanBytes));
+        advertising->setScanResponseData(response);
+        scanResponseBytes = scanBytes;
+    }
     if (enabled) BLEDevice::startAdvertising();
     ready = true;
 }
@@ -478,6 +509,9 @@ void status(JsonObject out) {
         out["address_type"] = "public";
     }
     out["rtcm_write_without_response"] = true;
+    // Desde 0.9.0: la respuesta de escaneo lleva nombre y datos de fabricante.
+    out["advertised_name"] = instrument::apName();
+    out["manufacturer_data"] = scanResponseBytes > 0;
     out["health_period_ms"] = kHealthPeriodMs;
     const uint16_t interval = connIntervalUnits.load();
     if (connected && interval) out["conn_interval_ms"] = interval * 1.25; else out["conn_interval_ms"] = nullptr;
@@ -498,6 +532,8 @@ void status(JsonObject out) {
     out["rtcm_available"] = gnss_receiver::snapshot().enabled;
     out["rtcm_valid_frames"] = correctionAccepted.load();
     out["rtcm_crc_errors"] = correctionRejected.load();
+    out["rtcm_partial_abandoned"] = correctionAbandoned.load();
+    out["rtcm_partial_expired"] = correctionExpired.load();
     out["rtcm_dropped_frames"] = correctionDropped.load();
     out["file_download_available"] = false;
     out["telemetry_hardware_validated"] = false;

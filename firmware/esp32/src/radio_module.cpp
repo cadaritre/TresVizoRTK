@@ -214,6 +214,9 @@ bool connected() { return linked.load(); }
 void status(JsonObject out) {
     out["state"] = !ready ? "start_failed" : linked ? "connected" : "not_connected";
     out["port"] = radio_link::kPort;
+    // Aditivo (0.9.0, receiver-identity.md): el radio del MeridianV es el aparato
+    // aparte, no uno integrado. Las apps lo usan junto con capabilities.lora_radio.
+    out["integrated"] = false;
     out["role"] = linked ? roleName(sentRole.load()) : nullptr;
     out["frames_to_radio"] = framesToRadio.load();
     out["frames_from_radio"] = framesFromRadio.load();

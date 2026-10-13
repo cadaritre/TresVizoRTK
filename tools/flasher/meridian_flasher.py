@@ -31,7 +31,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT / 'tools'))
-from firmware_identity import HARDWARE_ID, image_hardware_id
+from firmware_identity import HARDWARE_ID, HARDWARE_ID_V03, image_hardware_id
 BUILD = ROOT / 'firmware' / 'esp32' / '.pio' / 'build'
 PLATFORMIO = Path(os.environ.get('PLATFORMIO_CORE_DIR', Path.home() / '.platformio'))
 
@@ -47,6 +47,10 @@ class Model:
     # El MeridianV contesta por USB con su consola JSON; el módulo de radio no tiene
     # consola, así que no se lee antes ni después de cargarlo.
     console: bool = True
+    # Modo, frecuencia y tamaño de la flash, los mismos que usa `pio run -t upload`
+    # en su entorno (PlatformIO escribe «dio» en la cabecera aunque el módulo vaya en
+    # QIO: el segundo cargador lo cambia). Thing Plus y radio: 4 MB.
+    flash_args: tuple = ('--flash_mode', 'dio', '--flash_freq', '80m', '--flash_size', '4MB')
 
     @property
     def build_dir(self):
@@ -60,6 +64,10 @@ MODELS = (
     Model('MeridianV', 'meridianv', 'esp32s3_usb', HARDWARE_ID, 'Thing Plus ESP32-S3'),
     Model('Radio LoRa', 'radio', 'radio', 'tresvizo-radio-e22-esp32s3-v1', 'ESP32-S3 + E22-900M30S',
           project='radio', console=False),
+    # Placa principal v0.3 (hardware/main-board), WROOM-1-N16R2 de 16 MB. Mismo
+    # producto que la Thing Plus, otra imagen: la OTA rechaza la de la otra placa.
+    Model('MeridianV', 'meridianv', 'meridianv_v03', HARDWARE_ID_V03, 'Placa v0.3 (WROOM-1-N16R2)',
+          flash_args=('--flash_mode', 'dio', '--flash_freq', '80m', '--flash_size', '16MB')),
 )
 
 # Formato de la imagen (firmware/esp32/lib/protocol/src/signed_firmware.h).
@@ -203,9 +211,10 @@ def esptool_command():
     raise FlasherError('No encuentro esptool. Instala PlatformIO (el firmware ya lo usa) o ejecuta: python3 -m pip install esptool pyserial')
 
 
-def flash_command(esptool, port, app_file, boot_app0_file, full, bootloader=None, partitions=None):
+def flash_command(esptool, port, app_file, boot_app0_file, full, bootloader=None, partitions=None, flash_args=None):
     command = list(esptool) + ['--chip', 'esp32s3', '--port', port, '--baud', str(UPLOAD_BAUD),
-                               '--before', 'default_reset', '--after', 'hard_reset', 'write_flash', '-z'] + FLASH_ARGS
+                               '--before', 'default_reset', '--after', 'hard_reset', 'write_flash', '-z']
+    command += list(flash_args) if flash_args else FLASH_ARGS
     if full:
         if not bootloader or not partitions:
             raise FlasherError('Para la instalación completa faltan bootloader.bin o partitions.bin.')
@@ -304,11 +313,12 @@ def run_gui():
 
     # 1. Modelo
     ttk.Label(frame, text='1. Modelo de receptor', font=('', 13, 'bold')).grid(row=0, column=0, columnspan=3, sticky='w')
-    model_var = tk.StringVar(value=MODELS[0].name)
+    # Por entorno, no por nombre: la Thing Plus y la placa v0.3 son los dos «MeridianV».
+    model_var = tk.StringVar(value=MODELS[0].env)
     models_row = ttk.Frame(frame)
     models_row.grid(row=1, column=0, columnspan=3, sticky='w', pady=(4, 12))
     for model in MODELS:
-        ttk.Radiobutton(models_row, text=f'{model.name} · {model.board}', value=model.name, variable=model_var,
+        ttk.Radiobutton(models_row, text=f'{model.name} · {model.board}', value=model.env, variable=model_var,
                         command=lambda: refresh_state()).pack(side='left', padx=(0, 16))
 
     # 2. Imagen
@@ -388,7 +398,7 @@ def run_gui():
         log_box.configure(state='disabled')
 
     def current_model():
-        return next(m for m in MODELS if m.name == model_var.get())
+        return next(m for m in MODELS if m.env == model_var.get())
 
     def mismatch():
         info = state['image']
@@ -433,7 +443,7 @@ def run_gui():
             handle, temporary = tempfile.mkstemp(suffix='.bin', prefix='tresvizo-app-')
             with os.fdopen(handle, 'wb') as out:
                 out.write(info.app)
-            command = flash_command(esptool, port, temporary, boot, full, bootloader, partitions)
+            command = flash_command(esptool, port, temporary, boot, full, bootloader, partitions, model.flash_args)
             events.put(('log', '$ ' + ' '.join(command)))
             events.put(('status', f'Cargando {model.name}… no desconectes el cable.'))
             process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -467,7 +477,7 @@ def run_gui():
             except (FlasherError, subprocess.SubprocessError, ValueError) as error:
                 events.put(('done', (None, f'Cargado, pero no pude leer el equipo después ({error}). Desconéctalo, vuelve a conectarlo y compruébalo desde la app.')))
                 return
-            name = after.get('product_name') or 'MeridianV'
+            name = after.get('product_name') or after.get('model') or 'MeridianV'
             version = after.get('firmware_version') or '—'
             same_model = status_model(after) == model
             same_version = info.version is None or version == info.version
