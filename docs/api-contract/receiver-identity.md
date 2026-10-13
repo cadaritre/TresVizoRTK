@@ -70,8 +70,11 @@ saber el modelo).
 3. **Recuerdan la unidad por `serial`** (no por la dirección BLE, que cambia con la generación de la
    tabla GATT): el último equipo usado, su papel base/rover y sus ajustes de app.
 4. **Por capacidades**, no por modelo: si `capabilities.lora_radio` es `true`, la pantalla de radio
-   habla con el radio integrado (rutas de `/api/radio`) en vez de buscar el «TresVizo Radio XXXX»
-   por Bluetooth. `gnss_module` decide qué ajustes del GNSS se ofrecen.
+   habla con el radio integrado (rutas de `/api/radio`). Con `lora_radio: false` y
+   `subsystems.radio.link == "usb"`, el radio externo va por el USB-C del receptor y la app lo
+   configura por `/api/radio` del receptor ([USB_LINK.md](../radio/USB_LINK.md)); el emparejamiento
+   BLE del «TresVizo Radio» queda solo para radios 0.1.x. `gnss_module` decide qué ajustes del GNSS
+   se ofrecen.
 5. Un `model` desconocido no rompe nada: se muestra el texto tal cual y se usan capacidades.
 6. Las cadenas fijas «MeridianV» de la interfaz pasan a decir el modelo conectado (o «receptor»
    si no hay ninguno).

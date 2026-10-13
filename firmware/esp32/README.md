@@ -2,6 +2,36 @@
 
 **Alimentación — 02/10/2026:** LiPo 1S 3.7 V / 3000 mAh confirmada. Lectura MAX17048 y apagado coordinado Mk2 implementados; falta identificar el elevador de 5 V y validar físicamente el conjunto con UM980. Ver `hardware/wiring.md` desde la raíz. La carga es autónoma por hardware; USB impide el corte total de batería. (Thing Plus. La placa v0.3 tiene su propia alimentación: ver 0.9.0.)
 
+## Radio LoRa externo por el USB-C (12/10/2026, sobre 0.9.0; sin versión nueva)
+
+El radio LoRa externo deja el Wi-Fi propio (TCP 2102) y se conecta al **USB-C del receptor**, del
+que es el anfitrión USB: el receptor sigue siendo el CDC de siempre, en la Thing Plus y en la v0.3
+sin tocar el hardware. Protocolo en [USB_LINK.md](../../docs/radio/USB_LINK.md).
+
+- **Canal USB** (`src/usb_channel.cpp`): una tarea lee el CDC y lo separa con `radio_usb::Demux`
+  (`lib/protocol/src/radio_usb.h`, compartido con `firmware/radio`): líneas JSON de la consola
+  (mismas reglas: 1024 bytes, 413 y 408), RTCM3 crudo con CRC-24Q y tramas del enlace (`F5 52`).
+  Todo lo que sale por el USB pasa por un escritor único (`usb_channel::write`). La consola sigue
+  igual con una computadora; con un radio enlazado no ejecuta líneas (no hay nadie que las mande).
+- **Enlace** (`src/radio_module.cpp`, `lib/protocol/src/radio_usb_receiver.h`): `hello` →
+  `welcome` con la versión del protocolo; `role` al cambiar y cada segundo; sin `status` del radio
+  3.5 s, enlace caído. Base: cada RTCM del receptor sale crudo al radio. Rover: el RTCM del radio
+  entra al router como fuente `radio` (y se adopta sola si no hay otra elegida).
+- **Configuración**: `POST /api/radio` manda `config` con `seq`; el radio contesta `config_ack`.
+  `power_dbm` se sigue admitiendo hasta 30; el radio aplica 27 como mucho (IFT-008-2015).
+- **Energía** (`power_manager`): con un radio enlazado, la v0.3 pone el BQ25798 en HIZ (REG0F bit 2,
+  `bq25798::setHiz`) y lo reaplica cada segundo; al desenlazar lo quita si lo puso. La Thing Plus
+  no puede (MCP73831 sin I²C). El radio no da VBUS, así que el apagado (modo *ship*) funciona con
+  el radio puesto.
+- **API, aditiva**: `/api/radio` y `subsystems.radio` añaden `link` (`usb`), `max_power_dbm`,
+  `battery_mv`, `config_seq`, `config_state`, `config_error` y `power_limited` (en el contrato) y,
+  de diagnóstico, `protocol`, `usb_errors`, `charger_hiz` y `vbus_present`. `port` queda en 0: ya no
+  se escucha ningún puerto. Se quitan `radio_link.h` y su prueba.
+- **Pruebas nativas**: `radio_usb_test` (entramado), `radio_usb_receiver_test` (saludo, papel,
+  latido) y `bq25798_test` ampliada con HIZ.
+
+**Sin probar en equipo**: ni el enlace con un radio real ni el HIZ en una v0.3.
+
 ## 0.9.0 — Identidad del receptor, auditoría de fluidez y placa v0.3 (12/10/2026)
 
 Dos entornos para el mismo producto, el **MeridianV**:
@@ -63,8 +93,8 @@ Arreglos posteriores, iguales a los del MeridianVI:
     (`abandoned`);
   - con reloj (`feedAt`), una trama a medias sin bytes nuevos durante 1 s se descarta
     (`expired`; antes, 2 s solo por BLE);
-  - lo usan BLE, NTRIP y la UART del UM980. El rover del radio externo (`firmware/radio`) sigue
-    con `feed` sin reloj: ese proyecto lo está cambiando otra persona (enlace USB);
+  - lo usan BLE, NTRIP y la UART del UM980, y desde la 0.2.0 también el rover del radio externo
+    (`firmware/radio`, con `feedAt`);
   - `subsystems.ble` y `subsystems.ntrip` añaden `rtcm_partial_abandoned` y
     `rtcm_partial_expired`;
   - el retraso de una trama real detrás de una cabecera falsa en la UART pasa de hasta 1029

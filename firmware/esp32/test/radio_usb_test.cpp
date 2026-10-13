@@ -1,4 +1,4 @@
-// Entramado del enlace USB del radio (src/radio_usb.h, docs/radio/USB_LINK.md).
+// Entramado del enlace USB del radio (lib/protocol/src/radio_usb.h, docs/radio/USB_LINK.md).
 #include "radio_usb.h"
 #include <cassert>
 #include <cstdio>

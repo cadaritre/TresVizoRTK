@@ -67,11 +67,34 @@ se puede apagar con el radio puesto.
 
 ## En el MeridianV
 
-**Pendiente (fase 2).** El firmware del MeridianV todavía tiene el enlace anterior
-(`src/radio_module.cpp`: servidor TCP en el puerto 2102 de su red propia) y no habla con
-este radio por USB. Lo que cambiará: demultiplexor en el canal USB, fuente y sumidero `radio`
-por el cable, reenvío de la configuración, detección del radio, cargador de la v0.3 en HIZ
-mientras esté conectado y `link: "usb"` en `/api/radio` y `subsystems.radio` (aditivo).
+- `src/usb_channel.cpp`: una tarea lee el CDC y lo separa (consola JSON, RTCM, tramas del
+  enlace); todo lo que sale por el USB pasa por un escritor único.
+- `src/radio_module.cpp`: detecta el radio por su saludo, le da el papel según el modo del
+  receptor, le manda el RTCM de la base y mete el del rover en el router como fuente `radio`.
+- `/api/status` → `subsystems.radio`; `/api/radio` (GET estado; POST `network`, `channel`,
+  `power_dbm`, que se reenvían al radio con un número `seq` y se confirman con `config_state`).
+- Fuente `radio` en `/api/corrections/source`.
+- Placa v0.3: cargador en HIZ mientras haya un radio enlazado (USB_LINK.md §9.2).
+
+## Las apps
+
+Ya no hay Bluetooth del radio ni alta Wi-Fi. Con `capabilities.lora_radio` = `false` y
+`subsystems.radio.link` = `"usb"`:
+
+1. **Detección**: `GET /api/radio` → `state` = `connected` cuando hay un radio enchufado y
+   enlazado (`not_connected` si no). Mostrar `radio_version`, `radio_id`, `air`, `rssi_dbm`,
+   `snr_db`, los paquetes y `battery_mv` (null si el radio no la mide).
+2. **Configurar**: `POST /api/radio` con lo que cambie (`network` 0–255, `channel` 0–12,
+   `power_dbm` 0–27; se admite hasta 30, pero el radio aplica `max_power_dbm`). Respuesta 202
+   con `config_seq` y `config_state` = `pending`; sin radio, 409 `radio_not_connected`.
+3. **Confirmar**: volver a pedir `GET /api/radio` hasta que `config_state` sea `applied`
+   (con los valores nuevos en `network`, `channel` y `power_dbm`; `power_limited` = true si se
+   recortó), `rejected` (`config_error` dice por qué) o `not_confirmed` (el radio se
+   desconectó antes de contestar).
+4. **Fuente**: en rover, elegir `radio` en `/api/corrections/source` (si no hay otra elegida,
+   se adopta sola al enlazar). En base no hay nada que elegir: el RTCM sale solo.
+5. Con `link` ausente (firmware hasta 0.9.0) sigue el flujo anterior: radio 0.1.x por Wi-Fi y su
+   alta por Bluetooth («TresVizo Radio XXXX»).
 
 ## En el radio (`firmware/radio/`)
 
@@ -82,16 +105,14 @@ USB-UART, ver USB_LINK.md §9). Estado en un LED.
 
 ## Estado (12-10-2026)
 
-- **Hecho y compilando**: el firmware 0.2.0 del radio con el enlace USB (`firmware/radio/`),
-  con pruebas nativas del entramado y del saludo (`python3 tools/firmware_tests/run_native.py`).
-- **Pendiente**: el lado del MeridianV (fase 2).
+- **Hecho y compilando**: el firmware 0.2.0 del radio y el lado del MeridianV (Thing Plus y
+  v0.3), con pruebas nativas del entramado, del saludo de los dos lados y del HIZ del cargador
+  (`python3 tools/firmware_tests/run_native.py`).
 - **Sin probar con hardware**: no hay radios todavía.
 
 ## Lo que falta
 
 - La placa del radio: requisitos de USB-C y energía en USB_LINK.md §9.
 - Probarlo con dos radios en campo: alcance, pérdidas, latencia de la corrección.
-- Las apps: la pantalla de radio deja el Bluetooth del radio y el alta Wi-Fi; todo va por
-  `/api/radio` del MeridianV (estado, red, canal y potencia hasta 27 dBm), y elegir la fuente
-  «Radio».
+- Las apps: el flujo de «Las apps», arriba.
 - Medir la ganancia real del amplificador y el consumo a 27 dBm.

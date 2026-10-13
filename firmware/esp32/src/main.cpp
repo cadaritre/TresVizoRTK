@@ -1,4 +1,5 @@
 #include "radio_module.h"
+#include "usb_channel.h"
 #include "sd_recorder.h"
 #include "board_profile.h"
 #include "local_display.h"
@@ -30,10 +31,9 @@
 namespace {
 httpd_handle_t server = nullptr;
 SemaphoreHandle_t instrumentMutex;
+// La orden que entregó el canal USB (usb_channel.cpp): JSON de hasta 1024 bytes.
 char serialBuffer[config_rules::kMaxRequestBytes + 1];
 size_t serialLength = 0;
-bool serialOverflow = false;
-uint32_t serialStartedAt = 0;
 
 // El instrumento dejó de pedir clave de panel por decisión del propietario:
 // es un receptor GNSS de campo y la barrera estorbaba más de lo que protegía.
@@ -119,9 +119,12 @@ esp_err_t handleHttp(httpd_req_t* request) {
     return reply(request, code, response);
 }
 
+// Toda salida por el USB va por el escritor único del canal (con un radio enlazado,
+// una respuesta no debe colarse en medio de una trama).
 void serialReply(JsonDocument& response) {
-    serializeJson(response, Serial);
-    Serial.println();
+    String text;
+    serializeJson(response, text);
+    usb_channel::writeLine(text);
 }
 
 void handleSerialLine() {
@@ -164,29 +167,12 @@ void handleSerialLine() {
     serialReply(output);
 }
 
+// Las líneas, el 413 (más de 1024 bytes) y el 408 (5 s sin '\n') los resuelve el
+// demultiplexor del canal USB, con las mismas reglas de siempre; aquí se ejecuta la
+// orden, de una en una.
 void pollSerial() {
-    // Cuota por ciclo: una entrada continua no monopoliza el controlador.
-    for (size_t count = 0; count < 256 && Serial.available(); ++count) {
-        const char c = Serial.read();
-        if (!serialLength && !serialOverflow) serialStartedAt = millis();
-        if (c == '\n') {
-            if (serialOverflow) Serial.println("{\"status\":413,\"body\":{\"error\":\"request_too_large\"}}");
-            else if (serialLength) {
-                serialBuffer[serialLength] = '\0';
-                handleSerialLine();
-            }
-            serialLength = 0;
-            serialOverflow = false;
-        } else if (c != '\r') {
-            if (serialLength < config_rules::kMaxRequestBytes && !serialOverflow) serialBuffer[serialLength++] = c;
-            else serialOverflow = true;
-        }
-    }
-    if ((serialLength || serialOverflow) && config_rules::elapsed(millis(), serialStartedAt, 5000)) {
-        serialLength = 0;
-        serialOverflow = false;
-        Serial.println("{\"status\":408,\"body\":{\"error\":\"request_timeout\"}}");
-    }
+    serialLength = usb_channel::takeLine(serialBuffer, sizeof(serialBuffer));
+    if (serialLength) handleSerialLine();
 }
 }
 
@@ -215,7 +201,7 @@ void setup() {
     correction_router::begin();
     ntrip_input::begin();
     correction_output::begin();
-    // El radio LoRa externo: servidor en la red propia, en su propia tarea.
+    // El radio LoRa externo, por el USB-C (lo atiende la tarea del canal USB).
     radio_module::begin();
     base_survey::begin();
     gnss_visible::begin();
@@ -248,6 +234,9 @@ void setup() {
     } else Serial.println("Error al iniciar el servidor web. Consola USB disponible.");
     local_display::servicesReady();
     Serial.printf("TresVizo RTK %s. Consola JSON USB disponible.\n", instrument::kVersion);
+    // Desde aquí el CDC lo lee su tarea: órdenes JSON, o el radio LoRa si es lo que hay
+    // conectado (docs/radio/USB_LINK.md). Todo lo que sale pasa por usb_channel::write.
+    if (!usb_channel::begin()) Serial.println("Error: no se pudo arrancar el canal USB.");
 #ifdef TRESVIZO_TASK_WDT
     // El bucle principal también lo vigila el watchdog (5 s, el del SDK), igual
     // que `gnss_rx`. Aquí viven el Bluetooth, la consola USB, el botón de

@@ -11,7 +11,8 @@
 //
 // - Solo escribe tres cosas: SFET_PRESENT = 1 (la placa lleva el FET de envío
 //   Q101), WATCHDOG = desactivado e ICHG = 1 A. Nunca VREG, IINDPM, CELL ni
-//   EN_EXTILIM = 0. ICHG nunca pasa de 1.5 A.
+//   EN_EXTILIM = 0. ICHG nunca pasa de 1.5 A. Además, mientras haya un radio LoRa
+//   enlazado por el USB-C, EN_HIZ (setHiz, docs/radio/USB_LINK.md §9).
 // - Antes comprueba que es un BQ25798 (REG48) y que VREG es 4.2 V, el de 1S que
 //   fija PROG (R103 4.7 kΩ, tabla 7-1). Si VREG no es 4.2 V, el pack Li-ion 1S2P
 //   no se debe cargar con eso: deshabilita la carga (EN_CHG = 0) y no escribe más.
@@ -25,7 +26,7 @@ namespace bq25798 {
 constexpr uint8_t kAddress = 0x6B;            // §7.3.14.5, figura 7-19
 constexpr uint8_t kRegVreg = 0x01;            // REG01: VREG[10:0], 10 mV/bit (16 bits)
 constexpr uint8_t kRegIchg = 0x03;            // REG03: ICHG[8:0], 10 mA/bit (16 bits)
-constexpr uint8_t kRegControl0 = 0x0F;        // REG0F: bit 5 EN_CHG
+constexpr uint8_t kRegControl0 = 0x0F;        // REG0F: bit 5 EN_CHG, bit 2 EN_HIZ
 constexpr uint8_t kRegControl1 = 0x10;        // REG10: [2:0] WATCHDOG (0 = desactivado)
 constexpr uint8_t kRegControl2 = 0x11;        // REG11: [2:1] SDRV_CTRL, bit 0 SDRV_DLY
 constexpr uint8_t kRegControl5 = 0x14;        // REG14: bit 7 SFET_PRESENT, bit 1 EN_EXTILIM
@@ -36,6 +37,10 @@ constexpr uint8_t kRegFault0 = 0x20, kRegFault1 = 0x21;
 constexpr uint8_t kRegPartInfo = 0x48;        // REG48: [5:3] PN = 011b (BQ25798)
 
 constexpr uint8_t kEnChg = 0x20;
+// HIZ (§7.3.6.5, tabla 7-25): el convertidor deja de conmutar aunque haya adaptador y
+// el sistema va de la batería; no se toma corriente de VBUS. El cargador lo borra solo
+// al enchufarse un adaptador (y lo pone él ante una fuente pobre o IBUS_OCP).
+constexpr uint8_t kEnHiz = 0x04;
 constexpr uint8_t kWatchdogMask = 0x07;
 constexpr uint8_t kSdrvMask = 0x07;           // SDRV_CTRL[2:1] + SDRV_DLY
 constexpr uint8_t kSdrvShipNow = (2u << 1) | 1u;
@@ -173,6 +178,17 @@ Status poll(Bus& bus, ByteOrder order, unsigned ichgMa, unsigned ichgMaxMa) {
     }
     s.valid = true;
     return s;
+}
+
+// HIZ encendido o apagado; solo escribe si cambia. Devuelve false si el bus falla y
+// deja en `active` cómo quedó el bit.
+template<class Bus>
+bool setHiz(Bus& bus, bool on, bool& active) {
+    if (!update(bus, kRegControl0, on ? 0 : kEnHiz, on ? kEnHiz : 0)) return false;
+    uint8_t control0 = 0;
+    if (!bus.read(kRegControl0, &control0, 1)) return false;
+    active = control0 & kEnHiz;
+    return true;
 }
 
 enum class Ship : uint8_t { written, vbus_present, not_allowed, bus_error };

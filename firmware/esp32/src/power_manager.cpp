@@ -52,6 +52,11 @@ void sampleGauge(){
     valid=ok;voltage=volts;soc=percent>100?100:percent;sampled=millis();
     portEXIT_CRITICAL(&gaugeMux);
 }
+// El MCP73831 no se puede controlar ni dice si hay VBUS: con un radio que cumpla su
+// requisito (no da VBUS, USB_LINK.md §9.1) no hay nada que hacer.
+void blockUsbInput(bool){}
+int usbInputBlocked(){ return -1; }
+int usbPowerPresent(){ return -1; }
 void status(JsonObject out){
     bool ok;float v,s;uint32_t t;
     portENTER_CRITICAL(&gaugeMux);ok=valid;v=voltage;s=soc;t=sampled;portEXIT_CRITICAL(&gaugeMux);

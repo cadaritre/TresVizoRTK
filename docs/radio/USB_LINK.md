@@ -4,12 +4,12 @@ El radio LoRa es un **aparato aparte, con su propia pila**, que se conecta con u
 USB-C al puerto USB-C del MeridianV. Por ese cable entran y salen las correcciones: en base,
 el MeridianV le pasa el RTCM al radio y el radio lo transmite; en rover, el radio lo recibe
 por el aire y se lo entrega al MeridianV. Decisión del propietario del 12-10-2026; sustituye
-al enlace por el Wi-Fi del MeridianV (TCP a `192.168.4.1:2102`, `radio_link.h`) y al alta del
-radio por Bluetooth.
+al enlace por el Wi-Fi del MeridianV (TCP a `192.168.4.1:2102`, ya retirado) y al alta del
+radio por Bluetooth (que queda solo para radios 0.1.x).
 
-**Estado (12-10-2026).** Protocolo definido; el lado del radio está escrito y compila
-(`firmware/radio`, 0.2.0) y el entramado y el saludo tienen pruebas nativas. El lado del
-MeridianV está pendiente (fase 2). **Nada se ha probado con hardware** (§12).
+**Estado (12-10-2026).** Los dos lados están escritos y compilan: el radio (`firmware/radio`,
+0.2.0) y el MeridianV (Thing Plus y v0.3). El entramado, el saludo de los dos lados y el HIZ
+del cargador tienen pruebas nativas. **Nada se ha probado con hardware** (§12).
 
 ## 1. Papeles USB
 
@@ -56,7 +56,7 @@ común: así la consola JSON de siempre no cambia para quien conecte una computa
 El RTCM va **crudo**, no dentro de JSON: una línea de la consola admite 1024 bytes y una trama
 RTCM3 llega a 1029 (en base64, 1372).
 
-### 3.1 Trama del enlace (`firmware/radio/src/radio_usb.h`)
+### 3.1 Trama del enlace (`firmware/esp32/lib/protocol/src/radio_usb.h`)
 
 | Byte | Valor |
 | --- | --- |
@@ -98,9 +98,14 @@ no la versión: una trama con versión distinta de 1 no se reconoce (cuenta como
   malos, abandonadas, caducadas, líneas cortadas, largas y a medias, bytes de basura.
 
 **Quien escribe** manda cada trama o línea entera, de una vez y bajo un mismo cerrojo. En el
-MeridianV eso incluye las respuestas JSON, los avisos de texto, las tramas del enlace y el
-RTCM (fase 2). El demultiplexor aguanta una escritura metida en medio de otra, pero pierde lo
-que quede cortado.
+MeridianV todo sale por `usb_channel::write` (`src/usb_channel.cpp`): respuestas JSON, avisos
+de texto, tramas del enlace y RTCM. El demultiplexor aguanta una escritura metida en medio de
+otra, pero pierde lo que quede cortado.
+
+En el MeridianV una tarea propia lee el CDC y lo pasa por el demultiplexor; las órdenes JSON
+se ejecutan en el bucle principal, de una en una (mientras una espera, la tarea no lee más,
+como hacía la consola). **Con un radio enlazado la consola no ejecuta líneas ni contesta 413 o
+408**: del otro lado está el radio, que no manda órdenes, y una línea sería un trozo roto.
 
 ## 4. Saludo y versiones
 
@@ -262,9 +267,8 @@ dio papel rover. Un RTCM que llegue de algo que no es un radio enlazado se ignor
      apagado; y entraría la irrupción de los ~30 µF nominales de VBUS y PMID.
    - La Thing Plus carga sola (MCP73831, sin I²C): con VBUS presente se cargaría del radio sin
      que el firmware pueda impedirlo.
-   - Si alguna vez el radio tuviera que dar VBUS: que pase por un interruptor con límite de
-     corriente que su firmware pueda cortar, y habría que añadir al protocolo una orden para
-     cortarlo antes de que el MeridianV se apague. No está previsto.
+   - Decisión: el radio **no** da VBUS. Que funcione sin él está por confirmar en banco
+     (§12); si no funcionara, habría que replantear el requisito antes de diseñar la placa.
 2. **CC**: Rp de «USB por omisión» en CC1 y CC2 (36 kΩ a 3V3). La v0.3 y la Thing Plus
    tienen Rd de 5.1 kΩ: queda definido radio = DFP y MeridianV = UFP con cualquier cable C-C.
    Un teléfono o una computadora enchufados por error tampoco dan ni toman VBUS.
@@ -281,19 +285,22 @@ dio papel rover. Un RTCM que llegue de algo que no es un radio enlazado se ignor
 6. Con el radio apagado y enchufado, el pull-up de D+ del MeridianV (≈1.5 kΩ a 3.3 V) puede
    meter unos mA en el radio por sus diodos de protección: medirlo en banco.
 
-### 9.2 Lo que hará el MeridianV (fase 2)
+### 9.2 Lo que hace el MeridianV
 
 - **Placa v0.3** (BQ25798 por I²C): mientras haya un radio enlazado, el cargador en **HIZ**
-  (`EN_HIZ = 1` en REG0F; la posición del bit se confirma con la hoja SLUSDV2C al
-  implementarlo): no toma corriente de VBUS aunque un radio o un cable la den. Al desenlazar,
-  `EN_HIZ = 0`. Se reaplica en cada vuelta del gestor de energía mientras dure el enlace, por
-  si el cargador lo borra al enchufarse un adaptador (confirmarlo en la hoja). Con un radio que cumpla 9.1 no
-  cambia nada en la práctica (`usb_present` falso, el modo *ship* funciona). Si llega VBUS con
-  un radio enlazado, `subsystems.radio` lo avisa: ese radio incumple el requisito y el
-  MeridianV no podrá apagarse con él puesto («sigue alimentado», como con un cargador).
-- **Thing Plus**: el cargador no se puede controlar. Con un radio que cumpla 9.1 no hay nada
-  que hacer; si un radio diera VBUS, la Thing Plus se cargaría de su pila. Por eso el requisito
-  1 es del radio. Falta mirar en el esquema de SparkFun que su ESD de D+/D−, si la tiene, no
+  (`EN_HIZ = 1`, bit 2 de REG0F, tabla 7-25 de la hoja SLUSDV2C): el convertidor deja de
+  conmutar aunque haya adaptador y el sistema va de la batería (§7.3.6.5), así que no se toma
+  corriente de VBUS aunque un radio o un cable la den. Se reaplica cada segundo (lo hace la
+  tarea dueña de Wire) porque el cargador borra `EN_HIZ` al enchufarse un adaptador (misma
+  tabla). Al desenlazar, `EN_HIZ = 0`, solo si lo puso este firmware (un HIZ que pone el propio
+  cargador ante una fuente pobre no se toca). Con un radio que cumpla 9.1 no cambia nada en la
+  práctica (`usb_present` falso, el modo *ship* funciona). `subsystems.radio` dice
+  `charger_hiz` y `vbus_present`: si llega VBUS con un radio enlazado, ese radio incumple el
+  requisito y el MeridianV no podrá apagarse con él puesto (el modo *ship* solo entra sin
+  adaptador, §7.3.12; quedaría «sigue alimentado», como con un cargador).
+- **Thing Plus**: el cargador no se puede controlar (`charger_hiz` y `vbus_present` van null).
+  Con un radio que cumpla 9.1 no hay nada que hacer; si un radio diera VBUS, la Thing Plus se
+  cargaría de su pila. Por eso el requisito 1 es del radio. Falta mirar en el esquema de SparkFun que su ESD de D+/D−, si la tiene, no
   vaya a VBUS, y probar en banco la Thing Plus con su batería y un radio sin VBUS.
 
 ## 10. Caudal: USB contra aire
@@ -317,22 +324,28 @@ por la UART del UM980 son ~90 ms. Una época completa: 0.2–0.5 s de punta a pu
 
 | Archivo | Qué |
 | --- | --- |
-| `firmware/radio/src/radio_usb.h` | Entramado, tiempos y demultiplexor. Sin Arduino; lo usarán los dos firmwares (en la fase 2 pasa a `firmware/esp32/lib/protocol/src`, junto a `radio_link.h`) |
+| `firmware/esp32/lib/protocol/src/radio_usb.h` | Entramado, tiempos y demultiplexor. Sin Arduino; lo usan los dos firmwares |
+| `firmware/esp32/lib/protocol/src/radio_usb_receiver.h` | Saludo, papel y latido del lado del MeridianV |
+| `firmware/esp32/src/usb_channel.cpp` | Tarea que lee el CDC, demultiplexor, escritor único y entrega de órdenes a la consola |
+| `firmware/esp32/src/radio_module.cpp` | Enlace del radio: `welcome`, `role`, `status`, `config`/`config_ack`, RTCM en los dos sentidos, `/api/radio` y `subsystems.radio` |
+| `firmware/esp32/src/power_manager_v03.cpp`, `include/bq25798.h` | HIZ del cargador con el radio enlazado (`setHiz`) |
 | `firmware/radio/src/usb_session.h` | Saludo, latidos y caída del enlace del lado del radio |
 | `firmware/radio/src/usb_cdc_host.cpp` | Anfitrión USB y cliente CDC-ACM sobre ESP-IDF 4.4 |
-| `firmware/radio/test/radio_usb_test.cpp` | Entramado: ida y vuelta a trozos, texto y JSON, cirílico, basura, cortes, CRC malo, trama dentro de otra, líneas largas, caducidades, prueba al azar |
+| `firmware/esp32/test/radio_usb_test.cpp` | Entramado: ida y vuelta a trozos, texto y JSON, cirílico, basura, cortes, CRC malo, trama dentro de otra, líneas largas, caducidades, prueba al azar |
+| `firmware/esp32/test/radio_usb_receiver_test.cpp` | Saludo con y sin protocolo común, papel al cambiar y cada segundo, caída por silencio, vuelta de `millis()` |
+| `firmware/esp32/test/bq25798_test.cpp` | HIZ: solo toca REG0F bit 2, solo si cambia; con VBUS el modo *ship* sigue sin entrar |
 | `firmware/radio/test/usb_session_test.cpp` | Saludo, reintentos, bienvenida, papel, latido, caída, rechazo, desconexión, vuelta de `millis()` |
 
 Pruebas: `python3 tools/firmware_tests/run_native.py` (las del MeridianV y las del radio).
 
 ## 12. Pendiente y sin probar
 
-- **Fase 2, MeridianV**: demultiplexor en el canal USB, enlace del radio por USB en lugar del
-  servidor TCP, fuente y sumidero `radio` por USB, reenvío de `config` con `seq`, detección
-  del radio, regla del cargador y `link: "usb"` en `/api/radio` y `subsystems.radio`.
 - **Con hardware, nada**: que la USB Host Library de IDF 4.4 enumere y abra el USB-Serial/JTAG
-  del MeridianV; que DTR = RTS = 0 no lo reinicie; datos sin VBUS en la v0.3 y en la Thing Plus;
-  reconexiones; caudal y latencia reales; consumo del radio.
+  del MeridianV; que DTR = RTS = 0 no lo reinicie; **datos sin VBUS** en la v0.3 y en la Thing
+  Plus (con su batería; falta además el esquema de SparkFun para ver a qué va su ESD de D+/D−);
+  el HIZ del BQ25798 en una v0.3; reconexiones; caudal y latencia reales; consumo del radio.
+- La consola por USB con una computadora tampoco se ha probado tras pasar a la tarea del canal
+  (`tools/usb_console.py`, el cargador y `check_contract.py device`).
 - **Banco sin la placa del radio**: una ESP32-S3-DevKitC-1 puede hacer de radio: su puerto
   «USB» es el nativo y el «UART» sirve para cargarla y ver su consola. Antes, mirar en su
   esquema si su puerto «USB» saca VBUS y, si lo saca, no usarla con la v0.3 sin cortarlo.

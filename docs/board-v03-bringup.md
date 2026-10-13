@@ -147,6 +147,7 @@ Lo único que escribe:
 | REG10 [2:0] WATCHDOG | 000 (desactivado) | Para que la configuración no vuelva a la de fábrica a los 40 s |
 | REG03/04 ICHG | 1000 mA (100 × 10 mA) | J102: dos contactos GH por polo con AWG #26. El firmware no pasa nunca de 1.5 A; si lee más, vuelve a 1 A |
 | REG11 SDRV_CTRL / SDRV_DLY | 10 / 1 (0x45 desde 0x40), solo al apagar | Modo *ship* inmediato. Solo sin VBUS: con USB la orden se ignora (§7.3.12) y el equipo queda «sigue alimentado» hasta que se quita el cable |
+| REG0F bit 2 EN_HIZ | 1 mientras haya un radio LoRa enlazado por el USB-C; 0 al desenlazar (solo si lo puso el firmware) | Que el cargador no tome corriente de VBUS si un radio o un cable la dieran (tabla 7-25; se reaplica cada segundo porque el cargador lo borra al enchufarse un adaptador). Ver [USB_LINK.md](radio/USB_LINK.md) §9 |
 
 Nunca escribe VREG, IINDPM, VSYSMIN, CELL (REG0A) ni EN_EXTILIM = 0.
 

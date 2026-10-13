@@ -28,9 +28,14 @@ const char* chargerSetup = "not_started";
 const char* shipResult = nullptr;
 uint16_t vregMv = 0, ichgMa = 0;
 uint32_t chargerSampled = 0;
+// Radio LoRa enlazado por el USB-C: lo pide su módulo; lo aplica la tarea de Wire.
+std::atomic<bool> wantHiz{false};
+std::atomic<int> hizState{0};       // cómo quedó EN_HIZ en la última lectura
 // Solo la tarea de Wire.
 bq25798::ByteOrder order = bq25798::ByteOrder::unknown;
 bool configured = false;
+bool isCharger = false;             // REG48 dijo BQ25798: se le puede escribir
+bool hizByRadio = false;            // EN_HIZ lo puso este firmware por el radio
 uint32_t configuredAt = 0, shipAt = 0;
 // Solo el bucle.
 uint32_t lowSince = 0;
@@ -120,6 +125,7 @@ void sampleGauge() {
         order = result.order;
         // Configurado o con la carga deshabilitada: no se reintenta. Un error de bus sí.
         configured = result.result != bq25798::Setup::bus_error;
+        isCharger = configured && result.result != bq25798::Setup::unexpected_part;
         portENTER_CRITICAL(&mux);
         chargerSetup = bq25798::setupName(result.result); vregMv = result.vregMv; ichgMa = result.ichgMa;
         portEXIT_CRITICAL(&mux);
@@ -132,6 +138,17 @@ void sampleGauge() {
     if (polled.valid && !polled.sfetPresent && configured && order != bq25798::ByteOrder::unknown) {
         configured = false; configuredAt = 0;
     }
+    // Radio enlazado: HIZ, y se reaplica cada segundo porque el cargador lo borra al
+    // enchufarse un adaptador (tabla 7-25). Al desenlazar se quita solo si lo puso
+    // este firmware: un HIZ que puso el propio cargador (fuente pobre) no se toca.
+    const bool want = wantHiz.load();
+    if (isCharger && polled.valid && (want || hizByRadio)) {
+        bool active = false;
+        if (bq25798::setHiz(bus, want, active)) {
+            hizByRadio = want;
+            hizState = active ? 1 : 0;
+        }
+    } else if (!want) hizState = 0;
     uint16_t v = 0, s = 0;
     bool ok = readGauge(0x02, v) && readGauge(0x04, s);   // VCELL y SOC del MAX17048
     const float volts = v * 0.000078125f, percent = s / 256.0f;
@@ -155,6 +172,16 @@ void sampleGauge() {
         // apaga solo al quitar el cable.
         state = 3; shipAt = 0;
     }
+}
+
+void blockUsbInput(bool block) { wantHiz = block; }
+int usbInputBlocked() { return hizState.load(); }
+int usbPowerPresent() {
+    bool known, present;
+    portENTER_CRITICAL(&mux);
+    known = charger.valid && millis() - chargerSampled < 6000; present = charger.vbusPresent;
+    portEXIT_CRITICAL(&mux);
+    return known ? (present ? 1 : 0) : -1;
 }
 
 void status(JsonObject out) {

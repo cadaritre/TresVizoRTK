@@ -64,8 +64,7 @@ confirmar con la hoja de datos del lote.
 ## Sin probar
 
 Nada se ha probado con hardware: compila sin avisos y el entramado del cable y el saludo están
-probados en el host (`test/radio_usb_test.cpp`, `test/usb_session_test.cpp`); la lógica del
-aire, en `firmware/esp32/test/radio_air_test.cpp`. Falta: que la USB Host Library abra el CDC
+probados en el host (`firmware/esp32/test/radio_usb_test.cpp`, `test/usb_session_test.cpp`);
+la lógica del aire, en `firmware/esp32/test/radio_air_test.cpp`. Falta: que la USB Host Library abra el CDC
 del MeridianV, que la E22 arranque con estos pines y este TCXO, potencia real a la salida,
-alcance, y una base y un rover de punta a punta. El MeridianV aún no habla este enlace
-(fase 2).
+alcance, y una base y un rover de punta a punta con el MeridianV (que ya habla este enlace).

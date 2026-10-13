@@ -29,7 +29,7 @@
         {"path": "unit_name", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Modelo + guion + 4 últimos hex del serial. En MeridianVI es también el SSID, el nombre BLE y la OLED; el MeridianV sigue anunciando «MeridianV»."},
         {"path": "capabilities", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Lo que tiene el equipo. Una clave que falta = no se sabe (la app se comporta como hoy)."},
         {"path": "capabilities.gnss_module", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["UM980", "LG290P"], "unknown_values_ok": true, "note": "Decide qué ajustes del GNSS ofrece la app."},
-        {"path": "capabilities.lora_radio", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "true = radio LoRa integrado (MeridianVI): la pantalla de radio usa /api/radio en vez del «TresVizo Radio XXXX»."},
+        {"path": "capabilities.lora_radio", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "true = radio LoRa integrado (MeridianVI): la pantalla de radio usa /api/radio. Con false y `subsystems.radio.link` == \"usb\", el radio externo va por el USB-C del receptor y la app lo configura por /api/radio del receptor; el emparejamiento BLE del «TresVizo Radio» queda solo para radios 0.1.x."},
         {"path": "capabilities.imu", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Chip de la IMU o null si no hay o no se sabe."},
         {"path": "capabilities.battery_chemistry", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["li-ion", "lifepo4"], "unknown_values_ok": true, "note": "Informativa: el porcentaje sigue viniendo del firmware."},
         {"path": "capabilities.removable_storage", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "false en MeridianVI (microSD interna): la app no pide «saca la tarjeta»."},
@@ -165,7 +165,14 @@
         {"path": "subsystems.radio.radio_id", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "Null en el integrado."},
         {"path": "subsystems.radio.hardware", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false},
         {"path": "subsystems.radio.air", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "values": ["transmitting", "receiving", "listening", "idle", "radio_error"], "unknown_values_ok": true},
-        {"path": "subsystems.radio.last_status_age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "Solo el radio externo (latido por Wi-Fi). El integrado no la manda."},
+        {"path": "subsystems.radio.last_status_age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "Solo el radio externo: edad de su último `status` (latido por el USB-C; hasta 0.9.0, por Wi-Fi). El integrado no la manda."},
+        {"path": "subsystems.radio.link", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "values": ["usb"], "unknown_values_ok": true, "note": "Enlace USB-C (docs/radio/USB_LINK.md): `usb` = el radio externo va por el USB-C del receptor y se configura por esta ruta. Ausente en firmwares hasta 0.9.0 (Wi-Fi) y en el integrado."},
+        {"path": "subsystems.radio.max_power_dbm", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "Enlace USB: tope de potencia que aplica el radio (27 dBm, IFT-008-2015). Null sin radio."},
+        {"path": "subsystems.radio.battery_mv", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "Enlace USB: tensión de la pila del radio. Null si su placa no la mide."},
+        {"path": "subsystems.radio.config_seq", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "Enlace USB: número de la última orden de POST /api/radio. Null si no hubo ninguna."},
+        {"path": "subsystems.radio.config_state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "values": ["pending", "applied", "rejected", "not_confirmed"], "unknown_values_ok": true, "note": "Enlace USB: `pending` hasta que el radio la confirma con su número; `applied`, `rejected` (ver `config_error`) o `not_confirmed` si el radio se desconectó antes. Null sin órdenes."},
+        {"path": "subsystems.radio.config_error", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "Enlace USB: por qué el radio rechazó la última orden. Null si no la rechazó."},
+        {"path": "subsystems.radio.power_limited", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "ble": false, "note": "Enlace USB: true si se pidió más del tope y el radio aplicó `max_power_dbm`. Null sin respuesta todavía."},
         {"path": "subsystems.ntrip", "type": "object", "nullable": true, "optional": true, "apps": ["ios", "android"]},
         {"path": "subsystems.ntrip.state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["stopped", "starting", "stopping", "connecting", "streaming", "waiting_network", "retry_wait"], "unknown_values_ok": true},
         {"path": "subsystems.ntrip.error", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
@@ -680,7 +687,14 @@
         {"path": "radio_id", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Null en el integrado."},
         {"path": "hardware", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
         {"path": "air", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["transmitting", "receiving", "listening", "idle", "radio_error"], "unknown_values_ok": true},
-        {"path": "last_status_age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Solo el radio externo (latido por Wi-Fi). El integrado no la manda."}
+        {"path": "last_status_age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Solo el radio externo: edad de su último `status` (latido por el USB-C; hasta 0.9.0, por Wi-Fi). El integrado no la manda."},
+        {"path": "link", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["usb"], "unknown_values_ok": true, "note": "Enlace USB-C (docs/radio/USB_LINK.md): `usb` = el radio externo va por el USB-C del receptor y se configura por esta ruta. Ausente en firmwares hasta 0.9.0 (Wi-Fi) y en el integrado."},
+        {"path": "max_power_dbm", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Enlace USB: tope de potencia que aplica el radio (27 dBm, IFT-008-2015). Null sin radio."},
+        {"path": "battery_mv", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Enlace USB: tensión de la pila del radio. Null si su placa no la mide."},
+        {"path": "config_seq", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Enlace USB: número de la última orden de POST /api/radio. Null si no hubo ninguna."},
+        {"path": "config_state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["pending", "applied", "rejected", "not_confirmed"], "unknown_values_ok": true, "note": "Enlace USB: `pending` hasta que el radio la confirma con su número; `applied`, `rejected` (ver `config_error`) o `not_confirmed` si el radio se desconectó antes. Null sin órdenes."},
+        {"path": "config_error", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Enlace USB: por qué el radio rechazó la última orden. Null si no la rechazó."},
+        {"path": "power_limited", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Enlace USB: true si se pidió más del tope y el radio aplicó `max_power_dbm`. Null sin respuesta todavía."}
       ]
     },
     {
@@ -688,7 +702,7 @@
       "path": "/api/radio",
       "channels": ["http", "ble", "usb"],
       "apps": ["ios", "android"],
-      "note": "202 y el estado; el radio lo aplica en su vuelta siguiente (integrado: milisegundos). Claves de más o fuera de rango: 400 invalid_setting. Externo sin radio: 409 radio_not_connected; el integrado guarda y aplica igual.",
+      "note": "202 y el estado; el radio lo aplica en su vuelta siguiente (integrado: milisegundos). Claves de más o fuera de rango: 400 invalid_setting. Externo sin radio: 409 radio_not_connected; el integrado guarda y aplica igual. Externo por USB: aceptada no es confirmada; la respuesta trae `config_seq` y `config_state` = `pending`, y el GET siguiente dice `applied` o `rejected`.",
       "firmware": {"dispatch": ["src/instrument.cpp"], "writers": {"": ["src/radio_module.cpp#status"]}, "readers": ["src/radio_module.cpp#request"]},
       "response": [
         {"path": "state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["connected", "not_connected", "start_failed", "pins_pending"], "unknown_values_ok": true, "note": "Radio externo: connected/not_connected/start_failed. Integrado (0.9.0): connected (chip iniciado), start_failed o pins_pending."},
@@ -712,12 +726,19 @@
         {"path": "radio_id", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Null en el integrado."},
         {"path": "hardware", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"]},
         {"path": "air", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["transmitting", "receiving", "listening", "idle", "radio_error"], "unknown_values_ok": true},
-        {"path": "last_status_age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Solo el radio externo (latido por Wi-Fi). El integrado no la manda."}
+        {"path": "last_status_age_ms", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Solo el radio externo: edad de su último `status` (latido por el USB-C; hasta 0.9.0, por Wi-Fi). El integrado no la manda."},
+        {"path": "link", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["usb"], "unknown_values_ok": true, "note": "Enlace USB-C (docs/radio/USB_LINK.md): `usb` = el radio externo va por el USB-C del receptor y se configura por esta ruta. Ausente en firmwares hasta 0.9.0 (Wi-Fi) y en el integrado."},
+        {"path": "max_power_dbm", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Enlace USB: tope de potencia que aplica el radio (27 dBm, IFT-008-2015). Null sin radio."},
+        {"path": "battery_mv", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Enlace USB: tensión de la pila del radio. Null si su placa no la mide."},
+        {"path": "config_seq", "type": "integer", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Enlace USB: número de la última orden de POST /api/radio. Null si no hubo ninguna."},
+        {"path": "config_state", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "values": ["pending", "applied", "rejected", "not_confirmed"], "unknown_values_ok": true, "note": "Enlace USB: `pending` hasta que el radio la confirma con su número; `applied`, `rejected` (ver `config_error`) o `not_confirmed` si el radio se desconectó antes. Null sin órdenes."},
+        {"path": "config_error", "type": "string", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Enlace USB: por qué el radio rechazó la última orden. Null si no la rechazó."},
+        {"path": "power_limited", "type": "boolean", "nullable": true, "optional": true, "apps": ["ios", "android"], "note": "Enlace USB: true si se pidió más del tope y el radio aplicó `max_power_dbm`. Null sin respuesta todavía."}
       ],
       "request": [
         {"path": "network", "type": "integer", "apps": ["ios", "android"], "optional": true, "note": "0–255."},
         {"path": "channel", "type": "integer", "apps": ["ios", "android"], "optional": true, "note": "0–12 (903–927 MHz)."},
-        {"path": "power_dbm", "type": "integer", "apps": ["ios", "android"], "optional": true, "note": "0–30, a la salida de la E22."}
+        {"path": "power_dbm", "type": "integer", "apps": ["ios", "android"], "optional": true, "note": "0–30, a la salida de la E22. El radio externo por USB aplica como mucho 27 (IFT-008-2015) y lo dice en `power_limited`."}
       ]
     },
     {

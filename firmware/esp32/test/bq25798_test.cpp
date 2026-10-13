@@ -119,6 +119,23 @@ int main() {
         Chip dead; dead.failAfter = 0;
         assert(enterShip(dead) == Ship::bus_error);
     }
+    // HIZ con un radio enlazado por USB (REG0F bit 2): solo toca ese bit y solo si cambia.
+    {
+        Chip chip; configure(chip, 4200, 1000, 1500);
+        chip.written.clear();
+        bool active = false;
+        assert(setHiz(chip, true, active) && active && chip.reg[0x0F] == 0xA6);
+        assert(chip.written == std::set<uint8_t>({0x0F}));
+        chip.written.clear();
+        assert(setHiz(chip, true, active) && active && chip.written.empty());   // ya estaba
+        assert(setHiz(chip, false, active) && !active && chip.reg[0x0F] == 0xA2);
+        // Con HIZ y VBUS el modo ship sigue sin poder entrar (§7.3.12).
+        assert(setHiz(chip, true, active) && active);
+        chip.vbus = true;
+        assert(enterShip(chip) == Ship::vbus_present);
+        Chip dead; dead.failAfter = 0;
+        assert(!setHiz(dead, true, active));
+    }
     // El orden de bytes solo se acepta si VREG da 4.2 V en exactamente uno de los dos.
     {
         const uint8_t msb[2] = {0x01, 0xA4}, lsb[2] = {0xA4, 0x01}, other[2] = {0x03, 0x48};

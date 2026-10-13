@@ -20,8 +20,8 @@ namespace radio_usb {
 // RTCM3 (rtcm3.h): una trama a medias se abandona en cuanto **dentro del búfer** se
 // completa otra posterior con CRC correcto, y se suelta si pasa kStaleFrameMs sin bytes.
 //
-// Sin Arduino a propósito: lo usan los dos firmwares y se prueba con g++
-// (firmware/radio/test/radio_usb_test.cpp).
+// Sin Arduino a propósito: lo usan los dos firmwares (el radio lo incluye con
+// -I ../esp32/lib/protocol/src) y se prueba con g++ (test/radio_usb_test.cpp).
 
 // --- Trama del enlace -----------------------------------------------------------
 // 0xF5 nunca aparece en UTF-8 (ni, por tanto, en JSON ni en el texto del receptor) y
