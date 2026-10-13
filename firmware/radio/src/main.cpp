@@ -1,29 +1,34 @@
-// Módulo de radio LoRa del MeridianV (docs/radio/RADIO_MODULE.md).
+// Módulo de radio LoRa del MeridianV (docs/radio/RADIO_MODULE.md, docs/radio/USB_LINK.md).
 //
-// Tres partes en un bucle:
-//   - Bluetooth: la app le da de alta (red Wi-Fi y contraseña de su MeridianV) y lo
-//     configura; se anuncia como «TresVizo Radio XXXX».
-//   - Wi-Fi: se une a la red propia del MeridianV y abre TCP a su puerta de enlace
-//     (192.168.4.1:2102). Por ahí recibe su papel, el RTCM de la base y la
-//     configuración, y manda su estado cada segundo.
-//   - LoRa (SX1262 de la E22-900M30S): en base transmite el RTCM; en rover lo recibe,
-//     lo rearma con el parser RTCM3 (CRC-24Q) y entrega solo tramas válidas.
+// Dos partes en un bucle:
+//   - USB-C como anfitrión: el MeridianV (dispositivo CDC) se enchufa al radio y por ese
+//     cable van el saludo, el papel, la configuración, el estado y el RTCM crudo. Sin
+//     saludo aceptado el radio no transmite nada ni entrega correcciones.
+//   - LoRa (SX1262 de la E22-900M30S): en base transmite el RTCM que le da el MeridianV;
+//     en rover lo recibe, lo rearma con el parser RTCM3 (CRC-24Q) y le entrega solo
+//     tramas válidas.
+// La consola de depuración va por UART0 (el USB nativo es el enlace).
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include <BLE2902.h>
-#include <BLEDevice.h>
-#include <BLEServer.h>
 #include <RadioLib.h>
 #include <SPI.h>
-#include <WiFi.h>
-#include <freertos/semphr.h>
 #include <esp_app_format.h>
 #include <esp_image_format.h>
+#include <esp_system.h>
 #include "radio_air.h"
 #include "radio_config.h"
-#include "signed_firmware.h"
-#include "radio_link.h"
+#include "radio_usb.h"
 #include "rtcm3.h"
+#include "signed_firmware.h"
+#include "usb_cdc_host.h"
+#include "usb_session.h"
+
+#ifndef RADIO_PIN_VBAT
+#define RADIO_PIN_VBAT -1
+#endif
+#ifndef RADIO_VBAT_DIVIDER
+#define RADIO_VBAT_DIVIDER 2.0f
+#endif
 
 // Identidad de la imagen en la sección que ESP-IDF deja tras el descriptor de
 // aplicación (byte 288: versión; byte 320: placa), igual que el MeridianV. Así el
@@ -35,30 +40,17 @@ const signed_firmware::BoardFirmwareIdentity kImageIdentity __attribute__((secti
     {signed_firmware::makeIdentity(RADIO_VERSION), RADIO_HARDWARE_ID};
 
 namespace {
+using usb_session::Role;
+
 // --- Tiempos y límites (con su motivo) ---------------------------------------------
-// El MeridianV corta la conexión si pasan 5 s sin estado; uno por segundo deja margen.
-constexpr uint32_t kStatusPeriodMs = 1000;
-// Reintento de Wi-Fi y TCP: rápido para que al encender el MeridianV se enganche
-// enseguida, sin saturar al equipo si todavía no ha levantado su red.
-constexpr uint32_t kReconnectMs = 2000;
 // RTCM de la base más viejo que esto ya no le sirve al rover: se tira antes de
 // transmitirlo (el receptor admite correcciones de pocos segundos de edad).
 constexpr uint32_t kMaxFrameAgeMs = 2000;
 constexpr size_t kPendingFrames = 16;
 // Corriente máxima del SX1262 para la etapa que excita al amplificador de la E22.
 constexpr float kCurrentLimitMilliamps = 140.0f;
-constexpr uint16_t kBleMtu = 247;
-
-// UUID del servicio de configuración del radio (docs/radio/RADIO_MODULE.md).
-const char* kServiceUuid = "c04c0001-8f24-4adb-a350-77ef6339c320";
-const char* kConfigUuid = "c04c0002-8f24-4adb-a350-77ef6339c320";
-const char* kStatusUuid = "c04c0003-8f24-4adb-a350-77ef6339c320";
-
-enum class Role : uint8_t { idle, base, rover };
-const char* roleName(Role role) { return role == Role::base ? "base" : role == Role::rover ? "rover" : "idle"; }
 
 radio_config::Settings settings;
-Role role = Role::idle;
 
 // --- LoRa -------------------------------------------------------------------------
 SPIClass loraSpi(FSPI);
@@ -71,43 +63,58 @@ radio_air::Receiver receiver;
 gnss::Rtcm3Parser roverParser;
 uint32_t packetsSent = 0;
 float lastRssiDbm = NAN, lastSnrDb = NAN;
+Role airRole = Role::idle;     // el papel con el que está configurada la radio
 
 void IRAM_ATTR onPacketReceived() { packetArrived = true; }
 
-// --- Enlace con el MeridianV -------------------------------------------------------
-WiFiClient meridianLink;
-radio_link::Decoder decoder;
-uint32_t lastWifiAttempt = 0, lastLinkAttempt = 0, lastStatus = 0;
-bool helloSent = false;
+// --- Enlace USB con el MeridianV ----------------------------------------------------
+usb_session::Session session;
+radio_usb::Demux demux;
+uint32_t usbSession = 0;
+String receiverVersion;
+uint32_t framesToAir = 0, framesFromAir = 0;
 
-struct PendingFrame { uint32_t arrivedMs; uint16_t length; uint8_t bytes[1029]; };
+struct PendingFrame { uint32_t arrivedMs; uint16_t length; uint8_t bytes[radio_usb::kMaxRtcmBytes]; };
 PendingFrame pending[kPendingFrames];
 size_t pendingHead = 0, pendingCount = 0;
 uint32_t framesExpired = 0, framesOverflow = 0;
-
-// --- Bluetooth ---------------------------------------------------------------------
-BLECharacteristic* statusCharacteristic = nullptr;
-SemaphoreHandle_t bleLock = nullptr;
-String bleRequest;          // lo último que escribió la app, para aplicarlo en el bucle
-bool bleRequestPending = false;
-String lastError;
-bool bleClient = false;
 
 void setLed(bool on) {
     if (RADIO_PIN_LED >= 0) digitalWrite(RADIO_PIN_LED, on ? HIGH : LOW);
 }
 
-// Frecuencia, potencia y red según los ajustes; el papel decide si se escucha.
+String radioId() {
+    uint8_t mac[6] = {};
+    esp_efuse_mac_get_default(mac);
+    char text[13];
+    snprintf(text, sizeof(text), "%02X%02X%02X%02X%02X%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    return text;
+}
+
+// --- Radio ----------------------------------------------------------------------------
+// Deja la radio como pide el papel: rover escuchando, base lista para transmitir e idle
+// dormida (3 µA): el radio va con su pila y sin MeridianV no hay nada que hacer.
+void applyAirRole() {
+    pendingCount = 0;
+    packetizer = radio_air::Packetizer();
+    packetizer.network = settings.network;
+    receiver.reset();
+    roverParser.reset();
+    if (!loraReady) return;
+    lora.standby();
+    if (airRole == Role::rover) lora.startReceive();
+    else if (airRole == Role::idle) lora.sleep(true);
+}
+
+// Frecuencia, potencia y red según los ajustes.
 void configureLora() {
+    packetizer.network = settings.network;
+    receiver.network = settings.network;
     if (!loraReady) return;
     lora.standby();
     lora.setFrequency(radio_air::channelHz(settings.channel) / 1e6f);
     lora.setOutputPower(radio_air::chipDbmFor(settings.powerDbm));
-    packetizer.network = settings.network;
-    receiver.network = settings.network;
-    receiver.reset();
-    roverParser.reset();
-    if (role == Role::rover) lora.startReceive();
+    applyAirRole();
 }
 
 void startLora() {
@@ -126,78 +133,119 @@ void startLora() {
     configureLora();
 }
 
-bool sendToMeridian(radio_link::Type type, const uint8_t* payload, size_t length) {
-    if (!meridianLink.connected()) return false;
-    uint8_t wire[radio_link::kHeaderBytes + radio_link::kMaxPayloadBytes];
-    const size_t n = radio_link::encode(type, payload, length, wire, sizeof(wire));
-    return n && meridianLink.write(wire, n) == n;
-}
-
-bool sendJson(radio_link::Type type, JsonDocument& doc) {
-    char text[512];
-    const size_t n = serializeJson(doc, text, sizeof(text));
-    return n && n < sizeof(text) && sendToMeridian(type, reinterpret_cast<const uint8_t*>(text), n);
-}
-
-String radioId() {
-    uint8_t mac[6];
-    WiFi.macAddress(mac);
-    char text[18];
-    snprintf(text, sizeof(text), "%02X%02X%02X%02X%02X%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-    return text;
-}
-
 const char* airState() {
     if (!loraReady) return "radio_error";
-    if (role == Role::base) return "transmitting";
-    if (role == Role::rover) return receiver.accepted ? "receiving" : "listening";
+    if (airRole == Role::base) return "transmitting";
+    if (airRole == Role::rover) return receiver.accepted ? "receiving" : "listening";
     return "idle";
 }
 
-// El mismo estado para el MeridianV y para la app. La contraseña nunca sale.
-void fillStatus(JsonDocument& doc, bool forApp) {
-    doc["radio_version"] = static_cast<const char*>(kImageIdentity.firmware.version);
-    doc["role"] = roleName(role);
+// --- Envío por el USB ---------------------------------------------------------------
+bool sendJson(radio_usb::Type type, JsonDocument& doc) {
+    char text[radio_usb::kMaxPayloadBytes];
+    const size_t n = serializeJson(doc, text, sizeof(text));
+    if (!n || n >= sizeof(text)) return false;
+    uint8_t wire[radio_usb::kMaxFrameBytes];
+    const size_t length = radio_usb::encode(type, reinterpret_cast<const uint8_t*>(text), n, wire, sizeof(wire));
+    return length && usb_cdc_host::write(wire, length);
+}
+
+void putSettings(JsonDocument& doc) {
     doc["network"] = settings.network;
     doc["channel"] = settings.channel;
     doc["power_dbm"] = settings.powerDbm;
+    doc["max_power_dbm"] = radio_config::kMaxOutputDbm;
+}
+
+void sendHello() {
+    JsonDocument doc;
+    doc["protocol"] = radio_usb::kProtocol;
+    doc["radio_version"] = static_cast<const char*>(kImageIdentity.firmware.version);
+    doc["radio_id"] = radioId();
+    doc["hardware"] = static_cast<const char*>(kImageIdentity.hardwareId);
+    putSettings(doc);
+    doc["channels"] = radio_air::kChannelCount;
+    sendJson(radio_usb::Type::hello, doc);
+}
+
+// Estado cada segundo: también es el latido del radio para el MeridianV.
+void sendStatus() {
+    JsonDocument doc;
+    doc["role"] = usb_session::roleName(airRole);
+    putSettings(doc);
     if (isnan(lastRssiDbm)) doc["rssi_dbm"] = nullptr; else doc["rssi_dbm"] = lastRssiDbm;
     if (isnan(lastSnrDb)) doc["snr_db"] = nullptr; else doc["snr_db"] = lastSnrDb;
     doc["packets_sent"] = packetsSent;
     doc["packets_received"] = receiver.accepted;
     doc["packets_lost"] = receiver.lost;
     doc["packets_foreign"] = receiver.foreign;
+    doc["frames_to_air"] = framesToAir;
+    doc["frames_from_air"] = framesFromAir;
     doc["frames_expired"] = framesExpired;
+    doc["frames_overflow"] = framesOverflow;
+    doc["rtcm_rejected"] = roverParser.rejected;
     doc["air"] = airState();
-    if (forApp) {
-        doc["wifi_ssid"] = settings.wifiSsid;
-        doc["wifi"] = WiFi.status() == WL_CONNECTED ? "connected" : "connecting";
-        doc["meridian"] = meridianLink.connected() ? "connected" : "not_connected";
-        if (!loraReady) doc["radio_error_code"] = loraError;
-        if (lastError.length()) doc["error"] = lastError;
+    if (!loraReady) doc["radio_error_code"] = loraError;
+    if (RADIO_PIN_VBAT >= 0) doc["battery_mv"] = int(analogReadMilliVolts(RADIO_PIN_VBAT) * RADIO_VBAT_DIVIDER);
+    else doc["battery_mv"] = nullptr;
+    doc["uptime_s"] = millis() / 1000;
+    const usb_cdc_host::Info usb = usb_cdc_host::info();
+    doc["usb_rx_dropped"] = usb.rxDropped;
+    doc["usb_tx_dropped"] = usb.txDropped;
+    sendJson(radio_usb::Type::status, doc);
+}
+
+// --- Lo que llega del MeridianV --------------------------------------------------------
+void applyConfig(JsonDocument& request) {
+    radio_config::Settings next = settings;
+    String error;
+    bool limited = false;
+    JsonDocument ack;
+    ack["seq"] = request["seq"];
+    if (radio_config::apply(request.as<JsonVariantConst>(), next, error, limited)) {
+        settings = next;
+        ack["ok"] = true;
+        if (!radio_config::save(settings)) ack["saved"] = false;   // vale hasta apagarlo
+        if (limited) ack["power_limited"] = true;
+        configureLora();
+        Serial.printf("Ajustes: red %u, canal %u, %d dBm%s\n", settings.network, settings.channel,
+                      settings.powerDbm, limited ? " (recortado al tope legal)" : "");
+    } else {
+        ack["ok"] = false;
+        ack["error"] = "invalid_setting";
+        ack["message"] = error;
     }
+    putSettings(ack);
+    sendJson(radio_usb::Type::config_ack, ack);
 }
 
-void sendHello() {
+void handleFrame(uint8_t type, const uint8_t* payload, size_t length) {
+    const uint32_t now = millis();
+    session.heard(now);
     JsonDocument doc;
-    doc["radio_version"] = static_cast<const char*>(kImageIdentity.firmware.version);
-    doc["radio_id"] = radioId();
-    doc["hardware"] = static_cast<const char*>(kImageIdentity.hardwareId);
-    doc["network"] = settings.network;
-    doc["channel"] = settings.channel;
-    doc["power_dbm"] = settings.powerDbm;
-    helloSent = sendJson(radio_link::Type::hello, doc);
-}
-
-void setRole(Role next) {
-    if (next == role) return;
-    role = next;
-    pendingCount = 0;
-    if (!loraReady) return;
-    lora.standby();
-    receiver.reset();
-    roverParser.reset();
-    if (role == Role::rover) lora.startReceive();
+    if (deserializeJson(doc, reinterpret_cast<const char*>(payload), length) || !doc.is<JsonObject>()) return;
+    switch (static_cast<radio_usb::Type>(type)) {
+        case radio_usb::Type::welcome: {
+            // Aceptado solo si el receptor habla nuestro protocolo.
+            const bool accepted = (doc["accepted"] | false) && (doc["protocol"] | 0) == radio_usb::kProtocol;
+            const bool wasLinked = session.linked();
+            session.welcome(accepted, now);
+            receiverVersion = doc["receiver_version"] | "";
+            if (!wasLinked) {
+                if (session.linked()) Serial.printf("Enlazado con el MeridianV %s\n", receiverVersion.c_str());
+                else Serial.printf("El MeridianV rechazó el enlace: %s\n", static_cast<const char*>(doc["error"] | "?"));
+            }
+            break;
+        }
+        case radio_usb::Type::role:
+            session.setRole(usb_session::parseRole(doc["role"] | "idle"), now);
+            break;
+        case radio_usb::Type::config:
+            if (session.linked()) applyConfig(doc);
+            break;
+        default:
+            break;   // tipos nuevos que esta versión no conoce: se ignoran
+    }
 }
 
 void queueFrame(const uint8_t* frame, size_t length) {
@@ -211,6 +259,50 @@ void queueFrame(const uint8_t* frame, size_t length) {
     ++pendingCount;
 }
 
+struct LinkHandler {
+    void onFrame(uint8_t type, const uint8_t* payload, size_t length) { handleFrame(type, payload, length); }
+    // RTCM del receptor: solo la base lo transmite.
+    void onRtcm(const uint8_t* frame, size_t length) {
+        if (session.linked() && airRole == Role::base) queueFrame(frame, length);
+    }
+    // Respuestas JSON y texto del receptor (arranque, avisos): no son para el radio.
+    void onLine(const char*, size_t) {}
+    void onLineOverflow() {}
+    void onLineTimeout() {}
+};
+LinkHandler linkHandler;
+
+void serviceUsb() {
+    const uint32_t now = millis();
+    if (usb_cdc_host::open()) {
+        const uint32_t current = usb_cdc_host::session();
+        if (current != usbSession) {             // CDC nuevo: de cero
+            usbSession = current;
+            demux.reset();
+            session.attach(now);
+            const usb_cdc_host::Info usb = usb_cdc_host::info();
+            Serial.printf("USB: CDC %04X:%04X abierto\n", usb.vid, usb.pid);
+        }
+    } else if (session.state != usb_session::State::detached) {
+        session.detach();
+        Serial.println("USB: desconectado");
+    }
+    uint8_t chunk[256];
+    for (size_t n; (n = usb_cdc_host::read(chunk, sizeof(chunk))) > 0;) demux.feed(chunk, n, millis(), linkHandler);
+    demux.tick(millis(), linkHandler);
+    const usb_session::Session::Due due = session.tick(millis());
+    if (due.lost) Serial.println("Enlace: sin latido del MeridianV");
+    if (due.hello) sendHello();
+    if (due.status) sendStatus();
+    // El papel manda sobre la radio: cambia con `role`, al caerse el enlace y al desconectar.
+    if (session.role != airRole) {
+        airRole = session.role;
+        applyAirRole();
+        Serial.printf("Papel: %s\n", usb_session::roleName(airRole));
+    }
+}
+
+// --- Aire -------------------------------------------------------------------------------
 void transmit(const uint8_t* packet, size_t length) {
     if (!loraReady) return;
     if (lora.transmit(packet, length) == RADIOLIB_ERR_NONE) ++packetsSent;
@@ -222,12 +314,21 @@ void serviceBase() {
         PendingFrame& frame = pending[pendingHead];
         pendingHead = (pendingHead + 1) % kPendingFrames; --pendingCount;
         if (millis() - frame.arrivedMs > kMaxFrameAgeMs) { ++framesExpired; continue; }
+        ++framesToAir;
         packetizer.add(frame.bytes, frame.length, millis(), transmit);
     }
     packetizer.tick(millis(), transmit);
 }
 
-// Rover: un paquete llegó; se rearma el RTCM y se entregan las tramas válidas.
+void deliver(const uint8_t* frame, size_t length) {
+    // Cruda, con su CRC: el MeridianV la vuelve a comprobar en su demultiplexor.
+    // Si no cabe en el USB, cuenta en usb_tx_dropped.
+    if (session.linked() && airRole == Role::rover && usb_cdc_host::write(frame, length)) ++framesFromAir;
+}
+
+// Rover: un paquete llegó; se rearma el RTCM y se entregan las tramas válidas. Con
+// reloj (feedAt): una trama a medias sin bytes nuevos durante 1 s se descarta, y una
+// completa y buena detrás de una a medias sale en el acto (rtcm3.h).
 void serviceRover() {
     if (!packetArrived) return;
     packetArrived = false;
@@ -241,144 +342,20 @@ void serviceRover() {
         const uint8_t* chunk = receiver.accept(packet, length, chunkLength, gap);
         if (chunk) {
             if (gap) roverParser.reset();
-            for (size_t i = 0; i < chunkLength; ++i)
-                roverParser.feed(chunk[i], [](const uint8_t* frame, size_t frameLength) {
-                    sendToMeridian(radio_link::Type::rtcm, frame, frameLength);
-                });
+            const uint32_t now = millis();
+            for (size_t i = 0; i < chunkLength; ++i) roverParser.feedAt(chunk[i], now, deliver);
         }
     }
     lora.startReceive();
 }
 
-void handleLinkFrame(radio_link::Type type, const uint8_t* payload, size_t length) {
-    if (type == radio_link::Type::rtcm) {
-        if (role == Role::base) queueFrame(payload, length);
-        return;
-    }
-    JsonDocument doc;
-    if (deserializeJson(doc, reinterpret_cast<const char*>(payload), length)) return;
-    if (type == radio_link::Type::role) {
-        const String name = doc["role"] | "idle";
-        setRole(name == "base" ? Role::base : name == "rover" ? Role::rover : Role::idle);
-    } else if (type == radio_link::Type::config) {
-        radio_config::Settings next = settings;
-        String error;
-        // El MeridianV no toca el Wi-Fi del radio: eso solo por Bluetooth.
-        if (radio_config::apply(doc.as<JsonVariantConst>(), next, error, false)) {
-            settings = next;
-            radio_config::save(settings);
-            configureLora();
-        } else lastError = error;
-    }
-}
-
-void serviceLink() {
-    const uint32_t now = millis();
-    if (WiFi.status() != WL_CONNECTED) {
-        if (meridianLink.connected()) meridianLink.stop();
-        setRole(Role::idle);
-        if (now - lastWifiAttempt > kReconnectMs * 5) {
-            lastWifiAttempt = now;
-            WiFi.disconnect();
-            WiFi.begin(settings.wifiSsid.c_str(), settings.wifiPassword.c_str());
-        }
-        return;
-    }
-    if (!meridianLink.connected()) {
-        setRole(Role::idle);
-        helloSent = false;
-        if (now - lastLinkAttempt < kReconnectMs) return;
-        lastLinkAttempt = now;
-        // El MeridianV es la puerta de enlace de su propia red.
-        if (!meridianLink.connect(WiFi.gatewayIP(), radio_link::kPort, kReconnectMs)) return;
-        meridianLink.setNoDelay(true);
-        decoder.reset();
-        sendHello();
-        lastStatus = 0;
-    }
-    uint8_t buffer[512];
-    while (meridianLink.available() > 0) {
-        const int n = meridianLink.read(buffer, sizeof(buffer));
-        if (n <= 0) break;
-        decoder.feed(buffer, size_t(n), handleLinkFrame);
-        if (decoder.broken) { meridianLink.stop(); return; }
-    }
-    if (now - lastStatus >= kStatusPeriodMs) {
-        lastStatus = now;
-        JsonDocument doc;
-        fillStatus(doc, false);
-        if (!sendJson(radio_link::Type::status, doc)) meridianLink.stop();
-    }
-}
-
-// --- Bluetooth: alta y configuración desde la app ----------------------------------
-class ConfigCallbacks : public BLECharacteristicCallbacks {
-    void onWrite(BLECharacteristic* characteristic) override {
-        const std::string value = characteristic->getValue();
-        xSemaphoreTake(bleLock, portMAX_DELAY);
-        bleRequest = String(value.c_str());
-        bleRequestPending = true;
-        xSemaphoreGive(bleLock);
-    }
-};
-
-class ServerCallbacks : public BLEServerCallbacks {
-    void onConnect(BLEServer*) override { bleClient = true; }
-    void onDisconnect(BLEServer*) override { bleClient = false; BLEDevice::startAdvertising(); }
-};
-
-void startBluetooth() {
-    bleLock = xSemaphoreCreateMutex();
-    uint8_t mac[6];
-    WiFi.macAddress(mac);
-    char name[32];
-    snprintf(name, sizeof(name), "TresVizo Radio %02X%02X", mac[4], mac[5]);
-    BLEDevice::init(name);
-    BLEDevice::setMTU(kBleMtu);
-    BLEServer* server = BLEDevice::createServer();
-    server->setCallbacks(new ServerCallbacks());
-    BLEService* service = server->createService(kServiceUuid);
-    BLECharacteristic* config = service->createCharacteristic(kConfigUuid, BLECharacteristic::PROPERTY_WRITE);
-    config->setCallbacks(new ConfigCallbacks());
-    statusCharacteristic = service->createCharacteristic(
-        kStatusUuid, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
-    statusCharacteristic->addDescriptor(new BLE2902());
-    service->start();
-    BLEAdvertising* advertising = BLEDevice::getAdvertising();
-    advertising->addServiceUUID(kServiceUuid);
-    advertising->setScanResponse(true);
-    BLEDevice::startAdvertising();
-}
-
-void serviceBluetooth() {
-    String request;
-    xSemaphoreTake(bleLock, portMAX_DELAY);
-    if (bleRequestPending) { request = bleRequest; bleRequestPending = false; }
-    xSemaphoreGive(bleLock);
-    if (request.length()) {
-        JsonDocument doc;
-        radio_config::Settings next = settings;
-        String error;
-        if (deserializeJson(doc, request)) lastError = "JSON no válido.";
-        else if (!radio_config::apply(doc.as<JsonVariantConst>(), next, error, true)) lastError = error;
-        else {
-            const bool wifiChanged = next.wifiSsid != settings.wifiSsid || next.wifiPassword != settings.wifiPassword;
-            settings = next;
-            lastError = radio_config::save(settings) ? "" : "No se pudo guardar el ajuste.";
-            configureLora();
-            if (wifiChanged) { meridianLink.stop(); WiFi.disconnect(); lastWifiAttempt = 0; }
-        }
-    }
-    static uint32_t lastNotify = 0;
-    if (millis() - lastNotify >= kStatusPeriodMs) {
-        lastNotify = millis();
-        JsonDocument doc;
-        fillStatus(doc, true);
-        String text;
-        serializeJson(doc, text);
-        statusCharacteristic->setValue(text.c_str());
-        if (bleClient) statusCharacteristic->notify();
-    }
+// LED: fijo enlazado con el MeridianV; parpadeo saludando; destello corto esperando el
+// cable; parpadeo rápido si la radio no arrancó o el MeridianV rechazó el enlace.
+void updateLed(uint32_t now) {
+    if (!loraReady || session.state == usb_session::State::rejected) setLed((now / 100) % 2);
+    else if (session.linked()) setLed(true);
+    else if (session.state == usb_session::State::greeting) setLed((now / 250) % 2);
+    else setLed(now % 2000 < 80);
 }
 }  // namespace
 
@@ -386,20 +363,18 @@ void setup() {
     Serial.begin(115200);
     if (RADIO_PIN_LED >= 0) pinMode(RADIO_PIN_LED, OUTPUT);
     settings = radio_config::load();
-    WiFi.mode(WIFI_STA);
-    WiFi.setAutoReconnect(true);
-    startBluetooth();
-    startLora();
-    WiFi.begin(settings.wifiSsid.c_str(), settings.wifiPassword.c_str());
-    lastWifiAttempt = millis();
+    startLora();   // queda dormida (idle) hasta que el MeridianV le dé papel
+    const bool usbReady = usb_cdc_host::begin();
+    Serial.printf("TresVizo Radio %s (%s). LoRa %s, USB anfitrión %s. Red %u, canal %u, %d dBm.\n",
+                  RADIO_VERSION, radioId().c_str(), loraReady ? "lista" : "con error",
+                  usbReady ? "listo" : "con error", settings.network, settings.channel, settings.powerDbm);
+    if (!loraReady) Serial.printf("RadioLib: error %d\n", loraError);
 }
 
 void loop() {
-    serviceBluetooth();
-    serviceLink();
-    if (role == Role::base) serviceBase();
-    else if (role == Role::rover) serviceRover();
-    // LED: fijo enlazado con el MeridianV; parpadeo lento buscándolo.
-    setLed(meridianLink.connected() || (millis() / 500) % 2);
+    serviceUsb();
+    if (airRole == Role::base) serviceBase();
+    else if (airRole == Role::rover) serviceRover();
+    updateLed(millis());
     delay(1);
 }

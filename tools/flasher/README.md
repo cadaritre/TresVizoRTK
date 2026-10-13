@@ -28,8 +28,10 @@ Sin PlatformIO sirve cualquier Python con `pip install esptool pyserial`.
 ## Pasos
 
 1. **Modelo**: **MeridianV** o **Radio LoRa** (el módulo de radio aparte, con su propio
-   ESP32: `firmware/radio/`, `docs/radio/RADIO_MODULE.md`). El radio no tiene consola USB:
-   no se lee antes ni después de cargarlo; se comprueba desde la app por Bluetooth.
+   ESP32: `firmware/radio/`, `docs/radio/RADIO_MODULE.md`). El radio se carga por su puerto
+   «Carga» (puente USB-UART), no por el USB-C que va al MeridianV, y no tiene consola JSON:
+   no se lee antes ni después de cargarlo; se comprueba conectándolo al MeridianV
+   (`/api/radio`).
 2. **Imagen**: `firmware-signed.bin` (o `firmware.bin`) de `firmware/esp32/.pio/build/<modelo>/`
    o de un paquete de `tools/firmware_package.py`. La ventana dice de qué modelo es, su
    versión y si trae la firma del propietario.
