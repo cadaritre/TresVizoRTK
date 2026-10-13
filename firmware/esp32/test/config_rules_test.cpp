@@ -33,5 +33,18 @@ int main() {
     assert(rescanDelayMs(4, false) == 240000 && rescanDelayMs(40, false) == 240000);
     assert(rescanDelayMs(0, true) == 120000 && rescanDelayMs(2, true) == 120000);
     assert(rescanDelayMs(4, true) == 240000 && rescanDelayMs(UINT32_MAX, true) == 240000);
+    // Red externa: se busca con redes guardadas, sin pausa, sin escaneo en curso
+    // y sin enlace, por orden del usuario o al cumplirse la espera...
+    assert(startStationScan(false, true, false, false, false, true, false));
+    assert(startStationScan(false, true, false, false, false, false, true));
+    assert(!startStationScan(false, true, false, false, false, false, false));
+    assert(!startStationScan(false, false, false, false, false, true, true));
+    assert(!startStationScan(false, true, true, false, false, true, true));
+    assert(!startStationScan(false, true, false, true, false, true, true));
+    assert(!startStationScan(false, true, false, false, true, true, true));
+    // ...pero nunca con el apagado en curso (ni en «solo carga»): volvería a
+    // encender el Wi-Fi, aunque el usuario lo hubiera pedido antes.
+    assert(!startStationScan(true, true, false, false, false, true, true));
+    assert(stationWorkAllowed(false) && !stationWorkAllowed(true));
     return 0;
 }

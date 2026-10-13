@@ -36,6 +36,13 @@ std::atomic<uint8_t> undulation{static_cast<uint8_t>(Undulation::unknown)};
 bool bootQueried=false;
 // Tiempo que se espera a que CONFIG termine de escupir sus lineas.
 constexpr uint32_t kConfigSettleMs = 700;
+// Lectura del receptor al arrancar (ver `tick`): no antes de 5 s y, si el
+// receptor no ha dicho nada, no después de 20 s.
+constexpr uint32_t kBootQueryMinMs = 5000, kBootQueryMaxMs = 20000;
+bool bootReceiverReady(const gnss_receiver::Snapshot& receiver, uint32_t nowMs) {
+    if(!receiver.enabled) return false;
+    return receiver.accepted || receiver.rejected || nowMs > kBootQueryMaxMs;
+}
 const char* phase="idle";
 char line[1024]; size_t length=0;
 
@@ -441,7 +448,15 @@ void tick(HardwareSerial& uart) {
     // Preguntar el modo al arrancar, sin que nadie pulse nada. Sin esto el
     // equipo no sabe si es base hasta que alguien lo consulta, y mientras tanto
     // el cliente NTRIP se reconecta a una base que no necesita correcciones.
-    if(!bootQueried && !running && millis()>5000 && !firmware_update::busy() && gnss_receiver::snapshot().enabled) {
+    //
+    // **Cuándo:** pasados 5 s y con el receptor ya oído (una GGA, válida o no), o a
+    // los 20 s si no habla. En la placa v0.3 el ESP32 enciende el 5 V de la carrier
+    // al arrancar (GPIO45): el UM980 arranca a la vez y, sin esta espera, la única
+    // lectura del modo podía salir antes de que contestara. Sin modo leído el
+    // equipo no se sabe rover ni base: no hay autoconexión NTRIP y el radio queda
+    // en `idle` hasta que alguien pregunte.
+    if(!bootQueried && !running && millis()>kBootQueryMinMs && !firmware_update::busy() &&
+       bootReceiverReady(gnss_receiver::snapshot(),millis())) {
         bootQueried=true;
         count=index=0;sent=ack=readback=false;overflowed=false;failure="";expectedMode="";
         // **Al arrancar se reconcilia, no solo se pregunta.**

@@ -976,6 +976,9 @@ void tick() {
     const uint32_t now = millis();
     if (pendingRestart && config_rules::elapsed(now, restartRequestedAt, 1000) &&
         local_display::prepareRestart()) ESP.restart();
+    // Apagándose (o en «solo carga» del MeridianVI, con el Wi-Fi apagado) no se
+    // escanea ni se une a nada: cualquiera de las dos cosas enciende la radio.
+    const bool stationWork = config_rules::stationWorkAllowed(power_manager::pending());
     if (pendingNetwork && config_rules::elapsed(now, networkChangedAt, 1000)) {
         pendingNetwork = false;
         joinRequested = networkCount > 0;
@@ -990,7 +993,7 @@ void tick() {
         } else {
             const int index = findNetwork(pendingConnectSsid);
             // Si la olvidaron en ese segundo, vuelve la autoconexión normal.
-            if (index >= 0) {
+            if (index >= 0 && stationWork) {
                 connectTo(networks[index]);
             } else {
                 joinRequested = networkCount > 0;
@@ -1005,7 +1008,7 @@ void tick() {
             scanFinishedAt = now;
             // Los resultados se aprovechan venga el escaneo de donde venga: si
             // el equipo está suelto, se une sin pedir otro barrido.
-            if (networkCount && !stationPaused && WiFi.status() != WL_CONNECTED) {
+            if (stationWork && networkCount && !stationPaused && WiFi.status() != WL_CONNECTED) {
                 if (joinBestVisible()) scanMisses = 0;
                 else { lastConnectionAttempt = now; ++scanMisses; }
             }
@@ -1019,9 +1022,10 @@ void tick() {
     if (WiFi.status() == WL_CONNECTED) scanMisses = 0;
     // Una decisión del usuario vuelve a empezar la espera desde 30 s.
     if (joinRequested) scanMisses = 0;
-    if (networkCount && !stationPaused && scanState != ScanState::running && WiFi.status() != WL_CONNECTED &&
-        (joinRequested || config_rules::elapsed(now, lastConnectionAttempt,
-                                                config_rules::rescanDelayMs(scanMisses, WiFi.softAPgetStationNum() > 0)))) {
+    if (config_rules::startStationScan(!stationWork, networkCount > 0, stationPaused, scanState == ScanState::running,
+                                       WiFi.status() == WL_CONNECTED, joinRequested,
+                                       config_rules::elapsed(now, lastConnectionAttempt,
+                                                             config_rules::rescanDelayMs(scanMisses, WiFi.softAPgetStationNum() > 0)))) {
         joinRequested = false;
         startScan();
     }

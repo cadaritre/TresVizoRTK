@@ -61,4 +61,16 @@ inline uint32_t rescanDelayMs(uint32_t misses, bool apClients) {
     if (apClients && delay < kRescanWithApClientsMs) delay = kRescanWithApClientsMs;
     return delay;
 }
+
+// Trabajo automático con la red externa (escanear, unirse, reconectar). Con el
+// apagado en curso no se hace nada: un escaneo o un `WiFi.begin` vuelven a
+// encender la radio Wi-Fi. Eso incluye «sigue alimentado» (MeridianV con USB) y
+// «solo carga» del MeridianVI, que apaga el Wi-Fi a propósito (spec §17.5): con
+// redes guardadas, el siguiente escaneo lo volvía a encender.
+inline bool stationWorkAllowed(bool shutdownPending) { return !shutdownPending; }
+inline bool startStationScan(bool shutdownPending, bool networksSaved, bool paused, bool scanRunning,
+                             bool connected, bool joinRequested, bool backoffElapsed) {
+    if (!stationWorkAllowed(shutdownPending) || !networksSaved || paused || scanRunning || connected) return false;
+    return joinRequested || backoffElapsed;
+}
 }

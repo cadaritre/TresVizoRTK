@@ -12,7 +12,13 @@ JsonDocument status(){JsonDocument d;gnss_control::status(d.to<JsonObject>());re
 int start(const char* json,JsonDocument& out){return gnss_control::start(requestBody(json).as<JsonVariantConst>(),out);}
 int main(){
     receiver.enabled=true;gnss_control::begin();HardwareSerial uart;JsonDocument out;
-    hostMillis=5001;gnss_control::tick(uart);
+    // La lectura del arranque espera a oír al receptor (v0.3: el UM980 arranca con
+    // el ESP32) o, si no habla, a los 20 s.
+    hostMillis=5001;gnss_control::tick(uart);assert(uart.sent.empty());
+    assert(!gnss_control::bootReceiverReady(receiver,5001) && gnss_control::bootReceiverReady(receiver,20001));
+    {gnss_receiver::Snapshot off;assert(!gnss_control::bootReceiverReady(off,30000));}
+    receiver.rejected=1;assert(gnss_control::bootReceiverReady(receiver,5001));receiver.rejected=0;
+    receiver.accepted=1;gnss_control::tick(uart);
     assert(uart.sent.back()=="VERSIONA\r\n"); // inicialización en vuelo
     const uint32_t bootJob=status()["job_id"];
     assert(start("{\"action\":\"mask\",\"elevation_deg\":15}",out)==202);
